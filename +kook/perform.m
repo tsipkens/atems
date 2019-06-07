@@ -1,17 +1,20 @@
+
+function [] = perform_kook(img)
+
 % Code written by Ben Gigone and Emre Karatas, PhD
 % Adapted from Kook et al. 2016, SAE
 % Works on Matlab 2012a or higher + Image RawImage Toolbox
 %
 % This code is modified by Yiling Kang at the University of British
 % Columbia
+% This code was subsequently modified by Timothy Sipkens at the Unversity
+% of British Columbia
+%
 % Check README file for more documentation and information
 
 
 %% Clearing data and closing open windows
-clear
 close all; % close all figure windos
-clc; % clear command window
-warning off;
 
 %% Choose appropriate value for xls_sheet based on Excel version
 xls_sheet = 2; % uncomment if >= Excel 2013
@@ -19,7 +22,6 @@ xls_sheet = 2; % uncomment if >= Excel 2013
 
 
 %% Sensitivity and Scaling Parameters
-%TEMscale = 0.803388; % e.g. 200 nm per 200 pixels in the scale bar...comment this out if user is changing TEM scales every image
 maximgCount = 255; % Maximum image count for 8-bit image 
 SelfSubt = 0.7; % Self-subtraction level 
 mf = 1; % Median filter [x x] if needed 
@@ -35,43 +37,8 @@ report_title = {'Image_ID','Particle Diameter (dp)(nm)','Number of Particles','A
 extracted_text = cell(1,1);
 
 
-%% Load and Run Multiple Images
-img.num = 0; % 0: no image loaded; 1: at least one image loaded
-mainfolder = cd; % getting the directory of the code
 
-% loop continues until at least image is selected or the program is stopped
-while img.num == 0
-    clear img_Dir
-    img_Dir = '..\Images'; % get the directory of the image
-    
-    message = sprintf('Please choose image(s) to be analyzed');
-    uiwait(msgbox(message)); % User must click 'ok' to continue
-    [img.files,img_Dir] = uigetfile({'*.tif;*.jpg',...
-        'TEM image (*.tif;*.jpg)'},'Select Images',img_Dir,'MultiSelect',...
-        'on');% User browses for images. Modify for other image formats
-    img.num = size(img.num,2);
-    
-    if iscell(img.files) == 1 % Handling when only one image is selected
-        img.files = img.files';
-    elseif isempty(img.files) == 1 
-        error('No image was selected');
-    end
-    
-    if img.num == 0
-        % No image is selected
-        pixsize_choise=questdlg('No image was selected! Do you want to try again?', ...
-            'Error','Yes','No. Quit debugging','Yes');
-        if strcmp(pixsize_choise,'No. Quit debugging')
-            uiwait(msgbox('No image was selected and user decided to stop the program'))
-            error('No image was selected and user decided to stop the program');
-        end
-    end
-end
-[img.num,~] = size(img.files); % Total number of images loaded
-% If dpAutomatedDetection is called up as a function… 
-%[dpdist] = dpAutomatedDetection(TEMscale,maximgCount,SelfSubt,mf,alpha,rmin,rmax,sens_val,imgFile); 
-%function[dpdist] = dpAutomatedDetection(TEMscale,maximgCount,SelfSubt,mf,alpha,rmin,rmax,sens_val,imgFile) 
-
+%% Main image processing loop
 for img_counter = 1:img.num % run loop as many times as images selected
 
     %% Loading images one by one
@@ -86,49 +53,10 @@ img.RawImage = imread(['..\Images\',FileName]);
 %img.RawImage = rgb2gray(img.RawImage);
     
 
-%% User inputs the pixel size...use this if the pixel sizes are not all the same. If all the same, uncomment
-%  the pixel size code above
-uiwait(msgbox('Please crop the image close enough to the pixel size for more visibility.'));
+%% Crop footer and get scale
+[img,pixsize] = tools.get_footer_scale(img);
 
-% crops the pixel size so the user can see the numbers more clearly
-img.mag_crop = imcrop(img.RawImage); % crops image
-close(gcf);
-imshow(img.mag_crop); % show cropped image of pixel size
-set(gcf,'Position',get(0,'Screensize')); % maximize figure
-dlg_title = 'Pixel Size';
-promt1 = {'Please insert the pixel size in nm/pixel:'};
-num_lines = 1;
-default_1 = {'0.803388'};
-% user input execution
-TEMscale = str2double(cell2mat(inputdlg(promt1,dlg_title,num_lines,default_1)));
-
-[img,pixsize] = tools.get_scale_img(img);
-
-%% Computer detects TEM data footer and crops it away from image
-% when the program reaches a row of only white pixels, remove everything
-% below it (this is specific to UBC photos). It will do nothing if there is
-% no footer or if the footer is not pure white
-
-footer_found = 0;
-WHITE = 255;
-
-for i = 1:size(img.RawImage,1)
-    if sum(img.RawImage(i,:)) == size(img.RawImage,2)*WHITE && ...
-            footer_found == 0
-        FooterEdge = i;
-        footer_found = 1;
-        img.Cropped = img.RawImage(1:FooterEdge-1, :);
-    end
-end
-
-if footer_found == 0
-    img.Cropped = img.RawImage;
-end
-
-    
-%% Show Cropped Image
-
-figure();imshow(img.Cropped, []);title('Cropped Image');          %FIGURE 1
+figure();imshow(img.Cropped, []);title('Cropped Image'); % Figure 1: cropped iamge
 
 %% Creating a new folder to store data from this image processing program
 % TODO : Add new directory folder for each image and input overlayed image,
@@ -152,7 +80,7 @@ while userFin == 0
 
 %% creating new folder within folder for the individual image
 [~,FName,~] = fileparts(FileName);
-imgFoldName = sprintf('%s_imgAnlys', FName);
+imgFoldName = ['Data\KookOutput\',FName,'_imgAnlys'];
 if exist(imgFoldName, 'dir') ~= 7
     mkdir(imgFoldName)
 end
@@ -166,9 +94,7 @@ imshow(img.Cropped_agg); % show cropped aggregate
 
 aggNum = aggNum + 1;
 
-cropName = sprintf('%s_cropped_%i', FName, aggNum);
-
-saveas(gcf,cropName,'tif');
+saveas(gcf,[imgFoldName,'\cropped_',int2str(aggNum)],'tif');
 
 %% Preprocessing %%
 
@@ -198,8 +124,7 @@ imshow(II1_mf, []);
 title('Step 3: Median filter'); % FIGURE 3 
 
 %% Saving the results of pre-processing
-prepName = sprintf('%s_prep_%i', FName, aggNum);
-saveas(gcf, prepName, 'tif');
+saveas(gcf, [imgFoldName,'\prep_',int2str(aggNum)], 'tif');
 
 %% RawImage : Background erasing, Canny edge detection, background inversion, Circular Hough Transform
 
@@ -218,8 +143,7 @@ figure();
 imshow(BWCED);
 title('Step 5: Canny Edge Detection'); % FIGURE 5
 
-edgeName = sprintf('%s_edge_%i', FName, aggNum);
-saveas(gcf, edgeName, 'tif')
+saveas(gcf, [imgFoldName,'\edge_',int2str(aggNum)], 'tif')
 
 %% Imposing white background onto image so that the program does not detect any background particles
 
@@ -241,8 +165,7 @@ hold;
 h = viscircles(centersCED, radiiCED, 'EdgeColor','r'); 
 title('Step 7: Parimary particles overlaid on the original TEM image'); 
 
-circOrigName = sprintf('%s_circOrig_%i', FName, aggNum);
-saveas(gcf, circOrigName, 'tif')
+saveas(gcf, [imgFoldName,'\',FName,'_circOrig_',int2str(aggNum)], 'tif')
 
 % - check the circle finder by overlaying the CHT boundaries on the original image 
 R = imfuse(BWCED2, img.Cropped_agg,'blend'); 
@@ -251,14 +174,13 @@ R = imfuse(BWCED2, img.Cropped_agg,'blend');
 figure();imshow(R,[],'InitialMagnification',500);hold;h = viscircles(centersCED, radiiCED, 'EdgeColor','r'); 
 title('Step 8: Primary particles overlaid on the Canny edges and the original TEM image');
 
-circAllName = sprintf('%s_circAll_%i', FName, aggNum);
-saveas(gcf, circAllName, 'tif')
+saveas(gcf, [imgFoldName,'\circAll_',int2str(aggNum)], 'tif')
 
 %% Calculate Parameters (Add Histogram)
 
-dpdist = radiiCED*TEMscale*2;
+dpdist = radiiCED*pixsize*2;
 savepics = struct('dpdist', dpdist, 'centersCED', centersCED, 'metriCED', metricCED);
-save(['saved_pictures.mat'], 'savepics'); % Save the results 
+save(['Data\KookOutput\saved_pictures.mat'], 'savepics'); % Save the results 
 
 
 % ------- FIGURE 9 --------
@@ -270,8 +192,7 @@ xlabel('Soot Diameter');
 ylabel('Frequency')
 set(gca, 'fontsize', 16)
 
-hist_name = sprintf('%s_histo_%i', FName, aggNum);
-saveas(gcf, hist_name, 'jpg');
+saveas(gcf, [imgFoldName,'\histo_',int2str(aggNum)], 'jpg');
 
 %% error statement to pause program for debugging purposes
 
@@ -289,7 +210,7 @@ for i=1:1:Totaln
 end
 
 sum = sum/Totaln;
-RoG = sqrt(sum)*TEMscale;
+RoG = sqrt(sum)*pixsize;
 AverageRadius = mean(dpdist);
 NumberofParticles = length(dpdist);
 
@@ -299,7 +220,7 @@ title('Image Binarized');
 text(0.25 * size(binary_cropped, 1), 0.1 * size(binary_cropped, 2), sprintf('Radius of gyration = %6.2f nm', (RoG)),...
     'fontsize', 12, 'fontname','TimesNewRoman');
 
-binName = sprintf('%s_binary_%i', FName, aggNum);
+% binName = sprintf('%s_binary_%i', FName, aggNum);
 % saveas(gcf, binName, 'jpg')
 
 %% Saving Results

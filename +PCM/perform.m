@@ -1,14 +1,17 @@
+
+function [] = perform_PCM(img)
+
 % Pair Correlation Method (PCM)
 % Ramin Dastanpour & Steven N. Rogak
 % Developed at the University of British Columbia
 % Last updated in May 2018
 % Image processing package for the analysis of TEM images. Automatic
 % aggregate detection and automatic primary particle sizing
+%
+% This code was more recently modified by Timothy Sipkens at the University of British Columbia
 
 
 %% Clearing data and closing open windows
-clear
-clc;  % Clear command window
 close all; % Close all figure windows except those created by imtool
 imtool close all;   % Close all figure windows created by imtool
 
@@ -29,7 +32,7 @@ savecounter = 0;
 
 
 %% Housekeeping
-% global mainfolder img img_dir FileName
+% global mainfolder img img.dir FileName
 extracted_text = cell(1,1);
 
 
@@ -40,55 +43,22 @@ report_title = {'Image_ID','Particle Area (nm^2)','Particle Perimeter (nm)',...
     'dp (nm) [simple PCF]','dp (nm) [generalized PCF]','Max resolution (nm)','Engine Type'};
 
 
-%% Loading images; getting image file name and directory
-img.num = 0; % 0: no image loaded; 1: at least one image loaded
-mainfolder = cd; % getting the directory of the code
-% loop continues until at least image is selected or the program is stopped
-
-while img.num == 0
-    img_dir = '..\Images'; % get the directory of the image
-    
-    message = sprintf('Please choose image(s) to be analyzed');
-    
-    [img.files,img_dir] = uigetfile({'*.tif;*.jpg',...
-        'TEM image (*.tif;*.jpg)'},'Select Images',img_dir,'MultiSelect',...
-        'on');% User browses for images. Modify for other image formats
-    img.num = size(img.num,2);
-    if iscell(img.files) == 1 % Handling when only one image is selected
-        img.files = img.files';
-    elseif isempty(img.files) == 1 
-        error('No image was selected');
-    end
-    
-    if img.num == 0 % No image is selected
-        
-        pixsize_choise=questdlg('No image was selected! Do you want to try again?', ...
-            'Error','Yes','No. Quit debugging','Yes');
-        if strcmp(pixsize_choise,'No. Quit debugging')
-            uiwait(msgbox('No image was selected and user decided to stop the program'))
-            error('No image was selected and user decided to stop the program');
-        end
-    end
-end
-[img.num,~] = size(img.files); % Total number of images loaded
-
-
 %% Main image processing loop
 for img_counter = 1:img.num % run loop as many times as images selected
     
     %% Step1: Image preparation
     %% Step1-1: Loading images one-by-one
-    % cd(img_dir); % change active directory to image directory
+    % cd(img.dir); % change active directory to image directory
     if img.num == 1
         FileName = char(img.files); 
     else
         FileName = char(img.files(img_counter,1));
     end
-    img.RawImage = imread([img_dir,FileName]); % read in image
+    img.RawImage = imread([img.dir,FileName]); % read in image
     
     %% Step 1-3: Crop footer and get scale from footer
     
-    [img,pixsize] = tools.get_scale_img(img);
+    [img,pixsize] = tools.get_footer_scale(img);
     
     % Build the image processing coefficients for the image based on its
     % magnification
