@@ -1,6 +1,6 @@
 % Code written by Ben Gigone and Emre Karatas, PhD
 % Adapted from Kook et al. 2016, SAE
-% Works on Matlab 2012a or higher + Image Processing Toolbox
+% Works on Matlab 2012a or higher + Image RawImage Toolbox
 %
 % This code is modified by Yiling Kang at the University of British
 % Columbia
@@ -20,7 +20,7 @@ xls_sheet = 2; % uncomment if >= Excel 2013
 
 %% Sensitivity and Scaling Parameters
 %TEMscale = 0.803388; % e.g. 200 nm per 200 pixels in the scale bar...comment this out if user is changing TEM scales every image
-maxImgCount = 255; % Maximum image count for 8-bit image 
+maximgCount = 255; % Maximum image count for 8-bit image 
 SelfSubt = 0.7; % Self-subtraction level 
 mf = 1; % Median filter [x x] if needed 
 alpha = 0.1; % Shape of the negative Laplacian “unsharp” filter 0?1 0.1
@@ -36,27 +36,28 @@ extracted_text = cell(1,1);
 
 
 %% Load and Run Multiple Images
-Img.num = 0; % 0: no image loaded; 1: at least one image loaded
+img.num = 0; % 0: no image loaded; 1: at least one image loaded
 mainfolder = cd; % getting the directory of the code
 
 % loop continues until at least image is selected or the program is stopped
-while Img.num == 0
-    clear Img_Dir
-    addpath(mainfolder);
-    Img_Dir = cd; % get the directory of the image
-    save Imdirectory.mat Img_Dir mainfolder
+while img.num == 0
+    clear img_Dir
+    img_Dir = '..\Images'; % get the directory of the image
+    
     message = sprintf('Please choose image(s) to be analyzed');
     uiwait(msgbox(message)); % User must click 'ok' to continue
-    [Img.files,Img_Dir] = uigetfile({'*.tif;*.jpg',...
-        'TEM image (*.tif;*.jpg)'},'Select Images',Img_Dir,'MultiSelect',...
+    [img.files,img_Dir] = uigetfile({'*.tif;*.jpg',...
+        'TEM image (*.tif;*.jpg)'},'Select Images',img_Dir,'MultiSelect',...
         'on');% User browses for images. Modify for other image formats
-    Img.num = size(Img.num,2);
-    if iscell(Img.files) == 1 % Handling when only one image is selected
-        Img.files = Img.files';
-    elseif isempty(Img.files) == 1 
+    img.num = size(img.num,2);
+    
+    if iscell(img.files) == 1 % Handling when only one image is selected
+        img.files = img.files';
+    elseif isempty(img.files) == 1 
         error('No image was selected');
     end
-    if Img.num == 0
+    
+    if img.num == 0
         % No image is selected
         pixsize_choise=questdlg('No image was selected! Do you want to try again?', ...
             'Error','Yes','No. Quit debugging','Yes');
@@ -66,34 +67,33 @@ while Img.num == 0
         end
     end
 end
-[Img.num,~] = size(Img.files); % Total number of images loaded
+[img.num,~] = size(img.files); % Total number of images loaded
 % If dpAutomatedDetection is called up as a function… 
-%[dpdist] = dpAutomatedDetection(TEMscale,maxImgCount,SelfSubt,mf,alpha,rmin,rmax,sens_val,ImgFile); 
-%function[dpdist] = dpAutomatedDetection(TEMscale,maxImgCount,SelfSubt,mf,alpha,rmin,rmax,sens_val,ImgFile) 
+%[dpdist] = dpAutomatedDetection(TEMscale,maximgCount,SelfSubt,mf,alpha,rmin,rmax,sens_val,imgFile); 
+%function[dpdist] = dpAutomatedDetection(TEMscale,maximgCount,SelfSubt,mf,alpha,rmin,rmax,sens_val,imgFile) 
 
-for Img_counter = 1:Img.num % run loop as many times as images selected
+for img_counter = 1:img.num % run loop as many times as images selected
 
     %% Loading images one by one
-cd(Img_Dir); % change active directory to image directory
-if Img.num == 1
-    FileName = char(Img.files); 
+if img.num == 1
+    FileName = char(img.files); 
 else
-    FileName = char(Img.files(Img_counter,1));
+    FileName = char(img.files(img_counter,1));
 end
-Img.Processing = imread(FileName);
+img.RawImage = imread(['..\Images\',FileName]);
 
 %remove if necessary
-%Img.Processing = rgb2gray(Img.Processing);
-cd(mainfolder)
+%img.RawImage = rgb2gray(img.RawImage);
     
+
 %% User inputs the pixel size...use this if the pixel sizes are not all the same. If all the same, uncomment
 %  the pixel size code above
 uiwait(msgbox('Please crop the image close enough to the pixel size for more visibility.'));
 
 % crops the pixel size so the user can see the numbers more clearly
-Img.mag_crop = imcrop(Img.Processing); % crops image
+img.mag_crop = imcrop(img.RawImage); % crops image
 close(gcf);
-imshow(Img.mag_crop); % show cropped image of pixel size
+imshow(img.mag_crop); % show cropped image of pixel size
 set(gcf,'Position',get(0,'Screensize')); % maximize figure
 dlg_title = 'Pixel Size';
 promt1 = {'Please insert the pixel size in nm/pixel:'};
@@ -101,6 +101,8 @@ num_lines = 1;
 default_1 = {'0.803388'};
 % user input execution
 TEMscale = str2double(cell2mat(inputdlg(promt1,dlg_title,num_lines,default_1)));
+
+[img,pixsize] = tools.get_scale_img(img);
 
 %% Computer detects TEM data footer and crops it away from image
 % when the program reaches a row of only white pixels, remove everything
@@ -110,35 +112,32 @@ TEMscale = str2double(cell2mat(inputdlg(promt1,dlg_title,num_lines,default_1)));
 footer_found = 0;
 WHITE = 255;
 
-for i = 1:size(Img.Processing,1)
-    if sum(Img.Processing(i,:)) == size(Img.Processing,2)*WHITE && ...
+for i = 1:size(img.RawImage,1)
+    if sum(img.RawImage(i,:)) == size(img.RawImage,2)*WHITE && ...
             footer_found == 0
         FooterEdge = i;
         footer_found = 1;
-        Img.Cropped = Img.Processing(1:FooterEdge-1, :);
+        img.Cropped = img.RawImage(1:FooterEdge-1, :);
     end
 end
 
 if footer_found == 0
-    Img.Cropped = Img.Processing;
+    img.Cropped = img.RawImage;
 end
 
     
 %% Show Cropped Image
 
-figure();imshow(Img.Cropped, []);title('Cropped Image');          %FIGURE 1
+figure();imshow(img.Cropped, []);title('Cropped Image');          %FIGURE 1
 
 %% Creating a new folder to store data from this image processing program
 % TODO : Add new directory folder for each image and input overlayed image,
 % original image, edge detection results, and histogram for each one
 
-cd(Img_Dir) % go to image directory
-
 % checking whether output folder is available
-if exist('KookOutputNew','dir') ~= 7 % 7 if exist parameter is a directory
-    mkdir('KookOutputNew') % make output folder
+if exist('Data\KookOutput','dir') ~= 7 % 7 if exist parameter is a directory
+    mkdir('Data\KookOutput') % make output folder
 end
-cd('KookOutputNew')
 
 %% Begin image processing loop! User begins by cropping one aggregate to analyze
 
@@ -157,15 +156,13 @@ imgFoldName = sprintf('%s_imgAnlys', FName);
 if exist(imgFoldName, 'dir') ~= 7
     mkdir(imgFoldName)
 end
-
-cd(imgFoldName)
     
 %% cropping aggregate photo
 uiwait(msgbox('Please crop an image of the aggregate that you wish to analyze.'));
 
-Img.Cropped_agg = imcrop(Img.Cropped); % user crops aggregate
+img.Cropped_agg = imcrop(img.Cropped); % user crops aggregate
 close(gcf);
-imshow(Img.Cropped_agg); % show cropped aggregate
+imshow(img.Cropped_agg); % show cropped aggregate
 
 aggNum = aggNum + 1;
 
@@ -176,11 +173,11 @@ saveas(gcf,cropName,'tif');
 %% Preprocessing %%
 
 %% Converts cropped image to a binary image
-[binary_cropped] = Agg_det_Slider(Img.Cropped_agg);
+[binary_cropped] = kook.Agg_det_Slider(img.Cropped_agg);
 
 %% fixing background illumination
 se = strel('disk',85);
-II1 = imbothat(Img.Cropped_agg,se);
+II1 = imbothat(img.Cropped_agg,se);
 figure
 imshow(II1,[])
 title('Step 1: Black Top Hat Filter'); % FIGURE 1
@@ -204,19 +201,19 @@ title('Step 3: Median filter'); % FIGURE 3
 prepName = sprintf('%s_prep_%i', FName, aggNum);
 saveas(gcf, prepName, 'tif');
 
-%% Processing : Background erasing, Canny edge detection, background inversion, Circular Hough Transform
+%% RawImage : Background erasing, Canny edge detection, background inversion, Circular Hough Transform
 
 %% Erasing background by multiplying binary image with grayscale image
-Img.Analyze = double(binary_cropped) .* double(II1_mf);
+img.Analyze = double(binary_cropped) .* double(II1_mf);
 figure();
-imshow(Img.Analyze, []);
+imshow(img.Analyze, []);
 title('Step 4: Background Erasing') % FIGURE 4
 
 
 %% Canny Edge Detection
 
 % Canny edge detection 
-BWCED = edge(Img.Analyze,'Canny',edge_threshold); 
+BWCED = edge(img.Analyze,'Canny',edge_threshold); 
 figure();
 imshow(BWCED);
 title('Step 5: Canny Edge Detection'); % FIGURE 5
@@ -239,7 +236,7 @@ title('Step 6: Binary Image Overlap') % FIGURE 6
 
 % - draw circles  ----- FIGURE 7 -------
 figure();
-imshow(Img.Cropped_agg,[]);
+imshow(img.Cropped_agg,[]);
 hold;
 h = viscircles(centersCED, radiiCED, 'EdgeColor','r'); 
 title('Step 7: Parimary particles overlaid on the original TEM image'); 
@@ -248,7 +245,7 @@ circOrigName = sprintf('%s_circOrig_%i', FName, aggNum);
 saveas(gcf, circOrigName, 'tif')
 
 % - check the circle finder by overlaying the CHT boundaries on the original image 
-R = imfuse(BWCED2, Img.Cropped_agg,'blend'); 
+R = imfuse(BWCED2, img.Cropped_agg,'blend'); 
 
 % -------- FIGURE 8 ---------
 figure();imshow(R,[],'InitialMagnification',500);hold;h = viscircles(centersCED, radiiCED, 'EdgeColor','r'); 
@@ -303,10 +300,7 @@ text(0.25 * size(binary_cropped, 1), 0.1 * size(binary_cropped, 2), sprintf('Rad
     'fontsize', 12, 'fontname','TimesNewRoman');
 
 binName = sprintf('%s_binary_%i', FName, aggNum);
-saveas(gcf, binName, 'jpg')
-
-%% Exiting image directory
-cd(mainfolder)
+% saveas(gcf, binName, 'jpg')
 
 %% Saving Results
 extracted_text(1) = {FileName};
@@ -315,34 +309,32 @@ extractedData(2) = AverageRadius;
 extractedData(3) = RoG;
 
 %% Write to EXCEL and saving
-cd(Img_Dir)
-cd('KookOutputNew')
 
-    % saving to mat file
-    if exist('Kook_data.mat','file') == 2
-        save('Kook_data.mat','extractedData','extracted_text','dpdist','-append');
-    else
-        save('Kook_data.mat','extractedData','extracted_text','dpdist','report_title');
-    end
+% saving to mat file
+if exist('Data\KookOutput\Kook_data.mat','file') == 2
+    save('Data\KookOutput\Kook_data.mat','extractedData','extracted_text','dpdist','-append');
+else
+    save('Data\KookOutput\Kook_data.mat','extractedData','extracted_text','dpdist','report_title');
+end
 
 % loop to save each dpdist to the rest of the data
 for i = 1:length(dpdist)
     
-    if exist('Kook_output_new.xls','file') == 2
-        [~,sheets,~] = xlsfinfo('Kook_output_new.xls'); % checking to see if kook_output sheet already exists
+    if exist('Data\KookOutput\Kook_output_new.xls','file') == 2
+        [~,sheets,~] = xlsfinfo('Data\KookOutput\Kook_output_new.xls'); % checking to see if kook_output sheet already exists
         sheetname = char(sheets(1,xls_sheet)); % choosing the second sheet
-        datanum = xlsread('Kook_output_new.xls',sheetname); % loading the data
+        datanum = xlsread('Data\KookOutput\Kook_output_new.xls',sheetname); % loading the data
         starting_row = size(datanum,1) + 2; % finding number of rows and then starting on the next row
-        xlswrite('Kook_output_new.xls',extracted_text,'TEM_Results',['A' num2str(starting_row)]);
-        xlswrite('Kook_output_new.xls',dpdist(i),'TEM_Results',['B' num2str(starting_row)]);
-        xlswrite('Kook_output_new.xls',extractedData,'TEM_Results',['c' num2str(starting_row)]);
+        xlswrite('Data\KookOutput\Kook_output_new.xls',extracted_text,'TEM_Results',['A' num2str(starting_row)]);
+        xlswrite('Data\KookOutput\Kook_output_new.xls',dpdist(i),'TEM_Results',['B' num2str(starting_row)]);
+        xlswrite('Data\KookOutput\Kook_output_new.xls',extractedData,'TEM_Results',['c' num2str(starting_row)]);
         
     else
         savecounter = 1;
-        xlswrite('Kook_output_new.xls',report_title,'TEM_Results','A1');
-        xlswrite('Kook_output_new.xls',extracted_text,'TEM_Results','A2');
-        xlswrite('Kook_output_new.xls',dpdist(i),'TEM_Results','B2');
-        xlswrite('Kook_output_new.xls',extractedData,'TEM_Results','C2');
+        xlswrite('Data\KookOutput\Kook_output_new.xls',report_title,'TEM_Results','A1');
+        xlswrite('Data\KookOutput\Kook_output_new.xls',extracted_text,'TEM_Results','A2');
+        xlswrite('Data\KookOutput\Kook_output_new.xls',dpdist(i),'TEM_Results','B2');
+        xlswrite('Data\KookOutput\Kook_output_new.xls',extractedData,'TEM_Results','C2');
     end
 end
 
@@ -356,7 +348,7 @@ end
 
 end
 
-timer = Img_counter
+timer = img_counter
 
 end
 

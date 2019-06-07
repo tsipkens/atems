@@ -14,10 +14,10 @@ Cropped_img_int = Cropped_image;
 %% Step 1: Image refinment
 
 %% Step 1-1: Apply Lasso tool
-binaryImage = Lasso_fnc(Cropped_img_int);
+binaryImage = kook.Lasso_fnc(Cropped_img_int);
 
 %% Step 1-2: Refining background brightness
-Refined_surf_img = Background_fnc(binaryImage,Cropped_img_int);
+Refined_surf_img = kook.Background_fnc(binaryImage,Cropped_img_int);
 
 %% Step 2: Thresholding
 Thresh_slider_in = Refined_surf_img;
@@ -55,3 +55,5 @@ close(f);
 uiwait(msgbox('Please selects (left click) particles satisfactorily detected; and press enter'));
 Binary_int = bwselect(Binary_Image_4,8);
 NewBW_lasoo = Binary_int;
+
+end

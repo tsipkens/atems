@@ -86,6 +86,26 @@ for img_counter = 1:img.num % run loop as many times as images selected
     end
     img.RawImage = imread([img_dir,FileName]); % read in image
     
+    %% Step 1-3: Crop footer and get scale from footer
+    
+    [img,pixsize] = tools.get_scale_img(img);
+    
+    % Build the image processing coefficients for the image based on its
+    % magnification
+    if pixsize <= 0.181
+        coeffs = coeff_matrix(1,:);
+    elseif pixsize <= 0.361
+        coeffs = coeff_matrix(2,:);
+    else 
+        coeffs = coeff_matrix(3,:);
+    end
+    % displaying the image
+    imshow(img.RawImage);
+    title('processing Image', 'FontSize', fontSize);
+    set(gcf, 'Position', get(0,'Screensize')); % Maximize figure
+    
+    
+    %{
     %% Step1-2: Detecting Magnification and/or pixel size
     % Determining image magnification. Image magnification can be detected
     % automatically if images are taken at UBC. In this case, image footer
@@ -139,42 +159,7 @@ for img_counter = 1:img.num % run loop as many times as images selected
         % user input execution
         pixsize = str2double(cell2mat(inputdlg(promt1,dlg_title,num_lines,default_l)));
     end
-    % Build the image processing coefficients for the image based on its
-    % magnification
-    if pixsize <= 0.181
-        coeffs = coeff_matrix(1,:);
-    elseif pixsize <= 0.361
-        coeffs = coeff_matrix(2,:);
-    else 
-        coeffs = coeff_matrix(3,:);
-    end
-    % displaying the image
-    imshow(img.RawImage);
-    title('processing Image', 'FontSize', fontSize);
-    set(gcf, 'Position', get(0,'Screensize')); % Maximize figure
-    
-    
-    %% Step 1-3: Crop footer away
-    % when the program reaches a row of only white pixels, removes
-    % everything below it (specific to ubc photos). It will do nothing if
-    % there is no footer or the footer is not pure white.
-    footer_found = 0;
-    for i = 1:size(img.RawImage,1)
-        if sum(img.RawImage(i,:)) == size(img.RawImage,2)*255 && ...
-                footer_found == 0
-            
-            FooterEdge   = i;
-            footer_found = 1;
-            img.Cropped  = img.RawImage(1:FooterEdge-1, :);
-            img.Footer  = img.RawImage(1:FooterEdge-1, :);
-            
-        end
-    end
-    
-    if footer_found == 0
-        img.Cropped = img.RawImage;
-    end
-    
+    %}
     
     %% Step 1-4: Saving Cropped image
     close (gcf);
