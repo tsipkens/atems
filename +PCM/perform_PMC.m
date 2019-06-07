@@ -9,14 +9,14 @@
 %% Clearing data and closing open windows
 clear
 clc;  % Clear command window
-close all  % Close all figure windows except those created by imtool
-imtool close all   % Close all figure windows created by imtool
-workspace;  % Make sure that the workspace panel is being displayed
+close all; % Close all figure windows except those created by imtool
+imtool close all;   % Close all figure windows created by imtool
 
 
 %% Choose appropriate value for based on your Excel version
 xls_sheet = 2; % Uncomment this if your default MS Excel version is 2013
 % xls_sheet = 4; % Uncomment this if your default MS Excel version is <2013
+
 
 %% initializing values
 fontSize        = 10;
@@ -26,9 +26,12 @@ coeff_matrix    = [0.2 0.8 0.4 1.1 0.4;0.2 0.3 0.7 1.1 1.8;...
     0.3 0.8 0.5 2.2 3.5;0.1 0.8 0.4 1.1 0.5];
 moreaggs    = 0;
 savecounter = 0;
+
+
 %% Housekeeping
-global mainfolder Img Img_Dir FileName
+% global mainfolder img img_dir FileName
 extracted_text = cell(1,1);
+
 
 %% Report title
 report_title = {'Image_ID','Particle Area (nm^2)','Particle Perimeter (nm)',...
@@ -38,27 +41,27 @@ report_title = {'Image_ID','Particle Area (nm^2)','Particle Perimeter (nm)',...
 
 
 %% Loading images; getting image file name and directory
-Img.num = 0; % 0: no image loaded; 1: at least one image loaded
+img.num = 0; % 0: no image loaded; 1: at least one image loaded
 mainfolder = cd; % getting the directory of the code
 % loop continues until at least image is selected or the program is stopped
-while Img.num == 0
-    clear Img_Dir
-    addpath(mainfolder);
-    Img_Dir = cd; % get the directory of the image
-    save Imdirectory.mat Img_Dir mainfolder
+
+while img.num == 0
+    img_dir = '..\Images'; % get the directory of the image
+    
     message = sprintf('Please choose image(s) to be analyzed');
-    uiwait(msgbox(message)); % User must click 'ok' to continue
-    [Img.files,Img_Dir] = uigetfile({'*.tif;*.jpg',...
-        'TEM image (*.tif;*.jpg)'},'Select Images',Img_Dir,'MultiSelect',...
+    
+    [img.files,img_dir] = uigetfile({'*.tif;*.jpg',...
+        'TEM image (*.tif;*.jpg)'},'Select Images',img_dir,'MultiSelect',...
         'on');% User browses for images. Modify for other image formats
-    Img.num = size(Img.num,2);
-    if iscell(Img.files) == 1 % Handling when only one image is selected
-        Img.files = Img.files';
-    elseif isempty(Img.files) == 1 
+    img.num = size(img.num,2);
+    if iscell(img.files) == 1 % Handling when only one image is selected
+        img.files = img.files';
+    elseif isempty(img.files) == 1 
         error('No image was selected');
     end
-    if Img.num == 0
-        % No image is selected
+    
+    if img.num == 0 % No image is selected
+        
         pixsize_choise=questdlg('No image was selected! Do you want to try again?', ...
             'Error','Yes','No. Quit debugging','Yes');
         if strcmp(pixsize_choise,'No. Quit debugging')
@@ -67,22 +70,23 @@ while Img.num == 0
         end
     end
 end
-[Img.num,~] = size(Img.files); % Total number of images loaded
+[img.num,~] = size(img.files); % Total number of images loaded
 
 
 %% Main image processing loop
-for Img_counter = 1:Img.num % run loop as many times as images selected
+for img_counter = 1:img.num % run loop as many times as images selected
+    
     %% Step1: Image preparation
     %% Step1-1: Loading images one-by-one
-    cd(Img_Dir); % change active directory to image directory
-    if Img.num == 1
-        FileName = char(Img.files); 
+    % cd(img_dir); % change active directory to image directory
+    if img.num == 1
+        FileName = char(img.files); 
     else
-        FileName = char(Img.files(Img_counter,1));
+        FileName = char(img.files(img_counter,1));
     end
-    Img.Processing = imread(FileName);
-    cd(mainfolder)
+    img.RawImage = imread([img_dir,FileName]); % read in image
     
+    %{
     %% Step1-2: Detecting Magnification and/or pixel size
     % Determining image magnification. Image magnification can be detected
     % automatically if images are taken at UBC. In this case, image footer
@@ -97,12 +101,13 @@ for Img_counter = 1:Img.num % run loop as many times as images selected
         'Use scale bar',...
         'Insert pixel size manually',...
         'UBC -> Automatic detection');
+    
     if strcmp(pixsize_choise,'Use scale bar')
         % manually choosing the magnification
         uiwait(msgbox('Please crop the image close enough to the magnification bar'))
-        Img.mag_crop = imcrop(Img.Processing); % crop image
+        img.mag_crop = imcrop(img.RawImage); % crop image
         close (gcf);
-        imshow(Img.mag_crop); % Show Cropped image
+        imshow(img.mag_crop); % Show Cropped image
         set(gcf,'Position',get(0,'Screensize')); % Maximize figure.
         hold on
         uiwait(msgbox('Click on a point at the start (left) of the scale bar, then on a point at the end (right) of the scale bar'));
@@ -124,9 +129,9 @@ for Img_counter = 1:Img.num % run loop as many times as images selected
         close all
     elseif strcmp(pixsize_choise,'Insert pixel size manually')
         close (gcf);
-        Img.mag_crop = imcrop(Img.Processing); %crop image
+        img.mag_crop = imcrop(img.RawImage); %crop image
         close (gcf);
-        imshow(Img.mag_crop); % Show Cropped image
+        imshow(img.mag_crop); % Show Cropped image
         set(gcf,'Position',get(0,'Screensize')); % Maximize figure.
         dlg_title = 'Pixel size';
         promt1 = {'Please insert the pixel size in nm/pixel:'};
@@ -135,6 +140,12 @@ for Img_counter = 1:Img.num % run loop as many times as images selected
         % user input execution
         pixsize = str2double(cell2mat(inputdlg(promt1,dlg_title,num_lines,default_l)));
     end
+    %}
+    
+    %% Step 1-3: Crop footer and get scale from footer
+    
+    [img,pixsize] = tools.get_scale_img(img);
+    
     % Build the image processing coefficients for the image based on its
     % magnification
     if pixsize <= 0.181
@@ -145,69 +156,47 @@ for Img_counter = 1:Img.num % run loop as many times as images selected
         coeffs = coeff_matrix(3,:);
     end
     % displaying the image
-    imshow(Img.Processing);
+    imshow(img.RawImage);
     title('processing Image', 'FontSize', fontSize);
     set(gcf, 'Position', get(0,'Screensize')); % Maximize figure
     
-    %% Step 1-3: Crop footer away
-    % when the program reaches a row of only white pixels, removes
-    % everything below it (specific to ubc photos). It will do nothing if
-    % there is no footer or the footer is not pure white.
-    footer_found = 0;
-    for i = 1:size(Img.Processing,1)
-        if sum(Img.Processing(i,:)) == size(Img.Processing,2)*255 && ...
-                footer_found == 0
-            
-            FooterEdge   = i;
-            footer_found = 1;
-            Img.Cropped  = Img.Processing(1:FooterEdge-1, :);
-            
-        end
-    end
-    
-    if footer_found == 0
-        Img.Cropped = Img.Processing;
-    end
     
     %% Step 1-4: Saving Cropped image
-    close (gcf);                                                               
-    cd(Img_Dir) % go to the image directry
+    close (gcf);
     
     %checking whether the Output folder is available 
-    dirName = sprintf('PCMOutput');
+    dirName = sprintf('Data/PCMOutput');
     
     if exist(dirName,'dir') ~= 7 % 7 if exist parameter is a directory
         mkdir(dirName) % make output folder
     end
     
-    cd(dirName)
 %     % save Cropped image as a .tif file. Change to desired format if needed.
 %     imwrite...
-%     (Img.Cropped,[FileName '_CroppedImage_' num2str(Img_counter) '.tif'])
+%     (img.Cropped,[FileName '_CroppedImage_' num2str(img_counter) '.tif'])
 %     cd(mainfolder) % return to the code directry
     
+
     %% Step 2: automatic/semi-automatic aggregate detection
-    Img.Binary = Agg_detection(pixsize,moreaggs,minparticlesize,coeffs);
-    cd (Img_Dir)
-    cd (dirName)
+    img.Binary = PCM.Agg_detection(img,pixsize,moreaggs,minparticlesize,coeffs);
     
-    Img.Edge        = edge(Img.Binary,'sobel');
+    img.Edge        = edge(img.Binary,'sobel'); % Sobel edge detection
     SE              = strel('disk',1);
-    Img.DilatedEdge = imdilate(Img.Edge,SE);
+    img.DilatedEdge = imdilate(img.Edge,SE); % morphological dilation
     
-    clear Img.Edge SE2
-    Img.Imposed = imimposemin(Img.Cropped, Img.DilatedEdge);
-    imwrite(Img.Imposed,FileName,'tif')
+    clear img.Edge SE2
+    img.Imposed = imimposemin(img.Cropped, img.DilatedEdge);
+    
     
     %% Step 3: Automatic primary particle sizing
     %% Step 3-1: Find and size all particles on the final binary image
-    CC = bwconncomp(abs(Img.Binary-1));
+    CC = bwconncomp(abs(img.Binary-1));
     NofAggs = CC.NumObjects; % count number of particles
     
     %% Lopp for each aggregate on the image under investigation
     for nAgg = 1:NofAggs
         %% Step 3-2: Prepare an image of the isolated aggregate
-        Agg.Image = zeros(size(Img.Binary));
+        Agg.Image = zeros(size(img.Binary));
         Agg.Image(CC.PixelIdxList{1,nAgg}) = 1;
         
         % Edge Image via Sobel
@@ -221,12 +210,12 @@ for Img_counter = 1:Img.num % run loop as many times as images selected
         SE = strel('disk',1);
         Dilated_Image_edge = imdilate(Image_edge,SE);
         clear Image_edge SE
-        FinalImposedImage = imimposemin(Img.Cropped, Dilated_Image_edge);
+        FinalImposedImage = imimposemin(img.Cropped, Dilated_Image_edge);
         figure
         hold on
         imshow(FinalImposedImage);
 %         %save Binary image as a .tif file. Can be changed to other formats
-%         imwrite(Agg.Image,[FileName '_BinaryImage_' num2str(Img_counter) '.tif'])
+%         imwrite(Agg.Image,[FileName '_BinaryImage_' num2str(img_counter) '.tif'])
         
         %% Step 3-3: Development of the pair correlation function (PCF)
         
@@ -358,7 +347,7 @@ for Img_counter = 1:Img.num % run loop as many times as images selected
         
         %% Plot pair correlation function in line graph format
         filename = 'Pair Correlation Function Plot.jpeg';
-        path     = sprintf('PCF_%d_%d_new',nAgg,Img_counter);
+        path     = sprintf('PCF_%d_%d_new',nAgg,img_counter);
         str      = sprintf('Pair Correlation Line Plot %f ',PCF_simple);
         
         figure, loglog(Radius, smooth(PCF), '-r'), title (str), xlabel ('Radius'), ylabel('PCF(r)')
@@ -373,6 +362,7 @@ for Img_counter = 1:Img.num % run loop as many times as images selected
         clear Agg.Image Image_edge FinalImposedImage Skel skeletonY ...
             skeletonX Agg.Pixels Distance_mat Radius PCF PCF_smoothed ...
             Denamonator row col
+        
         
         %% Step 4: Saving results
         close all
@@ -389,31 +379,26 @@ for Img_counter = 1:Img.num % run loop as many times as images selected
         extracted_text(1)={FileName};
 
         %% Step 4-1: Autobackup
-        cd(Img_Dir)
-        cd('PCMOutput')
-        if exist('PCM_data.mat','file')==2
-            save('PCM_data.mat','extracted_data','extracted_text','-append');
+        if exist('Data\PCMOutput\PCM_data.mat','file')==2
+            save('Data\PCMOutput\PCM_data.mat','extracted_data','extracted_text','-append');
         else
-            save('PCM_data.mat','extracted_data','extracted_text','report_title');
+            save('Data\PCMOutput\PCM_data.mat','extracted_data','extracted_text','report_title');
         end
-        if exist('PCM_Output.xls','file')==2
-            [~,sheets,~] = xlsfinfo('PCM_Output.xls'); %finding info about the excel file
+        if exist('Data\PCMOutput\PCM_Output.xls','file')==2
+            [~,sheets,~] = xlsfinfo('Data\PCMOutput\PCM_Output.xls'); %finding info about the excel file
             sheetname=char(sheets(1,xls_sheet)); % choosing the second sheet
-            [datanum ~]=xlsread('PCM_Output.xls',sheetname); %loading the data
+            [datanum ~]=xlsread('Data\PCMOutput\PCM_Output.xls',sheetname); %loading the data
             starting_row=size(datanum,1)+2;
-            xlswrite('PCM_Output.xls',extracted_text,'TEM_Results',['A' num2str(starting_row)]);
-            xlswrite('PCM_Output.xls',extracted_data,'TEM_Results',['B' num2str(starting_row)]);
+            xlswrite('Data\PCMOutput\PCM_Output.xls',extracted_text,'TEM_Results',['A' num2str(starting_row)]);
+            xlswrite('Data\PCMOutput\PCM_Output.xls',extracted_data,'TEM_Results',['B' num2str(starting_row)]);
         else
             savecounter=1;
-            xlswrite('PCM_Output.xls',report_title,'TEM_Results','A1');
-            xlswrite('PCM_Output.xls',extracted_text,'TEM_Results','A2');
-            xlswrite('PCM_Output.xls',extracted_data,'TEM_Results','B2');
+            xlswrite('Data\PCMOutput\PCM_Output.xls',report_title,'TEM_Results','A1');
+            xlswrite('Data\PCMOutput\PCM_Output.xls',extracted_text,'TEM_Results','A2');
+            xlswrite('Data\PCMOutput\PCM_Output.xls',extracted_data,'TEM_Results','B2');
         end
         
-        cd(mainfolder)
     end
     
-    cd(mainfolder)
-    clear Img.Processing Img.Cropped Img.Binary Img.Edge ...
-        Img.DilatedEdge Img.Imposed CC coeffs Img.mag_crop FileName
+    
 end

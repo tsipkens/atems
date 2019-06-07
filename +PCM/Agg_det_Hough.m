@@ -81,6 +81,7 @@ se = strel('disk',round(d*minparticlesize/pixsize));
 NewBW = imopen(NewBW,se);
 subplot(3,3,7); imshow(NewBW)
 
+
 %% Step 4 Delete blobs under a threshold area size
 CC = bwconncomp(abs(NewBW-1));
 [~,numParts] = size(CC.PixelIdxList);
@@ -100,6 +101,7 @@ clear Edge_Image0 SE2
 FinalImposedImage = imimposemin(Cropped_img, Dilated_Edge_Image);
 figure; imshow(FinalImposedImage);
 
+
 %% Step 5 User interaction
  choice = questdlg('Satisfied with automatic aggregate detection? You will be able to delete non-aggregate noises and add missing particles later. If not, other methods will be used',...
      'Agg detection','Yes','Yes, but reduce noise','No','Yes'); 
@@ -115,4 +117,6 @@ elseif strcmp(choice,'Yes, but reduce noise')
 elseif strcmp(choice,'No') % semi-automatic or manual methods will be used
     Binary_image = [];
     moreaggs = 1;
+end
+
 end

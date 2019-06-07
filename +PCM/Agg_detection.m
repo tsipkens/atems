@@ -1,13 +1,12 @@
-function [Binary_image] = Agg_detection(pixsize,moreaggs,minparticlesize,coeffs) 
+function [Binary_image] = Agg_detection(img,pixsize,moreaggs,minparticlesize,coeffs) 
 % Automatic detection of the aggregates on TEM images
 % Function to be used with the Pair Correlation Method (PCM) package
 % Ramin Dastanpour & Steven N. Rogak
 % Developed at the University of British Columbia
 % 
 
-global Img
 %% Hough transformation
-[Binary_image,moreaggs,choice] = Agg_det_Hough(Img.Cropped,pixsize,moreaggs,minparticlesize,coeffs);
+[Binary_image,moreaggs,choice] = PCM.Agg_det_Hough(img.Cropped,pixsize,moreaggs,minparticlesize,coeffs);
 
 %% Showing detected particles
 % Make masked image so that user can see if particles have been erased or not
@@ -16,7 +15,7 @@ if size(Binary_image,1)~=0
     SE = strel('disk',1);
     Dilated_Edge_Image = imdilate(Edge_Image,SE);
     clear Edge_Image SE
-    FinalImposedImage = imimposemin(Img.Cropped, Dilated_Edge_Image);
+    FinalImposedImage = imimposemin(img.Cropped, Dilated_Edge_Image);
     figure; imshow(FinalImposedImage);
 end
 
@@ -34,24 +33,24 @@ else
 end
 
 %% Finding missing aggregates
-while moreaggs==1;
+while moreaggs==1
     clear choice
     uiwait(msgbox('Please crop the image around missing particle'));
-    [Cropped_img, rect] = imcrop(Img.Cropped); % user crops the image
+    [Cropped_img, rect] = imcrop(img.Cropped); % user crops the image
     [Final_Binary_int,~,choice] = ...
-        Agg_det_Hough(Cropped_img,pixsize,moreaggs,minparticlesize,coeffs);
+        PCM.Agg_det_Hough(Cropped_img,pixsize,moreaggs,minparticlesize,coeffs);
 
    if strcmp(choice,'No')
         %clear rect
         if size(Binary_image,2) == 0
-            Binary_image = zeros(size(Img.Cropped,1),size(Img.Cropped,2))+1;
+            Binary_image = zeros(size(img.Cropped,1),size(img.Cropped,2))+1;
         end
         %% Semi-Automatic selection
         % User draws a freehand (similar to lasso tool in Adope Photoshop)
         % boundary around the missing particle. Background correction and
         % image refinments will be only applied to the interior of this
         % object.
-        [NewBW_lasoo,rect] = Agg_det_Slider(Img.Cropped);
+        [NewBW_lasoo,rect] = PCM.Agg_det_Slider(img.Cropped);
         % Intermediate images are stored in temporary matrices
         TempBW = Binary_image;
         %the black part of the small cropped image is placed on the image
@@ -64,7 +63,7 @@ while moreaggs==1;
         SE = strel('disk',1);
         Dilated_Edge_Image = imdilate(Edge_Image,SE);
         clear Edge_Image SE2
-        FinalImposedImage = imimposemin(Img.Cropped, Dilated_Edge_Image);
+        FinalImposedImage = imimposemin(img.Cropped, Dilated_Edge_Image);
         figure; imshow(FinalImposedImage);
         
         %% Semi-automatic detection
@@ -72,7 +71,7 @@ while moreaggs==1;
             'Agg detection','Yes','No','Yes');
         if strcmp(choice2,'No')
             clear TempBW NewBW_lasoo NewBW
-            [NewBW_lasoo,rect] = Agg_det_Slider(Img.Cropped);
+            [NewBW_lasoo,rect] = Agg_det_Slider(img.Cropped);
             %image is stored in a temporary image
             TempBW = Binary_image;
             %the black part of the small cropped image is placed on the image
@@ -85,7 +84,7 @@ while moreaggs==1;
                 
     else
         if size(Binary_image,2)==0
-            Binary_image=zeros(size(Img.Cropped,1),size(Img.Cropped,2))+1;
+            Binary_image=zeros(size(img.Cropped,1),size(img.Cropped,2))+1;
         end
         TempBW = Binary_image;
         % the black part of the small cropped image is masked on the image
@@ -102,7 +101,7 @@ while moreaggs==1;
     SE = strel('disk',1);
     Dilated_Edge_Image = imdilate(Edge_Image,SE);
     clear Edge_Image0 SE2
-    FinalImposedImage = imimposemin(Img.Cropped, Dilated_Edge_Image);
+    FinalImposedImage = imimposemin(img.Cropped, Dilated_Edge_Image);
     figure; imshow(FinalImposedImage);
     
     choice = questdlg('Are there any particles not detected?',...

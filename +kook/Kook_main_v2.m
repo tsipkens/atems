@@ -17,6 +17,7 @@ warning off;
 xls_sheet = 2; % uncomment if >= Excel 2013
 % xls_sheet = 4 % uncomment if < Excel 2013
 
+
 %% Sensitivity and Scaling Parameters
 %TEMscale = 0.803388; % e.g. 200 nm per 200 pixels in the scale bar...comment this out if user is changing TEM scales every image
 maxImgCount = 255; % Maximum image count for 8-bit image 
@@ -28,9 +29,11 @@ rmin = 30; % Minimum radius in pixel (Keep high enough to eliminate dummies) %62
 sens_val = 0.939;%57; % the sensitivity (0?1) for the circular Hough transform 
 edge_threshold = [0.125 0.190]; % the threshold for finding edges with edge detection
 
+
 %% Excel report title
 report_title = {'Image_ID','Particle Diameter (dp)(nm)','Number of Particles','Average dp (nm)','Radius of Gyration (nm)'};
 extracted_text = cell(1,1);
+
 
 %% Load and Run Multiple Images
 Img.num = 0; % 0: no image loaded; 1: at least one image loaded
