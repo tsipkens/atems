@@ -10,7 +10,7 @@
 
 clc; clear all;
 
-f = double(imread('Images\20180529_A9_007.TIF'));
+f = double(imread('..\Images\20180529_A9_007.TIF'));
 f = f(1:1900,101:2200);
 % f = double(imread('+SplitBregmanTVdenoising\Lena512.png'));
 N = size(f);
@@ -23,8 +23,8 @@ g = f(:);
 
 mu = 20;
 disp('Performing total variation denoising...');
-g_denoise_atv = SplitBregmanTVdenoising.SB_ATV(g,mu,N);
-% g_denoise_itv = SplitBregmanTVdenoising.SB_ITV(g,mu);
+g_denoise_atv = totalVar.SB_ATV(g,mu,N);
+% g_denoise_itv = totalVar.SB_ITV(g,mu);
 disp('Denoising complete.');
 
 %%
