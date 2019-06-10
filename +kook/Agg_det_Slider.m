@@ -7,7 +7,9 @@ function [NewBW_lasoo] = Agg_det_Slider(Cropped_image)
 % This function applies background correction and thresholding on the
 % user-defined portion of the image.
 % Slider method
+
 global Binary_Image_4 binaryImage Thresh_slider_in
+
 %uiwait(msgbox('Please crop the image around particle you want to analyze.'));
 %[Cropped_img_int, rect] = imcrop(Cropped_image); % user crops image
 Cropped_img_int = Cropped_image;

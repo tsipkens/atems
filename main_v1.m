@@ -12,7 +12,13 @@ disp('Complete.');
 disp(' ');
 
 
-disp('Performing Kook analysis...');
+disp('Performing original Kook analysis...');
+kook_orig.perform(img);
+disp('Complete.');
+disp(' ');
+
+
+disp('Performing modified Kook analysis...');
 kook.perform(img);
 disp('Complete.');
 disp(' ');

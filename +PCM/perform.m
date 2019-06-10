@@ -1,5 +1,5 @@
 
-function [] = perform_PCM(img)
+function [] = perform(img)
 
 % Pair Correlation Method (PCM)
 % Ramin Dastanpour & Steven N. Rogak

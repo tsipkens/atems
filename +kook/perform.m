@@ -1,5 +1,5 @@
 
-function [] = perform_kook(img)
+function [] = perform(img)
 
 % Code written by Ben Gigone and Emre Karatas, PhD
 % Adapted from Kook et al. 2016, SAE
@@ -25,17 +25,16 @@ xls_sheet = 2; % uncomment if >= Excel 2013
 maximgCount = 255; % Maximum image count for 8-bit image 
 SelfSubt = 0.7; % Self-subtraction level 
 mf = 1; % Median filter [x x] if needed 
-alpha = 0.1; % Shape of the negative Laplacian “unsharp” filter 0?1 0.1
-rmax = 80; % Maximum radius in pixel %155
-rmin = 30; % Minimum radius in pixel (Keep high enough to eliminate dummies) %62
-sens_val = 0.939;%57; % the sensitivity (0?1) for the circular Hough transform 
+alpha = 0.1; % Shape of the negative Laplacian “unsharp” filter 0->1 0.1
+rmax = 30; % Maximum radius in pixel
+rmin = 4; % Minimum radius in pixel (Keep high enough to eliminate dummies)
+sens_val = 0.75; % the sensitivity (0?1) for the circular Hough transform 
 edge_threshold = [0.125 0.190]; % the threshold for finding edges with edge detection
 
 
 %% Excel report title
 report_title = {'Image_ID','Particle Diameter (dp)(nm)','Number of Particles','Average dp (nm)','Radius of Gyration (nm)'};
 extracted_text = cell(1,1);
-
 
 
 %% Main image processing loop
@@ -138,7 +137,9 @@ title('Step 4: Background Erasing') % FIGURE 4
 %% Canny Edge Detection
 
 % Canny edge detection 
-BWCED = edge(img.Analyze,'Canny',edge_threshold); 
+BWCED = edge(img.Analyze,'Canny');
+% BWCED = edge(img.Analyze,'Canny',edge_threshold);
+
 figure();
 imshow(BWCED);
 title('Step 5: Canny Edge Detection'); % FIGURE 5
