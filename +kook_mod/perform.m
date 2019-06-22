@@ -1,6 +1,7 @@
 
 function [] = perform(img)
-
+% PERFORM Performs modified Kook algorithm.
+%
 % Code written by Ben Gigone and Emre Karatas, PhD
 % Adapted from Kook et al. 2016, SAE
 % Works on Matlab 2012a or higher + Image RawImage Toolbox
@@ -10,7 +11,7 @@ function [] = perform(img)
 % This code was subsequently modified by Timothy Sipkens at the Unversity
 % of British Columbia
 %
-% Check README file for more documentation and information
+% Check README.txt file for more documentation and information
 
 
 %% Clearing data and closing open windows
@@ -83,8 +84,9 @@ imgFoldName = ['Data\KookOutput\',FName,'_imgAnlys'];
 if exist(imgFoldName, 'dir') ~= 7
     mkdir(imgFoldName)
 end
-    
-%% cropping aggregate photo
+
+
+%% Cropping aggregate photo
 uiwait(msgbox('Please crop an image of the aggregate that you wish to analyze.'));
 
 img.Cropped_agg = imcrop(img.Cropped); % user crops aggregate
@@ -95,63 +97,11 @@ aggNum = aggNum + 1;
 
 saveas(gcf,[imgFoldName,'\cropped_',int2str(aggNum)],'tif');
 
-%% Preprocessing %%
 
-%% Converts cropped image to a binary image
-[binary_cropped] = kook.Agg_det_Slider(img.Cropped_agg);
-
-%% fixing background illumination
-se = strel('disk',85);
-II1 = imbothat(img.Cropped_agg,se);
-figure
-imshow(II1,[])
-title('Step 1: Black Top Hat Filter'); % FIGURE 1
+%% Preprocess image
+[img,BWCED2,binary_cropped] = kook_mod.preprocess(img,imgFoldName,aggNum);
 
 
-%% Enhance Contrast
-II1 = imadjust(II1);
-figure()
-imshow(II1, [])
-title('Step 2: Contrast Enhanced');   %FIGURE 2
-
-%% Median Filtering
-
-% - step 3: median filter to remove noise 
-II1_mf = medfilt2(II1); %, [mf mf]); 
-%figure();
-imshow(II1_mf, []);
-title('Step 3: Median filter'); % FIGURE 3 
-
-%% Saving the results of pre-processing
-saveas(gcf, [imgFoldName,'\prep_',int2str(aggNum)], 'tif');
-
-%% RawImage : Background erasing, Canny edge detection, background inversion, Circular Hough Transform
-
-%% Erasing background by multiplying binary image with grayscale image
-img.Analyze = double(binary_cropped) .* double(II1_mf);
-figure();
-imshow(img.Analyze, []);
-title('Step 4: Background Erasing') % FIGURE 4
-
-
-%% Canny Edge Detection
-
-% Canny edge detection 
-BWCED = edge(img.Analyze,'Canny');
-% BWCED = edge(img.Analyze,'Canny',edge_threshold);
-
-figure();
-imshow(BWCED);
-title('Step 5: Canny Edge Detection'); % FIGURE 5
-
-saveas(gcf, [imgFoldName,'\edge_',int2str(aggNum)], 'tif')
-
-%% Imposing white background onto image so that the program does not detect any background particles
-
-BWCED2 = double(~binary_cropped) + double(BWCED);
-figure();
-imshow(BWCED2);
-title('Step 6: Binary Image Overlap') % FIGURE 6
 
 %% Find and Draw Circles Within Aggregates
 
@@ -177,6 +127,7 @@ title('Step 8: Primary particles overlaid on the Canny edges and the original TE
 
 saveas(gcf, [imgFoldName,'\circAll_',int2str(aggNum)], 'tif')
 
+
 %% Calculate Parameters (Add Histogram)
 
 dpdist = radiiCED*pixsize*2;
@@ -199,6 +150,7 @@ saveas(gcf, [imgFoldName,'\histo_',int2str(aggNum)], 'jpg');
 
 %% Binarize Image (Add RoG Calculation) 
 [x,y] = find(binary_cropped == 0);
+
 
 %% Calculating radius of gyration
 
@@ -270,7 +222,7 @@ end
 
 end
 
-timer = img_counter
+timer = img_counter;
 
 end
 

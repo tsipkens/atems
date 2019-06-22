@@ -17,6 +17,8 @@ for i = 1:size(img.RawImage,1)
         footer_found = 1;
         img.Cropped = img.RawImage(1:FooterEdge-1, :);
         img.Footer  = img.RawImage(FooterEdge:end, :);
+        
+        break;
     end
 end
 
