@@ -17,6 +17,7 @@ function u = SB_ATV(g,mu,N)
 % University College London
 % b.tremoulheac@cs.ucl.ac.uk
 % April 2012
+
 g = g(:);
 n = length(g);
 [B Bt BtB] = DiffOper(N);

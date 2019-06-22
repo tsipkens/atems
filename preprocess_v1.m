@@ -1,12 +1,6 @@
-%% This file partially demonstrates the Split Bregman method for Total Variation denoising
-%
-%   SB_ATV.m  Split Bregman Anisotropic Total Variation Denoising
-%   SB_ITV.m  Split Bregman Isotropic Total Variation Denoising
-%
-% Benjamin Trémoulhéac
-% University College London
-% b.tremoulheac@cs.ucl.ac.uk
-% April 2012
+
+% Experimental script used for image segmentation
+
 
 clc; clear all;
 
@@ -23,7 +17,7 @@ g = f(:);
 
 mu = 20;
 disp('Performing total variation denoising...');
-g_denoise_atv = totalVar.SB_ATV(g,mu,N);
+g_denoise_atv = tools.tot_var_SB_ATV(g,mu,N);
 % g_denoise_itv = totalVar.SB_ITV(g,mu);
 disp('Denoising complete.');
 

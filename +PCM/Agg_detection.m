@@ -50,7 +50,7 @@ while moreaggs==1
         % boundary around the missing particle. Background correction and
         % image refinments will be only applied to the interior of this
         % object.
-        [NewBW_lasoo,rect] = PCM.Agg_det_Slider(img.Cropped);
+        [NewBW_lasoo,rect] = thresholding_ui.Agg_det_Slider(img.Cropped);
         % Intermediate images are stored in temporary matrices
         TempBW = Binary_image;
         %the black part of the small cropped image is placed on the image
