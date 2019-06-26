@@ -1,15 +1,17 @@
 
-function [] = perform(img)
-
-% Pair Correlation Method (PCM)
-% Ramin Dastanpour & Steven N. Rogak
-% Developed at the University of British Columbia
-% Last updated in May 2018
+% PERFORM Performs the pair correlation method (PCM) of aggregate characterization
+% 
+% Developed at the University of British Columbia by Ramin Dastanpour and
+% Steven N. Rogak
+%
 % Image processing package for the analysis of TEM images. Automatic
 % aggregate detection and automatic primary particle sizing
 %
-% This code was more recently modified by Timothy Sipkens at the University of British Columbia
+% This code was more recently modified by Timothy Sipkens at the University
+% of British Columbia
+%=========================================================================%
 
+function [] = perform(img)
 
 %% Clearing data and closing open windows
 close all; % Close all figure windows except those created by imtool

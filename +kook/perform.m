@@ -8,7 +8,7 @@
 % Modified by Sanghoon Kook for diesel soot applications on 27 Sep 2014
 % Last update by original authors on 19 Dec 2014 by Sanghoon Kook
 % 
-% Modifications at UBC: 
+% Modifications by UBC: 
 % 1. TEMscale -> pixsize.
 % 2. Included references to img.
 % 3. Updates to commenting.
