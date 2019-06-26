@@ -6,11 +6,12 @@
 %
 % Original code written by Qing Nian Chan on 18 Sep 2014
 % Modified by Sanghoon Kook for diesel soot applications on 27 Sep 2014
-% Last update on 19 Dec 2014 by Sanghoon Kook
+% Last update by original authors on 19 Dec 2014 by Sanghoon Kook
 % 
-% Modifications: 
+% Modifications at UBC: 
 % 1. TEMscale -> pixsize.
 % 2. Included references to img.
+% 3. Updates to commenting.
 %=========================================================================%
 
 function [dpdist] = perform(img)
@@ -20,6 +21,8 @@ function [dpdist] = perform(img)
 %   dpdist  Primary particle size disitrbution of aggregate
 %-------------------------------------------------------------------------%
 
+
+%-- Parse inputs ---------------------------------------------------------%
 if img.num == 1
     FileName = char(img.files); 
 else
@@ -36,11 +39,9 @@ rmax = 30; % Maximum radius in pixel
 rmin = 4; % Minimun radius in pixel
 sens_val = 0.75; % the sensitivity (0->1) for the circular Hough transform
 
-% If dpAutomatedDetection is called up as a function…
-%[dpdist] = dpAutomatedDetection(TEMscale,maxImgCount,SelfSubt,mf,alpha,rmin,rmax,sens_val,ImgFile);
-%function[dpdist] = dpAutomatedDetection(TEMscale,maxImgCount,SelfSubt,mf,alpha,rmin,rmax,sens_val,ImgFile)
 II1 = img.Cropped;
 OriginalImg = II1;
+
 
 
 %== Pre-processing =======================================================% 
@@ -66,6 +67,7 @@ figure();imshow(II1_lt, []);title('Step 3: Unsharp filter');
 %-- Canny edge detection -------------------------------------------------%
 BWCED = edge(II1_lt,'canny'); % perfrom Canny edge detection
 figure();imshow(BWCED);title('Step 4: Canny edge detection');
+
 
 
 %== Main processing steps ================================================%
