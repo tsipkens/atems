@@ -26,5 +26,5 @@ The primary author of the code is Timothy A. Sipkens, who can be
 emailed at [tsipkens@mail.ubc.ca](mailto:tsipkens@mail.ubc.ca). 
 
 The code is the culmination of the work of several individuals, including
-Ramin Dastanpour, Una Trivanovich, Yeshun Ma, Steven Rogak, among 
-others.  
+Ramin Dastanpour, Yiling Kang, Una Trivanovich, Yeshun Ma, Steven Rogak, 
+among others.
