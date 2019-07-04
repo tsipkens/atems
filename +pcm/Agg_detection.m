@@ -6,7 +6,7 @@ function [Binary_image] = Agg_detection(img,pixsize,moreaggs,minparticlesize,coe
 % 
 
 %% Hough transformation
-[Binary_image,moreaggs,choice] = PCM.Agg_det_Hough(img.Cropped,pixsize,moreaggs,minparticlesize,coeffs);
+[Binary_image,moreaggs,choice] = pcm.Agg_det_Hough(img.Cropped,pixsize,moreaggs,minparticlesize,coeffs);
 
 %% Showing detected particles
 % Make masked image so that user can see if particles have been erased or not
@@ -38,7 +38,7 @@ while moreaggs==1
     uiwait(msgbox('Please crop the image around missing particle'));
     [Cropped_img, rect] = imcrop(img.Cropped); % user crops the image
     [Final_Binary_int,~,choice] = ...
-        PCM.Agg_det_Hough(Cropped_img,pixsize,moreaggs,minparticlesize,coeffs);
+        pcm.Agg_det_Hough(Cropped_img,pixsize,moreaggs,minparticlesize,coeffs);
 
    if strcmp(choice,'No')
         %clear rect
