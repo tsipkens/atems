@@ -7,9 +7,9 @@ TEM images.
 
 ### Description and instructions
 
-This software can be used to generate the `.warm` and `.accom` functions 
-used to calculate the thermal accommodation coefficient using molecular 
-dynamics (MD) of gas-surface scattering.
+The software contains multiple MATLAB code designed to compare multiple
+methods of analyzing TEM images of aggregates. These include the 
+particle correlation method (PCM) and Kook method. 
 
 ----------------------------------------------------------------------
 

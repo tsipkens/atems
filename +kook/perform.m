@@ -1,19 +1,28 @@
 
-function [dpdist] = perform(img)
-% PERFORM Original Kook function, virutally unmodified.
-% 
+% PERFORM   Original Kook function, modified only to be incorporated into a function.
 % Automatic primary particle finder v1.2 (works on Matlab 2012a or higher + Image Processing Toolbox)
 % The code implements pre-processing (Median Filter and unsharp masking), Canny edge detection, and
 % Circular Hough Transform.
 %
 % Original code written by Qing Nian Chan on 18 Sep 2014
 % Modified by Sanghoon Kook for diesel soot applications on 27 Sep 2014
-% Last update on 19 Dec 2014 by Sanghoon Kook
+% Last update by original authors on 19 Dec 2014 by Sanghoon Kook
 % 
-% Modifications: 
+% Modifications by UBC: 
 % 1. TEMscale -> pixsize.
 % 2. Included references to img.
+% 3. Updates to commenting.
+%=========================================================================%
 
+function [dpdist] = perform(img)
+%-------------------------------------------------------------------------%
+% Inputs:
+%   img     Image struct to be analyzed
+%   dpdist  Primary particle size disitrbution of aggregate
+%-------------------------------------------------------------------------%
+
+
+%-- Parse inputs ---------------------------------------------------------%
 if img.num == 1
     FileName = char(img.files); 
 else
@@ -30,18 +39,17 @@ rmax = 30; % Maximum radius in pixel
 rmin = 4; % Minimun radius in pixel
 sens_val = 0.75; % the sensitivity (0->1) for the circular Hough transform
 
-% If dpAutomatedDetection is called up as a function…
-%[dpdist] = dpAutomatedDetection(TEMscale,maxImgCount,SelfSubt,mf,alpha,rmin,rmax,sens_val,ImgFile);
-%function[dpdist] = dpAutomatedDetection(TEMscale,maxImgCount,SelfSubt,mf,alpha,rmin,rmax,sens_val,ImgFile)
 II1 = img.Cropped;
 OriginalImg = II1;
 
 
-%% Pre-processing
-%% Step 1: invert
+
+%== Pre-processing =======================================================% 
+%-- Step 1: Invert image greyscale ---------------------------------------%
 if size(OriginalImg,1) > 900
 	II1(950:size(II1,1), 1:250) = 0;% ignore scale bar in the TEM image x 1-250 pixel and y 950-max pixel
 end
+
 II1_bg=SelfSubt*II1; % Self-subtration from the original image
 II1=maxImgCount-II1;
 II1=II1-II1_bg;
@@ -56,12 +64,14 @@ II1_lt = imfilter(II1_mf, f);
 figure();imshow(II1_lt, []);title('Step 3: Unsharp filter');
 
 
-%% Canny edge detection
-BWCED = edge(II1_lt,'canny');
+%-- Canny edge detection -------------------------------------------------%
+BWCED = edge(II1_lt,'canny'); % perfrom Canny edge detection
 figure();imshow(BWCED);title('Step 4: Canny edge detection');
 
 
-%% Find circles within soot aggregates
+
+%== Main processing steps ================================================%
+%-- Find circles within soot aggregates ----------------------------------%
 [centersCED, radiiCED, metricCED] = imfindcircles(BWCED,[rmin rmax],...
     'objectpolarity', 'bright', 'sensitivity', sens_val, 'method', 'TwoStage');
 % - draw circles
@@ -70,13 +80,12 @@ h = viscircles(centersCED, radiiCED, 'EdgeColor','r');
 title('Step 5: Parimary particles overlaid on the original TEM image');
 
 
-%% - Check the circle finder by overlaying the CHT boundaries on the original image
+%-- Check the circle finder ----------------------------------------------%
+%-- Overlaying the CHT boundaries on the original image. 
 R = imfuse(BWCED, OriginalImg,'blend');
 figure();imshow(R,[],'InitialMagnification',500);hold;h = viscircles(centersCED, radiiCED, 'EdgeColor','r');
 title('Step 6: Primary particles overlaid on the Canny edges and the original TEM image');
 dpdist = radiiCED*pixsize*2;
-% save([ImgFile '_dp.mat'], 'dpdist_CED', 'centersCED', 'metricCED'); % Save the results
-% end % for the dpAutomatedDetection function
 
 
 end

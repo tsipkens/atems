@@ -1,28 +1,29 @@
 
-function [] = perform(img)
 % PERFORM Performs modified Kook algorithm.
 %
 % Code written by Ben Gigone and Emre Karatas, PhD
 % Adapted from Kook et al. 2016, SAE
 % Works on Matlab 2012a or higher + Image RawImage Toolbox
 %
-% This code is modified by Yiling Kang at the University of British
-% Columbia
-% This code was subsequently modified by Timothy Sipkens at the Unversity
-% of British Columbia
+% This code is modified by Yiling Kang and Timothy Sipkens at the 
+% University of British Columbia
 %
 % Check README.txt file for more documentation and information
+%=========================================================================%
+
+function [] = perform(img)
 
 
-%% Clearing data and closing open windows
+%-- Clearing data and closing open windows -------------------------------%
 close all; % close all figure windos
 
-%% Choose appropriate value for xls_sheet based on Excel version
+
+%-- Choose appropriate value for xls_sheet based on Excel version --------%
 xls_sheet = 2; % uncomment if >= Excel 2013
 % xls_sheet = 4 % uncomment if < Excel 2013
 
 
-%% Sensitivity and Scaling Parameters
+%-- Sensitivity and Scaling Parameters -----------------------------------%
 maximgCount = 255; % Maximum image count for 8-bit image 
 SelfSubt = 0.7; % Self-subtraction level 
 mf = 1; % Median filter [x x] if needed 
@@ -33,27 +34,24 @@ sens_val = 0.75; % the sensitivity (0?1) for the circular Hough transform
 edge_threshold = [0.125 0.190]; % the threshold for finding edges with edge detection
 
 
-%% Excel report title
+%-- Excel report title ---------------------------------------------------%
 report_title = {'Image_ID','Particle Diameter (dp)(nm)','Number of Particles','Average dp (nm)','Radius of Gyration (nm)'};
 extracted_text = cell(1,1);
 
 
-%% Main image processing loop
+%== Main image processing loop ===========================================%
 for img_counter = 1:img.num % run loop as many times as images selected
 
-    %% Loading images one by one
+%-- Loading images one by one -------%
 if img.num == 1
     FileName = char(img.files); 
 else
     FileName = char(img.files(img_counter,1));
 end
 img.RawImage = imread(['..\Images\',FileName]);
-
-%remove if necessary
-%img.RawImage = rgb2gray(img.RawImage);
     
 
-%% Crop footer and get scale
+%-- Crop footer and get scale --------------------------------------------%
 [img,pixsize] = tools.get_footer_scale(img);
 
 figure();imshow(img.Cropped, []);title('Cropped Image'); % Figure 1: cropped iamge

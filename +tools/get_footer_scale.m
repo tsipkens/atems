@@ -33,6 +33,12 @@ img.ocr = ocr(img.Footer);
 pixsize_end = strfind(img.ocr.Text,' nm/pix')-1;
 if isempty(pixsize_end) % if not found, try nmlpix
     pixsize_end = strfind(img.ocr.Text,' nmlpix')-1;
+    if isempty(pixsize_end)
+        pixsize_end = strfind(img.ocr.Text,' pm/pix')-1;
+        if isempty(pixsize_end)
+            pixsize_end = strfind(img.ocr.Text,' pmlpix')-1;
+        end
+    end
 end
 
 pixsize_start = strfind(img.ocr.Text,'Cal')+5;
