@@ -3,7 +3,6 @@ function [Binary_image] = Agg_detection(img,pixsize,moreaggs,minparticlesize,coe
 % Function to be used with the Pair Correlation Method (PCM) package
 % Ramin Dastanpour & Steven N. Rogak
 % Developed at the University of British Columbia
-% 
 
 %% Hough transformation
 [Binary_image,moreaggs,choice] = pcm.Agg_det_Hough(img.Cropped,pixsize,moreaggs,minparticlesize,coeffs);
