@@ -4,14 +4,12 @@ close all;
 clc;
 
 img_ref = tools.get_img_ref; % generates a set of images to be analyzed
-img.RawImage = tools.get_img(img_ref);
-imshow(img.RawImage);
+img.R = tools.get_img(img_ref);
 
-
-% disp('Performing PCM analysis...');
-% pcm.perform(img_ref);
-% disp('Complete.');
-% disp(' ');
+disp('Performing PCM analysis...');
+pcm.perform(img_ref);
+disp('Complete.');
+disp(' ');
 
 
 % disp('Performing original Kook analysis...');
