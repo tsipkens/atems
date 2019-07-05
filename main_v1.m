@@ -3,23 +3,23 @@ clear;
 close all;
 clc;
 
-img = tools.get_img; % generates a set of images to be analyzed
-
+img_ref = tools.get_img_ref; % generates a set of images to be analyzed
+img = tools.get_img(img_ref);
 
 disp('Performing PCM analysis...');
-PCM.perform(img);
+pcm.perform(img_ref);
 disp('Complete.');
 disp(' ');
 
 
 % disp('Performing original Kook analysis...');
-% kook.perform(img);
+% kook.perform(img_ref);
 % disp('Complete.');
 % disp(' ');
 
 
 % disp('Performing modified Kook analysis...');
-% kook_mod.perform(img);
+% kook_mod.perform(img_ref);
 % disp('Complete.');
 % disp(' ');
 
