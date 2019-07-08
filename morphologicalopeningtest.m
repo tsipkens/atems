@@ -30,10 +30,10 @@ disksizes = 1:1:upperbound;
 figure(3);
 for ii = 1:length(disksizes)
     se = strel('disk',disksizes(ii));
-%     displayimg(imclose(img.Cropped,se),...
-%         ['Disk of Size ',num2str(disksizes(ii)),' px']);
-    displayimg(imopen(img.Cropped,se),...
+    displayimg(imclose(img.Cropped,se),...
         ['Disk of Size ',num2str(disksizes(ii)),' px']);
+%     displayimg(imopen(img.Cropped,se),...
+%         ['Disk of Size ',num2str(disksizes(ii)),' px']);
     
     M(ii) = getframe(gcf); % record current frame
 end
