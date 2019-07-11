@@ -1,8 +1,9 @@
 
 % PERFORM   Original Kook function, modified only to be incorporated into a function.
-% Automatic primary particle finder v1.2 (works on Matlab 2012a or higher + Image Processing Toolbox)
-% The code implements pre-processing (Median Filter and unsharp masking), Canny edge detection, and
-% Circular Hough Transform.
+% Automatic primary particle finder v1.2 (works on Matlab 2012a or higher + 
+% Image Processing Toolbox)
+% The code implements pre-processing (Median Filter and unsharp masking), 
+% Canny edge detection, and  Circular Hough Transform.
 %
 % Original code written by Qing Nian Chan on 18 Sep 2014
 % Modified by Sanghoon Kook for diesel soot applications on 27 Sep 2014
