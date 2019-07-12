@@ -196,7 +196,7 @@ for k = 1:num_img
          
          %% TODO: Utilize the findcenters function somehow
          % I was thinking about putting it here
-         % findcenters(x,y,a,b);
+         % find_centers(x,y,a,b);
 
          % Computing particle position and its alignment
          %

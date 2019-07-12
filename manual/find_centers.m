@@ -1,6 +1,7 @@
-function center = findcenters(x,y,a,b)
-%FINDCENTERS Computes the intersection of the two lines formed by
-%coordinates given by x,y,a,b vectors
+
+% FIND_CENTERS Computes the intersection of the two lines to get particle center.
+% Author: Yehsun Ma, 2019-07-12
+% Notes:
 %   x,y,a,b are single column vectors of two entries denoting the x or y
 %   coordinate at the points the user had clicked on the image during
 %   primary particle sizing.
@@ -8,6 +9,9 @@ function center = findcenters(x,y,a,b)
 %   Utilizes derived formulae to compute the intersection of the linear
 %   functions composed of the provided parameters.  Returns center: a
 %   struct with x and y fields to represent the coordinates of the center.
+%=========================================================================%
+
+function center = find_centers(x,y,a,b)
 
 center = struct;
 
