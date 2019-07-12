@@ -34,7 +34,7 @@ while ii<=length(t0) % loop through characters in json string
             
             %-- Check if in an array -------------------------------------%
             %   Preserve formatting for arrays in arrays
-            if strcmp(t0(ii+1),'[')
+            if strcmp(t0(ii),'[')
                 if inarray; ii=ii+1; continue; end
             end
             
@@ -43,7 +43,9 @@ while ii<=length(t0) % loop through characters in json string
             
             %-- Check if entering array ----------------------------------%
             if ii~=length(t0) % if entering an array, turn inarray variable on
-                if and(strcmp(t0(ii),'['),~strcmp(t0(ii+1),'{'))
+                if and(strcmp(t0(ii),'['),strcmp(t0(ii+1),'['))
+                    inarray = 2;
+                elseif and(strcmp(t0(ii),'['),~strcmp(t0(ii+1),'{'))
                     inarray = 1;
                 end
             end
@@ -51,8 +53,13 @@ while ii<=length(t0) % loop through characters in json string
         case {'}',']'}
             %-- Check if in an array -------------------------------------%
             %   Preserve formatting for arrays in arrays
-            if strcmp(t0(ii+1),']')
-                if inarray; ii=ii+1; continue; end
+            if or(and(inarray==2,strcmp(t0(ii+1),']')),inarray==1)
+                inarray = 0;
+                ii=ii+1;
+            end
+            if and(strcmp(t0(ii),']'),inarray==2)
+                ii=ii+1;
+                continue;
             end
             
             %-- Check if previous line was written -----------------------%
@@ -75,7 +82,9 @@ while ii<=length(t0) % loop through characters in json string
         
         case ','
             %-- Check if line break should be placed after the comma -----%
-            if or(~inarray,(ii-linestart)>(linelength-2*length(tabs)))
+            if any([inarray==0,...
+                and((ii-linestart)>(linelength-2*length(tabs)),inarray==1),...
+                all([(ii-linestart)>(linelength-2*length(tabs)),inarray==2,strcmp(t0(ii+1),'[')])])
                     % only break around commas is not in an array or the line
                     % exceeds the linelength variable
                 fprintf(fid,[tabs,t0(linestart:ii),'\n']);

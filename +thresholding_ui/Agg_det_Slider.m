@@ -61,7 +61,7 @@ h = uicontrol('Position',[100 350 200 40],'String','Continue',...
 message = sprintf('Move the slider to the right or left to change threshold level\nWhen finished, click on continute');
 uiwait(msgbox(message));
 disp('Waiting for the user to apply the threshold to the image');
-uiwait(gcf); 
+uiwait(gcf);
 disp('Thresholding is applied');
 close(f);
 

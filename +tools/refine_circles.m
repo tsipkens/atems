@@ -5,21 +5,28 @@
 %                   roi.Circles objects.
 %=========================================================================%
 
-function [dp] = refine_circles(img,centers,radii)
+function [dp] = refine_circles(img,dp)
+
+radii = dp.radii;
+centers = dp.centers;
 
 figure;
 imshow(img); % display current image
 
-for ii=1:length(radii) % generate a series of roi.Circles objects (with handles)
+for ii=1:25%length(radii) % generate a series of roi.Circles objects (with handles)
     h(ii) = images.roi.Circle(gca,'Center',centers(ii,:),'Radius',radii(ii));
 end
 
-figure(gcf); % display current figure
-m = msgbox('Modify circles using the handles and click OK when complete.');
-uiwait(m); % display message box and wait for the user to click ok
+uicontrol('String','Finished',...
+    'Callback','uiresume(gcbf)','Position',[20 20 60 20]);
 
-dp.radii = [h.Radius]'; % prepare output
-dp.centers = reshape([h.Center],[2,length(h)])';
+uiwait; % wait for use to hit button
+
+iv = isvalid(h);
+if sum(iv)==0; disp('Figure closed: no update occurred.'); return; end
+
+dp.radii = vertcat(h(iv).Radius); % prepare output
+dp.centers = reshape(vertcat(h(iv).Center),[2,sum(iv)])';
 
 close(gcf);
 

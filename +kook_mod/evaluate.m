@@ -44,11 +44,11 @@ for img_counter = 1:img.num % run loop as many times as images selected
 
 %-- Loading images one by one -------%
 if img.num == 1
-    FileName = char(img.fname); 
+    fname = char(img.fname); 
 else
-    FileName = char(img.fname(img_counter,1));
+    fname = char(img.fname(img_counter,1));
 end
-img.RawImage = imread(['..\Images\',FileName]);
+img.RawImage = imread(['..\Images\',fname]);
     
 
 %-- Crop footer and get scale --------------------------------------------%
@@ -77,7 +77,7 @@ aggNum = 0;
 while userFin == 0
 
 %% creating new folder within folder for the individual image
-[~,FName,~] = fileparts(FileName);
+[~,FName,~] = fileparts(fname);
 imgFoldName = ['Data\KookOutput\',FName,'_imgAnlys'];
 if exist(imgFoldName, 'dir') ~= 7
     mkdir(imgFoldName)
@@ -175,7 +175,7 @@ text(0.25 * size(binary_cropped, 1), 0.1 * size(binary_cropped, 2), sprintf('Rad
 % saveas(gcf, binName, 'jpg')
 
 %% Saving Results
-extracted_text(1) = {FileName};
+extracted_text(1) = {fname};
 extractedData(1) = NumberofParticles;
 extractedData(2) = AverageRadius;
 extractedData(3) = RoG;

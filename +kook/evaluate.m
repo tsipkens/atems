@@ -32,7 +32,7 @@ if isempty(opt_plot); opt_plot = 0; end
 img = tools.get_imgs(img_ref); % read in image
 [img,pixsize] = tools.get_footer_scale(img);
 
-II1 = img.Cropped;
+II1 = img(1).Cropped;
 
 
 %== Start original code ==================================================%
@@ -96,10 +96,10 @@ end
 
 
 %-- Generate outputs -----------------------------------------------------%
+dp.method = 'Kook';
 dp.centers = centers; % output in px
 dp.radii = radii; % output in px
 dp.diameters = radii*pixsize*2; % output in nm
-dp.method = 'Kook';
 
 dpdist = radii*pixsize*2;
 
