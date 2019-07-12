@@ -42,21 +42,20 @@ imshow(Thresh_slider_in);
 
 % global  Filtered_Image_2
 level = graythresh(Thresh_slider_in);
-% Add a slider uicontrol
 hst = uicontrol('Style', 'slider',...
     'Min',0-level,'Max',1-level,'Value',.5-level,...
     'Position', [140 480 120 20],...
     'Callback', {@thresholding_ui.Thresh_Slider});
-get(hst,'value')
-% Implemented as a local function
+get(hst,'value') % add a slider uicontrol
+% implemented as a local function
 
-% Add a text uicontrol to label the slider
+% add a text uicontrol to label the slider
 uicontrol('Style','text',...
     'Position', [140 500 120 20],...
     'String','Threshold level')
 
 % Pause debugging while user changes the threshold level by moving the slider
-h = uicontrol('Position',[100 350 200 40],'String','Continue',...
+h = uicontrol('Position',[100 350 200 40],'String','Finished',...
     'Callback','uiresume(gcbf)');
 message = sprintf('Move the slider to the right or left to change threshold level\nWhen finished, click on continute');
 uiwait(msgbox(message));

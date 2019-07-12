@@ -17,21 +17,21 @@ colormap('gray');
 % disp(' ');
 
 
-disp('Performing original Kook analysis...');
-dp = kook.evaluate(img_ref);
-disp('Complete.');
-disp(' ');
-
-
-% disp('Performing modified Kook analysis...');
-% kook_mod.evaluate(img_ref);
+% disp('Performing original Kook analysis...');
+% dp = kook.evaluate(img_ref);
 % disp('Complete.');
 % disp(' ');
 
 
-load('data\data_FlareNet.mat');
-data(1).dp(1) = dp;
-data(1).dp(2) = dp;
-fname = 'sample2.json'; % json file name
-tools.write_json(fname,data); % write formatted json file
+disp('Performing modified Kook analysis...');
+kook_mod.evaluate(img_ref);
+disp('Complete.');
+disp(' ');
+
+
+% load('data\data_FlareNet.mat');
+% data(1).dp(1) = dp;
+% data(1).dp(2) = dp;
+% fname = 'sample2.json'; % json file name
+% tools.write_json(fname,data); % write formatted json file
 

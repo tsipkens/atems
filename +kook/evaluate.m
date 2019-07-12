@@ -96,7 +96,7 @@ end
 
 
 %-- Generate outputs -----------------------------------------------------%
-dp.method = 'Kook';
+dp.method = 'kook';
 dp.centers = centers; % output in px
 dp.radii = radii; % output in px
 dp.diameters = radii*pixsize*2; % output in nm

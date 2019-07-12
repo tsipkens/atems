@@ -11,7 +11,7 @@
 % Check README.txt file for more documentation and information
 %=========================================================================%
 
-function [] = evaluate(img)
+function [dp] = evaluate(img)
 
 
 %-- Clearing data and closing open windows -------------------------------%
@@ -104,14 +104,14 @@ saveas(gcf,[imgFoldName,'\cropped_',int2str(aggNum)],'tif');
 %% Find and Draw Circles Within Aggregates
 
 % Find circles within soot aggregates 
-[centersCED, radiiCED, metricCED] = imfindcircles(BWCED2,[rmin rmax],...
+[centers, radii, metric] = imfindcircles(BWCED2,[rmin rmax],...
     'ObjectPolarity', 'dark', 'Sensitivity', sens_val, 'Method', 'TwoStage'); 
 
 % - draw circles  ----- FIGURE 7 -------
 figure();
 imshow(img.Cropped_agg,[]);
 hold;
-h = viscircles(centersCED, radiiCED, 'EdgeColor','r'); 
+h = viscircles(centers, radii, 'EdgeColor','r'); 
 title('Step 7: Parimary particles overlaid on the original TEM image'); 
 
 saveas(gcf, [imgFoldName,'\',FName,'_circOrig_',int2str(aggNum)], 'tif')
@@ -120,7 +120,7 @@ saveas(gcf, [imgFoldName,'\',FName,'_circOrig_',int2str(aggNum)], 'tif')
 R = imfuse(BWCED2, img.Cropped_agg,'blend'); 
 
 % -------- FIGURE 8 ---------
-figure();imshow(R,[],'InitialMagnification',500);hold;h = viscircles(centersCED, radiiCED, 'EdgeColor','r'); 
+figure();imshow(R,[],'InitialMagnification',500);hold;h = viscircles(centers, radii, 'EdgeColor','r'); 
 title('Step 8: Primary particles overlaid on the Canny edges and the original TEM image');
 
 saveas(gcf, [imgFoldName,'\circAll_',int2str(aggNum)], 'tif')
@@ -128,8 +128,8 @@ saveas(gcf, [imgFoldName,'\circAll_',int2str(aggNum)], 'tif')
 
 %% Calculate Parameters (Add Histogram)
 
-dpdist = radiiCED*pixsize*2;
-savepics = struct('dpdist', dpdist, 'centersCED', centersCED, 'metriCED', metricCED);
+dpdist = radii*pixsize*2;
+savepics = struct('dpdist', dpdist, 'centersCED', centers, 'metriCED', metric);
 save(['Data\KookOutput\saved_pictures.mat'], 'savepics'); % Save the results 
 
 
@@ -223,5 +223,9 @@ end
 timer = img_counter;
 
 end
+
+dp.method = 'kook-mod';
+dp.centers = centers;
+dp.radii = radii;
 
 close all

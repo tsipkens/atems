@@ -1,7 +1,7 @@
 
 % REFINE_CIRCLES    Allows for modification of primary particle sizing.
 % Author:           Timothy Sipkens, 2019-07-04
-% Note:             Modification is doen by moving handles on MATLAB
+% Note:             Modification is done by moving handles on MATLAB
 %                   roi.Circles objects.
 %=========================================================================%
 
