@@ -1,0 +1,14 @@
+function center = findcenters(x,y,a,b)
+%FINDCENTERS Computes the intersection of the two lines formed by
+%coordinates given by x,y,a,b vectors
+%   Utilizes derived formulae to compute the intersection of the linear
+%   functions composed of the provided parameters.  Returns center: a
+%   vector of form [x,y] to represent the coordinates of the center.
+
+x1 = x(1);
+x2 = x(2);
+y1 = y(1);
+y2 = y(2
+
+end
+
