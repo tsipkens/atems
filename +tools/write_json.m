@@ -1,6 +1,6 @@
 
 
-function [t2,t0] = write_json(var,fname)
+function [t2,t0] = write_json(fname,var)
 
 fid = fopen(fname,'wt'); % open file, overwriting previous text
 
@@ -35,8 +35,7 @@ while ii<=length(t0) % loop through characters in json string
             %-- Check if in an array -------------------------------------%
             %   Preserve formatting for arrays in arrays
             if strcmp(t0(ii+1),'[')
-                if inarray; ii=ii+1; end
-                continue
+                if inarray; ii=ii+1; continue; end
             end
             
             [linestart,tabs,inarray] = ...
@@ -53,8 +52,7 @@ while ii<=length(t0) % loop through characters in json string
             %-- Check if in an array -------------------------------------%
             %   Preserve formatting for arrays in arrays
             if strcmp(t0(ii+1),']')
-                if inarray; ii=ii+1; end
-                continue
+                if inarray; ii=ii+1; continue; end
             end
             
             %-- Check if previous line was written -----------------------%

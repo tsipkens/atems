@@ -1,6 +1,8 @@
 
-function [img,pixsize] = get_footer_scale(img)
 % GET_FOOTER_SCALE Crops the footer from the image and determines the scale.
+%=========================================================================%
+
+function [img,pixsize] = get_footer_scale(img)
 
 
 %% Step 1-3: Crop footer away

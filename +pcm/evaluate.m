@@ -1,5 +1,5 @@
 
-% PERFORM Performs the pair correlation method (PCM) of aggregate characterization
+% EVALUATE  Performs the pair correlation method (PCM) of aggregate characterization
 % 
 % Developed at the University of British Columbia by Ramin Dastanpour and
 % Steven N. Rogak
@@ -11,7 +11,7 @@
 % of British Columbia
 %=========================================================================%
 
-function [] = perform(img)
+function [] = evaluate(img)
 
 %% Clearing data and closing open windows
 close all; % Close all figure windows except those created by imtool
@@ -52,11 +52,11 @@ for img_counter = 1:img.num % run loop as many times as images selected
     %% Step1-1: Loading images one-by-one
     % cd(img.dir); % change active directory to image directory
     if img.num == 1
-        FileName = char(img.files); 
+        fname = char(img.fname); 
     else
-        FileName = char(img.files(img_counter,1));
+        fname = char(img.fname(img_counter,1));
     end
-    img.RawImage = imread([img.dir,FileName]); % read in image
+    img.RawImage = imread([img.dir,fname]); % read in image
     
     %% Step 1-3: Crop footer and get scale from footer
     
@@ -291,7 +291,7 @@ for img_counter = 1:img.num % run loop as many times as images selected
         extracted_data(8) = round(2*Agg.RpSimple,2); % dp from simple PCM
         extracted_data(9) = round(2*Agg.RpGeneralized,2); % dp from generalized PCM
         extracted_data(10) = round(pixsize,3);
-        extracted_text(1)={FileName};
+        extracted_text(1)={fname};
 
         %% Step 4-1: Autobackup
         if exist('Data\PCMOutput\PCM_data.mat','file')==2

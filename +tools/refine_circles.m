@@ -1,11 +1,11 @@
 
-% MANUAL_MOD    Allows for modification of primary particle sizing.
-% Author:       Timothy Sipkens, 2019-07-04
-% Note:         Modification is doen by moving handles on MATLAB
-%               roi.Circles objects.
+% REFINE_CIRCLES    Allows for modification of primary particle sizing.
+% Author:           Timothy Sipkens, 2019-07-04
+% Note:             Modification is doen by moving handles on MATLAB
+%                   roi.Circles objects.
 %=========================================================================%
 
-function [dp] = manual_mod(img,centers,radii)
+function [dp] = refine_circles(img,centers,radii)
 
 figure;
 imshow(img); % display current image

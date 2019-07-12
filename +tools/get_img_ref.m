@@ -12,14 +12,14 @@ while img.num == 0
     
     message = sprintf('Please choose image(s) to be analyzed...');
     
-    [img.files,img.dir] = uigetfile({'*.tif;*.jpg',...
+    [img.fname,img.dir] = uigetfile({'*.tif;*.jpg',...
         'TEM image (*.tif;*.jpg)'},'Select Images',dir_start,'MultiSelect',...
         'on');% User browses for images. Modify for other image formats
     img.num = size(img.num,2);
     
-    if iscell(img.files) % Handling when only one image is selected
-        img.files = img.files';
-    elseif img.files==0
+    if iscell(img.fname) % Handling when only one image is selected
+        img.fname = img.fname';
+    elseif img.fname==0
         pixsize_choice=questdlg('No image was selected! Do you want to try again?', ...
             'Error','Yes','No. Quit debugging','Yes');
         
@@ -29,9 +29,11 @@ while img.num == 0
         else
             img.num= 0;
         end
+    else
+        img.fname = {img.fname};
     end
 end
-[img.num,~] = size(img.files); % Total number of images loaded
+[img.num,~] = size(img.fname); % Total number of images loaded
 
 
 end

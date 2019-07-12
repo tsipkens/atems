@@ -1,5 +1,5 @@
 
-% PERFORM Performs modified Kook algorithm.
+% EVALUATE  Performs modified Kook algorithm.
 %
 % Code written by Ben Gigone and Emre Karatas, PhD
 % Adapted from Kook et al. 2016, SAE
@@ -11,7 +11,7 @@
 % Check README.txt file for more documentation and information
 %=========================================================================%
 
-function [] = perform(img)
+function [] = evaluate(img)
 
 
 %-- Clearing data and closing open windows -------------------------------%
@@ -44,9 +44,9 @@ for img_counter = 1:img.num % run loop as many times as images selected
 
 %-- Loading images one by one -------%
 if img.num == 1
-    FileName = char(img.files); 
+    FileName = char(img.fname); 
 else
-    FileName = char(img.files(img_counter,1));
+    FileName = char(img.fname(img_counter,1));
 end
 img.RawImage = imread(['..\Images\',FileName]);
     

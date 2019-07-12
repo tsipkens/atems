@@ -1,9 +1,9 @@
 
-% CREATE_MOVIE  Generates a movie from a series of plots.
+% WRITE_MOVIE   Generates a movie from a series of plots.
 % Author:       Timothy Sipkens, 2019-07-04
 %=========================================================================%
 
-function [v] = create_movie(M,fname)
+function [v] = write_movie(fname,M)
 
 v = VideoWriter(fname,'Motion JPEG AVI');
 
