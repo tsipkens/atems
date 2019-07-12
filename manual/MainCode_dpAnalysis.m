@@ -193,6 +193,10 @@ for k = 1:num_img
 
          width(m,1) = pixsize*sqrt((a(2)-a(1))^2+(b(2) - b(1))^2);
          line ([a(1),a(2)],[b(1),b(2)],'Color', 'r', 'linewidth', 3);
+         
+         %% TODO: Utilize the findcenters function somehow
+         % I was thinking about putting it here
+         % findcenters(x,y,a,b);
 
          % Computing particle position and its alignment
          %
