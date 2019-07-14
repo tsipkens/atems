@@ -8,12 +8,13 @@
 %
 %   Utilizes derived formulae to compute the intersection of the linear
 %   functions composed of the provided parameters.  Returns center: a
-%   struct with x and y fields to represent the coordinates of the center.
+%   two column vector corresponding to the x and y coordinates of the
+%   primary particle
 %=========================================================================%
 
 function center = find_centers(x,y,a,b)
 
-center = struct;
+center = zeros(1,2);
 
 %-- Initialize xy parameters ---------------------------------------------%
 x1 = x(1);
@@ -35,8 +36,9 @@ n = (b1-b2)/(a1-a2);    % For ab line
 fxy = @(x) ((x-x1)*m)+y1;
     
 %-- Assign appropriate fields and return ---------------------------------%
-center.x = ((m*x1)+b1-(n*a1)-y1)/(m-n);
-center.y = fxy(center.x);
+center(1,:) = [((m*x1)+b1-(n*a1)-y1)/(m-n) ...
+    fxy(center.x)];
+% center.y = fxy(center.x);
 
 end
 

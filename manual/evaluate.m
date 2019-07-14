@@ -299,7 +299,7 @@ for k = 1:num_img % run loop as many times as images selected
              line ([a(1),a(2)],[b(1),b(2)],'Color', 'r', 'linewidth', 3);
              
              % Save center coordinate for this primary particle
-             centers(m,1) = find_centers(x,y,a,b);
+             centers(m,:) = find_centers(x,y,a,b);  % TODO: Test this
              
              %
              clear a b x y
