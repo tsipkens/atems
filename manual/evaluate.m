@@ -298,6 +298,9 @@ for k = 1:num_img % run loop as many times as images selected
              width(m,1) = pixsize*sqrt((a(2)-a(1))^2+(b(2) - b(1))^2);
              line ([a(1),a(2)],[b(1),b(2)],'Color', 'r', 'linewidth', 3);
              
+             % Save center coordinate for this primary particle
+             centers(m,1) = find_centers(x,y,a,b);
+             
              %
              clear a b x y
              

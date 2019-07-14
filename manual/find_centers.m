@@ -1,6 +1,6 @@
 
 % FIND_CENTERS Computes the intersection of the two lines to get particle center.
-% Author: Yehsun Ma, 2019-07-12
+% Author: Yeshun (Samuel) Ma, 2019-07-12
 % Notes:
 %   x,y,a,b are single column vectors of two entries denoting the x or y
 %   coordinate at the points the user had clicked on the image during
