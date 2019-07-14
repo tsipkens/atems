@@ -27,7 +27,7 @@ This code was primarily compiled by Timothy A. Sipkens while at the
 University of British Columbia (UBC), who can be emailed at
 [tsipkens@mail.ubc.ca](mailto:tsipkens@mail.ubc.ca). The code
 itself was compiled from various sources and features code written by
-several individuals at UBC, including Yeshun Ma, Ramin Dastanpour,
+several individuals at UBC, including Yeshun (Samuel) Ma, Ramin Dastanpour,
 Yiling Kang, Una Trivanovich, and Steven Rogak, among others.
 
 Also featured is the original MATLAB code of Kook et al.

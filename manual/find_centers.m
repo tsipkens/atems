@@ -15,26 +15,26 @@ function center = find_centers(x,y,a,b)
 
 center = struct;
 
-%% Initialize xy parameters
+%-- Initialize xy parameters ---------------------------------------------%
 x1 = x(1);
 x2 = x(2);
 y1 = y(1);
 y2 = y(2);
 
-%% Initialize ab parameters
+%-- Initialize ab parameters ---------------------------------------------%
 a1 = a(1);
 a2 = a(2);
 b1 = b(1);
 b2 = b(2);
 
-%% Compute slopes
+%-- Compute slopes -------------------------------------------------------%
 m = (y1-y2)/(x1-x2);    % For xy line
 n = (b1-b2)/(a1-a2);    % For ab line
 
-%% Function of line dictated by xy parameters
+%-- Function of line dictated by xy parameters ---------------------------%
 fxy = @(x) ((x-x1)*m)+y1;
-
-%% Assign appropriate fields and return
+    
+%-- Assign appropriate fields and return ---------------------------------%
 center.x = ((m*x1)+b1-(n*a1)-y1)/(m-n);
 center.y = fxy(center.x);
 
