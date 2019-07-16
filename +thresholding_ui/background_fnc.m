@@ -9,7 +9,7 @@
 %   This improves thresholding in the following steps of image processing
 %=========================================================================%
 
-function img_refined = Background_fnc(img_binary,img_cropped)
+function img_refined = background_fnc(img_binary,img_cropped)
 
 nagg = nnz(img_binary); % pixels within the aggregate
 ntot = numel(img_cropped); % pixels within the whole cropped image 
