@@ -33,20 +33,26 @@ img_refined = thresholding_ui.background_fnc(img_binary,img_cropped_int);
 %-- Step 2: Thresholding -------------------------------------------------%
 thresh_slider_in = img_refined;
 f = figure;
-set(gcf, 'Position', get(0,'Screensize')); % Maximize figure
-hax = axes('Units','pixels');
+screen_size = get(0,'Screensize');
+set(gcf,'Position',screen_size); % maximize figure
+
+axis_size = round(0.7*min(screen_size(3:4)));
+hax = axes('Units','Pixels','Position',...
+    [min(screen_size(3:4)-100-axis_size),...
+    50,axis_size,axis_size]);
 imshow(thresh_slider_in);
 
 level = graythresh(thresh_slider_in);
 hst = uicontrol('Style', 'slider',...
     'Min',0-level,'Max',1-level,'Value',.5-level,...
     'Position', [140 480 120 20],...
-    'Callback', {@thresholding_ui.thresh_slider,thresh_slider_in,img_binary});
+    'Callback', {@thresholding_ui.thresh_slider,hax,thresh_slider_in,img_binary});
 get(hst,'value') % add a slider uicontrol
 
 uicontrol('Style','text',...
     'Position', [140 500 120 20],...
-    'String','Threshold level') % add a text uicontrol to label the slider
+    'String','Threshold level');
+        % add a text uicontrol to label the slider
 
 %-- Pause program while user changes the threshold level -----------------%
 h = uicontrol('Position',[100 350 200 40],'String','Finished',...
