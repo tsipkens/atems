@@ -11,7 +11,7 @@
 % Check README.txt file for more documentation and information
 %=========================================================================%
 
-function [dp] = evaluate(img)
+function [dp] = evaluate(imgs)
 
 
 %-- Clearing data and closing open windows -------------------------------%
@@ -40,21 +40,21 @@ extracted_text = cell(1,1);
 
 
 %== Main image processing loop ===========================================%
-for img_counter = 1:img.num % run loop as many times as images selected
+for img_counter = 1:imgs.num % run loop as many times as images selected
 
 %-- Loading images one by one -------%
-if img.num == 1
-    fname = char(img.fname); 
+if imgs.num == 1
+    fname = char(imgs.fname); 
 else
-    fname = char(img.fname(img_counter,1));
+    fname = char(imgs.fname(img_counter,1));
 end
-img.RawImage = imread(['..\Images\',fname]);
+imgs.RawImage = imread(['..\Images\',fname]);
     
 
 %-- Crop footer and get scale --------------------------------------------%
-[img,pixsize] = tools.get_footer_scale(img);
+[imgs,pixsize] = tools.get_footer_scale(imgs);
 
-figure();imshow(img.Cropped, []);title('Cropped Image'); % Figure 1: cropped iamge
+figure();imshow(imgs.Cropped, []);title('Cropped Image'); % Figure 1: cropped iamge
 
 %-- Creating a new folder to store data from this image processing program --%
 % TODO : Add new directory folder for each image and input overlayed image,
@@ -88,9 +88,9 @@ end
 %-- Crop aggregate photo -------------------------------------------------%
 uiwait(msgbox('Please crop an image of the aggregate that you wish to analyze.'));
 
-img.Cropped_agg = imcrop(img.Cropped); % user crops aggregate
+imgs.Cropped_agg = imcrop(imgs.Cropped); % user crops aggregate
 close(gcf);
-imshow(img.Cropped_agg); % show cropped aggregate
+imshow(imgs.Cropped_agg); % show cropped aggregate
 
 aggNum = aggNum + 1;
 
@@ -98,7 +98,7 @@ saveas(gcf,[imgFoldName,'\cropped_',int2str(aggNum)],'tif');
 
 
 %== Preprocess image =====================================================%
-[img,BWCED2,binary_cropped] = kook_mod.preprocess(img,imgFoldName,aggNum);
+[imgs,BWCED2,binary_cropped] = kook_mod.preprocess(imgs,imgFoldName,aggNum);
 
 
 
@@ -110,7 +110,7 @@ saveas(gcf,[imgFoldName,'\cropped_',int2str(aggNum)],'tif');
 
 %-- Draw circles - FIGURE 7 -------%
 figure();
-imshow(img.Cropped_agg,[]);
+imshow(imgs.Cropped_agg,[]);
 hold;
 h = viscircles(centers, radii, 'EdgeColor','r'); 
 title('Step 7: Parimary particles overlaid on the original TEM image'); 
@@ -118,7 +118,7 @@ title('Step 7: Parimary particles overlaid on the original TEM image');
 saveas(gcf, [imgFoldName,'\',FName,'_circOrig_',int2str(aggNum)], 'tif')
 
 % - check the circle finder by overlaying the CHT boundaries on the original image 
-R = imfuse(BWCED2, img.Cropped_agg,'blend'); 
+R = imfuse(BWCED2, imgs.Cropped_agg,'blend'); 
 
 %-- FIGURE 8 ---------%
 figure();imshow(R,[],'InitialMagnification',500);hold;h = viscircles(centers, radii, 'EdgeColor','r'); 

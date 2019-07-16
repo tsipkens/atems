@@ -1,4 +1,4 @@
-function [img_binary,rect,thresh_slider_in] = Agg_det_Slider(img_cropped,opts_crop) 
+function [img_binary,rect,thresh_slider_in] = Agg_det_Slider(img_cropped,bool_crop) 
 % Semi-automatic detection of the aggregates on TEM images
 % Function to be used with the Pair Correlation Method (PCM) package
 % Ramin Dastanpour & Steven N. Rogak
@@ -11,11 +11,11 @@ function [img_binary,rect,thresh_slider_in] = Agg_det_Slider(img_cropped,opts_cr
 global Binary_Image_4
 
 %-- Parse input ---------------------%
-if ~exist('opts_crop','var'); opts_crop = []; end
-if isempty(opts_crop); opts_crop = 1; end
+if ~exist('opts_crop','var'); bool_crop = []; end
+if isempty(bool_crop); bool_crop = 1; end
 
 %-- Crop image ----------------------%
-if opts_crop
+if bool_crop
     uiwait(msgbox('Please crop the image around missing particle'));
     [img_cropped_int, rect] = imcrop(img_cropped); % user crops image
 else
