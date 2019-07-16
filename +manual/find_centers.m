@@ -12,7 +12,7 @@
 %   primary particle
 %=========================================================================%
 
-function center = find_centers(x,y,a,b)
+function centers = find_centers(x,y,a,b)
 
 center = zeros(1,2);
 
@@ -29,16 +29,12 @@ b1 = b(1);
 b2 = b(2);
 
 %-- Compute slopes -------------------------------------------------------%
-m = (y1-y2)/(x1-x2);    % For xy line
-n = (b1-b2)/(a1-a2);    % For ab line
+m = (y1-y2)./(x1-x2);    % For xy line (vectorized)
+n = (b1-b2)./(a1-a2);    % For ab line
 
-%-- Function of line dictated by xy parameters ---------------------------%
-fxy = @(x) ((x-x1)*m)+y1;
-    
 %-- Assign appropriate fields and return ---------------------------------%
-center(1,:) = [((m*x1)+b1-(n*a1)-y1)/(m-n) ...
-    fxy(center.x)];
-% center.y = fxy(center.x);
+centers(1,:) = (b1-y1-n.*a1+m.*x1)./(m-n); % x-coordinate
+centers(2,:) = (centers(1,:)-a1).*n+b1; % y-coordinate
 
 end
 

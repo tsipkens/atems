@@ -6,7 +6,7 @@
 %%%% "Observations of a Correlation between Primary Particle and Aggregate
 %%%% Size for Soot Particles", J. of Aerosol Sci. & Tech.
 
-function [ A_length, A_width ] = Agg_Dimension(mainfolder,Im_Dir,Final_Edge,FileName,pixsize,particle_number )
+function [ A_length, A_width ] = Agg_Dimension(mainfolder,Final_Edge,FileName,pixsize,particle_number )
 %Aggregate_Dimension etermines the length & width of the agglomerate, and
 %provides a rotated image of the particle with length and width axis
 %   Based on function_length_width3 (Arka and Hugo) with memory saving improvement
@@ -134,7 +134,7 @@ line ([x1_w_rit, x2_w_lef], [y2_w_lef, y2_w_lef],'Color', 'r', 'linewidth', 3);
 line ([x1_w_rit, x1_w_rit], [y1_w_rit, y2_w_lef],'Color', 'r', 'linewidth', 3);
 
 cd(mainfolder)
-cd('../data/ManualOutput')
+cd('data/ManualOutput')
 saveas(gcf,[FileName '_Aggregate_L_W_' num2str(particle_number) '.tif'])
 close all
 cd (mainfolder)

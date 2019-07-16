@@ -1,4 +1,4 @@
-function [NewBW_lasoo,rect] = Agg_det_Slider(Cropped_image,opts_crop) 
+function [NewBW_lasoo,rect,Thresh_slider_in] = Agg_det_Slider(Cropped_image,opts_crop) 
 % Semi-automatic detection of the aggregates on TEM images
 % Function to be used with the Pair Correlation Method (PCM) package
 % Ramin Dastanpour & Steven N. Rogak
@@ -23,6 +23,7 @@ if opts_crop
     [Cropped_img_int, rect] = imcrop(Cropped_image); % user crops image
 else
 	Cropped_img_int = Cropped_image; % originally bypassed in Kook code
+    rect = [];
 end
 
 %% Step 1: Image refinment
@@ -69,5 +70,6 @@ uiwait(msgbox('Please selects (left click) particles satisfactorily detected; an
 Binary_int = bwselect(Binary_Image_4,8);
 NewBW_lasoo = ~Binary_int;
 % NewBW_lasoo = Binary_int; % originally this in the Kook code
+
 
 end

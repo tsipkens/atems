@@ -231,7 +231,7 @@ for img_counter = 1:img.num % run loop as many times as images selected
         Centroid.y  = sum(ypos)/n_pix;
         Ar          = zeros(n_pix,1);
         
-        for k = 1:n_pix;
+        for k = 1:n_pix
             Ar(k,1) = (((xpos(k,1)-Centroid.x)*pixsize)^2+...
                       ((ypos(k,1)-Centroid.y)*pixsize)^2)*pixsize^2;
         end

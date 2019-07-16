@@ -6,7 +6,7 @@
 %%%% "Observations of a Correlation between Primary Particle and Aggregate
 %%%% Size for Soot Particles", J. of Aerosol Sci. & Tech.
 
-function [Final_Binary, Final_Edge, Final_imposed] = Thresh_refine(Binary_im_slider,Thresh_slider_in,Im_Dir,FileName,n_aggregate)
+function [Final_Binary, Final_Edge, Final_imposed] = Thresh_refine(Binary_im_slider,Thresh_slider_in,FileName,n_aggregate)
 
 global Binary_Image_5 Manual_Edge FinalImposedImage
 
@@ -45,7 +45,7 @@ clear Edge_Image SE2
 % images
 
 pass=0;
-while pass==0;
+while pass==0
     
     uiwait(msgbox('Please LEFT click on the pixels that are clearly not part of the outline.  Push ENTER when finish.',...
         'Process Stage: Manual Edge','help'));
@@ -72,8 +72,7 @@ Final_imposed = FinalImposedImage;
 Final_Binary = Binary_Image_5;
 Final_Edge = Manual_Edge;
 %% Saving Images
-cd(mainfolder)
-cd('../data')
+cd('data')
 if exist('ManualOutput','dir')~=7 %checking wheter the Output folder available 
     mkdir('ManualOutput')
 end
