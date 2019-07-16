@@ -17,7 +17,7 @@
 % 5. Added option as to whether of not to generate plots
 %=========================================================================%
 
-function [dp,dpdist] = evaluate(img_ref,opt_plot)
+function [dp,dpdist] = evaluate(imgs,bool_plot)
 %-------------------------------------------------------------------------%
 % Inputs:
 %   img_ref Image struct to be analyzed
@@ -26,13 +26,14 @@ function [dp,dpdist] = evaluate(img_ref,opt_plot)
 
 
 %-- Parse inputs and load image ------------------------------------------%
-if ~exist('opt_plot','var'); opt_plot = []; end
-if isempty(opt_plot); opt_plot = 0; end
+if ~exist('bool_plot','var'); bool_plot = []; end
+if isempty(bool_plot); bool_plot = 0; end
 
-img = tools.get_imgs(img_ref); % read in image
-[img,pixsize] = tools.get_footer_scale(img);
+%img = tools.get_imgs(img_ref); % read in image
+%[img,pixsize] = tools.get_footer_scale(img);
+pixsize = imgs(1).pixsize;
 
-II1 = img(1).Cropped;
+II1 = imgs(1).Cropped;
 
 
 %-- Set relevant parameter values ----------------------------------------%
@@ -58,20 +59,20 @@ II1_bg=SelfSubt*II1; % Self-subtration from the original image
 II1=maxImgCount-II1;
 II1=II1-II1_bg;
 II1(II1<0)=0;
-if opt_plot; figure();imshow(II1, []);title('Step 1: Inversion and self-subtraction'); end
+if bool_plot; figure();imshow(II1, []);title('Step 1: Inversion and self-subtraction'); end
 
 %-- Step 2: median filter to remove noise --------------------------------%
 II1_mf=medfilt2(II1, [mf mf]);
-if opt_plot; figure();imshow(II1_mf, []);title('Step 2: Median filter'); end
+if bool_plot; figure();imshow(II1_mf, []);title('Step 2: Median filter'); end
 
 %-- Step 3: Unsharp filter------------------------------------------------%
 f = fspecial('unsharp', alpha);
 II1_lt = imfilter(II1_mf, f);
-if opt_plot; figure();imshow(II1_lt, []);title('Step 3: Unsharp filter'); end
+if bool_plot; figure();imshow(II1_lt, []);title('Step 3: Unsharp filter'); end
 
 %-- Step 4: Canny edge detection -----------------------------------------%
 BWCED = edge(II1_lt,'canny'); % perfrom Canny edge detection
-if opt_plot; figure();imshow(BWCED);title('Step 4: Canny edge detection'); end
+if bool_plot; figure();imshow(BWCED);title('Step 4: Canny edge detection'); end
 
 
 
@@ -80,7 +81,7 @@ if opt_plot; figure();imshow(BWCED);title('Step 4: Canny edge detection'); end
 [centers, radii] = imfindcircles(BWCED,[rmin rmax],...
     'objectpolarity', 'bright', 'sensitivity', sens_val, 'method', 'TwoStage');
 % - draw circles
-if opt_plot
+if bool_plot
     figure();imshow(OriginalImg,[]);hold;
     h = viscircles(centers, radii, 'EdgeColor','r');
     title('Step 5: Parimary particles overlaid on the original TEM image');
@@ -89,7 +90,7 @@ end
 
 %-- Check the circle finder ----------------------------------------------%
 %-- Overlaying the CHT boundaries on the original image. 
-if opt_plot
+if bool_plot
     R = imfuse(BWCED, OriginalImg,'blend');
     figure();imshow(R,[],'InitialMagnification',500);hold;h = viscircles(centers, radii, 'EdgeColor','r');
     title('Step 6: Primary particles overlaid on the Canny edges and the original TEM image');
