@@ -11,10 +11,10 @@ imagesc(img(1).Cropped);
 colormap('gray');
 
 
-disp('Performing manual analysis...');
-manual.evaluate(img_ref);
-disp('Complete.');
-disp(' ');
+% disp('Performing manual analysis...');
+% manual.evaluate(img_ref);
+% disp('Complete.');
+% disp(' ');
 
 
 % disp('Performing PCM analysis...');
@@ -29,10 +29,10 @@ disp(' ');
 % disp(' ');
 
 
-% disp('Performing modified Kook analysis...');
-% kook_mod.evaluate(img_ref);
-% disp('Complete.');
-% disp(' ');
+disp('Performing modified Kook analysis...');
+kook_mod.evaluate(img_ref);
+disp('Complete.');
+disp(' ');
 
 
 % load('data\data_FlareNet.mat');

@@ -92,7 +92,7 @@ for img_counter = 1:img.num % run loop as many times as images selected
 %     cd(mainfolder) % return to the code directry
     
 
-    %% Step 2: automatic/semi-automatic aggregate detection
+    %% Step 2: Automatic/semi-automatic aggregate detection
     img.Binary = pcm.Agg_detection(img,pixsize,moreaggs,minparticlesize,coeffs);
     
     img.Edge        = edge(img.Binary,'sobel'); % Sobel edge detection

@@ -9,10 +9,10 @@ function Refined_surf_img = Background_fnc(binaryImage,Cropped_img)
 % This improves thresholding in the following steps of image processing
 
 %% Number of the pixels within the aggregate
-Npix_agg = sum(sum(binaryImage));
+Npix_agg = nnz(binaryImage);
 
 %% Number of the pixels within the whole cropped image 
-Npix_tot = size(Cropped_img,1)*size(Cropped_img,2);
+Npix_tot = numel(Cropped_img);
 
 %% Number of the pixels in the backgound of the aggregate
 Npix_bckgrnd = Npix_tot-Npix_agg;
@@ -47,3 +47,5 @@ end
 %% Refining Cropped_img, using fitted surface
 refined_Surf_img_int=mean_bckgrnd+double(Cropped_img)-fitted_surf;
 Refined_surf_img=uint8(refined_Surf_img_int);
+
+end

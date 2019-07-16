@@ -8,7 +8,7 @@
 function [img,BWCED2,binary_cropped] = preprocess(img,imgFoldName,aggNum)
 
 %== Preprocessing ========================================================%
-%-- Converts cropped image to a binary image (using thresholdin UI) ------%
+%-- Converts cropped image to a binary image (using thresholding UI) -----%
 [binary_cropped] = thresholding_ui.Agg_det_Slider(img.Cropped_agg,0);
 binary_cropped = ~binary_cropped;
 
@@ -43,7 +43,7 @@ saveas(gcf, [imgFoldName,'\prep_',int2str(aggNum)], 'tif');
 %   Background erasing, Canny edge detection, background inversion, 
 %   Circular Hough Transform
 
-%-- Erasing background by multiplying binary image with grayscale image---%
+%-- Erasing background by multiplying binary image with grayscale image --%
 img.Analyze = double(binary_cropped) .* double(II1_mf);
 figure();
 imshow(img.Analyze, []);

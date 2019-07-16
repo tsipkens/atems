@@ -1,5 +1,5 @@
 
-function gui_threshold()
+function data = gui_threshold()
 
 clear;
 close all;
@@ -17,8 +17,8 @@ f = figure('Visible','off','Position',[500,200,700,500]);
 ha = axes('Units','Pixels','Position',[50,50,500,400]);
 imshow(img.Cropped);
 
-hrestart = uicontrol('Style','pushbutton',...
-   'String','Restart','Position',[580,440,100,25]); 
+% hrestart = uicontrol('Style','pushbutton',...
+%    'String','Restart','Position',[580,440,100,25]); 
 hcrop = uicontrol('Style','pushbutton','String','Crop',...
    'Position',[580,400,100,25],'Callback',{@cropper,img});
 htext = uicontrol('Style','text','String','Modify thresholding:',...
@@ -51,7 +51,7 @@ function cropper(src,event,img)
         r(2):(r(2)+r(4)),r(1):(r(1)+r(3)));
     imshow(im_crop);
     uicontrol('Style','pushbutton','String','Uncrop',...
-       'Position',[580,440,100,25],'Callback',{@uncropper,img});
+       'Position',[580,400,100,25],'Callback',{@uncropper,img});
 
     setappdata(gca,'image',im_crop);
     setappdata(gca,'pos',[r(2),r(1)]);
@@ -66,7 +66,7 @@ function uncropper(src,event,img)
 
     imshow(img.Cropped);
     uicontrol('Style','pushbutton','String','Crop',...
-       'Position',[580,440,70,25],'Callback',{@cropper,img});
+       'Position',[580,400,70,25],'Callback',{@cropper,img});
 
     setappdata(gca,'image',img.Cropped);
     setappdata(gca,'pos',[1,1]);

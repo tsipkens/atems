@@ -35,7 +35,7 @@ img = tools.get_imgs(img_ref); % read in image
 II1 = img(1).Cropped;
 
 
-%== Start original code ==================================================%
+%-- Set relevant parameter values ----------------------------------------%
 maxImgCount = 255; % Maximum image count for 8-bit image
 SelfSubt = 0.8; % Self-subtraction level
 mf = 1; % Median filter [x x] if needed
@@ -59,16 +59,17 @@ II1=maxImgCount-II1;
 II1=II1-II1_bg;
 II1(II1<0)=0;
 if opt_plot; figure();imshow(II1, []);title('Step 1: Inversion and self-subtraction'); end
-% - step 2: median filter to remove noise
+
+%-- Step 2: median filter to remove noise --------------------------------%
 II1_mf=medfilt2(II1, [mf mf]);
 if opt_plot; figure();imshow(II1_mf, []);title('Step 2: Median filter'); end
-% - step 3: Unsharp filter
+
+%-- Step 3: Unsharp filter------------------------------------------------%
 f = fspecial('unsharp', alpha);
 II1_lt = imfilter(II1_mf, f);
 if opt_plot; figure();imshow(II1_lt, []);title('Step 3: Unsharp filter'); end
 
-
-%-- Canny edge detection -------------------------------------------------%
+%-- Step 4: Canny edge detection -----------------------------------------%
 BWCED = edge(II1_lt,'canny'); % perfrom Canny edge detection
 if opt_plot; figure();imshow(BWCED);title('Step 4: Canny edge detection'); end
 
@@ -95,7 +96,7 @@ if opt_plot
 end
 
 
-%-- Generate outputs -----------------------------------------------------%
+%== Generate outputs =====================================================%
 dp.method = 'kook';
 dp.centers = centers; % output in px
 dp.radii = radii; % output in px

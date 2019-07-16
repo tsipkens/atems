@@ -1,4 +1,4 @@
-function Thresh_Slider(hObj,event,ax) %#ok<INUSL>
+function Thresh_Slider(hObj,event,Thresh_slider_in,binaryImage) %#ok<INUSL>
 % Thresholding the image as a part of smi-automatic particle detection
 % Function to be used with the Pair Correlation Method (PCM) package
 % Ramin Dastanpour & Steven N. Rogak
@@ -6,7 +6,7 @@ function Thresh_Slider(hObj,event,ax) %#ok<INUSL>
 % Last updated in Feb. 2016
 % Slider method
 
-global Thresh_slider_in binaryImage Binary_Image_4
+global Binary_Image_4
 
 %% Average filter
 hav = fspecial('average');

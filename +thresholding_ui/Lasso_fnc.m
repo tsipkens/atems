@@ -13,28 +13,32 @@ function binaryImage = Lasso_fnc(Cropped_im)
 %   - QOL - User will not have to restart program if they mess up the lasso
 
 fontsize = 10;
-%% Displaying cropped image
+
+%-- Displaying cropped image ---------------------------------------------%
 figure; imshow(Cropped_im);
 title('Original CROPPED Image', 'FontSize', fontsize);
 set(gcf, 'Position', get(0,'Screensize')); % Maximize figure.
 
-%% Freehand drawing. Selecting region of interest (ROI)
-
+%-- Freehand drawing. Selecting region of interest (ROI) -----------------%
 drawing_correct = 0; % this variable is used to check if the user drew the lasso correctly
 while drawing_correct == 0 
-   message = sprintf('Please draw an approximate boundary around the aggregate.\nLeft click and hold to begin drawing.\nLift mouse button to finish');
-   uiwait(msgbox(message));
-   hFH = imfreehand(); 
-   finished_check = questdlg('Are you satisfied with your drawing?','Lasso Complete?','Yes','No','No');
-            % if user is happy with their selection...
-            if strcmp(finished_check, 'Yes')
-                drawing_correct = 1;
-            % if user would like to redo their selection...
-            else
-                delete(hFH);
-            end     
+    message = sprintf('Please draw an approximate boundary around the aggregate.\nLeft click and hold to begin drawing.\nLift mouse button to finish');
+    uiwait(msgbox(message));
+    hFH = imfreehand(); 
+    finished_check = questdlg('Are you satisfied with your drawing?','Lasso Complete?','Yes','No','No');
+    
+    % if user is happy with their selection...
+    if strcmp(finished_check, 'Yes')
+        drawing_correct = 1;
+    % if user would like to redo their selection...
+    else
+        delete(hFH);
+    end     
 end
 
 
-%% Create a binary masked image from the ROI object
+%-- Create a binary masked image from the ROI object ---------------------%
 binaryImage = hFH.createMask();
+
+
+end

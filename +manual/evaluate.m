@@ -55,16 +55,16 @@ for kk = 1:img.num % run loop as many times as images selected
         
         %% Step3-3: Particle type selection
         %% describe types
-        choise = questdlg('Select Particle Type:',...
+        choice = questdlg('Select Particle Type:',...
                 'Particle Type','Aggregate',...
                 'Aggregate (dp measurement only)','Single primary particle','Aggregate'); 
 
-        if strcmp(choise,'Aggregate')
+        if strcmp(choice,'Aggregate')
             Particle_Type = 1;
-        elseif strcmp(choise,'Aggregate (dp measurement only)')
+        elseif strcmp(choice,'Aggregate (dp measurement only)')
             Particle_Type = 2;
             agg_primary=1;
-        elseif strcmp(choise,'Single primary particle')
+        elseif strcmp(choice,'Single primary particle')
             Particle_Type = 3;
             agg_primary=1;
         end
@@ -86,14 +86,13 @@ for kk = 1:img.num % run loop as many times as images selected
             save Imdata.mat Cropped_im binaryImage
             cd(mainfolder)
             
-            %%%% Asking user if he/she wants to analyse primary particles
-            %%%% or not
-            choise = questdlg('Do you want to measure primary particle size',...
+            %-- Ask user if they want to analyse primary particles or not
+            choice = questdlg('Do you want to measure primary particle size',...
                 'Primary particle sizing?','Yes',...
                 'No','Yes'); 
-            if strcmp(choise,'Yes')
+            if strcmp(choice,'Yes')
                 agg_primary = 1;
-            elseif strcmp(choise,'No')
+            elseif strcmp(choice,'No')
                 agg_primary = 2;
             end
             
@@ -123,7 +122,7 @@ for kk = 1:img.num % run loop as many times as images selected
         while agg_primary == 1 && continuing_parameter ~= 3
             
             m = m+1;
-            num_primary = m
+            num_primary = m;
             
             uiwait(msgbox(['Please select two points on the image that correspond to the length of the ' title_measurement ],...
             ['Process Stage: Length of' title_measurement ' ' num2str(m)...
@@ -147,9 +146,9 @@ for kk = 1:img.num % run loop as many times as images selected
              
              %%%%
              if Particle_Type < 3
-                 choise = questdlg('Do you want to analyse another primary particle ?',...
+                 choice = questdlg('Do you want to analyse another primary particle ?',...
                  'Continue?','Yes','No','Yes');
-                 if strcmp(choise,'Yes')
+                 if strcmp(choice,'Yes')
                      continuing_parameter = 1;
                  else
                      continuing_parameter = 3;
@@ -297,9 +296,9 @@ for kk = 1:img.num % run loop as many times as images selected
         clear length width A_length A_width 
         
         
-        choise = questdlg('Do you want to analyse another aggregate ?',...
+        choice = questdlg('Do you want to analyse another aggregate ?',...
             'Continue?','Yes','No','Yes');
-        if strcmp(choise,'Yes')
+        if strcmp(choice,'Yes')
             continuing_aggregate = 1;     
         else
             continuing_aggregate = 0;
