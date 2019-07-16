@@ -24,7 +24,7 @@ drawing_correct = 0; % this variable is used to check if the user drew the lasso
 while drawing_correct == 0 
     message = sprintf('Please draw an approximate boundary around the aggregate.\nLeft click and hold to begin drawing.\nLift mouse button to finish');
     uiwait(msgbox(message));
-    hFH = imfreehand(); 
+    hFH = drawfreehand(); 
     finished_check = questdlg('Are you satisfied with your drawing?','Lasso Complete?','Yes','No','No');
     
     % if user is happy with their selection...

@@ -22,8 +22,8 @@ Thresh_slider_in = medfilt2(Filtered_Image_1 , [W W]);
 %% Binary image via threshold value
 adj = get(hObj,'Value');
 level = graythresh(Thresh_slider_in);
-level = level+adj; 
-Binary_Image_1 = im2bw(Thresh_slider_in,level);
+level = level+adj;
+Binary_Image_1 = imbinarize(Thresh_slider_in,level);
 
 %% Binary image via Dilation  
 % to reduce initial noise and fill initial gaps
@@ -39,6 +39,9 @@ Binary_Image_3(binaryImage)=Binary_Image_2(binaryImage);
 Binary_Image_4=logical(Binary_Image_3);
 
 %%
-temp_image2=imimposemin(Thresh_slider_in,Binary_Image_4);
+temp_image2 = imimposemin(Thresh_slider_in,Binary_Image_4);
 imshow(temp_image2);
 set(gcf, 'Position', get(0,'Screensize')); % Maximize figure
+
+
+end

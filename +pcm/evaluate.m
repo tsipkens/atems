@@ -13,17 +13,17 @@
 
 function [] = evaluate(img)
 
-%% Clearing data and closing open windows
+%-- Clearing data and closing open windows -------------------------------%
 close all; % Close all figure windows except those created by imtool
 imtool close all;   % Close all figure windows created by imtool
 
 
-%% Choose appropriate value for based on your Excel version
+%-- Choose appropriate value for based on your Excel version -------------%
 xls_sheet = 2; % Uncomment this if your default MS Excel version is 2013
 % xls_sheet = 4; % Uncomment this if your default MS Excel version is <2013
 
 
-%% initializing values
+%-- Initialize values ----------------------------------------------------%
 fontSize        = 10;
 minparticlesize = 4.9; % to filter out noises
 % Coefficient for automatic Hough transformation
@@ -33,23 +33,23 @@ moreaggs    = 0;
 savecounter = 0;
 
 
-%% Housekeeping
-% global mainfolder img img.dir FileName
+%-- Housekeeping ---------------------------------------------------------%
+%   Global mainfolder img img.dir FileName
 extracted_text = cell(1,1);
 
 
-%% Report title
+%-- Report title ---------------------------------------------------------%
 report_title = {'Image_ID','Particle Area (nm^2)','Particle Perimeter (nm)',...
     'Particle Length (nm)','Particle Width (nm)','Particle aspect ratio',...
     'Radius of Gyration (nm)','Particle eq. da (nm)',...
     'dp (nm) [simple PCF]','dp (nm) [generalized PCF]','Max resolution (nm)','Engine Type'};
 
 
-%% Main image processing loop
+%== Main image processing loop ===========================================%
 for img_counter = 1:img.num % run loop as many times as images selected
     
-    %% Step1: Image preparation
-    %% Step1-1: Loading images one-by-one
+    %== Step 1: Image preparation ========================================%
+    %-- Step 1-1: Loading images one-by-one ------------------------------%
     % cd(img.dir); % change active directory to image directory
     if img.num == 1
         fname = char(img.fname); 
@@ -58,8 +58,7 @@ for img_counter = 1:img.num % run loop as many times as images selected
     end
     img.RawImage = imread([img.dir,fname]); % read in image
     
-    %% Step 1-3: Crop footer and get scale from footer
-    
+    %-- Step 1-3: Crop footer and get scale from footer ------------------%
     [img,pixsize] = tools.get_footer_scale(img);
     
     % Build the image processing coefficients for the image based on its
@@ -76,23 +75,18 @@ for img_counter = 1:img.num % run loop as many times as images selected
     title('processing Image', 'FontSize', fontSize);
     set(gcf, 'Position', get(0,'Screensize')); % Maximize figure
     
-    %% Step 1-4: Saving Cropped image
+    %-- Step 1-4: Saving Cropped image -----------------------------------%
     close (gcf);
     
-    %checking whether the Output folder is available 
+    % Check whether the Output folder is available 
     dirName = sprintf('Data/PCMOutput');
     
     if exist(dirName,'dir') ~= 7 % 7 if exist parameter is a directory
         mkdir(dirName) % make output folder
     end
     
-%     % save Cropped image as a .tif file. Change to desired format if needed.
-%     imwrite...
-%     (img.Cropped,[FileName '_CroppedImage_' num2str(img_counter) '.tif'])
-%     cd(mainfolder) % return to the code directry
-    
 
-    %% Step 2: Automatic/semi-automatic aggregate detection
+    %== Step 2: Automatic/semi-automatic aggregate detection =============%
     img.Binary = pcm.Agg_detection(img,pixsize,moreaggs,minparticlesize,coeffs);
     
     img.Edge        = edge(img.Binary,'sobel'); % Sobel edge detection
@@ -103,14 +97,14 @@ for img_counter = 1:img.num % run loop as many times as images selected
     img.Imposed = imimposemin(img.Cropped, img.DilatedEdge);
     
     
-    %% Step 3: Automatic primary particle sizing
-    %% Step 3-1: Find and size all particles on the final binary image
+    %== Step 3: Automatic primary particle sizing ========================%
+    %-- Step 3-1: Find and size all particles on the final binary image --%
     CC = bwconncomp(abs(img.Binary-1));
     NofAggs = CC.NumObjects; % count number of particles
     
-    %% Lopp for each aggregate on the image under investigation
+    %-- Lopp for each aggregate on the image under investigation ---------%
     for nAgg = 1:NofAggs
-        %% Step 3-2: Prepare an image of the isolated aggregate
+        %-- Step 3-2: Prepare an image of the isolated aggregate ---------%
         Agg.Image = zeros(size(img.Binary));
         Agg.Image(CC.PixelIdxList{1,nAgg}) = 1;
         
@@ -129,21 +123,19 @@ for img_counter = 1:img.num % run loop as many times as images selected
         figure
         hold on
         imshow(FinalImposedImage);
-%         %save Binary image as a .tif file. Can be changed to other formats
-%         imwrite(Agg.Image,[FileName '_BinaryImage_' num2str(img_counter) '.tif'])
         
-        %% Step 3-3: Development of the pair correlation function (PCF)
+        %-- Step 3-3: Development of the pair correlation function (PCF) -%
         
-        %% 3-3-1: Find the skeleton of the aggregate
+        %-- 3-3-1: Find the skeleton of the aggregate --------------------%
         Skel = bwmorph(Agg.Image,'thin',Inf);
         [skeletonY, skeletonX] = find(Skel);
         
-        %% 3-3-2: Calculate the distances between skeleton pixels and other pixels
+        %-- 3-3-2: Calculate the distances between skeleton pixels and other pixels
         clear row col
         [row, col] = find (Agg.Image);
         
-        % Total number of pixels in aggregate
-        Agg.Pixels = nnz(Agg.Image);
+        
+        Agg.Pixels = nnz(Agg.Image); % total number of pixels in aggregate
         
         % to consolidate the pixels of consideration to much smaller arrays
         
@@ -152,10 +144,10 @@ for img_counter = 1:img.num % run loop as many times as images selected
         Y       = 0;
         density = 20; % larger densities make the program less computationally expensive
         
-        for i = 1:density:Agg.Pixels
+        for ii = 1:density:Agg.Pixels
             p    = p + 1;
-            X(p) = col(i);
-            Y(p) = row(i);
+            X(p) = col(ii);
+            Y(p) = row(ii);
         end
         
         % to calculate all the distances with reference to one pixel at a time,
@@ -165,8 +157,8 @@ for img_counter = 1:img.num % run loop as many times as images selected
             Distance_mat(((j-1)*length(X)+1):(j*length(X))) = Distance_int;
         end
         
-        %% 3-3-3: Construct the pair correlation
-        % Sort radii into bins and calculate PCF
+        %-- 3-3-3: Construct the pair correlation ------------------------%
+        %   Sort radii into bins and calculate PCF
         Distance_max = double(uint16(max(Distance_mat)));
         Distance_mat = nonzeros(Distance_mat).*pixsize;
         nbins        = Distance_max * pixsize;
@@ -194,13 +186,13 @@ for img_counter = 1:img.num % run loop as many times as images selected
         PCF                  = PCF./Denamonator;
         PCF_smoothed         = smooth(PCF);
         
-        for i=1:size(PCF_smoothed)-1
-            if PCF_smoothed(i) == PCF_smoothed(i+1)
-                PCF_smoothed(i+1) = PCF_smoothed(i)-1e-4;
+        for ii=1:size(PCF_smoothed)-1
+            if PCF_smoothed(ii) == PCF_smoothed(ii+1)
+                PCF_smoothed(ii+1) = PCF_smoothed(ii)-1e-4;
             end
         end
         
-        %% 3-4: Computing aggregate dimentions/parameters
+        %-- 3-4: Computing aggregate dimentions/parameters ---------------%
         % Projected area of the aggregate
         Agg.Area = Agg.Pixels*pixsize^2;
         
@@ -244,12 +236,12 @@ for img_counter = 1:img.num % run loop as many times as images selected
         Agg.W           = min((max(row)-min(row)),(max(col)-min(col)))*pixsize;
         Agg.Aspectratio = Agg.L/Agg.W;
         
-        %% 3-5: Primary particle sizing
-        %% 3-5-1: Simple PCM
+        %-- 3-5: Primary particle sizing ---------------------------------%
+        %-- 3-5-1: Simple PCM --------------------------------------------%
         PCF_simple   = .913;
         Agg.RpSimple = interp1(PCF_smoothed, Radius, PCF_simple);
         
-        %% 3-5-2: Generalized PCM
+        %-- 3-5-2: Generalized PCM ---------------------------------------%
         URg      = 1.1*Agg.Rg; % 10% higher than Rg
         LRg      = 0.9*Agg.Rg; % 10% lower than Rg
         PCFRg    = interp1(Radius, PCF_smoothed, Agg.Rg); % P at Rg
@@ -260,7 +252,7 @@ for img_counter = 1:img.num % run loop as many times as images selected
         PCF_generalized   = (.913/.84)*(0.7+0.003*PRgslope^(-0.24)+0.2*Agg.Aspectratio^-1.13);
         Agg.RpGeneralized = interp1(PCF_smoothed, Radius, PCF_generalized);
         
-        %% Plot pair correlation function in line graph format
+        %-- Plot pair correlation function in line graph format ----------%
         filename = 'Pair Correlation Function Plot.jpeg';
         path     = sprintf('PCF_%d_%d_new',nAgg,img_counter);
         str      = sprintf('Pair Correlation Line Plot %f ',PCF_simple);
@@ -270,16 +262,15 @@ for img_counter = 1:img.num % run loop as many times as images selected
         hold on
         
         loglog(Agg.RpSimple,PCF_simple,'*')
-   %    saveas(gcf, path) %uncomment to save
         close all
         
-        %% Clear variables
+        %-- Clear variables ----------------------------------------------%
         clear Agg.Image Image_edge FinalImposedImage Skel skeletonY ...
             skeletonX Agg.Pixels Distance_mat Radius PCF PCF_smoothed ...
             Denamonator row col
         
         
-        %% Step 4: Saving results
+        %== Step 4: Save results =========================================%
         close all
         extracted_data(1) = round(Agg.Area,2);
         extracted_data(2) = round(Agg.Perimeter,2);
@@ -293,7 +284,7 @@ for img_counter = 1:img.num % run loop as many times as images selected
         extracted_data(10) = round(pixsize,3);
         extracted_text(1)={fname};
 
-        %% Step 4-1: Autobackup
+        %-- Step 4-1: Autobackup -----------------------------------------%
         if exist('Data\PCMOutput\PCM_data.mat','file')==2
             save('Data\PCMOutput\PCM_data.mat','extracted_data','extracted_text','-append');
         else
@@ -302,12 +293,12 @@ for img_counter = 1:img.num % run loop as many times as images selected
         if exist('Data\PCMOutput\PCM_Output.xls','file')==2
             [~,sheets,~] = xlsfinfo('Data\PCMOutput\PCM_Output.xls'); %finding info about the excel file
             sheetname=char(sheets(1,xls_sheet)); % choosing the second sheet
-            [datanum ~]=xlsread('Data\PCMOutput\PCM_Output.xls',sheetname); %loading the data
+            [datanum]=xlsread('Data\PCMOutput\PCM_Output.xls',sheetname); %loading the data
             starting_row=size(datanum,1)+2;
             xlswrite('Data\PCMOutput\PCM_Output.xls',extracted_text,'TEM_Results',['A' num2str(starting_row)]);
             xlswrite('Data\PCMOutput\PCM_Output.xls',extracted_data,'TEM_Results',['B' num2str(starting_row)]);
         else
-            savecounter=1;
+            savecounter = 1;
             xlswrite('Data\PCMOutput\PCM_Output.xls',report_title,'TEM_Results','A1');
             xlswrite('Data\PCMOutput\PCM_Output.xls',extracted_text,'TEM_Results','A2');
             xlswrite('Data\PCMOutput\PCM_Output.xls',extracted_data,'TEM_Results','B2');

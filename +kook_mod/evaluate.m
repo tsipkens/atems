@@ -1,5 +1,5 @@
 
-% EVALUATE  Performs modified Kook algorithm.
+% EVALUATE  Performs modified Kook algorithm
 %
 % Code written by Ben Gigone and Emre Karatas, PhD
 % Adapted from Kook et al. 2016, SAE
@@ -56,7 +56,7 @@ img.RawImage = imread(['..\Images\',fname]);
 
 figure();imshow(img.Cropped, []);title('Cropped Image'); % Figure 1: cropped iamge
 
-%% Creating a new folder to store data from this image processing program
+%-- Creating a new folder to store data from this image processing program --%
 % TODO : Add new directory folder for each image and input overlayed image,
 % original image, edge detection results, and histogram for each one
 
@@ -65,7 +65,8 @@ if exist('Data\KookOutput','dir') ~= 7 % 7 if exist parameter is a directory
     mkdir('Data\KookOutput') % make output folder
 end
 
-%% Begin image processing loop! User begins by cropping one aggregate to analyze
+%== Begin image processing loop ==========================================%
+%-- User begins by cropping one aggregate to analyze ---------------------%
 
 % initializing variables
 userFin = 0; % if user is finished selecting aggregates, userFin = 1
@@ -76,7 +77,7 @@ aggNum = 0;
 
 while userFin == 0
 
-%% creating new folder within folder for the individual image
+%-- Creating new folder for the individual image -------------------------%
 [~,FName,~] = fileparts(fname);
 imgFoldName = ['Data\KookOutput\',FName,'_imgAnlys'];
 if exist(imgFoldName, 'dir') ~= 7

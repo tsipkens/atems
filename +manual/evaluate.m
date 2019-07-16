@@ -1,18 +1,18 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%    Executive code for analyzing TEM images produced by TEM, V.1.   %%%
-%%%% Written by Ramin Dastanpour, Steve Rogak, Hugo Tjong, Arka Soewono  %%%
-%%%% The University of British Columbia, Vanouver, BC, Canada           %%%
-%%%% If you use this code or any modified version of it, you are expected
-%%%% to refere to the the main developers and appropriate articles, e.g. 
-%%%% "Observations of a Correlation between Primary Particle and Aggregate
-%%%% Size for Soot Particles", J. of Aerosol Sci. & Tech.
 
-%%%%% USE THIS CODE TO MEASURE MORPHOLOGY PARAMETERS OF AGGREGATES AND 
-%%%%% PRIMARY PARTICLES WITHING AGGREGATES. IF ONLY INTERESTED IN PRIMARY
-%%%%% PARTICLE SIZING USE MainCode_dpAnalysis.m
+% EVALUATE  
+%   Written by Ramin Dastanpour, Steve Rogak, Hugo Tjong, Arka Soewono  %%%
+%	The University of British Columbia, Vanouver, BC, Canada
+%	If you use this code or any modified version of it, you are expected
+%	to refere to the the main developers and appropriate articles, e.g. 
+%	"Observations of a Correlation between Primary Particle and Aggregate
+%	Size for Soot Particles", J. of Aerosol Sci. & Tech.
+
+%	USE THIS CODE TO MEASURE MORPHOLOGY PARAMETERS OF AGGREGATES AND 
+%	PRIMARY PARTICLES WITHING AGGREGATES. IF ONLY INTERESTED IN PRIMARY
+%	PARTICLE SIZING USE MainCode_dpAnalysis.m
+%=========================================================================%
 
 function [] = evaluate(img)
-
 
 %-- Report title ---------------------------------------------------------%
 report_title = {'Image_ID','Primary Width (nm)','Primary Length (nm)',...
@@ -25,10 +25,11 @@ mainfolder = cd;
 particle_count = 0;
 tot_primary = 0;
 
+
 for kk = 1:img.num % run loop as many times as images selected
     
-    %% Step1: Image preparation
-    %% Step1-1: Loading images one-by-one
+    %== Step 1: Image preparation ========================================%
+    %-- Step 1-1: Loading images one-by-one ------------------------------%
     % cd(img.dir); % change active directory to image directory
     if img.num == 1
         fname = char(img.fname); 
@@ -37,24 +38,21 @@ for kk = 1:img.num % run loop as many times as images selected
     end
     img.RawImage = imread([img.dir,fname]); % read in image
     
-    %% Step 1-3: Crop footer and get scale from footer
-    
+    %-- Step 1-3: Crop footer and get scale from footer ------------------%
     [img,pixsize] = tools.get_footer_scale(img);
-    Cropped_im = img.Cropped;
+    img_cropped = img.Cropped;
     
     
-    %% Step3: Analyzing each aggregate
-    continuing_aggregate=1;
-    l=0;
-    n_aggregate=0;
+    %== Step 3: Analyzing each aggregate =================================%
+    continuing_aggregate = 1;
+    ll = 0;
+    n_aggregate = 0;
     while continuing_aggregate~=0
-%     for l = 1:n_aggregate
-        l=l+1;
+        ll = ll+1;
         n_aggregate=n_aggregate+1;
         particle_count = particle_count+1;
         
-        %% Step3-3: Particle type selection
-        %% describe types
+        %== Step 3-3: Particle type selection ============================%
         choice = questdlg('Select Particle Type:',...
                 'Particle Type','Aggregate',...
                 'Aggregate (dp measurement only)','Single primary particle','Aggregate'); 
@@ -69,10 +67,10 @@ for kk = 1:img.num % run loop as many times as images selected
             agg_primary=1;
         end
         
-        %% Step3-4: Image refinment
+        %== Step 3-4: Image refinment ====================================%
         if Particle_Type == 1
             
-            %% Step3-4-3 Applying thresholding. Part 1
+            %-- Step 3-4-3: Applying thresholding. Part 1 ----------------%
             [binary_cropped,~,Thresh_slider_in] = thresholding_ui.Agg_det_Slider(img.Cropped,0);
             binaryImage = ~binary_cropped;
             
@@ -80,7 +78,7 @@ for kk = 1:img.num % run loop as many times as images selected
                 Thresh_slider_in,img.fname{kk},n_aggregate);
             
 
-            %% Step3-4-4 Applying thresholding. Part 2
+            %-- Step3-4-4: Applying thresholding. Part 2 -----------------%
             cd(mainfolder)
             cd('data/ManualOutput')
             save Imdata.mat Cropped_im binaryImage
@@ -98,24 +96,24 @@ for kk = 1:img.num % run loop as many times as images selected
             
         end
         
-       %% Step3-5: Particle sizing (dp for aggregate; particle size for others)
+       %== Step 3-5: Particle sizing (dp for aggregate; particle size for others)
         if agg_primary==1 
-            imshow(Cropped_im);
+            imshow(img_cropped);
             uiwait(msgbox('Please crop the image for primary particle sizing.'))
-            Cropped_im_primary = imcrop(Cropped_im);
+            Cropped_im_primary = imcrop(img_cropped);
             close (gcf);
             imshow(Cropped_im_primary)
             hold on
         end
         
-        %% Step3-5-2: Setting titles
+        %-- Step 3-5-2: Setting titles -----------------------------------%
         if Particle_Type < 3
             title_measurement = 'Primary particle';
         else
             title_measurement = 'Single particle';
         end
         
-        %% Step3-5-3: Computing particles dimentions
+        %-- Step 3-5-3: Computing particles dimentions -------------------%
         continuing_parameter = 2;
         m = 0;
         num_primary = 0;
@@ -138,13 +136,12 @@ for kk = 1:img.num % run loop as many times as images selected
              width(m,1) = pixsize*sqrt((a(2)-a(1))^2+(b(2) - b(1))^2);
              line ([a(1),a(2)],[b(1),b(2)],'Color', 'r', 'linewidth', 3);
              
-             % Save center coordinate for this primary particle
+             %-- Save center of primary particle -------------------------%
              centers(m,:) = manual.find_centers(x,y,a,b);  % TODO: Test this
              
-             %
              clear a b x y
              
-             %%%%
+             %-- Check if there are more primary particles ---------------%
              if Particle_Type < 3
                  choice = questdlg('Do you want to analyse another primary particle ?',...
                  'Continue?','Yes','No','Yes');
@@ -158,36 +155,32 @@ for kk = 1:img.num % run loop as many times as images selected
              end
         end
         
-%         clear a b x y
-        %% Saving results
-        cd(mainfolder)
-        cd('data/ManualOutput')
-        saveas(gcf,[img.fname{kk} '_Primary_L_W_' num2str(l) '.tif'])
-        close all
-        cd (mainfolder)
         
-        %% Step3-5-4: Computing aggregate dimentions/parameters
+        %-- Save results -------------------------------------------------%
+        saveas(gcf,['data/ManualOutput/',img.fname{kk} '_Primary_L_W_' num2str(ll) '.tif'])
+        close all
+        
+        %== Step 3-5-4: Computing aggregate dimentions/parameters ========%
         if Particle_Type == 1
             
-            %% Calculating Aggregate Area
-            % to determine the total area of the agglomerate
-            area_pixelcount = nnz(binaryImage);
-            Aggregate_Area = area_pixelcount*pixsize^2;
-
-            %% Calculating Aggregate Perimeter
-            % to determine an estimate of the perimeter of the particle
+           
+            area_pixelcount = nnz(binaryImage); % number of non-zero pixels
+            Aggregate_Area = nnz(binaryImage)*pixsize^2; % aggregate area
+            
             Aggregate_perimeter = manual.Perimeter_Length(binaryImage,pixsize,area_pixelcount);
-
-            %% Calculating Aggregate Length and Width
-            %to determine the length and width of the agglomerate
-            [A_length, A_width] = manual.Agg_Dimension(mainfolder,Final_Edge,img.fname{kk},pixsize,l);
-
-            %% Calculating Radius of Gyration
+                % calculate aggregat perimeter
+            
+            %-- Calculating aggregate length and width -------------------%
+            %   To determine the length and width of the agglomerate
+            [A_length, A_width] = manual.Agg_Dimension(mainfolder,Final_Edge,img.fname{kk},pixsize,ll);
+                % calculate aggregate length and width
+            
             [Radius_Gyration] = manual.Gyration(binaryImage, pixsize);
+                % calculate radius of gyration
 
         end
         
-        %% recording report
+        %-- Prepare output -----------------------------------------------%
         tot_primary=tot_primary+1;
         
         if Particle_Type==2
@@ -215,7 +208,7 @@ for kk = 1:img.num % run loop as many times as images selected
                 report_num(tot_primary:tot_primary+num_primary-1,10)=Aggregate_perimeter;
                 report_num(tot_primary:tot_primary+num_primary-1,11)=Radius_Gyration;
                 report_num(tot_primary:tot_primary+num_primary-1,12)=Particle_Type;
-                report_num(tot_primary:tot_primary+num_primary-1,13)=l;
+                report_num(tot_primary:tot_primary+num_primary-1,13)=ll;
                 report_num(tot_primary:tot_primary+num_primary-1,14)=pixsize;
 %                 report_txt(tot_primary:tot_primary+num_primary-1,1)=img.fname{kk};
                 tot_primary=tot_primary+num_primary-1;
@@ -235,7 +228,7 @@ for kk = 1:img.num % run loop as many times as images selected
                 report_num(tot_primary,10)=Aggregate_perimeter;
                 report_num(tot_primary,11)=Radius_Gyration;
                 report_num(tot_primary,12)=Particle_Type;
-                report_num(tot_primary,13)=l;
+                report_num(tot_primary,13)=ll;
                 report_num(tot_primary,14)=pixsize;
 %                 report_txt(tot_primary,1)=img.fname{kk};
             elseif num_primary==0
@@ -254,7 +247,7 @@ for kk = 1:img.num % run loop as many times as images selected
                 report_num(tot_primary,10)=Aggregate_perimeter;
                 report_num(tot_primary,11)=Radius_Gyration;
                 report_num(tot_primary,12)=Particle_Type;
-                report_num(tot_primary,13)=l;
+                report_num(tot_primary,13)=ll;
                 report_num(tot_primary,14)=pixsize;
 %                 report_txt(tot_primary,1)=img.fname{kk};
             end
@@ -274,27 +267,21 @@ for kk = 1:img.num % run loop as many times as images selected
             report_num(tot_primary,10)=NaN;
             report_num(tot_primary,11)=NaN;
             report_num(tot_primary,12)=Particle_Type;
-            report_num(tot_primary,13)=l;
+            report_num(tot_primary,13)=ll;
             report_num(tot_primary,14)=pixsize;
 %             report_txt(tot_primary,1)=img.fname{kk};
             
         end
         
-        %% Autobackup
         
-        cd(mainfolder)
-        cd('data/ManualOutput')
-        if exist('Report_dpda.mat','file')==2
-            save('Report_dpda.mat','report_num','-append');
+        %-- Autobackup ----------------------------------------------------%
+        if exist('data/ManualOutput/Report_dpda.mat','file')==2
+            save('data/ManualOutput/Report_dpda.mat','report_num','-append');
         else
-            save('Report_dpda.mat','report_num','report_title');
+            save('data/ManualOutput/Report_dpda.mat','report_num','report_title');
         end
         
-        cd(mainfolder)
-        
-%         clear length width A_length A_width x_center y_center alignment 
-        clear length width A_length A_width 
-        
+        clear length width % clear variables prior to next iteration
         
         choice = questdlg('Do you want to analyse another aggregate ?',...
             'Continue?','Yes','No','Yes');
@@ -310,10 +297,7 @@ for kk = 1:img.num % run loop as many times as images selected
 
 end
 
-%% Writing Excel Report
-
-cd(mainfolder)
-
+%-- Write Excel report ---------------------------------------------------%
 if exist('data/ManualOutput/Final_dpda_Report.xls','file')==2
     datanum=manual.excel_import('data/ManualOutput/Final_dpda_Report.xls',2);
     starting_row=size(datanum,1)+2;
@@ -325,7 +309,6 @@ else
     xlswrite('data/ManualOutput/Final_dpda_Report.xls',report_num,'TEM_ImageProcessingData','B2');
 end
 
-cd(mainfolder)
 
 
 end
