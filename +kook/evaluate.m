@@ -20,7 +20,7 @@
 function [dp,dpdist] = evaluate(img_ref,opt_plot)
 %-------------------------------------------------------------------------%
 % Inputs:
-%   img     Image struct to be analyzed
+%   img_ref Image struct to be analyzed
 %   dpdist  Primary particle size disitrbution of aggregate
 %-------------------------------------------------------------------------%
 

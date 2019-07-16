@@ -5,9 +5,9 @@ clc;
 
 img_ref = tools.get_img_ref;
     % generates a reference to a set of images to be analyzed
-img = tools.get_imgs(img_ref); % load a single image
-img = tools.get_footer_scale(img); % get footer for selected image
-imagesc(img(1).Cropped);
+imgs = tools.get_imgs(img_ref); % load a single image
+imgs = tools.get_footer_scale(imgs); % get footer for selected image
+imshow(imgs(1).RawImage);
 colormap('gray');
 
 
@@ -29,10 +29,10 @@ colormap('gray');
 % disp(' ');
 
 
-disp('Performing modified Kook analysis...');
-kook_mod.evaluate(img_ref);
-disp('Complete.');
-disp(' ');
+% disp('Performing modified Kook analysis...');
+% kook_mod.evaluate(img_ref);
+% disp('Complete.');
+% disp(' ');
 
 
 % load('data\data_FlareNet.mat');

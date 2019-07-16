@@ -85,7 +85,7 @@ if exist(imgFoldName, 'dir') ~= 7
 end
 
 
-%% Cropping aggregate photo
+%-- Crop aggregate photo -------------------------------------------------%
 uiwait(msgbox('Please crop an image of the aggregate that you wish to analyze.'));
 
 img.Cropped_agg = imcrop(img.Cropped); % user crops aggregate
@@ -97,18 +97,18 @@ aggNum = aggNum + 1;
 saveas(gcf,[imgFoldName,'\cropped_',int2str(aggNum)],'tif');
 
 
-%% Preprocess image
+%== Preprocess image =====================================================%
 [img,BWCED2,binary_cropped] = kook_mod.preprocess(img,imgFoldName,aggNum);
 
 
 
-%% Find and Draw Circles Within Aggregates
+%== Find and draw circles within aggregates ==============================%
 
 % Find circles within soot aggregates 
 [centers, radii, metric] = imfindcircles(BWCED2,[rmin rmax],...
     'ObjectPolarity', 'dark', 'Sensitivity', sens_val, 'Method', 'TwoStage'); 
 
-% - draw circles  ----- FIGURE 7 -------
+%-- Draw circles - FIGURE 7 -------%
 figure();
 imshow(img.Cropped_agg,[]);
 hold;
@@ -120,14 +120,14 @@ saveas(gcf, [imgFoldName,'\',FName,'_circOrig_',int2str(aggNum)], 'tif')
 % - check the circle finder by overlaying the CHT boundaries on the original image 
 R = imfuse(BWCED2, img.Cropped_agg,'blend'); 
 
-% -------- FIGURE 8 ---------
+%-- FIGURE 8 ---------%
 figure();imshow(R,[],'InitialMagnification',500);hold;h = viscircles(centers, radii, 'EdgeColor','r'); 
 title('Step 8: Primary particles overlaid on the Canny edges and the original TEM image');
 
 saveas(gcf, [imgFoldName,'\circAll_',int2str(aggNum)], 'tif')
 
 
-%% Calculate Parameters (Add Histogram)
+%== Calculate Parameters (Add Histogram) =================================%
 
 dpdist = radii*pixsize*2;
 savepics = struct('dpdist', dpdist, 'centersCED', centers, 'metriCED', metric);
@@ -145,13 +145,13 @@ set(gca, 'fontsize', 16)
 
 saveas(gcf, [imgFoldName,'\histo_',int2str(aggNum)], 'jpg');
 
-%% error statement to pause program for debugging purposes
+%- Error statement to pause program for debugging purposes ---------------%
 
-%% Binarize Image (Add RoG Calculation) 
+%-- Binarize Image (Add RoG Calculation) ---------------------------------%
 [x,y] = find(binary_cropped == 0);
 
 
-%% Calculating radius of gyration
+%-- Calculating radius of gyration ---------------------------------------%
 
 CenterOfMassXY = [mean(x); mean(y)] ;
 
@@ -175,14 +175,13 @@ text(0.25 * size(binary_cropped, 1), 0.1 * size(binary_cropped, 2), sprintf('Rad
 % binName = sprintf('%s_binary_%i', FName, aggNum);
 % saveas(gcf, binName, 'jpg')
 
-%% Saving Results
+%-- Save results ---------------------------------------------------------%
 extracted_text(1) = {fname};
 extractedData(1) = NumberofParticles;
 extractedData(2) = AverageRadius;
 extractedData(3) = RoG;
 
-%% Write to EXCEL and saving
-
+%-- Write to EXCEL and saving --------------------------------------------%
 % saving to mat file
 if exist('Data\KookOutput\Kook_data.mat','file') == 2
     save('Data\KookOutput\Kook_data.mat','extractedData','extracted_text','dpdist','-append');
@@ -212,7 +211,7 @@ for i = 1:length(dpdist)
 end
 
 
-%% checking to see if user is done analyzing aggregates
+%-- Check to see if user is done analyzing aggregates --------------------%
 fin_choice = questdlg('Are there any more aggregates you wish to analyze?','Done?','Yes','No','Yes');
 
 if strcmp(fin_choice,'No')

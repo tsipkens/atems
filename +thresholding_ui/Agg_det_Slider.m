@@ -1,4 +1,4 @@
-function [binary_int,rect,thresh_slider_in] = Agg_det_Slider(img_cropped,opts_crop) 
+function [img_binary,rect,thresh_slider_in] = Agg_det_Slider(img_cropped,opts_crop) 
 % Semi-automatic detection of the aggregates on TEM images
 % Function to be used with the Pair Correlation Method (PCM) package
 % Ramin Dastanpour & Steven N. Rogak
@@ -66,8 +66,8 @@ close(f);
 
 %== Select particles and format output ===================================%
 uiwait(msgbox('Please selects (left click) particles satisfactorily detected; and press enter'));
-binary_int = bwselect(Binary_Image_4,8);
-binary_int = ~binary_int; % formatted for PCA, other codes should reverse this
+img_binary = bwselect(Binary_Image_4,8);
+img_binary = ~img_binary; % formatted for PCA, other codes should reverse this
 
 
 end

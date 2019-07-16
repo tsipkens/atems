@@ -7,7 +7,7 @@
 % Slider method
 %=========================================================================%
 
-function thresh_slider(hObj,event,hax,Thresh_slider_in,binaryImage) %#ok<INUSL>
+function thresh_slider(hObj,event,hax,thresh_slider_in,binaryImage) %#ok<INUSL>
 
 global Binary_Image_4
 
@@ -15,22 +15,21 @@ axes(hax);
 
 %-- Average filter -------------------------------------------------------%
 hav = fspecial('average');
-img_filtered = imfilter(Thresh_slider_in, hav);
-clear hav
+img_filtered = imfilter(thresh_slider_in, hav);
 
 
 %-- Median ---------------------------------------------------------------%
 % Examines a neighborhood of WxW matrix, takes and makes the centre of that
 % matrix the median of the original neighborhood
 W = 5;
-Thresh_slider_in = medfilt2(img_filtered , [W W]);
+thresh_slider_in = medfilt2(img_filtered,[W W]);
 
 
 %-- Binary image via threshold value -------------------------------------%
 adj = get(hObj,'Value');
-level = graythresh(Thresh_slider_in);
+level = graythresh(thresh_slider_in);
 level = level+adj;
-img_binary1 = imbinarize(Thresh_slider_in,level);
+img_binary1 = imbinarize(thresh_slider_in,level);
 
 
 %-- Binary image via dilation --------------------------------------------%
@@ -47,7 +46,7 @@ img_binary3 = 0.*img_binary2;
 img_binary3(binaryImage) = img_binary2(binaryImage);
 Binary_Image_4 = logical(img_binary3);
 
-img_temp2 = imimposemin(Thresh_slider_in,Binary_Image_4);
+img_temp2 = imimposemin(thresh_slider_in,Binary_Image_4);
 imshow(img_temp2);
 
 
