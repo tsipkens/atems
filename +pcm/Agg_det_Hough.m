@@ -14,8 +14,8 @@ function [img_binary,moreaggs,choice] = ...
 %== Step 1: Apply intensity threshold ====================================%
 level = graythresh(img_cropped);
 BW = imbinarize(img_cropped,level);
-figure
-hold on
+figure;
+hold on;
 subplot(3,3,1);imshow(img_cropped)
 subplot(3,3,2); imshow(BW)
 a = coeffs(1);

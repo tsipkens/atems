@@ -14,16 +14,16 @@ colormap('gray');
 
 
 
-disp('Performing manual analysis...');
-img_data_manual = manual.evaluate(imgs);
-disp('Complete.');
-disp(' ');
-
-
-% disp('Performing PCM analysis...');
-% img_data_pcm = pcm.evaluate(imgs);
+% disp('Performing manual analysis...');
+% img_data_manual = manual.evaluate(imgs);
 % disp('Complete.');
 % disp(' ');
+
+
+disp('Performing PCM analysis...');
+img_data_pcm = pcm.evaluate(imgs);
+disp('Complete.');
+disp(' ');
 
 
 % disp('Performing original Kook analysis...');

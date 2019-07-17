@@ -35,14 +35,13 @@ function [ A_length, A_width ] = Agg_Dimension(img_edge,pixsize)
 area_edge_particle = nnz(img_edge);
 length = 0;
 
-%% Lenght Calculation
-
-% to compute the length in vector form, and record the position of the two
-% pixels that specify the length.  Since the 'find' function searches
-% column-by-column, in the order of increasing x, then increasing y, the
-% pixel specified by 'pos1' will always have a greater y-indices than the
-% pixel specified by pos2.  This helps determine theta, later on in the
-% program.
+%== Length calculation ===================================================%
+%   To compute the length in vector form, and record the position of the two
+%   pixels that specify the length.  Since the 'find' function searches
+%   column-by-column, in the order of increasing x, then increasing y, the
+%   pixel specified by 'pos1' will always have a greater y-indices than the
+%   pixel specified by pos2.  This helps determine theta, later on in the
+%   program.
 
 for pos1 = 1:1:area_edge_particle
     DISTANCE = ( (COL1 - COL1(pos1)).^2 + (ROW1 - ROW1(pos1)).^2 ).^.5;
@@ -58,13 +57,13 @@ end
 A_length=length*pixsize;
 clear COL1 ROW1 DISTANCE area_edge_particle
 
-%% Width Calculation
 
-% to mark the pixels that specify the length.  It is important to note that
-% an error may arise during the rotation of the image, because some pixels
-% are obscured, or even deleted via the rotation process.  In order to
-% prevent this, the pixel left-adjacent to the true length-defining pixels
-% are also marked with a value of '2', or '3'.
+%== Width Calculation ====================================================%
+%   Tto mark the pixels that specify the length.  It is important to note that
+%   an error may arise during the rotation of the image, because some pixels
+%   are obscured, or even deleted via the rotation process.  In order to
+%   prevent this, the pixel left-adjacent to the true length-defining pixels
+%   are also marked with a value of '2', or '3'.
 
 Temp_Final_Edge = img_edge;
 Temp_Final_Edge (y1_l_bot, x1_l_bot:(x1_l_bot+2)) = 2;
@@ -103,7 +102,7 @@ A_width=width*pixsize;
 
 clear ROW2 COL2
 
-%% PLOT LENGTH AND WIDTH AXIS ALONG ROT
+%-- PLOT LENGTH AND WIDTH AXIS ALONG ROT ---------------------------------%
 % ---ALGORITHM---
 % To draw the perpendicular length axis, the indices of the length-defining
 % pixels are needed.  These are located by finding the pixels that were 

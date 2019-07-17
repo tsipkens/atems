@@ -122,10 +122,10 @@ while moreaggs==1
     if isempty(img_binary)
         img_binary = ones(size(img.Cropped));
     end
-    rect = round(rect);
-    size_temp = size(img_temp);
-    img_binary(rect(2):(rect(2)+size_temp(1)-1),...
-        rect(1):(rect(1)+size_temp(2)-1)) = ...
+    rect = rou
+    size_temp = size(img_temp)
+    img_binary(round(rect(2)):round((rect(2)+rect(4)-1)),...
+        round(rect(1)):round((rect(1)+rect(3)-1))) = ...
         img_temp;
     
     imshow(img_binary)

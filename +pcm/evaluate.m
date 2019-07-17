@@ -28,17 +28,6 @@ moreaggs    = 0;
 savecounter = 0;
 
 
-%-- Housekeeping ---------------------------------------------------------%
-%   Global mainfolder img img.dir FileName
-extracted_text = cell(1,1);
-
-
-%-- Report title ---------------------------------------------------------%
-report_title = {'Image_ID','Particle Area (nm^2)','Particle Perimeter (nm)',...
-    'Particle Length (nm)','Particle Width (nm)','Particle aspect ratio',...
-    'Radius of Gyration (nm)','Particle eq. da (nm)',...
-    'dp (nm) [simple PCF]','dp (nm) [generalized PCF]','Max resolution (nm)','Engine Type'};
-
 img_data = struct;
 
 %== Main image processing loop ===========================================%
@@ -67,17 +56,17 @@ for ii = 1:length(imgs) % run loop as many times as images selected
     close (gcf);
     
     % Check whether the Output folder is available 
-    dirName = sprintf('Data/PCMOutput');
+    dirName = sprintf('Data\PCMOutput\');
     
     if exist(dirName,'dir') ~= 7 % 7 if exist parameter is a directory
         mkdir(dirName) % make output folder
     end
     
-
+    
     %== Step 2: Automatic/semi-automatic aggregate detection =============%
     imgs(ii).Binary = pcm.Agg_detection(imgs(ii),pixsize,moreaggs,minparticlesize,coeffs);
     
-    imgs(ii).Edge        = edge(imgs(ii).Binary,'sobel'); % Sobel edge detection
+    imgs(ii).Edge   = edge(imgs(ii).Binary,'sobel'); % Sobel edge detection
     SE              = strel('disk',1);
     imgs(ii).DilatedEdge = imdilate(imgs(ii).Edge,SE); % morphological dilation
     
@@ -276,6 +265,17 @@ for ii = 1:length(imgs) % run loop as many times as images selected
         %== Step 4: Save results =========================================%
         %{
         
+        %   Global mainfolder img img.dir FileName
+        extracted_text = cell(1,1);
+
+
+        %-- Report title ---------------------------------------------------------%
+        report_title = {'Image_ID','Particle Area (nm^2)','Particle Perimeter (nm)',...
+            'Particle Length (nm)','Particle Width (nm)','Particle aspect ratio',...
+            'Radius of Gyration (nm)','Particle eq. da (nm)',...
+            'dp (nm) [simple PCF]','dp (nm) [generalized PCF]','Max resolution (nm)','Engine Type'};
+
+
         %-- Choose appropriate value for based on your Excel version -------------%
         xls_sheet = 2; % Uncomment this if your default MS Excel version is 2013
         % xls_sheet = 4; % Uncomment this if your default MS Excel version is <2013
