@@ -14,9 +14,9 @@ pair correlation method (PCM), Kook, and manual methods.
 
 ### Output
 
-The various methods of evaluating the properties of the aggregate properties 
+The various methods of evaluating the properties of the aggregate properties
 output the data in a structured format, which can be exported to a JSON
-format to be analyzed in other softwares and languages. 
+format to be analyzed in other softwares and languages.
 
 --------------------------------------------------------------------------
 
