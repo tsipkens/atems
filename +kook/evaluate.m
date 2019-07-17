@@ -29,8 +29,7 @@ function [dp,dpdist] = evaluate(imgs,bool_plot)
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
 
-%img = tools.get_imgs(img_ref); % read in image
-%[img,pixsize] = tools.get_footer_scale(img);
+
 pixsize = imgs(1).pixsize;
 
 II1 = imgs(1).Cropped;

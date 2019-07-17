@@ -18,6 +18,11 @@ if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
 
 
+%-- Choose appropriate value for based on your Excel version -------------%
+xls_sheet = 2; % Uncomment this if your default MS Excel version is 2013
+% xls_sheet = 4; % Uncomment this if your default MS Excel version is <2013
+
+
 %-- Initialize values ----------------------------------------------------%
 fontSize        = 10;
 minparticlesize = 4.9; % to filter out noises
@@ -44,8 +49,14 @@ img_data = struct;
 %== Main image processing loop ===========================================%
 for ii = 1:length(imgs) % run loop as many times as images selected
     
+    img_data(ii). imgs(ii).fname;
+    
+    
     %== Step 1: Image preparation ========================================%
-    %-- Step 1-3: Crop footer and get scale from footer (now external) ------------------%
+    %-- Step 1-1: Loading images one-by-one ------------------------------%
+    % cd(img.dir); % change active directory to image directory
+    
+    %-- Step 1-3: Crop footer and get scale from footer ------------------%
     pixsize = imgs(ii).pixsize;
     
     % Build the image processing coefficients for the image based on its
@@ -90,26 +101,17 @@ for ii = 1:length(imgs) % run loop as many times as images selected
     CC = bwconncomp(abs(imgs(ii).Binary-1));
     NofAggs = CC.NumObjects; % count number of particles
     
-    ll = 0; % initialize aggregate counter
-    
     %-- Lopp for each aggregate on the image under investigation ---------%
     for nAgg = 1:NofAggs
-        
-        ll = ll + 1; % increment aggregate counter
-        
-        Data = struct; % initialize data structure for current aggregate
-        Data.method = 'pcm';
-        
-        
         %-- Step 3-2: Prepare an image of the isolated aggregate ---------%
-        Data.Image = zeros(size(imgs(ii).Binary));
-        Data.Image(CC.PixelIdxList{1,nAgg}) = 1;
+        agg.Image = zeros(size(imgs(ii).Binary));
+        agg.Image(CC.PixelIdxList{1,nAgg}) = 1;
         
         % Edge Image via Sobel
         % Use Sobel's Method as a built-in edge detection function for
         % aggregates's outline. Other methods (e.g. Roberts, Canny)can also
         % be considered
-        Image_edge = edge(Data.Image,'sobel');
+        Image_edge = edge(agg.Image,'sobel');
         
         % Dilated Edge Image
         % Use dilation to strengthen the aggregate's outline
@@ -124,15 +126,15 @@ for ii = 1:length(imgs) % run loop as many times as images selected
         %-- Step 3-3: Development of the pair correlation function (PCF) -%
         
         %-- 3-3-1: Find the skeleton of the aggregate --------------------%
-        Skel = bwmorph(Data.Image,'thin',Inf);
+        Skel = bwmorph(agg.Image,'thin',Inf);
         [skeletonY, skeletonX] = find(Skel);
         
         %-- 3-3-2: Calculate the distances between skeleton pixels and other pixels
         clear row col
-        [row, col] = find (Data.Image);
+        [row, col] = find (agg.Image);
         
         
-        Data.Pixels = nnz(Data.Image); % total number of pixels in aggregate
+        agg.Pixels = nnz(agg.Image); % total number of pixels in aggregate
         
         % to consolidate the pixels of consideration to much smaller arrays
         
@@ -141,7 +143,7 @@ for ii = 1:length(imgs) % run loop as many times as images selected
         Y       = 0;
         density = 20; % larger densities make the program less computationally expensive
         
-        for kk = 1:density:Data.Pixels
+        for kk = 1:density:agg.Pixels
             p    = p + 1;
             X(p) = col(kk);
             Y(p) = row(kk);
@@ -191,30 +193,30 @@ for ii = 1:length(imgs) % run loop as many times as images selected
         
         %-- 3-4: Computing aggregate dimentions/parameters ---------------%
         % Projected area of the aggregate
-        Data.Area = Data.Pixels*pixsize^2;
+        agg.Area = agg.Pixels*pixsize^2;
         
         % Projected area equivalent diameter of the aggregate
-        Data.da = ((Data.Pixels/pi)^.5)*2*pixsize;
+        agg.da = ((agg.Pixels/pi)^.5)*2*pixsize;
         
         % Aggregate Perimeter
         clear row col
-        [row, col]           = find(Data.Image);
+        [row, col]           = find(agg.Image);
         perimeter_pixelcount = 0;
         
-        for kk = 1:1:Data.Pixels
-            if  (Data.Image(row(kk)-1,col(kk))==0) || ...
-                (Data.Image(row(kk),col(kk)+1)==0) || ...
-                (Data.Image(row(kk),col(kk)-1)==0) || ...
-                (Data.Image(row(kk)+1,col(kk))==0)
+        for kk = 1:1:agg.Pixels
+            if  (agg.Image(row(kk)-1,col(kk))==0) || ...
+                (agg.Image(row(kk),col(kk)+1)==0) || ...
+                (agg.Image(row(kk),col(kk)-1)==0) || ...
+                (agg.Image(row(kk)+1,col(kk))==0)
                 
                 perimeter_pixelcount = perimeter_pixelcount + 1;
             end
         end
         
-        Data.Perimeter = perimeter_pixelcount*pixsize;
+        agg.Perimeter = perimeter_pixelcount*pixsize;
         
         % Aggregate gyration radius
-        [xpos,ypos] = find(Data.Image);
+        [xpos,ypos] = find(agg.Image);
         n_pix       = length(xpos);
         Centroid.x  = sum(xpos)/n_pix;
         Centroid.y  = sum(ypos)/n_pix;
@@ -225,29 +227,29 @@ for ii = 1:length(imgs) % run loop as many times as images selected
                       ((ypos(kk,1)-Centroid.y)*pixsize)^2)*pixsize^2;
         end
         
-        Data.Rg = (sum(Ar)/Data.Area)^0.5;
+        agg.Rg = (sum(Ar)/agg.Area)^0.5;
         clear Ar ypos xpos Centroid.x Centroid.y
         
         % Aggregate Length, Width, and aspect ratio      
-        Data.L           = max((max(row)-min(row)),(max(col)-min(col)))*pixsize;
-        Data.W           = min((max(row)-min(row)),(max(col)-min(col)))*pixsize;
-        Data.aspect_ratio = Data.L/Data.W;
+        agg.L           = max((max(row)-min(row)),(max(col)-min(col)))*pixsize;
+        agg.W           = min((max(row)-min(row)),(max(col)-min(col)))*pixsize;
+        agg.Aspectratio = agg.L/agg.W;
         
         %-- 3-5: Primary particle sizing ---------------------------------%
         %-- 3-5-1: Simple PCM --------------------------------------------%
         PCF_simple   = .913;
-        Data.RpSimple = interp1(PCF_smoothed, Radius, PCF_simple);
+        agg.RpSimple = interp1(PCF_smoothed, Radius, PCF_simple);
         
         %-- 3-5-2: Generalized PCM ---------------------------------------%
-        URg      = 1.1*Data.Rg; % 10% higher than Rg
-        LRg      = 0.9*Data.Rg; % 10% lower than Rg
-        PCFRg    = interp1(Radius, PCF_smoothed, Data.Rg); % P at Rg
+        URg      = 1.1*agg.Rg; % 10% higher than Rg
+        LRg      = 0.9*agg.Rg; % 10% lower than Rg
+        PCFRg    = interp1(Radius, PCF_smoothed, agg.Rg); % P at Rg
         PCFURg   = interp1(Radius, PCF_smoothed, URg); % P at URg
         PCFLRg   = interp1(Radius, PCF_smoothed, LRg); % P at LRg
         PRgslope = (PCFURg+PCFLRg-PCFRg)/(URg-LRg); % dp/dr(Rg)
         
-        PCF_generalized   = (.913/.84)*(0.7+0.003*PRgslope^(-0.24)+0.2*Data.aspect_ratio^-1.13);
-        Data.RpGeneralized = interp1(PCF_smoothed, Radius, PCF_generalized);
+        PCF_generalized   = (.913/.84)*(0.7+0.003*PRgslope^(-0.24)+0.2*agg.Aspectratio^-1.13);
+        agg.RpGeneralized = interp1(PCF_smoothed, Radius, PCF_generalized);
         
         %-- Plot pair correlation function in line graph format ----------%
         filename = 'Pair Correlation Function Plot.jpeg';
@@ -258,7 +260,7 @@ for ii = 1:length(imgs) % run loop as many times as images selected
         
         hold on
         
-        loglog(Data.RpSimple,PCF_simple,'*')
+        loglog(agg.RpSimple,PCF_simple,'*')
         close all
         
         %-- Clear variables ----------------------------------------------%
@@ -266,20 +268,19 @@ for ii = 1:length(imgs) % run loop as many times as images selected
             skeletonX Agg.Pixels Distance_mat Radius PCF PCF_smoothed ...
             Denamonator row col
         
-        %== Step 4: Save results =========================================%
-        %   Format output and autobackup data ----------------------------%
-        img_data(ii).Agg(ll).fname = imgs(ii).fname; % store file name with data
-        img_data(ii).Agg(ll).Data = Data; % copy Dp data structure into img_data
-        save('Data\PCMOutput\PCM_data.mat','img_data'); % backup img_data
+        img_data(ii).Agg(ll) = Agg; % copy Dp data structure into img_data
         
+        %-- Autobackup data --%
+        if exist('Data\PCMOutput\PCM_data.mat','file')==2
+            
+        else
+            save('Data\PCMOutput\PCM_data.mat','img_data');
+        end
+        
+        close all;
         
         %== Step 4: Save results =========================================%
         %{
-        
-        %-- Choose appropriate value for based on your Excel version -------------%
-        xls_sheet = 2; % Uncomment this if your default MS Excel version is 2013
-        % xls_sheet = 4; % Uncomment this if your default MS Excel version is <2013
-        
         extracted_data(1) = round(agg.Area,2);
         extracted_data(2) = round(agg.Perimeter,2);
         extracted_data(3) = round(agg.L,2);

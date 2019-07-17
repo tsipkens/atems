@@ -1,4 +1,4 @@
-function [img_binary,rect,thresh_slider_in] = Agg_det_Slider(img_cropped,bool_crop) 
+function [img_binary,rect,thresh_slider_in,img_cropped] = Agg_det_Slider(img,bool_crop) 
 % Semi-automatic detection of the aggregates on TEM images
 % Function to be used with the Pair Correlation Method (PCM) package
 % Ramin Dastanpour & Steven N. Rogak
@@ -11,24 +11,24 @@ function [img_binary,rect,thresh_slider_in] = Agg_det_Slider(img_cropped,bool_cr
 global Binary_Image_4
 
 %-- Parse input ---------------------%
-if ~exist('opts_crop','var'); bool_crop = []; end
+if ~exist('bool_crop','var'); bool_crop = []; end
 if isempty(bool_crop); bool_crop = 1; end
 
 %-- Crop image ----------------------%
 if bool_crop
     uiwait(msgbox('Please crop the image around missing particle'));
-    [img_cropped_int, rect] = imcrop(img_cropped); % user crops image
+    [img_cropped, rect] = imcrop(img); % user crops image
 else
-	img_cropped_int = img_cropped; % originally bypassed in Kook code
+	img_cropped = img; % originally bypassed in Kook code
     rect = [];
 end
 
 %== Step 1: Image refinment ==============================================%
 %-- Step 1-1: Apply Lasso tool -------------------------------------------%
-img_binary = thresholding_ui.lasso_fnc(img_cropped_int);
+img_binary = thresholding_ui.lasso_fnc(img_cropped);
 
 %-- Step 1-2: Refining background brightness -----------------------------%
-img_refined = thresholding_ui.background_fnc(img_binary,img_cropped_int);
+img_refined = thresholding_ui.background_fnc(img_binary,img_cropped);
 
 %-- Step 2: Thresholding -------------------------------------------------%
 thresh_slider_in = img_refined;
@@ -47,7 +47,7 @@ hst = uicontrol('Style', 'slider',...
     'Min',0-level,'Max',1-level,'Value',.5-level,...
     'Position', [140 480 120 20],...
     'Callback', {@thresholding_ui.thresh_slider,hax,thresh_slider_in,img_binary});
-get(hst,'value') % add a slider uicontrol
+get(hst,'value'); % add a slider uicontrol
 
 uicontrol('Style','text',...
     'Position', [140 500 120 20],...

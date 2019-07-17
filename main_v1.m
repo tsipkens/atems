@@ -11,26 +11,26 @@ imshow(imgs(1).RawImage);
 colormap('gray');
 
 
-% disp('Performing manual analysis...');
-% manual.evaluate(img_ref);
-% disp('Complete.');
-% disp(' ');
+disp('Performing manual analysis...');
+img_data_manual = manual.evaluate(imgs);
+disp('Complete.');
+disp(' ');
 
 
 % disp('Performing PCM analysis...');
-% pcm.evaluate(img_ref);
+% img_data_pcm = pcm.evaluate(imgs);
 % disp('Complete.');
 % disp(' ');
 
 
 % disp('Performing original Kook analysis...');
-% dp = kook.evaluate(img_ref);
+% dp = kook.evaluate(imgs);
 % disp('Complete.');
 % disp(' ');
 
 
 % disp('Performing modified Kook analysis...');
-% kook_mod.evaluate(img_ref);
+% img_data_kook = kook_mod.evaluate(imgs);
 % disp('Complete.');
 % disp(' ');
 

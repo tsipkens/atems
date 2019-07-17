@@ -6,40 +6,42 @@
 %%%% "Observations of a Correlation between Primary Particle and Aggregate
 %%%% Size for Soot Particles", J. of Aerosol Sci. & Tech.
 
-function [Final_Binary, Final_Edge, Final_imposed] = Thresh_refine(Binary_im_slider,Thresh_slider_in,FileName,n_aggregate)
+function [img_binary5, img_manual_edge, img_final_imposed] = Thresh_refine(img_binary,Thresh_slider_in)
 
-global Binary_Image_5 Manual_Edge FinalImposedImage
 
-%% Binary image via SELECTION
+%-- Binary image via SELECTION -------------------------------------------%
 % to further reduce the noise, and solve the area calculation problems of
 % multiple particle images
 
 uiwait(msgbox('Please select which particle(s) wished to be analyzed.\nDouble click, or right click, or shift-click on the desired particle.\nNote that only one particle may be selected per analysis!',...
     'Process Stage: Manual Artifact Removal','help'));
-Binary_Image_5 = bwselect(Binary_im_slider,8);
+img_binary5 = bwselect(img_binary,8);
 
-%% Imposed Image
+
+%-- Imposed image --------------------------------------------------------%
 % to get particle, with no background, thus eliminating the semi-large
 % carbon frames in the background
 % impose the inverse of Binary_Image_5 on Filtered_Image_2
 
-Imposed_Image=imimposemin(Thresh_slider_in, ~Binary_Image_5);
+% Imposed_Image = imimposemin(Thresh_slider_in, ~Binary_Image_5);
+img_imposed = img_binary5; % currently skipping this step
 
-%% Edge Image via Sobel
+
+%-- Edge detection via Sobel ---------------------------------------------%
 % Use Sobel's Method as a built-in edge detection function for particle's 
 % outline.  Can consider using other methods (Roberts, Canny, etc)
 
-Edge_Image = edge(Imposed_Image,'sobel');
+img_edge = edge(img_imposed,'sobel');
 
-%% Dilated Edge Image
+
+%-- Dilated Edge Image ---------------------------------------------------%
 % to strengthen the particle's outline, use dilation
 
 SE2 = strel('disk',1);
-Dilated_Edge_Image = imdilate(Edge_Image,SE2);
+img_dilate = imdilate(img_edge,SE2);
 
-clear Edge_Image SE2
 
-%% Manual Edge Image
+%-- Manual edge detection on image ---------------------------------------%
 % to get rid of large spots that are not part of the image obvious to the
 % human eye.  May consider automating this process later on for cleaner
 % images
@@ -49,29 +51,28 @@ while pass==0
     
     uiwait(msgbox('Please LEFT click on the pixels that are clearly not part of the outline.  Push ENTER when finish.',...
         'Process Stage: Manual Edge','help'));
-    temp_Edge=bwselect(Dilated_Edge_Image,4);
+    img_temp_edge = bwselect(img_dilate,4);
     close all
-    Manual_Edge=Dilated_Edge_Image-temp_Edge;
+    img_manual_edge = img_dilate-img_temp_edge;
     
-    imshow(Manual_Edge);
+    imshow(img_manual_edge);
     
-    choise=questdlg('Do you want to repeat the Manual Edge process?',...
+    choice = questdlg('Do you want to repeat the Manual Edge process?',...
         'Manual Edge Clarification','Yes',...
         'No','Yes'); 
     close all
-    if  strcmp(choise,'No') == 1
+    if  strcmp(choice,'No') == 1
         pass = 1;
     end
 
 end
 
-clear temp_Edge Dilated_Edge
+img_final_imposed = imimposemin(Thresh_slider_in, img_manual_edge);
 
-FinalImposedImage = imimposemin(Thresh_slider_in, Manual_Edge);
-Final_imposed = FinalImposedImage;
-Final_Binary = Binary_Image_5;
-Final_Edge = Manual_Edge;
-%% Saving Images
+
+% Saving Images
+%{
+% Currently commented to prevent changing of folder
 cd('data')
 if exist('ManualOutput','dir')~=7 %checking wheter the Output folder available 
     mkdir('ManualOutput')
@@ -82,4 +83,6 @@ imwrite(Thresh_slider_in,[FileName '_Filtered_Image_' num2str(n_aggregate) '.tif
 imwrite(Binary_Image_5,[FileName '_Binary_Image_' num2str(n_aggregate) '.tif']);
 imwrite(Manual_Edge,[FileName '_Edge_Image_' num2str(n_aggregate) '.tif']);
 imwrite(FinalImposedImage,[FileName '_Imposed_Image_' num2str(n_aggregate) '.tif']);
+%}
 
+end

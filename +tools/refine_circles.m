@@ -13,7 +13,7 @@ centers = dp.centers;
 figure;
 imshow(img); % display current image
 
-for ii=1:25%length(radii) % generate a series of roi.Circles objects (with handles)
+for ii=1:min(length(radii),25) % generate a series of roi.Circles objects (with handles)
     h(ii) = images.roi.Circle(gca,'Center',centers(ii,:),'Radius',radii(ii));
 end
 

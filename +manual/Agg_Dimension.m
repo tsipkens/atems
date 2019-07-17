@@ -6,7 +6,7 @@
 %%%% "Observations of a Correlation between Primary Particle and Aggregate
 %%%% Size for Soot Particles", J. of Aerosol Sci. & Tech.
 
-function [ A_length, A_width ] = Agg_Dimension(mainfolder,Final_Edge,FileName,pixsize,particle_number )
+function [ A_length, A_width ] = Agg_Dimension(img_edge,pixsize)
 %Aggregate_Dimension etermines the length & width of the agglomerate, and
 %provides a rotated image of the particle with length and width axis
 %   Based on function_length_width3 (Arka and Hugo) with memory saving improvement
@@ -31,8 +31,8 @@ function [ A_length, A_width ] = Agg_Dimension(mainfolder,Final_Edge,FileName,pi
 %   Then the width corresponds to the location of the greatest x indices of a
 %   white pixel minus the location of the smallest x indices of a white pixel.
 
-[ROW1, COL1] = find (Final_Edge);
-area_edge_particle = nnz(Final_Edge);
+[ROW1, COL1] = find (img_edge);
+area_edge_particle = nnz(img_edge);
 length = 0;
 
 %% Lenght Calculation
@@ -66,7 +66,7 @@ clear COL1 ROW1 DISTANCE area_edge_particle
 % prevent this, the pixel left-adjacent to the true length-defining pixels
 % are also marked with a value of '2', or '3'.
 
-Temp_Final_Edge = Final_Edge;
+Temp_Final_Edge = img_edge;
 Temp_Final_Edge (y1_l_bot, x1_l_bot:(x1_l_bot+2)) = 2;
 Temp_Final_Edge (y1_l_bot, x1_l_bot+1) = 2;
 Temp_Final_Edge (y2_l_top, x2_l_top) = 3;
@@ -133,10 +133,13 @@ line ([x1_l_bot_rot, x2_l_top_rot], [y1_l_bot_rot, y2_l_top_rot], 'linewidth', 3
 line ([x1_w_rit, x2_w_lef], [y2_w_lef, y2_w_lef],'Color', 'r', 'linewidth', 3);
 line ([x1_w_rit, x1_w_rit], [y1_w_rit, y2_w_lef],'Color', 'r', 'linewidth', 3);
 
+%{
 cd(mainfolder)
 cd('data/ManualOutput')
 saveas(gcf,[FileName '_Aggregate_L_W_' num2str(particle_number) '.tif'])
 close all
 cd (mainfolder)
+%}
+
 end
 

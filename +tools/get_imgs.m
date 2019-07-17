@@ -10,9 +10,9 @@ if ~exist('n','var'); n = []; end
 if isempty(n); n = 1:length(img_ref.fname); end
     % if image number not specified, use the first one
 
-
 %-- Read in image --------------------------------------------------------%
 for ii=1:length(n)
+    imgs(ii).fname = img_ref.fname{ii};
     imgs(ii).RawImage = imread([img_ref.dir,img_ref.fname{n(ii)}]);
 end
 

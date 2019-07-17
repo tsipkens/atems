@@ -12,45 +12,32 @@
 %	PARTICLE SIZING USE MainCode_dpAnalysis.m
 %=========================================================================%
 
-function [] = evaluate(img)
+function [img_data] = evaluate(imgs,bool_plot)
 
-%-- Report title ---------------------------------------------------------%
-report_title = {'Image_ID','Primary Width (nm)','Primary Length (nm)',...
-    'Primary eq. d (nm)','Primary Area Based on LW average(nm^2)',...
-    'Primary Particle_Count','Particle Width (nm)','Particle Length (nm)',...
-    'Particle Area (nm^2)','Particle eq. Da','Particle Perimeter (nm)',...
-    'Radius of Gyration','Particle Type','Image_ref_number',...
-    'Max res.','Cropped image ref'};
-mainfolder = cd;
 particle_count = 0;
 tot_primary = 0;
 
+img_data = struct;
 
-for kk = 1:img.num % run loop as many times as images selected
+for ii = 1:length(imgs) % run loop as many times as images selected
     
     %== Step 1: Image preparation ========================================%
-    %-- Step 1-1: Loading images one-by-one ------------------------------%
-    % cd(img.dir); % change active directory to image directory
-    if img.num == 1
-        fname = char(img.fname); 
-    else
-        fname = char(img.fname(img_counter,1));
-    end
-    img.RawImage = imread([img.dir,fname]); % read in image
-    
     %-- Step 1-3: Crop footer and get scale from footer ------------------%
-    [img,pixsize] = tools.get_footer_scale(img);
-    img_cropped = img.Cropped;
+    pixsize = imgs(ii).pixsize;
     
     
     %== Step 3: Analyzing each aggregate =================================%
     continuing_aggregate = 1;
-    ll = 0;
-    n_aggregate = 0;
+    jj = 0;
+    ll = 0; % initialize aggregate counter
+    
     while continuing_aggregate~=0
-        ll = ll+1;
-        n_aggregate=n_aggregate+1;
+        
+        jj = jj+1;
+        ll = ll+1; % increment aggregate counter
         particle_count = particle_count+1;
+        
+        Data = struct;
         
         %== Step 3-3: Particle type selection ============================%
         choice = questdlg('Select Particle Type:',...
@@ -71,18 +58,13 @@ for kk = 1:img.num % run loop as many times as images selected
         if Particle_Type == 1
             
             %-- Step 3-4-3: Applying thresholding. Part 1 ----------------%
-            [binary_cropped,~,Thresh_slider_in] = thresholding_ui.Agg_det_Slider(img.Cropped,0);
-            binaryImage = ~binary_cropped;
+            [img_binary,~,Thresh_slider_in,img_cropped] = ...
+                thresholding_ui.Agg_det_Slider(imgs(ii).Cropped,1);
+            img_binary = ~img_binary;
             
-            [~, Final_Edge,~] = manual.Thresh_refine(binaryImage,...
-                Thresh_slider_in,img.fname{kk},n_aggregate);
+            [~, img_edge,~] = manual.Thresh_refine(img_binary,...
+                Thresh_slider_in);
             
-
-            %-- Step3-4-4: Applying thresholding. Part 2 -----------------%
-            cd(mainfolder)
-            cd('data/ManualOutput')
-            save Imdata.mat Cropped_im binaryImage
-            cd(mainfolder)
             
             %-- Ask user if they want to analyse primary particles or not
             choice = questdlg('Do you want to measure primary particle size',...
@@ -97,12 +79,15 @@ for kk = 1:img.num % run loop as many times as images selected
         end
         
        %== Step 3-5: Particle sizing (dp for aggregate; particle size for others)
-        if agg_primary==1 
-            imshow(img_cropped);
-            uiwait(msgbox('Please crop the image for primary particle sizing.'))
-            Cropped_im_primary = imcrop(img_cropped);
-            close (gcf);
-            imshow(Cropped_im_primary)
+        if agg_primary==1
+            if ~exist('img_cropped','var')
+                uiwait(msgbox('Please crop the image for primary particle sizing.'))
+                img_cropped = imcrop(imgs(ii).Cropped);
+                close (gcf);
+            end
+            
+            img_cropped_primary = img_cropped;
+            imshow(img_cropped_primary)
             hold on
         end
         
@@ -125,19 +110,21 @@ for kk = 1:img.num % run loop as many times as images selected
             uiwait(msgbox(['Please select two points on the image that correspond to the length of the ' title_measurement ],...
             ['Process Stage: Length of' title_measurement ' ' num2str(m)...
             '/' num2str(num_primary)],'help'));
-
+            
              [x, y] = ginput(2);
 
-             length(m,1) = pixsize*sqrt((x(2)-x(1))^2+(y(2) - y(1))^2);
+             Data.length(m,1) = pixsize*sqrt((x(2)-x(1))^2+(y(2) - y(1))^2);
              line ([x(1),x(2)],[y(1),y(2)], 'linewidth', 3);
 
              [a, b] = ginput(2);
 
-             width(m,1) = pixsize*sqrt((a(2)-a(1))^2+(b(2) - b(1))^2);
+             Data.width(m,1) = pixsize*sqrt((a(2)-a(1))^2+(b(2) - b(1))^2);
              line ([a(1),a(2)],[b(1),b(2)],'Color', 'r', 'linewidth', 3);
              
              %-- Save center of primary particle -------------------------%
-             centers(m,:) = manual.find_centers(x,y,a,b);  % TODO: Test this
+             Data.centers(m,:) = manual.find_centers(x,y,a,b);
+             Data.radii(m,:) = (sqrt((a(2)-a(1))^2+(b(2)-b(1))^2)+...
+                 sqrt((x(2)-x(1))^2+(y(2)-y(1))^2))/2;
              
              clear a b x y
              
@@ -157,131 +144,44 @@ for kk = 1:img.num % run loop as many times as images selected
         
         
         %-- Save results -------------------------------------------------%
-        saveas(gcf,['data/ManualOutput/',img.fname{kk} '_Primary_L_W_' num2str(ll) '.tif'])
-        close all
+        saveas(gcf,['data/ManualOutput/',imgs(ii).fname '_Primary_L_W_' num2str(jj) '.tif'])
         
         %== Step 3-5-4: Computing aggregate dimentions/parameters ========%
         if Particle_Type == 1
-            
            
-            area_pixelcount = nnz(binaryImage); % number of non-zero pixels
-            Aggregate_Area = nnz(binaryImage)*pixsize^2; % aggregate area
+            area_pixelcount = nnz(img_binary); % number of non-zero pixels
+            Data.area = nnz(img_binary)*pixsize^2; % aggregate area
             
-            Aggregate_perimeter = manual.Perimeter_Length(binaryImage,pixsize,area_pixelcount);
+            Data.perimeter = manual.Perimeter_Length(img_binary,pixsize,area_pixelcount);
                 % calculate aggregat perimeter
             
             %-- Calculating aggregate length and width -------------------%
             %   To determine the length and width of the agglomerate
-            [A_length, A_width] = manual.Agg_Dimension(mainfolder,Final_Edge,img.fname{kk},pixsize,ll);
+            [Data.A_length, Data.A_width] = ...
+                manual.Agg_Dimension(img_edge,pixsize);
                 % calculate aggregate length and width
             
-            [Radius_Gyration] = manual.Gyration(binaryImage, pixsize);
+            [Data.Rg] = manual.Gyration(img_binary, pixsize);
                 % calculate radius of gyration
-
+            
         end
+        
+        
+        %== Save results =============================================%
+        %   Format output and autobackup data ------------------------%
+        Data.img_cropped = img_cropped;
+        
+        img_data(ii).Agg(ll).fname = imgs(ii).fname; % store file name with data
+        img_data(ii).Agg(ll).Data = Data; % copy Dp data structure into img_data
+        save('Data\ManualOutput\manual_data.mat','img_data'); % backup img_data
+            
         
         %-- Prepare output -----------------------------------------------%
         tot_primary=tot_primary+1;
         
-        if Particle_Type==2
-            Aggregate_Area=NaN;
-            Aggregate_perimeter=NaN;
-            A_width=NaN;
-            A_length=NaN;
-            Radius_Gyration=NaN;
-        end
+        clear length width img_cropped % clear variables prior to next iteration
         
-        if Particle_Type<3
-            if num_primary>1
-                report_num(tot_primary:tot_primary+num_primary-1,1)=width;
-                report_num(tot_primary:tot_primary+num_primary-1,2)=length;
-                report_num(tot_primary:tot_primary+num_primary-1,3)=(width+length)/2;
-                report_num(tot_primary:tot_primary+num_primary-1,4)=pi/4*width.*length;
-                report_num(tot_primary:tot_primary+num_primary-1,5)=num_primary;
-%                 report_num(tot_primary:tot_primary+num_primary-1,4)=x_center;
-%                 report_num(tot_primary:tot_primary+num_primary-1,5)=y_center;
-%                 report_num(tot_primary:tot_primary+num_primary-1,6)=alignment;
-                report_num(tot_primary:tot_primary+num_primary-1,6)=A_width;
-                report_num(tot_primary:tot_primary+num_primary-1,7)=A_length;
-                report_num(tot_primary:tot_primary+num_primary-1,8)=Aggregate_Area;
-                report_num(tot_primary:tot_primary+num_primary-1,9)=sqrt(4*Aggregate_Area/pi);
-                report_num(tot_primary:tot_primary+num_primary-1,10)=Aggregate_perimeter;
-                report_num(tot_primary:tot_primary+num_primary-1,11)=Radius_Gyration;
-                report_num(tot_primary:tot_primary+num_primary-1,12)=Particle_Type;
-                report_num(tot_primary:tot_primary+num_primary-1,13)=ll;
-                report_num(tot_primary:tot_primary+num_primary-1,14)=pixsize;
-%                 report_txt(tot_primary:tot_primary+num_primary-1,1)=img.fname{kk};
-                tot_primary=tot_primary+num_primary-1;
-            elseif num_primary==1
-                report_num(tot_primary,1)=width;
-                report_num(tot_primary,2)=length;
-                report_num(tot_primary,3)=(width+length)/2;
-                report_num(tot_primary,4)=pi/4*width.*length;
-                report_num(tot_primary,5)=num_primary;
-%                 report_num(tot_primary,4)=x_center;
-%                 report_num(tot_primary,5)=y_center;
-%                 report_num(tot_primary,6)=alignment;
-                report_num(tot_primary,6)=A_width;
-                report_num(tot_primary,7)=A_length;
-                report_num(tot_primary,8)=Aggregate_Area;
-                report_num(tot_primary,9)=sqrt(4*Aggregate_Area/pi);
-                report_num(tot_primary,10)=Aggregate_perimeter;
-                report_num(tot_primary,11)=Radius_Gyration;
-                report_num(tot_primary,12)=Particle_Type;
-                report_num(tot_primary,13)=ll;
-                report_num(tot_primary,14)=pixsize;
-%                 report_txt(tot_primary,1)=img.fname{kk};
-            elseif num_primary==0
-                report_num(tot_primary,1)=NaN;
-                report_num(tot_primary,2)=NaN;
-                report_num(tot_primary,3)=NaN;
-                report_num(tot_primary,4)=NaN;
-                report_num(tot_primary,5)=num_primary;
-%                 report_num(tot_primary,4)=x_center;
-%                 report_num(tot_primary,5)=y_center;
-%                 report_num(tot_primary,6)=alignment;
-                report_num(tot_primary,6)=A_width;
-                report_num(tot_primary,7)=A_length;
-                report_num(tot_primary,8)=Aggregate_Area;
-                report_num(tot_primary,9)=sqrt(4*Aggregate_Area/pi);
-                report_num(tot_primary,10)=Aggregate_perimeter;
-                report_num(tot_primary,11)=Radius_Gyration;
-                report_num(tot_primary,12)=Particle_Type;
-                report_num(tot_primary,13)=ll;
-                report_num(tot_primary,14)=pixsize;
-%                 report_txt(tot_primary,1)=img.fname{kk};
-            end
-        else
-            report_num(tot_primary,1)=NaN;
-            report_num(tot_primary,2)=NaN;
-            report_num(tot_primary,3)=NaN;
-            report_num(tot_primary,4)=NaN;
-            report_num(tot_primary,5)=NaN;
-%             report_num(tot_primary,4)=x_center;
-%             report_num(tot_primary,5)=y_center;
-%             report_num(tot_primary,6)=alignment;
-            report_num(tot_primary,6)=width;
-            report_num(tot_primary,7)=length;
-            report_num(tot_primary,8)=NaN;
-            report_num(tot_primary,9)=(width+length)/2;
-            report_num(tot_primary,10)=NaN;
-            report_num(tot_primary,11)=NaN;
-            report_num(tot_primary,12)=Particle_Type;
-            report_num(tot_primary,13)=ll;
-            report_num(tot_primary,14)=pixsize;
-%             report_txt(tot_primary,1)=img.fname{kk};
-            
-        end
-        
-        
-        %-- Autobackup ----------------------------------------------------%
-        if exist('data/ManualOutput/Report_dpda.mat','file')==2
-            save('data/ManualOutput/Report_dpda.mat','report_num','-append');
-        else
-            save('data/ManualOutput/Report_dpda.mat','report_num','report_title');
-        end
-        
-        clear length width % clear variables prior to next iteration
+        close all;
         
         choice = questdlg('Do you want to analyse another aggregate ?',...
             'Continue?','Yes','No','Yes');
@@ -293,20 +193,7 @@ for kk = 1:img.num % run loop as many times as images selected
         
         
     end
-    
 
-end
-
-%-- Write Excel report ---------------------------------------------------%
-if exist('data/ManualOutput/Final_dpda_Report.xls','file')==2
-    datanum=manual.excel_import('data/ManualOutput/Final_dpda_Report.xls',2);
-    starting_row=size(datanum,1)+2;
-    % xlswrite('data/ManualOutput/Final_dpda_Report.xls',report_txt,'TEM_ImageProcessingData',['A' num2str(starting_row)]);
-    xlswrite('data/ManualOutput/Final_dpda_Report.xls',report_num,'TEM_ImageProcessingData',['B' num2str(starting_row)]);
-else
-    xlswrite('data/ManualOutput/Final_dpda_Report.xls',report_title,'TEM_ImageProcessingData','A1');
-    % xlswrite('data/ManualOutput/Final_dpda_Report.xls',report_txt,'TEM_ImageProcessingData','A2');
-    xlswrite('data/ManualOutput/Final_dpda_Report.xls',report_num,'TEM_ImageProcessingData','B2');
 end
 
 
