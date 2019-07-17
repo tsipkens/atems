@@ -4,7 +4,6 @@ This program contains several methods of characterizing aggregates from
 TEM images, including evaluating the aggregate projected area, perimeter,
 and primary particle diameter.
 
-----------------------------------------------------------------------
 
 ### Description and instructions
 
@@ -12,14 +11,12 @@ The software contains MATLAB designed to compare multiple
 methods of analyzing TEM images of aggregates. These include the
 pair correlation method (PCM), Kook, and manual methods.
 
-----------------------------------------------------------------------
 
 #### License
 
 This software is licensed under an MIT license (see the corresponding file
 for details).
 
-----------------------------------------------------------------------
 
 #### Contact information and acknowledgements
 
