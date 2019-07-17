@@ -12,6 +12,13 @@ methods of analyzing TEM images of aggregates. These include the
 pair correlation method (PCM), Kook, and manual methods.
 
 
+### Output
+
+The various methods of evaluating the properties of the aggregate properties 
+output the data in a structured format, which can be exported to a JSON
+format to be analyzed in other softwares and languages. 
+
+
 #### License
 
 This software is licensed under an MIT license (see the corresponding file
