@@ -11,6 +11,9 @@ imshow(imgs(1).RawImage);
 colormap('gray');
 
 
+
+
+
 disp('Performing manual analysis...');
 img_data_manual = manual.evaluate(imgs);
 disp('Complete.');

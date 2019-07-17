@@ -4,10 +4,10 @@ function [Binary_image] = Agg_detection(img,pixsize,moreaggs,minparticlesize,coe
 % Ramin Dastanpour & Steven N. Rogak
 % Developed at the University of British Columbia
 
-%% Hough transformation
+%-- Hough transformation
 [Binary_image,moreaggs,choice] = pcm.Agg_det_Hough(img.Cropped,pixsize,moreaggs,minparticlesize,coeffs);
 
-%% Showing detected particles
+%-- Showing detected particles -------------------------------------------%
 % Make masked image so that user can see if particles have been erased or not
 if size(Binary_image,1)~=0
     Edge_Image = edge(Binary_image,'sobel');
@@ -18,7 +18,7 @@ if size(Binary_image,1)~=0
     figure; imshow(FinalImposedImage);
 end
 
-%% User interaction
+%-- User interaction -----------------------------------------------------%
 if strcmp(choice,'Yes') || strcmp(choice,'Yes, but reduce noise')
     clear choice
     choice = questdlg('Are there any particles not detected?',...
@@ -31,7 +31,7 @@ else
     moreaggs=1;
 end
 
-%% Finding missing aggregates
+%-- Finding missing aggregates -------------------------------------------%
 while moreaggs==1
     clear choice
     uiwait(msgbox('Please crop the image around missing particle'));
@@ -44,7 +44,7 @@ while moreaggs==1
         if size(Binary_image,2) == 0
             Binary_image = zeros(size(img.Cropped,1),size(img.Cropped,2))+1;
         end
-        %% Semi-Automatic selection
+        %-- Semi-Automatic selection -------------------------------------%
         % User draws a freehand (similar to lasso tool in Adope Photoshop)
         % boundary around the missing particle. Background correction and
         % image refinments will be only applied to the interior of this
@@ -65,7 +65,7 @@ while moreaggs==1
         FinalImposedImage = imimposemin(img.Cropped, Dilated_Edge_Image);
         figure; imshow(FinalImposedImage);
         
-        %% Semi-automatic detection
+        %-- Semi-automatic detection -------------------------------------%
         choice2 = questdlg('Satisfied with aggregate detection? If not, try drawing an edge around the aggregate manually...',...
             'Agg detection','Yes','No','Yes');
         if strcmp(choice2,'No')
