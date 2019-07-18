@@ -1,22 +1,50 @@
-## UBC-TEM-analysis
+# UBC-TEM-analysis
 
 This program contains several methods of characterizing aggregates from
 TEM images, including evaluating the aggregate projected area, perimeter,
 and primary particle diameter.
 
 
-### Description and instructions
+### Description
 
 The software contains MATLAB designed to compare multiple
 methods of analyzing TEM images of aggregates. These include the
 pair correlation method (PCM), Kook, and manual methods.
 
+#### Packages
+
+###### +kook
+
+This package contains a copy of the code provided by Kook et al. (2015),
+with minor modifications to match in the input/output of some of the
+other packages.
+
+###### +kook_mod
+
+This package contains a heavily modified version of the method proposed
+by Kook et al. (2015).
+
+###### +manual
+
+An implementation of the manual sizing code developed at the University of
+British Columbia.
+
+###### +pcm
+
+This package contains an update to code for evaluating the pair correlation
+method (PCM) described by Dastanpour et al. (2016).
+
+###### +thresholding_ui
+
+This package contains a unified implementation of the thresholding user
+interface associated with the PCM code of Dastanpour et al. (2016) and
+manual code developed at the University of British Columbia.
 
 ### Output
 
 The various methods of evaluating the properties of the aggregate properties
 output the data in a structured format, which can be exported to a JSON
-format to be analyzed in other softwares and languages.
+format to be analyzed in other software and languages.
 
 --------------------------------------------------------------------------
 
