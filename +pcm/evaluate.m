@@ -11,11 +11,13 @@
 % of British Columbia
 %=========================================================================%
 
-function [img_data,imgs] = evaluate(imgs,bool_plot)
+function [Agg,imgs] = evaluate(imgs,bool_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
+
+Agg = struct;
 
 
 %-- Initialize values ----------------------------------------------------%
@@ -25,10 +27,9 @@ minparticlesize = 4.9; % to filter out noises
 coeff_matrix    = [0.2 0.8 0.4 1.1 0.4;0.2 0.3 0.7 1.1 1.8;...
     0.3 0.8 0.5 2.2 3.5;0.1 0.8 0.4 1.1 0.5];
 moreaggs    = 0;
-savecounter = 0;
 
 
-img_data = struct;
+ll = 0; % initialize aggregate counter
 
 %== Main image processing loop ===========================================%
 for ii = 1:length(imgs) % run loop as many times as images selected
@@ -56,7 +57,7 @@ for ii = 1:length(imgs) % run loop as many times as images selected
     close (gcf);
     
     % Check whether the Output folder is available 
-    dirName = sprintf('Data\PCMOutput\');
+    dirName = 'data\PCMOutput\';
     
     if exist(dirName,'dir') ~= 7 % 7 if exist parameter is a directory
         mkdir(dirName) % make output folder
@@ -78,8 +79,6 @@ for ii = 1:length(imgs) % run loop as many times as images selected
     %-- Step 3-1: Find and size all particles on the final binary image --%
     CC = bwconncomp(abs(imgs(ii).Binary-1));
     NofAggs = CC.NumObjects; % count number of particles
-    
-    ll = 0; % initialize aggregate counter
     
     %-- Lopp for each aggregate on the image under investigation ---------%
     for nAgg = 1:NofAggs
@@ -103,12 +102,12 @@ for ii = 1:length(imgs) % run loop as many times as images selected
         % Dilated Edge Image
         % Use dilation to strengthen the aggregate's outline
         SE = strel('disk',1);
-        Dilated_Image_edge = imdilate(Image_edge,SE);
+        img_dilated = imdilate(Image_edge,SE);
         clear Image_edge SE
-        FinalImposedImage = imimposemin(imgs(ii).Cropped, Dilated_Image_edge);
+        img_final_imposed = imimposemin(imgs(ii).Cropped, img_dilated);
         figure
         hold on
-        imshow(FinalImposedImage);
+        imshow(img_final_imposed);
         
         %-- Step 3-3: Development of the pair correlation function (PCF) -%
         
@@ -180,7 +179,7 @@ for ii = 1:length(imgs) % run loop as many times as images selected
         
         %-- 3-4: Computing aggregate dimentions/parameters ---------------%
         % Projected area of the aggregate
-        Data.Area = Data.Pixels*pixsize^2;
+        Data.area = Data.Pixels*pixsize^2;
         
         % Projected area equivalent diameter of the aggregate
         Data.da = ((Data.Pixels/pi)^.5)*2*pixsize;
@@ -200,21 +199,22 @@ for ii = 1:length(imgs) % run loop as many times as images selected
             end
         end
         
-        Data.Perimeter = perimeter_pixelcount*pixsize;
+        Data.perimeter = perimeter_pixelcount*pixsize;
         
         % Aggregate gyration radius
+        % NOTE: Consider moving to aggregate detection code
         [xpos,ypos] = find(Data.Image);
         n_pix       = length(xpos);
-        Centroid.x  = sum(xpos)/n_pix;
-        Centroid.y  = sum(ypos)/n_pix;
+        centroid.x  = sum(xpos)/n_pix;
+        centroid.y  = sum(ypos)/n_pix;
         Ar          = zeros(n_pix,1);
         
         for kk = 1:n_pix
-            Ar(kk,1) = (((xpos(kk,1)-Centroid.x)*pixsize)^2+...
-                      ((ypos(kk,1)-Centroid.y)*pixsize)^2)*pixsize^2;
+            Ar(kk,1) = (((xpos(kk,1)-centroid.x)*pixsize)^2+...
+                      ((ypos(kk,1)-centroid.y)*pixsize)^2)*pixsize^2;
         end
         
-        Data.Rg = (sum(Ar)/Data.Area)^0.5;
+        Data.Rg = (sum(Ar)/Data.area)^0.5;
         clear Ar ypos xpos Centroid.x Centroid.y
         
         % Aggregate Length, Width, and aspect ratio      
@@ -257,9 +257,9 @@ for ii = 1:length(imgs) % run loop as many times as images selected
         
         %== Step 4: Save results =========================================%
         %   Format output and autobackup data ----------------------------%
-        img_data(ii).Agg(ll).fname = imgs(ii).fname; % store file name with data
-        img_data(ii).Agg(ll).Data = Data; % copy Dp data structure into img_data
-        save('Data\PCMOutput\PCM_data.mat','img_data'); % backup img_data
+        Agg(ll).fname = imgs(ii).fname; % store file name with data
+        Agg(ll).pcm = Data; % copy Dp data structure into img_data
+        save('data\pcm_data.mat','Agg'); % backup img_data
         
         
         %== Step 4: Save results =========================================%

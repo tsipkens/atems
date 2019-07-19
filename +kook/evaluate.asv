@@ -17,7 +17,7 @@
 % 5. Added option as to whether of not to generate plots
 %=========================================================================%
 
-function [Agg,dp,dpdist] = evaluate(imgs,bool_plot)
+function [Agg,dp,dpdist] = evaluate(imgs,bool_plot,Agg)
 %-------------------------------------------------------------------------%
 % Inputs:
 %   imgs       Image struct to be analyzed
@@ -29,7 +29,11 @@ function [Agg,dp,dpdist] = evaluate(imgs,bool_plot)
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
 
-Agg = struct;
+if ~exist('Agg','var'); Agg = struct; end
+if ~isa(Agg,'struct') % overwrite if not a struct
+    Agg = struct;
+    warning('Overwrote the provided Agg as it was not a structure.');
+end
 
 pixsize = imgs(1).pixsize;
 
@@ -98,11 +102,12 @@ end
 
 
 %== Generate outputs =====================================================%
-Agg(1).kook.centers = centers; % output in px
-Agg(1).kook.radii = radii; % output in px
-Agg(1).kook.diameters = radii*pixsize*2; % output in nm
+Agg(1).Data{dd}.method = 'kook';
+Agg(1).Data{dd}.centers = centers; % output in px
+Agg(1).Data{dd}.radii = radii; % output in px
+Agg(1).Data{dd}.diameters = radii*pixsize*2; % output in nm
 
-dp = Agg(1).kook.diameters;
+dp = Agg(1).Data{dd}.diameters;
 dpdist = radii*pixsize*2;
 
 

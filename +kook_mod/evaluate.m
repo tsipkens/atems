@@ -11,11 +11,13 @@
 % Check README.txt file for more documentation and information
 %=========================================================================%
 
-function [img_data,imgs] = evaluate(imgs,bool_plot)
+function [Agg,imgs] = evaluate(imgs,bool_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
+
+Agg = struct;
 
 
 %-- Sensitivity and Scaling Parameters -----------------------------------%
@@ -28,7 +30,7 @@ rmin = 4; % Minimum radius in pixel (Keep high enough to eliminate dummies)
 sens_val = 0.75; % the sensitivity (0?1) for the circular Hough transform 
 edge_threshold = [0.125 0.190]; % the threshold for finding edges with edge detection
 
-img_data = struct; % initialize image data structure
+ll = 0; % initialize aggregate counter
 
 %== Main image processing loop ===========================================%
 for ii = 1:length(imgs) % run loop as many times as images selected
@@ -52,8 +54,6 @@ end
 
 % initializing variables
 userFin = 0; % if user is finished selecting aggregates, userFin = 1
-
-ll = 0; % initialize aggregate counter
 
 while userFin == 0
     
@@ -154,9 +154,9 @@ while userFin == 0
     
     %== Save results =====================================================%
     %   Format output and autobackup data --------------------------------%
-    img_data(ii).Agg(ll).fname = imgs(ii).fname; % store file name with data
-    img_data(ii).Agg(ll).Data = Data; % copy Dp data structure into img_data
-    save('Data\KookOutput\kook_data.mat','img_data'); % backup img_data
+    Agg(ll).fname = imgs(ii).fname; % store file name with data
+    Agg(ll).kook_mod = Data; % copy Dp data structure into img_data
+    save('Data\kook_mod_data.mat','Agg'); % backup img_data
     
     close all;
     
