@@ -5,12 +5,13 @@
 % ciations:     Kook et al. 2016, SAE
 %=========================================================================%
 
-function [img,BWCED2,binary_cropped] = preprocess(img,imgFoldName,aggNum)
+function [img_analyze,img_Canny,img_binary] = ...
+    preprocess(img,imgFoldName,aggNum,bool_plot)
 
 %== Preprocessing ========================================================%
-%-- Converts cropped image to a binary image (using thresholdin UI) ------%
-[binary_cropped] = thresholding_ui.Agg_det_Slider(img.Cropped_agg,0);
-binary_cropped = ~binary_cropped;
+%-- Converts cropped image to a binary image (using thresholding UI) -----%
+[img_binary] = thresholding_ui.Agg_det_Slider(img.Cropped_agg,0);
+img_binary = ~img_binary;
 
 
 %-- Fix background illumination ------------------------------------------%
@@ -43,30 +44,33 @@ saveas(gcf, [imgFoldName,'\prep_',int2str(aggNum)], 'tif');
 %   Background erasing, Canny edge detection, background inversion, 
 %   Circular Hough Transform
 
-%-- Erasing background by multiplying binary image with grayscale image---%
-img.Analyze = double(binary_cropped) .* double(II1_mf);
-figure();
-imshow(img.Analyze, []);
-title('Step 4: Background Erasing') % FIGURE 4
+%-- Erasing background by multiplying binary image with grayscale image --%
+img_analyze = double(img_binary) .* double(II1_mf);
+if bool_plot % FIGURE 4
+    figure();
+    imshow(img_analyze, []);
+    title('Step 4: Background Erasing')
+end
 
 
 %-- Canny Edge Detection -------------------------------------------------%
-BWCED = edge(img.Analyze,'Canny'); % MATLAB Canny edge detection 
-
-figure(); % plot Canny edges
-imshow(BWCED);
-title('Step 5: Canny Edge Detection'); % FIGURE 5
-
-saveas(gcf, [imgFoldName,'\edge_',int2str(aggNum)], 'tif')
+img_Canny0 = edge(img_analyze,'Canny'); % MATLAB Canny edge detection 
+if bool_plot % FIGURE 5
+    figure(); % plot Canny edges
+    imshow(img_Canny0);
+    title('Step 5: Canny Edge Detection');
+    saveas(gcf, [imgFoldName,'\edge_',int2str(aggNum)], 'tif')
+end
 
 
 %-- Imposing white background onto image ---------------------------------%
 %   This precent the program from detecting any background particles
-BWCED2 = double(~binary_cropped) + double(BWCED);
-figure();
-imshow(BWCED2);
-title('Step 6: Binary Image Overlap') % FIGURE 6
-
+img_Canny = double(~img_binary) + double(img_Canny0);
+if bool_plot % FIGURE 6
+    figure();
+    imshow(img_Canny);
+    title('Step 6: Binary Image Overlap')
+end
 
 end
 
