@@ -22,11 +22,11 @@ Agg = struct;
 
 %-- Initialize values ----------------------------------------------------%
 fontSize        = 10;
-minparticlesize = 4.9; % to filter out noises
-% Coefficient for automatic Hough transformation
-coeff_matrix    = [0.2 0.8 0.4 1.1 0.4;0.2 0.3 0.7 1.1 1.8;...
-    0.3 0.8 0.5 2.2 3.5;0.1 0.8 0.4 1.1 0.5];
-moreaggs    = 0;
+% minparticlesize = 4.9; % to filter out noises
+% % Coefficient for automatic Hough transformation
+% coeff_matrix    = [0.2 0.8 0.4 1.1 0.4;0.2 0.3 0.7 1.1 1.8;...
+%     0.3 0.8 0.5 2.2 3.5;0.1 0.8 0.4 1.1 0.5];
+% moreaggs    = 0;
 
 
 ll = 0; % initialize aggregate counter
@@ -38,15 +38,15 @@ for ii = 1:length(imgs) % run loop as many times as images selected
     %-- Step 1-3: Crop footer and get scale from footer (now external) ------------------%
     pixsize = imgs(ii).pixsize;
     
-    % Build the image processing coefficients for the image based on its
-    % magnification
-    if pixsize <= 0.181
-        coeffs = coeff_matrix(1,:);
-    elseif pixsize <= 0.361
-        coeffs = coeff_matrix(2,:);
-    else 
-        coeffs = coeff_matrix(3,:);
-    end
+%     % Build the image processing coefficients for the image based on its
+%     % magnification
+%     if pixsize <= 0.181
+%         coeffs = coeff_matrix(1,:);
+%     elseif pixsize <= 0.361
+%         coeffs = coeff_matrix(2,:);
+%     else 
+%         coeffs = coeff_matrix(3,:);
+%     end
     
     % Displaying the image
     imshow(imgs(ii).Cropped);
@@ -65,16 +65,18 @@ for ii = 1:length(imgs) % run loop as many times as images selected
     
     
     %== Step 2: Automatic/semi-automatic aggregate detection =============%
-    imgs(ii).Binary = pcm.Agg_detection(imgs(ii),pixsize,moreaggs,minparticlesize,coeffs);
-    
-    imgs(ii).Edge   = edge(imgs(ii).Binary,'sobel'); % Sobel edge detection
-    SE              = strel('disk',1);
-    imgs(ii).DilatedEdge = imdilate(imgs(ii).Edge,SE); % morphological dilation
-    
-    clear img.Edge SE2
-    imgs(ii).Imposed = imimposemin(imgs(ii).Cropped, imgs(ii).DilatedEdge);
-    
-    
+%     imgs(ii).Binary = pcm.Agg_detection(imgs(ii),pixsize,moreaggs,minparticlesize,coeffs);
+%     
+%     imgs(ii).Edge   = edge(imgs(ii).Binary,'sobel'); % Sobel edge detection
+%     SE              = strel('disk',1);
+%     imgs(ii).DilatedEdge = imdilate(imgs(ii).Edge,SE); % morphological dilation
+%     
+%     clear img.Edge SE2
+%     imgs(ii).Imposed = imimposemin(imgs(ii).Cropped, imgs(ii).DilatedEdge);
+%     
+%     [imgs(ii).Binary,imgs(ii).dilatedEdge,imgs(ii).Imposed] =  ... 
+%         thresholding_ui.detectAggregate(imgs(ii));
+%     
     %== Step 3: Automatic primary particle sizing ========================%
     %-- Step 3-1: Find and size all particles on the final binary image --%
     CC = bwconncomp(abs(imgs(ii).Binary-1));

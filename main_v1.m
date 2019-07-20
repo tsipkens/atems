@@ -11,6 +11,12 @@ imgs = tools.get_footer_scale(imgs); % get footer for selected image
 % colormap('gray');
 
 
+% Run thresholding at start for every image struct
+for ii = 1:length(imgs)
+    [imgs(ii).Binary, imgs(ii).DilatedEdge, ...
+        imgs(ii).Imposed] = thresholding_ui.detectAggregate(imgs(ii));
+end
+
 
 % disp('Performing manual analysis...');
 % Agg_manual = manual.evaluate(imgs);
@@ -18,10 +24,10 @@ imgs = tools.get_footer_scale(imgs); % get footer for selected image
 % disp(' ');
 
 
-% disp('Performing PCM analysis...');
-% Agg_pcm = pcm.evaluate(imgs);
-% disp('Complete.');
-% disp(' ');
+disp('Performing PCM analysis...');
+Agg_pcm = pcm.evaluate(imgs);
+disp('Complete.');
+disp(' ');
 
 
 % disp('Performing original Kook analysis...');
@@ -30,10 +36,10 @@ imgs = tools.get_footer_scale(imgs); % get footer for selected image
 % disp(' ');
 
 
-disp('Performing modified Kook analysis...');
-Agg_kook_mod = kook_mod.evaluate(imgs);
-disp('Complete.');
-disp(' ');
+% disp('Performing modified Kook analysis...');
+% Agg_kook_mod = kook_mod.evaluate(imgs);
+% disp('Complete.');
+% disp(' ');
 
 
 % load('data\data_FlareNet.mat');
