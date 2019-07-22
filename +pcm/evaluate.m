@@ -47,14 +47,14 @@ for ii = 1:length(imgs) % run loop as many times as images selected
 %     else 
 %         coeffs = coeff_matrix(3,:);
 %     end
-    
-    % Displaying the image
-    imshow(imgs(ii).Cropped);
-    title('processing Image', 'FontSize', fontSize);
-    set(gcf, 'Position', get(0,'Screensize')); % Maximize figure
-    
-    %-- Step 1-4: Saving Cropped image -----------------------------------%
-    close (gcf);
+%     
+%     % Displaying the image
+%     imshow(imgs(ii).Cropped);
+%     title('processing Image', 'FontSize', fontSize);
+%     set(gcf, 'Position', get(0,'Screensize')); % Maximize figure
+%     
+%     %-- Step 1-4: Saving Cropped image -----------------------------------%
+%     close (gcf);
     
     % Check whether the Output folder is available 
     dirName = 'data\PCMOutput\';
@@ -76,7 +76,7 @@ for ii = 1:length(imgs) % run loop as many times as images selected
 %     
 %     [imgs(ii).Binary,imgs(ii).dilatedEdge,imgs(ii).Imposed] =  ... 
 %         thresholding_ui.detectAggregate(imgs(ii));
-%     
+    
     %== Step 3: Automatic primary particle sizing ========================%
     %-- Step 3-1: Find and size all particles on the final binary image --%
     CC = bwconncomp(abs(imgs(ii).Binary-1));

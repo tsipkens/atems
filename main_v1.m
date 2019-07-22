@@ -11,11 +11,8 @@ imgs = tools.get_footer_scale(imgs); % get footer for selected image
 % colormap('gray');
 
 
-% Run thresholding at start for every image struct
-for ii = 1:length(imgs)
-    [imgs(ii).Binary, imgs(ii).DilatedEdge, ...
-        imgs(ii).Imposed] = thresholding_ui.detectAggregate(imgs(ii));
-end
+%-- Run thresholding for all of the images -------------------------------%
+imgs = thresholding_ui.detect_aggregate(imgs);
 
 
 % disp('Performing manual analysis...');
