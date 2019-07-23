@@ -1,14 +1,15 @@
-% AUTOMATIC/SEMI-AUTOMATIC AGGREGATE DETECTION
+% AUTOMATIC/SEMI-AUTOMATIC AggsREGATE DETECTION
 % Parameters:
 %   img     Struct describing image, including fields containing fname, 
 %           rawimage, cropped image, footer, ocr, and pixel size
 % Return Types:
-%	binary      Binary image from running threshold slider
-%	dilated 	Dilated image from running imdilate on Sobel edge detection
-%   imposed 	Imposed image of cropped and dilated edge
+%	img     Struct with additional fields
+            
 %=========================================================================%
 
-function imgs = detect_aggregate(imgs)
+function Aggs = detect_aggregate(imgs)
+
+ll = 0;
 
 for ii=1:length(imgs)
     
@@ -18,7 +19,7 @@ for ii=1:length(imgs)
     % Coefficient for automatic Hough transformation
     coeff_matrix    = [0.2 0.8 0.4 1.1 0.4;0.2 0.3 0.7 1.1 1.8;...
         0.3 0.8 0.5 2.2 3.5;0.1 0.8 0.4 1.1 0.5];
-    moreaggs    = 0;
+    moreAggs    = 0;
 
 
     % Build the image processing coefficients for the image based on its
@@ -32,15 +33,30 @@ for ii=1:length(imgs)
     end
 
     %-- Run slider to obtain binary image --------------------------------%
-    imgs(ii).Binary = thresholding_ui.Agg_detection(imgs(ii),pixsize, ...
-        moreaggs,minparticlesize,coeffs);
-
-    imgs(ii).Edge = edge(imgs(ii).Binary,'sobel'); % Sobel edge detection
-    SE = strel('disk',1);
-    imgs(ii).DilatedEdge = imdilate(imgs(ii).Edge,SE); % morphological dilation
-
-    %-- Generate impoced image -------------------------------------------%
-    imgs(ii).Imposed = imimposemin(imgs(ii).Cropped, imgs(ii).DilatedEdge);
+    [total_binary,~,~,~] = ... 
+        thresholding_ui.Agg_detection(imgs(ii),pixsize, ...
+        moreAggs,minparticlesize,coeffs);
+    
+    % total_binary = total_binary;
+    
+    CC = bwconncomp(abs(total_binary-1));
+    NofAggss = CC.NumObjects; % count number of particles
+    
+    for nAggs = 1:NofAggss
+        
+        % TODO: Remove any aggregates touching the edge
+        
+        ll = ll + 1; % increment Aggsregate counter
+        
+        Aggs(ll).fname = imgs(ii).fname;
+        
+        %-- Step 3-2: Prepare an image of the isolated Aggsregate ---------%
+        Aggs(ll).binary = zeros(size(total_binary));
+        Aggs(ll).binary(CC.PixelIdxList{1,nAggs}) = 1;
+        Aggs(ll).image = imgs(ii).Cropped;
+        Aggs(ll).pixsize = imgs(ii).pixsize;
+    end
+    
         
 end
 

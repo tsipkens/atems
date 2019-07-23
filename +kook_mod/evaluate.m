@@ -36,7 +36,7 @@ ll = 0; % initialize aggregate counter
 for ii = 1:length(imgs) % run loop as many times as images selected
 
 %-- Crop footer and get scale --------------------------------------------%
-pixsize = imgs(ii).pixsize;
+pixsize = imgs(ii).pixsize; 
 
 figure(); imshow(imgs(ii).Cropped, []); title('Cropped Image'); % Figure 1: cropped iamge
 
@@ -55,7 +55,7 @@ end
 % initializing variables
 userFin = 0; % if user is finished selecting aggregates, userFin = 1
 
-while userFin == 0
+% while userFin == 0
     
     ll = ll + 1; % increment aggregate counter
     
@@ -83,8 +83,21 @@ while userFin == 0
     end
     
     %== Preprocess image =================================================%
-    [~,img_Canny,img_binary] = kook_mod.preprocess(imgs(ii),folder_save_img,ll,bool_plot);
-    imgs(ii).Canny = img_Canny;
+    % [~,img_Canny,img_binary] = kook_mod.preprocess(imgs(ii),folder_save_img,ll,bool_plot);
+    % imgs(ii).Canny = img_Canny;
+
+    img_Canny   = [];                      % Canny images as an array for aggregates
+    img_Binary  = img(ii).Binary_By_Agg;   % Binary images as an array for aggregates
+
+    for jj=1:length(imgs(ii).Cropped_By_Agg)
+        [~,canny,~] = kook_mod.preprocess(imgs(ii).Cropped_By_Agg(jj), ...
+            imgs(ii).Binary_By_Agg(jj),folder_save_img,ll,bool_plot);
+        
+        img_Canny   = [img_Canny,canny];
+    end
+        
+    
+    %% What is going on here????
     
     %== Find and draw circles within aggregates ==========================%
     % Find circles within soot aggregates 

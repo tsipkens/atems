@@ -12,7 +12,7 @@ imgs = tools.get_footer_scale(imgs); % get footer for selected image
 
 
 %-- Run thresholding for all of the images -------------------------------%
-imgs = thresholding_ui.detect_aggregate(imgs);
+Aggs = thresholding_ui.detect_aggregate(imgs);
 
 
 % disp('Performing manual analysis...');
@@ -22,7 +22,7 @@ imgs = thresholding_ui.detect_aggregate(imgs);
 
 
 disp('Performing PCM analysis...');
-Agg_pcm = pcm.evaluate(imgs);
+Aggs = pcm.evaluate(Aggs);
 disp('Complete.');
 disp(' ');
 

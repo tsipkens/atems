@@ -4,8 +4,11 @@
 % Developed at the University of British Columbia
 %=========================================================================%
 
-function [img_binary,img_cropped] = ...
+function [img_binary,img_cropped,agg_binary_bin,agg_cropped_bin] = ...
     Agg_detection(img,pixsize,moreaggs,minparticlesize,coeffs) 
+
+agg_binary_bin = {};    % Bin of binary aggregate images
+agg_cropped_bin = {};   % Bin of cropped aggregated images
 
 %== Parse inputs =========================================================%
 if ~exist('pixsize','var'); pixsize = []; end
@@ -61,6 +64,7 @@ else
     img_binary = [];
 end
 
+img_cropped = [];
 
 %== Attempt 2: Crop image and then Hough =================================%
 while moreaggs==1
@@ -114,6 +118,9 @@ while moreaggs==1
             imshow(TempBW);
             NewBW = TempBW;
         end
+        
+        agg_binary_bin  = [agg_binary_bin, img_temp];
+        agg_cropped_bin = [agg_cropped_bin, img_cropped];
                 
     end
     
