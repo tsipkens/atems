@@ -11,6 +11,19 @@ The software contains MATLAB designed to compare multiple
 methods of analyzing TEM images of aggregates. These include the
 pair correlation method (PCM), Kook, and manual methods.
 
+#### Data structure 
+
+Images are handled primarily by two variables: `img_ref`
+and `imgs`. The former contains a reference to the images, 
+including file name and containing directory. The latter 
+contains both the imported raw image, as well as processed
+versions of the image, such as those that have been
+denoised. 
+
+The output data itself is given as a structure array, with one 
+entry per aggregate. This data can then be exported to a JSON
+format to be analyzed in other software and languages.
+
 #### Packages
 
 ###### +kook
@@ -26,8 +39,10 @@ by Kook et al. (2015).
 
 ###### +manual
 
-An implementation of the manual sizing code developed at the University of
-British Columbia.
+Code to be used in the manual sizing of soot primary particles developed 
+at the University of British Columbia. The current method uses crosshairs
+to select the length and width of the particle. This is converted to 
+various quantities, such as the mean primary particle diameter. 
 
 ###### +pcm
 
@@ -38,13 +53,9 @@ method (PCM) described by Dastanpour et al. (2016).
 
 This package contains a unified implementation of the thresholding user
 interface associated with the PCM code of Dastanpour et al. (2016) and
-manual code developed at the University of British Columbia.
-
-### Output
-
-The various methods of evaluating the properties of the aggregate properties
-output the data in a structured format, which can be exported to a JSON
-format to be analyzed in other software and languages.
+manual code developed at the University of British Columbia. The code is
+to be implemented prior to to primary particle sizing and is critical
+to the PCM primary particle size estimation. 
 
 --------------------------------------------------------------------------
 
