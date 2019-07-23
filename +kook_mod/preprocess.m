@@ -12,7 +12,7 @@
 %=========================================================================%
 
 function [img_analyze,img_Canny,img_binary] = ...
-    preprocess(agg_cropped,agg_binary,imgFoldName,aggNum,bool_plot)
+    preprocess(agg_cropped,agg_binary,imgFoldName,ll,bool_plot)
 
 %== Preprocessing ========================================================%
 %-- Converts cropped image to a binary image (using thresholding UI) -----%
@@ -39,12 +39,12 @@ title('Step 2: Contrast Enhanced');   %FIGURE 2
 %   Step 3: median filter to remove noise 
 II1_mf = medfilt2(II1); %, [mf mf]); 
 
-imshow(II1_mf, []); % show pro-processed image
-title('Step 3: Median filter'); % FIGURE 3 
-
-saveas(gcf, [imgFoldName,'\prep_',int2str(aggNum)], 'tif');
-    % save the results of pre-processing
-
+if bool_plot
+    imshow(II1_mf, []); % show pro-processed image
+    title('Step 3: Median filter'); % FIGURE 3 
+    saveas(gcf, [imgFoldName,'\prep_',int2str(ll)], 'tif');
+        % save the results of pre-processing
+end
     
 %== RawImage processing ==================================================%
 %   Background erasing, Canny edge detection, background inversion, 
@@ -65,7 +65,7 @@ if bool_plot % FIGURE 5
     figure(); % plot Canny edges
     imshow(img_Canny0);
     title('Step 5: Canny Edge Detection');
-    saveas(gcf, [imgFoldName,'\edge_',int2str(aggNum)], 'tif')
+    saveas(gcf, [imgFoldName,'\edge_',int2str(ll)], 'tif')
 end
 
 

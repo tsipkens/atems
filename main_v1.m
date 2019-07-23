@@ -16,27 +16,27 @@ Aggs = thresholding_ui.detect_aggregate(imgs);
 
 
 % disp('Performing manual analysis...');
-% Agg_manual = manual.evaluate(imgs);
+% Aggs_manual = manual.evaluate(imgs);
 % disp('Complete.');
 % disp(' ');
 
 
 disp('Performing PCM analysis...');
-Aggs = pcm.evaluate(Aggs);
+Aggs_pcm = pcm.evaluate(Aggs);
 disp('Complete.');
 disp(' ');
 
 
 % disp('Performing original Kook analysis...');
-% Agg_kook = kook.evaluate(imgs);
+% Aggs_kook = kook.evaluate(imgs);
 % disp('Complete.');
 % disp(' ');
 
 
-% disp('Performing modified Kook analysis...');
-% Agg_kook_mod = kook_mod.evaluate(imgs);
-% disp('Complete.');
-% disp(' ');
+disp('Performing modified Kook analysis...');
+Aggs_kook_mod = kook_mod.evaluate(Aggs);
+disp('Complete.');
+disp(' ');
 
 
 % load('data\data_FlareNet.mat');

@@ -11,13 +11,11 @@
 % Check README.txt file for more documentation and information
 %=========================================================================%
 
-function [Agg,imgs] = evaluate(imgs,bool_plot)
+function Aggs = evaluate(Aggs,bool_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
-
-Agg = struct;
 
 
 %-- Sensitivity and Scaling Parameters -----------------------------------%
@@ -30,74 +28,69 @@ rmin = 4; % Minimum radius in pixel (Keep high enough to eliminate dummies)
 sens_val = 0.75; % the sensitivity (0?1) for the circular Hough transform 
 edge_threshold = [0.125 0.190]; % the threshold for finding edges with edge detection
 
-ll = 0; % initialize aggregate counter
 
 %== Main image processing loop ===========================================%
-for ii = 1:length(imgs) % run loop as many times as images selected
+for ll = 1:length(Aggs) % run loop as many times as images selected
 
-%-- Crop footer and get scale --------------------------------------------%
-pixsize = imgs(ii).pixsize; 
-
-figure(); imshow(imgs(ii).Cropped, []); title('Cropped Image'); % Figure 1: cropped iamge
-
-%-- Creating a new folder to store data from this image processing program --%
-% TODO : Add new directory folder for each image and input overlayed image,
-% original image, edge detection results, and histogram for each one
-
-% checking whether output folder is available
-if exist('Data\KookOutput','dir') ~= 7 % 7 if exist parameter is a directory
-    mkdir('Data\KookOutput') % make output folder
-end
-
-%== Begin image processing loop ==========================================%
-%-- User begins by cropping one aggregate to analyze ---------------------%
-
-% initializing variables
-userFin = 0; % if user is finished selecting aggregates, userFin = 1
-
-% while userFin == 0
+    %-- Crop footer and get scale --------------------------------------------%
+    pixsize = Aggs(ll).pixsize; 
+    img_cropped = Aggs(ll).image;
+    img_binary = Aggs(ll).binary;
     
-    ll = ll + 1; % increment aggregate counter
-    
+    figure(); imshow(img_cropped, []); title('Cropped Image'); % Figure 1: cropped iamge
+
+    %-- Creating a new folder to store data from this image processing program --%
+    % TODO : Add new directory folder for each image and input overlayed image,
+    % original image, edge detection results, and histogram for each one
+
+    % checking whether output folder is available
+    if exist('Data\KookOutput','dir') ~= 7 % 7 if exist parameter is a directory
+        mkdir('Data\KookOutput') % make output folder
+    end
+
+    %== Begin image processing loop ==========================================%
+    %-- User begins by cropping one aggregate to analyze ---------------------%
+
+
     Data = struct; % initialize data structure for current aggregate
     Data.method = 'kook_mod';
     
     
     %-- Creating new folder for the individual image ---------------------%
-    folder_save_img = ['Data\KookOutput\',imgs(ii).fname,'_imgAnlys'];
+    folder_save_img = ['Data\KookOutput\',Aggs(ll).fname,'_imgAnlys'];
     if exist(folder_save_img, 'dir') ~= 7
         mkdir(folder_save_img)
     end
 
 
     %-- Crop aggregate photo ---------------------------------------------%
-    uiwait(msgbox('Please crop an image of the aggregate that you wish to analyze.'));
-    
-    figure;
-    imgs(ii).Cropped_agg = imcrop(imgs(ii).Cropped); % user crops aggregate
-    close(gcf);
-    
-    if bool_plot
-        imshow(imgs(ii).Cropped_agg); % show cropped aggregate
-        saveas(gcf,[folder_save_img,'\cropped_',int2str(ll)],'tif');
-    end
+%     uiwait(msgbox('Please crop an image of the aggregate that you wish to analyze.'));
+%     
+%     figure;
+%     imgs(ii).Cropped_agg = imcrop(imgs(ii).Cropped); % user crops aggregate
+%     close(gcf);
+%     
+%     if bool_plot
+%         imshow(imgs(ii).Cropped_agg); % show cropped aggregate
+%         saveas(gcf,[folder_save_img,'\cropped_',int2str(ll)],'tif');
+%     end
     
     %== Preprocess image =================================================%
     % [~,img_Canny,img_binary] = kook_mod.preprocess(imgs(ii),folder_save_img,ll,bool_plot);
     % imgs(ii).Canny = img_Canny;
+   
 
-    img_Canny   = [];                      % Canny images as an array for aggregates
-    img_Binary  = img(ii).Binary_By_Agg;   % Binary images as an array for aggregates
-
-    for jj=1:length(imgs(ii).Cropped_By_Agg)
-        [~,canny,~] = kook_mod.preprocess(imgs(ii).Cropped_By_Agg(jj), ...
-            imgs(ii).Binary_By_Agg(jj),folder_save_img,ll,bool_plot);
+%     for jj=1:length(Aggs(ll).image)
+%         [~,canny,~] = kook_mod.preprocess(imgs(ii).Cropped_By_Agg(jj), ...
+%             imgs(ii).Binary_By_Agg(jj),folder_save_img,ll,bool_plot);
+%         
+%         img_Canny   = [img_Canny,canny];
+%     end
         
-        img_Canny   = [img_Canny,canny];
-    end
-        
+    [~,img_Canny,~] = kook_mod.preprocess(img_cropped, ...
+            img_binary,folder_save_img,ll,bool_plot);
+       
     
-    %% What is going on here????
     
     %== Find and draw circles within aggregates ==========================%
     % Find circles within soot aggregates 
@@ -109,7 +102,7 @@ userFin = 0; % if user is finished selecting aggregates, userFin = 1
     
     if bool_plot % Draw circles (Figure 7)
         figure();
-        imshow(imgs(ii).Cropped_agg,[]);
+        imshow(img_cropped,[]);
         hold;
         h = viscircles(centers, radii, 'EdgeColor','r'); 
         title('Step 7: Parimary particles overlaid on the original TEM image'); 
@@ -119,12 +112,14 @@ userFin = 0; % if user is finished selecting aggregates, userFin = 1
 
     %-- Check the circle finder by overlaying the CHT boundaries on the original image 
     %-- Remove circles out of the aggregate (?)
-    R = imfuse(img_Canny,imgs(ii).Cropped_agg,'blend'); 
+    R = imfuse(img_Canny,img_cropped,'blend'); 
 
     % Draw modified circles (Figure 8)
-    figure();imshow(R,[],'InitialMagnification',500);hold;h = viscircles(centers, radii, 'EdgeColor','r'); 
-    title('Step 8: Primary particles overlaid on the Canny edges and the original TEM image');
-    saveas(gcf, [folder_save_img,'\circAll_',int2str(ll)], 'tif')
+    if bool_plot
+        figure();imshow(R,[],'InitialMagnification',500);hold;h = viscircles(centers, radii, 'EdgeColor','r'); 
+        title('Step 8: Primary particles overlaid on the Canny edges and the original TEM image');
+        saveas(gcf, [folder_save_img,'\circAll_',int2str(ll)], 'tif')
+    end
 
 
     %-- Calculate Parameters (Add Histogram) -----------------------------%
@@ -167,9 +162,8 @@ userFin = 0; % if user is finished selecting aggregates, userFin = 1
     
     %== Save results =====================================================%
     %   Format output and autobackup data --------------------------------%
-    Agg(ll).fname = imgs(ii).fname; % store file name with data
-    Agg(ll).kook_mod = Data; % copy Dp data structure into img_data
-    save('Data\kook_mod_data.mat','Agg'); % backup img_data
+    Aggs(ll).kook_mod = Data; % copy Dp data structure into img_data
+    save('Data\kook_mod_data.mat','Aggs'); % backup img_data
     
     close all;
     
@@ -208,16 +202,8 @@ userFin = 0; % if user is finished selecting aggregates, userFin = 1
     end
     %}
 
-    %-- Check to see if user is done analyzing aggregates --------------------%
-    fin_choice = questdlg('Are there any more aggregates you wish to analyze?','Done?','Yes','No','Yes');
-
-    if strcmp(fin_choice,'No')
-        userFin = 1;
-    end
 
 end % end of aggregate loop
-
-end % end of image loop
 
 close all
 
