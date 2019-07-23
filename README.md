@@ -11,16 +11,16 @@ The software contains MATLAB designed to compare multiple
 methods of analyzing TEM images of aggregates. These include the
 pair correlation method (PCM), Kook, and manual methods.
 
-#### Data structure 
+#### Data structure
 
 Images are handled primarily by two variables: `img_ref`
-and `imgs`. The former contains a reference to the images, 
-including file name and containing directory. The latter 
+and `imgs`. The former contains a reference to the images,
+including file name and containing directory. The latter
 contains both the imported raw image, as well as processed
 versions of the image, such as those that have been
-denoised. 
+denoised.
 
-The output data itself is given as a structure array, with one 
+The output data itself is given as a structure array, with one
 entry per aggregate. This data can then be exported to a JSON
 format to be analyzed in other software and languages.
 
@@ -28,34 +28,31 @@ format to be analyzed in other software and languages.
 
 ###### +kook
 
-This package contains a copy of the code provided by Kook et al. (2015),
+This package contains a copy of the code provided by [Kook et al. (2015)][kook],
 with minor modifications to match in the input/output of some of the
 other packages.
 
 ###### +kook_mod
 
 This package contains a heavily modified version of the method proposed
-by Kook et al. (2015).
+by [Kook et al. (2015)][kook].
 
 ###### +manual
 
-Code to be used in the manual sizing of soot primary particles developed 
+Code to be used in the manual sizing of soot primary particles developed
 at the University of British Columbia. The current method uses crosshairs
-to select the length and width of the particle. This is converted to 
-various quantities, such as the mean primary particle diameter. 
+to select the length and width of the particle. This is converted to
+various quantities, such as the mean primary particle diameter.
 
 ###### +pcm
 
 This package contains an update to code for evaluating the pair correlation
-method (PCM) described by Dastanpour et al. (2016).
+method (PCM) described by [Dastanpour et al. (2016)][dastanpour2016].
 
 ###### +thresholding_ui
 
 This package contains a unified implementation of the thresholding user
-interface associated with the PCM code of Dastanpour et al. (2016) and
-manual code developed at the University of British Columbia. The code is
-to be implemented prior to to primary particle sizing and is critical
-to the PCM primary particle size estimation. 
+interface associated with the PCM code of [Dastanpour et al. (2016)][dastanpour2016] and manual code developed at the University of British Columbia. The code is to be implemented prior to primary particle sizing and is critical to the PCM primary particle size estimation.
 
 --------------------------------------------------------------------------
 
@@ -74,11 +71,18 @@ itself was compiled from various sources and features code written by
 several individuals at UBC, including Yeshun (Samuel) Ma, Ramin Dastanpour,
 Yiling Kang, Una Trivanovich, and Steven Rogak, among others.
 
-Also featured is the original MATLAB code of Kook et al.
-([https://doi.org/10.4271/2015-01-1991](https://doi.org/10.4271/2015-01-1991)),
+Also featured is the original MATLAB code of [Kook et al. (2015)][kook]
 modified slightly to accommodate the expected inputs and outputs common
 to the other functions, and a modification thereof by Ramin Dastanpour
 and Yiling Kang.
 
-The PCM code is adapted from the work of Dastanpour et al.
-([https://doi.org/10.1016/j.powtec.2016.03.027](https://doi.org/10.1016/j.powtec.2016.03.027)).
+The PCM code is adapted from the work of [Dastanpour et al. (2016)][dastanpour2016].
+
+
+#### References
+
+1. [Kook et al. (2015)][kook]
+2. [Dastanpour et al. (2016)][dastanpour2016]
+
+[kook]: https://doi.org/10.4271/2015-01-1991
+[dastanpour2016]: https://doi.org/10.4271/2015-01-1991
