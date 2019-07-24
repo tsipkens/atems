@@ -18,6 +18,8 @@ if isempty(bool_plot); bool_plot = 0; end
 %== Process image ========================================================%
 for ll = 1:length(Aggs) % run loop as many times as images selected
     
+    Data = struct; % re-initialize data structure
+    
     pixsize = Aggs(ll).pixsize; % copy pixel size locally
     img_cropped = Aggs(ll).image;
     img_binary = Aggs(ll).binary;
@@ -48,33 +50,28 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
         Data.width(jj,1) = pixsize*sqrt((a(2)-a(1))^2+(b(2) - b(1))^2);
         line ([a(1),a(2)],[b(1),b(2)],'Color', 'r', 'linewidth', 3);
         
-        %-- Save center of primary particle -------------------------%
+        %-- Save center of the primary particle --------------------------%
         Data.centers(jj,:) = manual.find_centers(x,y,a,b);
         Data.radii(jj,:) = (sqrt((a(2)-a(1))^2+(b(2)-b(1))^2)+...
-         sqrt((x(2)-x(1))^2+(y(2)-y(1))^2))/2;
+        	sqrt((x(2)-x(1))^2+(y(2)-y(1))^2))/4;
+            % takes an average over drawn lines
         
-        %-- Check if there are more primary particles ---------------%
+        %-- Check if there are more primary particles --------------------%
         choice = questdlg('Do you want to analyze another primary particle ?',...
         'Continue?','Yes','No','Yes');
         if strcmp(choice,'Yes')
-         bool_finished = 0;
+        	bool_finished = 0;
         else
-         bool_finished = 1;
+        	bool_finished = 1;
         end
+        
     end
     
-    %== Step 3-5-4: Computing aggregate dimensions/parameters ========%
-    area_pixelcount = nnz(img_binary); % number of non-zero pixels
-    Data.area = nnz(img_binary)*pixsize^2; % aggregate area
-
-    Data.perimeter = manual.Perimeter_Length(img_binary,pixsize,area_pixelcount);
-        % calculate aggregat perimeter
-
-
-    %== Save results =============================================%
+    Data = tools.refine_circles(img_cropped,Data);
+        % allow for refinement of circles
+    
+    %== Save results =====================================================%
     %   Format output and autobackup data ------------------------%
-    Data.img_cropped = img_cropped;
-
     Aggs(ll).manual = Data; % copy Dp data structure into img_data
     save('Data\manual_data.mat','Aggs'); % backup img_data
     

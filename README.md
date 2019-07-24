@@ -14,13 +14,13 @@ pair correlation method (PCM), Kook, and manual methods.
 #### Data structure
 
 Images are handled primarily by two variables: `img_ref`
-and `imgs`. The former contains a reference to the images,
+and `Imgs`. The former contains a reference to the images,
 including file name and containing directory. The latter
 contains both the imported raw image, as well as processed
 versions of the image, such as those that have been
 denoised.
 
-The output data itself is given as a structure array, with one
+The output data itself, `Aggs`, is a structure array with one
 entry per aggregate. This data can then be exported to a JSON
 format to be analyzed in other software and languages.
 
@@ -47,8 +47,7 @@ code is a heavily modified version of the code associated with [Dastanpour and R
 
 ###### +pcm
 
-This package contains an update to code for evaluating the pair correlation
-method (PCM) described by [Dastanpour et al. (2016)][dastanpour2016].
+The University of British Columbia's pair correlation method (PCM) MATLAB code for processing TEM images of soot to determine morphological properties. This package contains a significant update to the previous code provided with [Dastanpour et al. (2016)][dastanpour2016].
 
 ###### +thresholding_ui
 

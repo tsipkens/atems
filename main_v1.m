@@ -12,11 +12,11 @@ imgs = tools.get_footer_scale(imgs); % get footer for selected image
 
 
 %-- Run thresholding for all of the images -------------------------------%
-Aggs = thresholding_ui.detect_aggregate(imgs);
+Aggs = thresholding_ui.evaluate(Imgs);
 
 
 % disp('Performing manual analysis...');
-% Aggs_manual = manual.evaluate(imgs);
+% Aggs_manual = manual.evaluate(Aggs);
 % disp('Complete.');
 % disp(' ');
 

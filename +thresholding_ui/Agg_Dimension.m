@@ -138,5 +138,28 @@ close all
 cd (mainfolder)
 %}
 
+%{
+%== FROM PCM: ============================================%
+
+
+
+    % Aggregate gyration radius
+    % NOTE: Consider moving to Aggsregate detection code
+    [xpos,ypos] = find(img_binary);
+    n_pix       = length(xpos);
+    centroid.x  = sum(xpos)/n_pix;
+    centroid.y  = sum(ypos)/n_pix;
+    Ar          = zeros(n_pix,1);
+
+    for kk = 1:n_pix
+        Ar(kk,1) = (((xpos(kk,1)-centroid.x)*pixsize)^2+...
+                  ((ypos(kk,1)-centroid.y)*pixsize)^2)*pixsize^2;
+    end
+
+
+ % Aggsregate Length, Width, and aspect ratio      
+    Data.L           = max((max(row)-min(row)),(max(col)-min(col)))*pixsize;
+    Data.W           = min((max(row)-min(row)),(max(col)-min(col)))*pixsize;
+%}
 end
 
