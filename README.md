@@ -42,7 +42,8 @@ by [Kook et al. (2015)][kook].
 Code to be used in the manual sizing of soot primary particles developed
 at the University of British Columbia. The current method uses crosshairs
 to select the length and width of the particle. This is converted to
-various quantities, such as the mean primary particle diameter.
+various quantities, such as the mean primary particle diameter. The manual
+code is a heavily modified version of the code associated with [Dastanpour and Rogak (2014)][dastanpour2014].
 
 ###### +pcm
 
@@ -83,6 +84,8 @@ The PCM code is adapted from the work of [Dastanpour et al. (2016)][dastanpour20
 
 1. [Kook et al. (2015)][kook]
 2. [Dastanpour et al. (2016)][dastanpour2016]
+3. [Dastanpour and Rogak (2014)][dastanpour2014]
 
 [kook]: https://doi.org/10.4271/2015-01-1991
 [dastanpour2016]: https://doi.org/10.4271/2015-01-1991
+[dastanpour2014]: https://doi.org/10.1080/02786826.2014.955565
