@@ -73,7 +73,7 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     %== Save results =====================================================%
     %   Format output and autobackup data ------------------------%
     Aggs(ll).manual = Data; % copy Dp data structure into img_data
-    save('Data\manual_data.mat','Aggs'); % backup img_data
+    save('manual_data.mat','Aggs'); % backup img_data
     
     close all;
 
