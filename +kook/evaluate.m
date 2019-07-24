@@ -17,11 +17,11 @@
 % 5. Added option as to whether of not to generate plots
 %=========================================================================%
 
-function [dp,dpdist] = evaluate(imgs,bool_plot)
+function [Agg,dp,dpdist] = evaluate(imgs,bool_plot)
 %-------------------------------------------------------------------------%
 % Inputs:
-%   img_ref Image struct to be analyzed
-%   dpdist  Primary particle size disitrbution of aggregate
+%   imgs       Image struct to be analyzed
+%   bool_plot  A boolean determining whether or not to generate plots
 %-------------------------------------------------------------------------%
 
 
@@ -29,6 +29,7 @@ function [dp,dpdist] = evaluate(imgs,bool_plot)
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
 
+Agg = struct;
 
 pixsize = imgs(1).pixsize;
 
@@ -97,11 +98,11 @@ end
 
 
 %== Generate outputs =====================================================%
-dp.method = 'kook';
-dp.centers = centers; % output in px
-dp.radii = radii; % output in px
-dp.diameters = radii*pixsize*2; % output in nm
+Agg(1).kook.centers = centers; % output in px
+Agg(1).kook.radii = radii; % output in px
+Agg(1).kook.diameters = radii*pixsize*2; % output in nm
 
+dp = Agg(1).kook.diameters;
 dpdist = radii*pixsize*2;
 
 

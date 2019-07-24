@@ -3,20 +3,26 @@
 % Author:       Timothy Sipkens, 2019-06-24; Yiling Kang, 2018
 % Originally:   Ben Gigone and Emre Karatas, PhD
 % ciations:     Kook et al. 2016, SAE
+%
+% Preprocesses the cropped aggregate using background subtraction and
+% various techniques.  Works on one aggregate.
+%
+% Parameters:   agg_cropped - cropped image of aggregate
+%               agg_binary - cropped binary image of aggregate
 %=========================================================================%
 
 function [img_analyze,img_Canny,img_binary] = ...
-    preprocess(img,imgFoldName,aggNum,bool_plot)
+    preprocess(agg_cropped,agg_binary,imgFoldName,ll,bool_plot)
 
 %== Preprocessing ========================================================%
 %-- Converts cropped image to a binary image (using thresholding UI) -----%
-[img_binary] = thresholding_ui.Agg_det_Slider(img.Cropped_agg,0);
-img_binary = ~img_binary;
+% [img_binary] = thresholding_ui.Agg_det_Slider(img.Cropped_agg,0);
+img_binary = ~agg_binary;
 
 
 %-- Fix background illumination ------------------------------------------%
 se = strel('disk',85);
-II1 = imbothat(img.Cropped_agg,se);
+II1 = imbothat(agg_cropped,se);
 figure
 imshow(II1,[])
 title('Step 1: Black Top Hat Filter'); % FIGURE 1
@@ -33,12 +39,12 @@ title('Step 2: Contrast Enhanced');   %FIGURE 2
 %   Step 3: median filter to remove noise 
 II1_mf = medfilt2(II1); %, [mf mf]); 
 
-imshow(II1_mf, []); % show pro-processed image
-title('Step 3: Median filter'); % FIGURE 3 
-
-saveas(gcf, [imgFoldName,'\prep_',int2str(aggNum)], 'tif');
-    % save the results of pre-processing
-
+if bool_plot
+    imshow(II1_mf, []); % show pro-processed image
+    title('Step 3: Median filter'); % FIGURE 3 
+    saveas(gcf, [imgFoldName,'\prep_',int2str(ll)], 'tif');
+        % save the results of pre-processing
+end
     
 %== RawImage processing ==================================================%
 %   Background erasing, Canny edge detection, background inversion, 
@@ -59,14 +65,14 @@ if bool_plot % FIGURE 5
     figure(); % plot Canny edges
     imshow(img_Canny0);
     title('Step 5: Canny Edge Detection');
-    saveas(gcf, [imgFoldName,'\edge_',int2str(aggNum)], 'tif')
+    saveas(gcf, [imgFoldName,'\edge_',int2str(ll)], 'tif')
 end
 
 
 %-- Imposing white background onto image ---------------------------------%
 %   This precent the program from detecting any background particles
 img_Canny = double(~img_binary) + double(img_Canny0);
-if bool_plot % FIGURE 6
+if bool_plot % FIGURE 6 
     figure();
     imshow(img_Canny);
     title('Step 6: Binary Image Overlap')

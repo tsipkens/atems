@@ -7,35 +7,36 @@ img_ref = tools.get_img_ref;
     % generates a reference to a set of images to be analyzed
 imgs = tools.get_imgs(img_ref); % load a single image
 imgs = tools.get_footer_scale(imgs); % get footer for selected image
-imshow(imgs(1).RawImage);
-colormap('gray');
+% imshow(imgs(1).RawImage);
+% colormap('gray');
 
 
-
+%-- Run thresholding for all of the images -------------------------------%
+Aggs = thresholding_ui.evaluate(Imgs);
 
 
 % disp('Performing manual analysis...');
-% img_data_manual = manual.evaluate(imgs);
+% Aggs_manual = manual.evaluate(Aggs);
 % disp('Complete.');
 % disp(' ');
 
 
 disp('Performing PCM analysis...');
-img_data_pcm = pcm.evaluate(imgs);
+Aggs_pcm = pcm.evaluate(Aggs);
 disp('Complete.');
 disp(' ');
 
 
 % disp('Performing original Kook analysis...');
-% dp = kook.evaluate(imgs);
+% Aggs_kook = kook.evaluate(imgs);
 % disp('Complete.');
 % disp(' ');
 
 
-% disp('Performing modified Kook analysis...');
-% img_data_kook = kook_mod.evaluate(imgs);
-% disp('Complete.');
-% disp(' ');
+disp('Performing modified Kook analysis...');
+Aggs_kook_mod = kook_mod.evaluate(Aggs);
+disp('Complete.');
+disp(' ');
 
 
 % load('data\data_FlareNet.mat');
