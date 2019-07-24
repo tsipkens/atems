@@ -9,7 +9,8 @@ and primary particle diameter.
 
 The software contains MATLAB designed to compare multiple
 methods of analyzing TEM images of aggregates. These include the
-pair correlation method (PCM), Kook, and manual methods.
+pair correlation method (PCM), Kook, and manual methods. Each method is contained in a package, with a corresponding `evaluate_*` function that
+can be used to call the method.
 
 #### Data structure
 

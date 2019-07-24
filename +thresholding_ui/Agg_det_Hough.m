@@ -1,23 +1,27 @@
 
 % AGG_DET_HOUGH  Hough Transformation and Rolling Ball Transformation
-% Automatic detection of the aggregates on TEM images
-% Function to be used with the Pair Correlation Method (PCM) package
-% Ramin Dastanpour & Steven N. Rogak
-% Developed at the University of British Columbia
-% Last updated in Feb. 2016
+%                Automatic detection of the aggregates on TEM images
+% Authors:  Ramin Dastanpour & Steven N. Rogak
+% Notes:    Developed at the University of British Columbia
+%           Last updated in Feb. 2016
 %=========================================================================%
 
 function [img_binary,moreaggs,choice] = ...
-    Agg_det_Hough(img_cropped,npix,moreaggs,minparticlesize,coeffs) 
+    Agg_det_Hough(img_cropped,npix,moreaggs,minparticlesize,coeffs,bool_plot) 
+
+if ~exist('bool_plot','var'); bool_plot = []; end
+if isempty(bool_plot); bool_plot = 0; end
 
 
 %== Step 1: Apply intensity threshold ====================================%
 level = graythresh(img_cropped);
 BW = imbinarize(img_cropped,level);
-figure;
-hold on;
-subplot(3,3,1);imshow(img_cropped)
-subplot(3,3,2); imshow(BW)
+if bool_plot
+    figure;
+    hold on;
+    subplot(3,3,1);imshow(img_cropped)
+    subplot(3,3,2); imshow(BW)
+end
 a = coeffs(1);
 b = coeffs(2);
 c = coeffs(3);
@@ -66,7 +70,7 @@ while q<=p
     end
     q = q+1;
 end
-subplot(3,3,3); imshow(BW)
+if bool_plot; subplot(3,3,3); imshow(BW); end
 
 
 %== Step 3: Rolling Ball Transformation ==================================%
@@ -74,19 +78,19 @@ subplot(3,3,3); imshow(BW)
 %   imopen opens black areas
 se = strel('disk',round(a*minparticlesize/npix));
 img_bewBW = imclose(BW,se);
-subplot(3,3,4); imshow(img_bewBW)
+if bool_plot; subplot(3,3,4); imshow(img_bewBW); end
 
 se = strel('disk',round(b*minparticlesize/npix));
 img_bewBW = imopen(img_bewBW,se);
-subplot(3,3,5); imshow(img_bewBW)
+if bool_plot; subplot(3,3,5); imshow(img_bewBW); end
 
 se = strel('disk',round(c*minparticlesize/npix));
 img_bewBW = imclose(img_bewBW,se);
-subplot(3,3,6); imshow(img_bewBW)
+if bool_plot; subplot(3,3,6); imshow(img_bewBW); end
 
 se = strel('disk',round(d*minparticlesize/npix));
 img_bewBW = imopen(img_bewBW,se);
-subplot(3,3,7); imshow(img_bewBW)
+if bool_plot; subplot(3,3,7); imshow(img_bewBW); end
 
 
 %== Step 4: Delete blobs under a threshold area size =====================%
@@ -99,14 +103,9 @@ for kk = 1:nparts
         img_bewBW(CC.PixelIdxList{1,kk}) = 1;
     end
 end
-subplot(3,3,8); imshow(img_bewBW)
+if bool_plot; subplot(3,3,8); imshow(img_bewBW); end
 
-img_edge = edge(img_bewBW,'sobel');
-se_edge = strel('disk',1);
-img_dilatededge = imdilate(img_edge,se_edge);
-clear Edge_Image0 SE2
-img_finalimposed = imimposemin(img_cropped, img_dilatededge);
-figure; imshow(img_finalimposed);
+tools.plot_binary_overlay(img_cropped,img_bewBW);
 
 
 %== Step 5: User interaction =============================================%

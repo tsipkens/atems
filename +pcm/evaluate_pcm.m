@@ -1,5 +1,5 @@
 
-% EVALUATE  Performs the pair correlation method (PCM) of Aggsregate characterization
+% EVALUATE_PCM  Performs the pair correlation method (PCM) of Aggsregate characterization
 % 
 % Developed at the University of British Columbia by Ramin Dastanpour and
 % Steven N. Rogak
@@ -11,11 +11,17 @@
 % of British Columbia
 %=========================================================================%
 
-function [Aggs] = evaluate(Aggs,bool_plot)
+function [Aggs] = evaluate_pcm(Aggs,bool_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
+
+
+%-- Check whether the data folder is available ---------------------------%
+if exist('data','dir') ~= 7 % 7 if exist parameter is a directory
+    mkdir('data') % make output folder
+end
 
 
 %-- Initialize values ----------------------------------------------------%
@@ -23,7 +29,6 @@ if isempty(bool_plot); bool_plot = 0; end
 % % Coefficient for automatic Hough transformation
 % coeff_matrix    = [0.2 0.8 0.4 1.1 0.4;0.2 0.3 0.7 1.1 1.8;...
 %     0.3 0.8 0.5 2.2 3.5;0.1 0.8 0.4 1.1 0.5];
-% moreAggss    = 0;
 
 
 %== Main image processing loop ===========================================%
@@ -36,37 +41,17 @@ for ll = 1:nAggs % run loop as many times as images selected
     img_binary = Aggs(ll).binary;
     img_cropped = Aggs(ll).image;
     
-    
-    % Check whether the Output folder is available 
-    dirName = 'data\PCMOutput\';
-    
-    if exist(dirName,'dir') ~= 7 % 7 if exist parameter is a directory
-        mkdir(dirName) % make output folder
-    end
-    
-    
     %-- Loop through aggregates ------------------------------------------%
     Data = Aggs(ll); % initialize data structure for current aggregate
     Data.method = 'pcm';
-
-
-    % Edge Image via Sobel
-    % Use Sobel's Method as a built-in edge detection function for
-    % Aggsregates's outline. Other methods (e.g. Roberts, Canny)can also
-    % be considered
-    img_edge = edge(img_binary,'sobel');
-
-    % Dilated Edge Image
-    % Use dilation to strengthen the Aggsregate's outline
-    SE = strel('disk',1);
-    img_dilated = imdilate(img_edge,SE);
-    img_final_imposed = imimposemin(img_cropped, img_dilated);
-    figure
-    hold on
-    imshow(img_final_imposed);
-
-    %-- Step 3-3: Development of the pair correlation function (PCF) -%
-
+    
+    
+    if bool_plot
+        tools.plot_binary_overlay(img_cropped,img_binary);
+    end
+    
+    
+    %== Step 3-3: Development of the pair correlation function (PCF) -%
     %-- 3-3-1: Find the skeleton of the Aggsregate --------------------%
     Skel = bwmorph(img_binary,'thin',Inf);
     [skeletonY, skeletonX] = find(Skel);
@@ -132,7 +117,7 @@ for ll = 1:nAggs % run loop as many times as images selected
     %== 3-5: Primary particle sizing =====================================%
     %-- 3-5-1: Simple PCM ------------------------------------------------%
     PCF_simple   = .913;
-    Aggs(ll).pcm_dp_simple = ...
+    Aggs(ll).dp_pcm_simple = ...
         interp1(PCF_smoothed, Radius, PCF_simple);
         % dp from simple PCM
     
@@ -145,7 +130,7 @@ for ll = 1:nAggs % run loop as many times as images selected
     PRgslope = (PCFURg+PCFLRg-PCFRg)/(URg-LRg); % dp/dr(Rg)
 
     PCF_generalized   = (.913/.84)*(0.7+0.003*PRgslope^(-0.24)+0.2*Data.aspect_ratio^-1.13);
-    Aggs(ll).pcm_dp_general = ...
+    Aggs(ll).dp_pcm_general = ...
         interp1(PCF_smoothed, Radius, PCF_generalized);
         % dp from generalized PCM
     
@@ -163,7 +148,7 @@ for ll = 1:nAggs % run loop as many times as images selected
 
     %== Step 4: Save results =========================================%
     %   Autobackup data
-    save('pcm_data.mat','Aggs'); % backup img_data
+    save('data\pcm_data.mat','Aggs'); % backup img_data
     
 end
     

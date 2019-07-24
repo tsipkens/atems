@@ -59,7 +59,7 @@ clear COL1 ROW1 DISTANCE area_edge_particle
 
 
 %== Width Calculation ====================================================%
-%   Tto mark the pixels that specify the length.  It is important to note that
+%   To mark the pixels that specify the length.  It is important to note that
 %   an error may arise during the rotation of the image, because some pixels
 %   are obscured, or even deleted via the rotation process.  In order to
 %   prevent this, the pixel left-adjacent to the true length-defining pixels

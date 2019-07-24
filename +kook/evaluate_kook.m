@@ -1,5 +1,5 @@
 
-% EVALUATE  Original Kook function, modified only to be incorporated into a function.
+% EVALUATE_KOOK  Original Kook function, modified only to be incorporated into a function.
 % Automatic primary particle finder v1.2 (works on Matlab 2012a or higher + 
 % Image Processing Toolbox)
 % The code implements pre-processing (Median Filter and unsharp masking), 
@@ -17,7 +17,7 @@
 % 5. Added option as to whether of not to generate plots
 %=========================================================================%
 
-function [Agg,dp,dpdist] = evaluate(imgs,bool_plot)
+function [Agg,dp,dpdist] = evaluate_kook(imgs,bool_plot)
 %-------------------------------------------------------------------------%
 % Inputs:
 %   imgs       Image struct to be analyzed

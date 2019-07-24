@@ -1,11 +1,11 @@
 
-% EVALUATE  Automatically detects and segments aggregates in an image
+% EVALUATE_TH  Automatically detects and segments aggregates in an image
 % Parameters:
 %   img     Struct describing image, including fields containing fname, 
 %           rawimage, cropped image, footer, ocr, and pixel size
 %=========================================================================%
 
-function Aggs = evaluate(Imgs)
+function Aggs = evaluate_th(Imgs)
 
 ll = 0; % initialize aggregate counter
 
@@ -32,6 +32,7 @@ for ii=1:length(Imgs) % loop through provided images
     end
 
     %-- Run slider to obtain binary image --------------------------------%
+    figure;
     [total_binary,~,~,~] = ... 
         thresholding_ui.Agg_detection(Imgs(ii),pixsize, ...
         more_aggs,minparticlesize,coeffs);
@@ -63,6 +64,7 @@ for ii=1:length(Imgs) % loop through provided images
         SE = strel('disk',1);
         img_dilated = imdilate(img_binary,SE);
         img_edge = img_dilated-img_binary;
+        % img_edge = edge(img_binary,'sobel'); % currently causes an error
         
         [Aggs(ll).length, Aggs(ll).width] = ...
             thresholding_ui.Agg_Dimension(img_edge,pixsize);
@@ -81,12 +83,24 @@ for ii=1:length(Imgs) % loop through provided images
         % Aggs(ll).perimeter = ...
         %     thresholding_ui.perimeter_length(img_binary,...
         %     pixsize,Aggs(ll).num_pixels); % alternate perimeter
-            
+        
+        [x,y] = find(img_binary ~= 0);
+        Aggs(ll).center_mass = [mean(x); mean(y)];
+        
+        tools.plot_binary_overlay(Aggs(ll).image,img_binary);
+        hold on;
+        plot(Aggs(ll).center_mass(2),Aggs(ll).center_mass(1),'rx');
+        viscircles(fliplr(Aggs(ll).center_mass'),...
+            Aggs(ll).Rg/pixsize);
+        hold off;
+        pause(0.2);
         
     end
-    
-    close all; % close all images
         
 end
+
+pause(1);
+close gcf;
+
 
 end

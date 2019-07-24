@@ -12,29 +12,29 @@ imgs = tools.get_footer_scale(imgs); % get footer for selected image
 
 
 %-- Run thresholding for all of the images -------------------------------%
-Aggs = thresholding_ui.evaluate(Imgs);
+Aggs = thresholding_ui.evaluate_th(Imgs);
 
 
 % disp('Performing manual analysis...');
-% Aggs_manual = manual.evaluate(Aggs);
+% Aggs_manual = manual.evaluate_man(Aggs);
 % disp('Complete.');
 % disp(' ');
 
 
 disp('Performing PCM analysis...');
-Aggs_pcm = pcm.evaluate(Aggs);
+Aggs_pcm = pcm.evaluate_pcm(Aggs);
 disp('Complete.');
 disp(' ');
 
 
 % disp('Performing original Kook analysis...');
-% Aggs_kook = kook.evaluate(imgs);
+% Aggs_kook = kook.evaluate_kook(imgs);
 % disp('Complete.');
 % disp(' ');
 
 
 disp('Performing modified Kook analysis...');
-Aggs_kook_mod = kook_mod.evaluate(Aggs);
+Aggs_kook_mod = kook_mod.evaluate_km(Aggs);
 disp('Complete.');
 disp(' ');
 
