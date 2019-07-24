@@ -22,7 +22,7 @@ if isempty(bool_plot); bool_plot = 0; end
 maximgCount = 255; % Maximum image count for 8-bit image 
 SelfSubt = 0.7; % Self-subtraction level 
 mf = 1; % Median filter [x x] if needed 
-alpha = 0.1; % Shape of the negative Laplacian “unsharp” filter 0->1 0.1
+alpha = 0.1; % Shape of the negative Laplacian â€œunsharpâ€ filter 0->1 0.1
 rmax = 30; % Maximum radius in pixel
 rmin = 4; % Minimum radius in pixel (Keep high enough to eliminate dummies)
 sens_val = 0.75; % the sensitivity (0?1) for the circular Hough transform 
@@ -54,7 +54,6 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
 
     Data = struct; % initialize data structure for current aggregate
     Data.method = 'kook_mod';
-    
     
     %-- Creating new folder for the individual image ---------------------%
     folder_save_img = ['Data\KookOutput\',Aggs(ll).fname,'_imgAnlys'];
@@ -89,7 +88,6 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
         
     [~,img_Canny,~] = kook_mod.preprocess(img_cropped, ...
             img_binary,folder_save_img,ll,bool_plot);
-       
     
     
     %== Find and draw circles within aggregates ==========================%
@@ -163,7 +161,7 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     %== Save results =====================================================%
     %   Format output and autobackup data --------------------------------%
     Aggs(ll).kook_mod = Data; % copy Dp data structure into img_data
-    save('Data\kook_mod_data.mat','Aggs'); % backup img_data
+    save('kook_mod_data.mat','Aggs'); % backup img_data
     
     close all;
     
