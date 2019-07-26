@@ -27,8 +27,8 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     Data = struct; % re-initialize data structure
     
     pixsize = Aggs(ll).pixsize; % copy pixel size locally
-    img_cropped = Aggs(ll).image;
-    img_binary = Aggs(ll).binary;
+    img_cropped = Aggs(ll).img_cropped;
+    img_binary = Aggs(ll).img_cropped_binary;
     
     %== Step 3: Analyzing each aggregate =================================%
     bool_finished = 0;

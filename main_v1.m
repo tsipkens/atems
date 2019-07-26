@@ -5,8 +5,8 @@ clc;
 
 img_ref = tools.get_img_ref;
     % generates a reference to a set of images to be analyzed
-imgs = tools.get_imgs(img_ref); % load a single image
-imgs = tools.get_footer_scale(imgs); % get footer for selected image
+Imgs = tools.get_imgs(img_ref); % load a single image
+Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 % imshow(imgs(1).RawImage);
 % colormap('gray');
 
@@ -21,10 +21,10 @@ Aggs = thresholding_ui.evaluate_th(Imgs);
 % disp(' ');
 
 
-disp('Performing PCM analysis...');
-Aggs_pcm = pcm.evaluate_pcm(Aggs);
-disp('Complete.');
-disp(' ');
+% disp('Performing PCM analysis...');
+% Aggs_pcm = pcm.evaluate_pcm(Aggs);
+% disp('Complete.');
+% disp(' ');
 
 
 % disp('Performing original Kook analysis...');

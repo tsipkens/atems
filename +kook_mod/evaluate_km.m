@@ -26,7 +26,7 @@ end
 
 %-- Sensitivity and Scaling Parameters -----------------------------------%
 maximgCount = 255; % Maximum image count for 8-bit image 
-SelfSubt = 0.7; % Self-subtraction level 
+SelfSubt = 0.8; % Self-subtraction level 
 mf = 1; % Median filter [x x] if needed 
 alpha = 0.1; % Shape of the negative Laplacian â€œunsharpâ€? filter 0->1 0.1
 rmax = 30; % Maximum radius in pixel
@@ -40,12 +40,12 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
 
     %-- Crop footer and get scale --------------------------------------------%
     pixsize = Aggs(ll).pixsize; 
-    img_cropped = Aggs(ll).image;
-    img_binary = Aggs(ll).binary;
+    img_cropped = Aggs(ll).img_cropped;
+    img_binary = Aggs(ll).img_cropped_binary;
     
-    if bool_plot
-        figure(); imshow(img_cropped, []); title('Cropped Image'); % Figure 1: cropped iamge
-    end
+    %if bool_plot
+        figure(gcf); imshow(img_cropped);
+    %end
     
     %-- Creating a new folder to store data from this image processing program --%
     % TODO : Add new directory folder for each image and input overlayed image,
@@ -60,7 +60,7 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     %== Find and draw circles within aggregates ==========================%
     % Find circles within soot aggregates 
     [centers, radii] = imfindcircles(img_Canny,[rmin rmax],...
-        'ObjectPolarity', 'dark', 'Sensitivity', sens_val, 'Method', 'TwoStage'); 
+        'ObjectPolarity', 'bright', 'Sensitivity', sens_val, 'Method', 'TwoStage'); 
     Data.centers = centers;
     Data.radii = radii;
     

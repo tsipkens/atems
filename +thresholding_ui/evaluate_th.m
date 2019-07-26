@@ -51,6 +51,9 @@ for ii=1:length(Imgs) % loop through provided images
         
         Aggs(ll).fname = Imgs(ii).fname; % file name for aggregate
         Aggs(ll).pixsize = pixsize;
+        
+ 
+        
         Aggs(ll).image = Imgs(ii).Cropped;
             % store image that the aggregate occurs in
         
@@ -58,6 +61,9 @@ for ii=1:length(Imgs) % loop through provided images
         img_binary = zeros(size(total_binary));
         img_binary(CC.PixelIdxList{1,jj}) = 1;
         Aggs(ll).binary = img_binary;
+        
+        [Aggs(ll).img_cropped,Aggs(ll).img_cropped_binary,Aggs(ll).rect] = ...
+            thresholding_ui.autocrop(Imgs(ii).Cropped,img_binary);
         
         
         %== Compute aggregate dimensions/parameters ======================%

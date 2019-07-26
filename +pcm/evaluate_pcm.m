@@ -38,17 +38,18 @@ for ll = 1:nAggs % run loop as many times as images selected
     
     %== Step 1: Image preparation ========================================%
     pixsize = Aggs(ll).pixsize;
-    img_binary = Aggs(ll).binary;
-    img_cropped = Aggs(ll).image;
+    img_binary = Aggs(ll).img_cropped_binary;
+    img_cropped = Aggs(ll).img_cropped;
     
     %-- Loop through aggregates ------------------------------------------%
     Data = Aggs(ll); % initialize data structure for current aggregate
     Data.method = 'pcm';
     
     
-    if bool_plot
+    % if bool_plot
+        figure(gcf);
         tools.plot_binary_overlay(img_cropped,img_binary);
-    end
+    % end
     
     
     %== Step 3-3: Development of the pair correlation function (PCF) -%
