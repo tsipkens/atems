@@ -36,6 +36,9 @@ for ii=1:length(Imgs) % loop through provided images
     [total_binary,~,~,~] = ... 
         thresholding_ui.Agg_detection(Imgs(ii),pixsize, ...
         more_aggs,minparticlesize,coeffs);
+
+    % Remove aggregates touching the edge
+    total_binary = imclearborder(total_binary);
     
     CC = bwconncomp(abs(total_binary-1)); % find seperate aggregates
     naggs = CC.NumObjects; % count number of aggregates
@@ -44,8 +47,6 @@ for ii=1:length(Imgs) % loop through provided images
     
     %== Main loop to analyze each aggregate ==============================%
     for jj = 1:naggs % loop through number of found aggregates
-        
-        % TODO: Remove any aggregates touching the edge
         
         ll = ll + 1; % increment aggregate counter
         
