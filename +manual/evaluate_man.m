@@ -81,7 +81,7 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     %   Format output and autobackup data ------------------------%
     Aggs(ll).manual = Data; % copy Dp data structure into img_data
     Aggs(ll).dp_manual = mean(Data.dp);
-    save('data\manual_data.mat','Aggs'); % backup img_data
+    save(['data',filesep,'manual_data.mat'],'Aggs'); % backup img_data
     
     close all;
 

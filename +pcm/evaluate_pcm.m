@@ -149,7 +149,7 @@ for ll = 1:nAggs % run loop as many times as images selected
 
     %== Step 4: Save results =========================================%
     %   Autobackup data
-    save('data\pcm_data.mat','Aggs'); % backup img_data
+    save(['data',filesep,'pcm_data.mat'],'Aggs'); % backup img_data
     
 end
     

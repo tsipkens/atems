@@ -104,7 +104,7 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     %== Save results =====================================================%
     %   Format output and autobackup data --------------------------------%
     Aggs(ll).kook_mod = Data; % copy Dp data structure into img_data
-    save('data\kook_mod_data.mat','Aggs'); % backup img_data
+    save(['data',filesep,'kook_mod_data.mat'],'Aggs'); % backup img_data
     
     close all;
     
