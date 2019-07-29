@@ -82,10 +82,10 @@ The PCM code is adapted from the work of [Dastanpour et al. (2016)][dastanpour20
 
 #### References
 
-1. [Kook et al. (2015)][kook]
-2. [Dastanpour et al. (2016)][dastanpour2016]
-3. [Dastanpour and Rogak (2014)][dastanpour2014]
+1. [Kook et al., SAE Int. J. Engines (2015)][kook]
+2. [Dastanpour et al., J. Powder Tech. (2016)][dastanpour2016]
+3. [Dastanpour and Rogak, Aerosol Sci. Technol. (2014)][dastanpour2014]
 
 [kook]: https://doi.org/10.4271/2015-01-1991
-[dastanpour2016]: https://doi.org/10.4271/2015-01-1991
+[dastanpour2016]: https://doi.org/10.1016/j.powtec.2016.03.027
 [dastanpour2014]: https://doi.org/10.1080/02786826.2014.955565
