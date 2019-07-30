@@ -1,5 +1,6 @@
 
-% EVALUATE_KOOK  Original Kook function, modified only to be incorporated into a function.
+% PERFORM_KOOK  Original Kook function, modified only to be incorporated as a function.
+%
 % Automatic primary particle finder v1.2 (works on Matlab 2012a or higher + 
 % Image Processing Toolbox)
 % The code implements pre-processing (Median Filter and unsharp masking), 
@@ -17,10 +18,10 @@
 % 5. Added option as to whether of not to generate plots
 %=========================================================================%
 
-function [Agg,dp,dpdist] = evaluate_kook(imgs,bool_plot)
+function [Agg,dp,dpdist] = perform_kook(Imgs,bool_plot)
 %-------------------------------------------------------------------------%
 % Inputs:
-%   imgs       Image struct to be analyzed
+%   Imgs       Image struct to be analyzed
 %   bool_plot  A boolean determining whether or not to generate plots
 %-------------------------------------------------------------------------%
 
@@ -29,11 +30,13 @@ function [Agg,dp,dpdist] = evaluate_kook(imgs,bool_plot)
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
 
-Agg = struct;
+disp('Performing original Kook analysis...');
 
-pixsize = imgs(1).pixsize;
+Agg = struct; % initialize aggregate data structure
 
-II1 = imgs(1).Cropped;
+pixsize = Imgs(1).pixsize;
+
+II1 = Imgs(1).Cropped;
 
 
 %-- Set relevant parameter values ----------------------------------------%
@@ -105,5 +108,7 @@ Agg(1).kook.diameters = radii*pixsize*2; % output in nm
 dp = Agg(1).kook.diameters;
 dpdist = radii*pixsize*2;
 
+disp('Complete.');
+disp(' ');
 
 end

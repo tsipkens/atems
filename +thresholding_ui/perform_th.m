@@ -1,11 +1,14 @@
 
-% EVALUATE_TH  Automatically detects and segments aggregates in an image
-% Parameters:
-%   img     Struct describing image, including fields containing fname, 
-%           rawimage, cropped image, footer, ocr, and pixel size
+% PERFORM_TH  Automatically detects and segments aggregates in an image
+% Authors:    Timothy Sipkens, Yeshun (Samuel) Ma, 2019
+
+% Note:
+%   Originally written by Ramin Dastanpour, Steve Rogak, Hugo Tjong,
+%   Arka Soewono from the University of British Columbia, 
+%   Vanouver, BC, Canada
 %=========================================================================%
 
-function Aggs = evaluate_th(Imgs)
+function Aggs = perform_th(Imgs)
 
 ll = 0; % initialize aggregate counter
 
@@ -37,8 +40,9 @@ for ii=1:length(Imgs) % loop through provided images
         thresholding_ui.Agg_detection(Imgs(ii),pixsize, ...
         more_aggs,minparticlesize,coeffs);
 
-    % Remove aggregates touching the edge
-    total_binary = imclearborder(total_binary);
+    %-- Remove aggregates touching the edge ------%
+    total_binary = imclearborder(~total_binary); % clear border on negative of binary
+    total_binary = ~total_binary; % invert the binary
     
     CC = bwconncomp(abs(total_binary-1)); % find seperate aggregates
     naggs = CC.NumObjects; % count number of aggregates
@@ -52,8 +56,6 @@ for ii=1:length(Imgs) % loop through provided images
         
         Aggs(ll).fname = Imgs(ii).fname; % file name for aggregate
         Aggs(ll).pixsize = pixsize;
-        
- 
         
         Aggs(ll).image = Imgs(ii).Cropped;
             % store image that the aggregate occurs in
@@ -94,13 +96,13 @@ for ii=1:length(Imgs) % loop through provided images
         [x,y] = find(img_binary ~= 0);
         Aggs(ll).center_mass = [mean(x); mean(y)];
         
+        figure(gcf);
         tools.plot_binary_overlay(Aggs(ll).image,img_binary);
         hold on;
         plot(Aggs(ll).center_mass(2),Aggs(ll).center_mass(1),'rx');
         viscircles(fliplr(Aggs(ll).center_mass'),...
             Aggs(ll).Rg/pixsize);
         hold off;
-        pause(0.2);
         
     end
         
@@ -109,5 +111,7 @@ end
 pause(1);
 close gcf;
 
+disp('Completed thresholding.');
+disp(' ');
 
 end

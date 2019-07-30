@@ -1,5 +1,5 @@
 
-% EVALUATE_KM  Performs modified Kook algorithm
+% PERFORM_KM  Performs modified Kook algorithm
 %
 % Code written by Ben Gigone and Emre Karatas, PhD
 % Adapted from Kook et al. 2016, SAE
@@ -11,12 +11,13 @@
 % Check README.txt file for more documentation and information
 %=========================================================================%
 
-function Aggs = evaluate_km(Aggs,bool_plot)
+function Aggs = perform_km(Aggs,bool_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
 
+disp('Performing modified Kook analysis...');
 
 %-- Check whether the data folder is available ---------------------------%
 if exist('data','dir') ~= 7 % 7 if exist parameter is a directory
@@ -103,47 +104,18 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     
     %== Save results =====================================================%
     %   Format output and autobackup data --------------------------------%
-    Aggs(ll).kook_mod = Data; % copy Dp data structure into img_data
-    save(['data',filesep,'kook_mod_data.mat'],'Aggs'); % backup img_data
-    
+    Aggs(ll).kook_mod = Data; % copy data structure into img_data
+    if mod(ll,10)==0 % save data every 10 aggregates
+        disp('Saving data...');
+        save(['data',filesep,'kook_mod_data.mat'],'Aggs'); % backup img_data
+        disp('Save complete');
+        disp(' ');
+    end
     close all;
     
-    %{
-    %-- Excel report title -----------------------------------------------%
-    % report_title = {'Image_ID','Particle Diameter (dp)(nm)','Number of Particles','Average dp (nm)','Radius of Gyration (nm)'};
-    % extracted_text = cell(1,1);
-        
-    %-- Write to EXCEL and saving ----------------------------------------%
-    % saving to mat file
-    if exist('Data\KookOutput\Kook_data.mat','file') == 2
-        save('Data\KookOutput\Kook_data.mat','extractedData','extracted_text','dpdist','-append');
-    else
-        save('Data\KookOutput\Kook_data.mat','extractedData','extracted_text','dpdist','report_title');
-    end
-
-    % loop to save each dpdist to the rest of the data
-    for i = 1:length(dpdist)
-
-        if exist('Data\KookOutput\Kook_output_new.xls','file') == 2
-            [~,sheets,~] = xlsfinfo('Data\KookOutput\Kook_output_new.xls'); % checking to see if kook_output sheet already exists
-            sheetname = char(sheets(1,xls_sheet)); % choosing the second sheet
-            datanum = xlsread('Data\KookOutput\Kook_output_new.xls',sheetname); % loading the data
-            starting_row = size(datanum,1) + 2; % finding number of rows and then starting on the next row
-            xlswrite('Data\KookOutput\Kook_output_new.xls',extracted_text,'TEM_Results',['A' num2str(starting_row)]);
-            xlswrite('Data\KookOutput\Kook_output_new.xls',dpdist(i),'TEM_Results',['B' num2str(starting_row)]);
-            xlswrite('Data\KookOutput\Kook_output_new.xls',extractedData,'TEM_Results',['c' num2str(starting_row)]);
-
-        else
-            savecounter = 1;
-            xlswrite('Data\KookOutput\Kook_output_new.xls',report_title,'TEM_Results','A1');
-            xlswrite('Data\KookOutput\Kook_output_new.xls',extracted_text,'TEM_Results','A2');
-            xlswrite('Data\KookOutput\Kook_output_new.xls',dpdist(i),'TEM_Results','B2');
-            xlswrite('Data\KookOutput\Kook_output_new.xls',extractedData,'TEM_Results','C2');
-        end
-    end
-    %}
-
-
 end % end of aggregate loop
+
+disp('Complete.');
+disp(' ');
 
 end

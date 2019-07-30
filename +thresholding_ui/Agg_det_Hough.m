@@ -76,40 +76,54 @@ if bool_plot; subplot(3,3,3); imshow(BW); end
 %== Step 3: Rolling Ball Transformation ==================================%
 %   imclose opens white areas
 %   imopen opens black areas
+disp('Closing image...');
 se = strel('disk',round(a*minparticlesize/npix));
 img_bewBW = imclose(BW,se);
 if bool_plot; subplot(3,3,4); imshow(img_bewBW); end
 
+disp('Opening image...');
 se = strel('disk',round(b*minparticlesize/npix));
 img_bewBW = imopen(img_bewBW,se);
 if bool_plot; subplot(3,3,5); imshow(img_bewBW); end
 
+disp('Closing image...');
 se = strel('disk',round(c*minparticlesize/npix));
 img_bewBW = imclose(img_bewBW,se);
 if bool_plot; subplot(3,3,6); imshow(img_bewBW); end
 
+disp('Opening image...');
 se = strel('disk',round(d*minparticlesize/npix));
 img_bewBW = imopen(img_bewBW,se);
 if bool_plot; subplot(3,3,7); imshow(img_bewBW); end
+disp('Completed morphological operations.');
 
 
 %== Step 4: Delete blobs under a threshold area size =====================%
 CC = bwconncomp(abs(img_bewBW-1));
 [~,nparts] = size(CC.PixelIdxList);
-for kk = 1:nparts
-    area_aggregate = length(CC.PixelIdxList{1,kk})*npix^2;
+if nparts>50 % if a lot of particles, remove more particles
+    mod = 10;
+    disp(['Found too many particles, removing particles below: ',...
+        num2str(e*10),' nm.']);
+else
+    mod = 1;
+end
     
-    if area_aggregate <= (e*minparticlesize/npix)^2 && moreaggs == 0
+for kk = 1:nparts
+    area = length(CC.PixelIdxList{1,kk})*npix^2;
+    
+    if area <= (mod*e*minparticlesize/npix)^2
         img_bewBW(CC.PixelIdxList{1,kk}) = 1;
     end
 end
 if bool_plot; subplot(3,3,8); imshow(img_bewBW); end
 
+figure(gcf);
 tools.plot_binary_overlay(img_cropped,img_bewBW);
 
 
 %== Step 5: User interaction =============================================%
- choice = questdlg('Satisfied with automatic aggregate detection? You will be able to delete non-aggregate noises and add missing particles later. If not, other methods will be used',...
+choice = questdlg('Satisfied with automatic aggregate detection? You will be able to delete non-aggregate noises and add missing particles later. If not, other methods will be used',...
      'Agg detection','Yes','Yes, but reduce noise','No','Yes'); 
 
 if strcmp(choice,'Yes')

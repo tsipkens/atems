@@ -42,7 +42,6 @@ length = 0;
 %   pixel specified by 'pos1' will always have a greater y-indices than the
 %   pixel specified by pos2.  This helps determine theta, later on in the
 %   program.
-
 for pos1 = 1:1:area_edge_particle
     DISTANCE = ( (COL1 - COL1(pos1)).^2 + (ROW1 - ROW1(pos1)).^2 ).^.5;
     [greatest_distance, pos2] = max(DISTANCE);
@@ -64,12 +63,12 @@ clear COL1 ROW1 DISTANCE area_edge_particle
 %   are obscured, or even deleted via the rotation process.  In order to
 %   prevent this, the pixel left-adjacent to the true length-defining pixels
 %   are also marked with a value of '2', or '3'.
-
 Temp_Final_Edge = img_edge;
 Temp_Final_Edge (y1_l_bot, x1_l_bot:(x1_l_bot+2)) = 2;
 Temp_Final_Edge (y1_l_bot, x1_l_bot+1) = 2;
 Temp_Final_Edge (y2_l_top, x2_l_top) = 3;
 Temp_Final_Edge (y2_l_top, x2_l_top+1) = 3;
+
 
 % to determine theta, the problem becomes a system of 2 equations with 2
 % unknown, with 2 differing situations.
@@ -85,7 +84,7 @@ end
 
 
 % to rotate the image counterclockwise, until the length axis is vertical
-Rotated_Final_Edge = imrotate (Temp_Final_Edge, theta);
+Rotated_Final_Edge = imrotate(Temp_Final_Edge, theta);
 
 
 % to find the maximum and minimum x values to calculate the width

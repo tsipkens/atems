@@ -1,5 +1,5 @@
 
-% EVALUATE_MAN  Runs manual primary particle sizing on an array of aggregates.
+% PERFORM_MAN   Runs manual primary particle sizing on an array of aggregates.
 % Modified by:  Timothy Sipkens, 2019-07-23
 
 % Note:
@@ -8,12 +8,13 @@
 %   Vanouver, BC, Canada
 %=========================================================================%
 
-function [Aggs,Data] = evaluate_man(Aggs,bool_plot)
+function [Aggs,Data] = perform_man(Aggs,bool_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
 
+disp('Performing manual analysis...');
 
 %-- Check whether the data folder is available ---------------------------%
 if exist('data','dir') ~= 7 % 7 if exist parameter is a directory
@@ -88,6 +89,9 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
 end
 
 Data = [Aggs.manual];
+
+disp('Complete.');
+disp(' ');
 
 end
 
