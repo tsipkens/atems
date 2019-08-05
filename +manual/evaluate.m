@@ -27,9 +27,10 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     %== Step 3: Analyzing each aggregate =================================%
     bool_finished = 0;
     jj = 0; % intialize particle counter
-    
-    t0 = 0.6.*(img_cropped.*uint8(img_binary));
-    imshow(0.4.*img_cropped+t0);
+    img_cropped2 = imcrop(img_cropped);
+    % t0 = 0.6.*(img_cropped.*uint8(img_binary));
+    % imshow(0.4.*img_cropped+t0);
+    imshow(img_cropped2);
     hold on;
     
     while bool_finished == 0
