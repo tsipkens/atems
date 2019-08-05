@@ -15,10 +15,10 @@ Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 Aggs = thresholding_ui.perform_th(Imgs);
 
 
-% [Aggs_manual,Data_manual] = manual.perform_man(Aggs);
+[Aggs_manual,Data_manual] = manual.perform_man(Aggs);
 
 
-Aggs_pcm = pcm.perform_pcm(Aggs);
+% Aggs_pcm = pcm.perform_pcm(Aggs);
 
 
 % Aggs_kook = kook.perform_kook(Imgs);

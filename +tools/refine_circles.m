@@ -10,8 +10,10 @@ function [Data] = refine_circles(img,Data)
 radii = Data.radii;
 centers = Data.centers;
 
-figure;
+f = figure; % generate new figure for refine circles step
+clf;
 imshow(img); % display current image
+f.WindowState = 'maximized';
 
 for ii=1:length(radii) % generate a series of roi.Circles objects (with handles)
     h(ii) = images.roi.Circle(gca,'Center',centers(ii,:),'Radius',radii(ii));

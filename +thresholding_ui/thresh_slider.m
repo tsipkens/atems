@@ -1,5 +1,5 @@
 
-% Thresholding the image as a part of smi-automatic particle detection
+% Thresholding the image as a part of semi-automatic particle detection
 % Function to be used with the Pair Correlation Method (PCM) package
 % Ramin Dastanpour & Steven N. Rogak
 % Developed at the University of British Columbia
@@ -10,8 +10,6 @@
 function thresh_slider(hObj,event,hax,thresh_slider_in,binaryImage) %#ok<INUSL>
 
 global Binary_Image_4
-
-axes(hax);
 
 %-- Average filter -------------------------------------------------------%
 hav = fspecial('average');
@@ -47,7 +45,9 @@ img_binary3(binaryImage) = img_binary2(binaryImage);
 Binary_Image_4 = logical(img_binary3);
 
 img_temp2 = imimposemin(thresh_slider_in,Binary_Image_4);
-imshow(img_temp2);
 
+axes(hax);
+% cla;
+imshow(img_temp2);
 
 end

@@ -21,6 +21,8 @@ if exist('data','dir') ~= 7 % 7 if exist parameter is a directory
     mkdir('data') % make output folder
 end
 
+figure; % figure handle used during manual sizing
+
 
 %== Process image ========================================================%
 for ll = 1:length(Aggs) % run loop as many times as images selected
@@ -35,7 +37,7 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     bool_finished = 0;
     jj = 0; % intialize particle counter
     
-    tools.plot_binary_overlay(img_cropped,img_binary);
+    tools.plot_binary_overlay(img_cropped,img_binary,0);
     hold on;
     
     while bool_finished == 0
