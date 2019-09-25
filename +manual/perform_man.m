@@ -36,7 +36,6 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     %== Step 3: Analyzing each aggregate =================================%
     bool_finished = 0;
     jj = 0; % intialize particle counter
-    
     tools.plot_binary_overlay(img_cropped,img_binary,0);
     hold on;
     
