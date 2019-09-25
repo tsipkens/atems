@@ -1,4 +1,4 @@
-# UBC-TEM-analysis
+# ubc-tem-analysis
 
 This program contains several methods of characterizing aggregates from
 TEM images, including evaluating the aggregate projected area, perimeter,
