@@ -1,5 +1,5 @@
 
-% EVALUATE      Runs manual primary particle sizing on an array of aggregates.
+% PERFORM_MAN   Runs manual primary particle sizing on an array of aggregates.
 % Modified by:  Timothy Sipkens, 2019-07-23
 
 % Note:
@@ -8,11 +8,20 @@
 %   Vanouver, BC, Canada
 %=========================================================================%
 
-function [Aggs,Data] = evaluate(Aggs,bool_plot)
+function [Aggs,Data] = perform_man(Aggs,bool_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
+
+disp('Performing manual analysis...');
+
+%-- Check whether the data folder is available ---------------------------%
+if exist('data','dir') ~= 7 % 7 if exist parameter is a directory
+    mkdir('data') % make output folder
+end
+
+figure; % figure handle used during manual sizing
 
 
 %== Process image ========================================================%
@@ -21,16 +30,13 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     Data = struct; % re-initialize data structure
     
     pixsize = Aggs(ll).pixsize; % copy pixel size locally
-    img_cropped = Aggs(ll).image;
-    img_binary = Aggs(ll).binary;
+    img_cropped = Aggs(ll).img_cropped;
+    img_binary = Aggs(ll).img_cropped_binary;
     
     %== Step 3: Analyzing each aggregate =================================%
     bool_finished = 0;
     jj = 0; % intialize particle counter
-    img_cropped2 = imcrop(img_cropped);
-    % t0 = 0.6.*(img_cropped.*uint8(img_binary));
-    % imshow(0.4.*img_cropped+t0);
-    imshow(img_cropped2);
+    tools.plot_binary_overlay(img_cropped,img_binary,0);
     hold on;
     
     while bool_finished == 0
@@ -57,6 +63,8 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
         	sqrt((x(2)-x(1))^2+(y(2)-y(1))^2))/4;
             % takes an average over drawn lines
         
+        Data.dp(jj,:) = 2*pixsize*Data.radii(jj,:);
+        
         %-- Check if there are more primary particles --------------------%
         choice = questdlg('Do you want to analyze another primary particle ?',...
         'Continue?','Yes','No','Yes');
@@ -74,13 +82,17 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     %== Save results =====================================================%
     %   Format output and autobackup data ------------------------%
     Aggs(ll).manual = Data; % copy Dp data structure into img_data
-    save('manual_data.mat','Aggs'); % backup img_data
+    Aggs(ll).dp_manual = mean(Data.dp);
+    save(['data',filesep,'manual_data.mat'],'Aggs'); % backup img_data
     
     close all;
 
 end
 
 Data = [Aggs.manual];
+
+disp('Complete.');
+disp(' ');
 
 end
 

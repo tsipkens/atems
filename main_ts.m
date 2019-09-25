@@ -12,31 +12,19 @@ Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 
 
 %-- Run thresholding for all of the images -------------------------------%
-Aggs = thresholding_ui.evaluate(Imgs);
+Aggs = thresholding_ui.perform_th(Imgs);
 
 
-% disp('Performing manual analysis...');
-% [Aggs_manual,Data_manual] = manual.evaluate(Aggs);
-% disp('Complete.');
-% disp(' ');
+[Aggs_manual,Data_manual] = manual.perform_man(Aggs);
 
 
-disp('Performing PCM analysis...');
-Aggs_pcm = pcm.evaluate(Aggs);
-disp('Complete.');
-disp(' ');
+% Aggs_pcm = pcm.perform_pcm(Aggs);
 
 
-% disp('Performing original Kook analysis...');
-% Aggs_kook = kook.evaluate(imgs);
-% disp('Complete.');
-% disp(' ');
+% Aggs_kook = kook.perform_kook(Imgs);
 
 
-% disp('Performing modified Kook analysis...');
-% Aggs_kook_mod = kook_mod.evaluate(Aggs);
-% disp('Complete.');
-% disp(' ');
+% Aggs_kook_mod = kook_mod.perform_km(Aggs);
 
 
 % load('data\data_FlareNet.mat');

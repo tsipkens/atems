@@ -1,23 +1,27 @@
 
 % AGG_DET_HOUGH  Hough Transformation and Rolling Ball Transformation
-% Automatic detection of the aggregates on TEM images
-% Function to be used with the Pair Correlation Method (PCM) package
-% Ramin Dastanpour & Steven N. Rogak
-% Developed at the University of British Columbia
-% Last updated in Feb. 2016
+%                Automatic detection of the aggregates on TEM images
+% Authors:  Ramin Dastanpour & Steven N. Rogak
+% Notes:    Developed at the University of British Columbia
+%           Last updated in Feb. 2016
 %=========================================================================%
 
 function [img_binary,moreaggs,choice] = ...
-    Agg_det_Hough(img_cropped,npix,moreaggs,minparticlesize,coeffs) 
+    Agg_det_Hough(img_cropped,npix,moreaggs,minparticlesize,coeffs,bool_plot) 
+
+if ~exist('bool_plot','var'); bool_plot = []; end
+if isempty(bool_plot); bool_plot = 0; end
 
 
 %== Step 1: Apply intensity threshold ====================================%
 level = graythresh(img_cropped);
 BW = imbinarize(img_cropped,level);
-figure;
-hold on;
-subplot(3,3,1);imshow(img_cropped)
-subplot(3,3,2); imshow(BW)
+if bool_plot
+    figure;
+    hold on;
+    subplot(3,3,1);imshow(img_cropped)
+    subplot(3,3,2); imshow(BW)
+end
 a = coeffs(1);
 b = coeffs(2);
 c = coeffs(3);
@@ -66,51 +70,60 @@ while q<=p
     end
     q = q+1;
 end
-subplot(3,3,3); imshow(BW)
+if bool_plot; subplot(3,3,3); imshow(BW); end
 
 
 %== Step 3: Rolling Ball Transformation ==================================%
 %   imclose opens white areas
 %   imopen opens black areas
+disp('Closing image...');
 se = strel('disk',round(a*minparticlesize/npix));
 img_bewBW = imclose(BW,se);
-subplot(3,3,4); imshow(img_bewBW)
+if bool_plot; subplot(3,3,4); imshow(img_bewBW); end
 
+disp('Opening image...');
 se = strel('disk',round(b*minparticlesize/npix));
 img_bewBW = imopen(img_bewBW,se);
-subplot(3,3,5); imshow(img_bewBW)
+if bool_plot; subplot(3,3,5); imshow(img_bewBW); end
 
+disp('Closing image...');
 se = strel('disk',round(c*minparticlesize/npix));
 img_bewBW = imclose(img_bewBW,se);
-subplot(3,3,6); imshow(img_bewBW)
+if bool_plot; subplot(3,3,6); imshow(img_bewBW); end
 
+disp('Opening image...');
 se = strel('disk',round(d*minparticlesize/npix));
 img_bewBW = imopen(img_bewBW,se);
-subplot(3,3,7); imshow(img_bewBW)
+if bool_plot; subplot(3,3,7); imshow(img_bewBW); end
+disp('Completed morphological operations.');
 
 
 %== Step 4: Delete blobs under a threshold area size =====================%
 CC = bwconncomp(abs(img_bewBW-1));
 [~,nparts] = size(CC.PixelIdxList);
-for kk = 1:nparts
-    area_aggregate = length(CC.PixelIdxList{1,kk})*npix^2;
+if nparts>50 % if a lot of particles, remove more particles
+    mod = 10;
+    disp(['Found too many particles, removing particles below: ',...
+        num2str(e*10),' nm.']);
+else
+    mod = 1;
+end
     
-    if area_aggregate <= (e*minparticlesize/npix)^2 && moreaggs == 0
+for kk = 1:nparts
+    area = length(CC.PixelIdxList{1,kk})*npix^2;
+    
+    if area <= (mod*e*minparticlesize/npix)^2
         img_bewBW(CC.PixelIdxList{1,kk}) = 1;
     end
 end
-subplot(3,3,8); imshow(img_bewBW)
+if bool_plot; subplot(3,3,8); imshow(img_bewBW); end
 
-img_edge = edge(img_bewBW,'sobel');
-se_edge = strel('disk',1);
-img_dilatededge = imdilate(img_edge,se_edge);
-clear Edge_Image0 SE2
-img_finalimposed = imimposemin(img_cropped, img_dilatededge);
-figure; imshow(img_finalimposed);
+figure(gcf);
+tools.plot_binary_overlay(img_cropped,img_bewBW);
 
 
 %== Step 5: User interaction =============================================%
- choice = questdlg('Satisfied with automatic aggregate detection? You will be able to delete non-aggregate noises and add missing particles later. If not, other methods will be used',...
+choice = questdlg('Satisfied with automatic aggregate detection? You will be able to delete non-aggregate noises and add missing particles later. If not, other methods will be used',...
      'Agg detection','Yes','Yes, but reduce noise','No','Yes'); 
 
 if strcmp(choice,'Yes')

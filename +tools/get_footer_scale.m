@@ -32,6 +32,7 @@ for jj=1:length(img)
 
     %-- Step 1-2: Detecting Magnification and/or pixel size --------------%
     img(jj).ocr = ocr(img(jj).Footer);
+    bool_nm = 1;
 
     pixsize_end = strfind(img(jj).ocr.Text,' nm/pix')-1;
     if isempty(pixsize_end) % if not found, try nmlpix
@@ -41,13 +42,14 @@ for jj=1:length(img)
             if isempty(pixsize_end)
                 pixsize_end = strfind(img(jj).ocr.Text,' pmlpix')-1;
             end
+            bool_nm = 0;
         end
     end
 
     pixsize_start = strfind(img(jj).ocr.Text,'Cal')+5;
     img(jj).pixsize = str2double(img(jj).ocr.Text(pixsize_start:pixsize_end));
-
-
+    if bool_nm==0; img(jj).pixsize = img(jj).pixsize*1e3; end
+    
     %{
     %-- Step1-2: Detecting Magnification and/or pixel size ---------------%
     % Determining image magnification. Image magnification can be detected

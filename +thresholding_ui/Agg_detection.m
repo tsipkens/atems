@@ -47,7 +47,7 @@ if size(img_binary,1)~=0
     img_dilated = imdilate(img_edge,se);
     
     img_final_imposed = imimposemin(img.Cropped,img_dilated);
-    figure; imshow(img_final_imposed);
+    imshow(img_final_imposed);
 end
 
 %-- User interaction -----------------------------------------------------%
@@ -98,7 +98,7 @@ while moreaggs==1
         img_dilated = imdilate(img_edge,se);
         
         img_final_imposed = imimposemin(img_cropped,img_dilated);
-        figure; imshow(img_final_imposed);
+        imshow(img_final_imposed);
         
         
         %== Attempt 4: Manual thresholding, again ========================%
@@ -134,14 +134,12 @@ while moreaggs==1
         rect(1):(rect(1)+size_temp(2)-1)) = ...
         img_temp;
     
-    imshow(img_binary)
-    
     img_edge = edge(img_binary,'sobel');
     se = strel('disk',1);
     img_dilated = imdilate(img_edge,se);
     
     img_final_imposed = imimposemin(img.Cropped,img_dilated);
-    figure; imshow(img_final_imposed);
+    imshow(img_final_imposed);
     
     choice = questdlg('Are there any particles not detected?',...
         'Missing particles','Yes','No','No');
