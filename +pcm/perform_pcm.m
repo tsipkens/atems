@@ -140,7 +140,7 @@ for ll = 1:nAggs % run loop as many times as images selected
     %-- 3-5-1: Simple PCM ------------------------------------------------%
     PCF_simple   = .913;
     Aggs(ll).dp_pcm_simple = ...
-        interp1(PCF_smoothed, Radius, PCF_simple);
+        2*interp1(PCF_smoothed, Radius, PCF_simple);
         % dp from simple PCM
     
     %-- 3-5-2: Generalized PCM ---------------------------------------%
@@ -153,7 +153,7 @@ for ll = 1:nAggs % run loop as many times as images selected
 
     PCF_generalized   = (.913/.84)*(0.7+0.003*PRgslope^(-0.24)+0.2*Data.aspect_ratio^-1.13);
     Aggs(ll).dp_pcm_general = ...
-        interp1(PCF_smoothed, Radius, PCF_generalized);
+        2*interp1(PCF_smoothed, Radius, PCF_generalized);
         % dp from generalized PCM
     
         
