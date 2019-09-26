@@ -3,20 +3,20 @@
 % Author:   Timothy Sipkens, 2019-07-04
 %=========================================================================%
 
-function [imgs,RawImage] = get_imgs(img_ref,n)
+function [Imgs,RawImage] = get_imgs(Imgs_ref,n)
 
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('n','var'); n = []; end
-if isempty(n); n = 1:length(img_ref.fname); end
+if isempty(n); n = 1:length(Imgs_ref.fname); end
     % if image number not specified, use the first one
 
 %-- Read in image --------------------------------------------------------%
-for ii=1:length(n)
-    imgs(ii).fname = img_ref.fname{ii};
-    imgs(ii).RawImage = imread([img_ref.dir,img_ref.fname{n(ii)}]);
+for ii=length(n):-1:1
+    Imgs(ii).fname = Imgs_ref.fname{ii};
+    Imgs(ii).RawImage = imread([Imgs_ref.dir,Imgs_ref.fname{n(ii)}]);
 end
 
-RawImage = imgs(1).RawImage;
+RawImage = Imgs(1).RawImage;
 
 end
 

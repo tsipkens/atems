@@ -11,7 +11,7 @@
 % of British Columbia
 %=========================================================================%
 
-function [Aggs] = perform_pcm(Aggs,bool_plot,bool_backup)
+function [aggs] = perform_pcm(aggs,bool_plot,bool_backup)
 
 %-- Parse inputs and load image ------------------------------------------%
 if ~exist('bool_plot','var'); bool_plot = []; end
@@ -21,6 +21,20 @@ if ~exist('bool_backup','var'); bool_backup = []; end
 if isempty(bool_backup); bool_backup = 0; end
 
 disp('Performing PCM analysis...');
+
+% if isstruct(aggs)
+%     Aggs_str = aggs;
+%     aggs = {Aggs_str.Cropped};
+%     pixsize = [Aggs_str.pixsize];
+%     fname = {Aggs_str.fname};
+% elseif ~iscell(aggs)
+%     aggs = {aggs};
+% end
+% 
+% if ~exist('pixsize','var'); pixsize = []; end
+% if isempty(pixsize); pixsize = ones(size(aggs)); end
+%-------------------------------------------------------------------------%
+
 
 %-- Check whether the data folder is available ---------------------------%
 if exist('data','dir') ~= 7 % 7 if exist parameter is a directory
@@ -32,18 +46,18 @@ figure; % generate figure for visualizing current aggregate
 
 
 %== Main image processing loop ===========================================%
-nAggs = length(Aggs);
+nAggs = length(aggs);
 tools.textbar(0);
 
 for ll = 1:nAggs % run loop as many times as images selected
     
     %== Step 1: Image preparation ========================================%
-    pixsize = Aggs(ll).pixsize;
-    img_binary = Aggs(ll).img_cropped_binary;
-    img_cropped = Aggs(ll).img_cropped;
+    pixsize = aggs(ll).pixsize;
+    img_binary = aggs(ll).img_cropped_binary;
+    img_cropped = aggs(ll).img_cropped;
     
     %-- Loop through aggregates ------------------------------------------%
-    Data = Aggs(ll); % initialize data structure for current aggregate
+    Data = aggs(ll); % initialize data structure for current aggregate
     Data.method = 'pcm';
     
     figure(gcf);
@@ -125,7 +139,7 @@ for ll = 1:nAggs % run loop as many times as images selected
     %== 3-5: Primary particle sizing =====================================%
     %-- 3-5-1: Simple PCM ------------------------------------------------%
     PCF_simple   = .913;
-    Aggs(ll).dp_pcm_simple = ...
+    aggs(ll).dp_pcm_simple = ...
         interp1(PCF_smoothed, Radius, PCF_simple);
         % dp from simple PCM
     
@@ -138,7 +152,7 @@ for ll = 1:nAggs % run loop as many times as images selected
     PRgslope = (PCFURg+PCFLRg-PCFRg)/(URg-LRg); % dp/dr(Rg)
 
     PCF_generalized   = (.913/.84)*(0.7+0.003*PRgslope^(-0.24)+0.2*Data.aspect_ratio^-1.13);
-    Aggs(ll).dp_pcm_general = ...
+    aggs(ll).dp_pcm_general = ...
         interp1(PCF_smoothed, Radius, PCF_generalized);
         % dp from generalized PCM
     
@@ -149,7 +163,7 @@ for ll = 1:nAggs % run loop as many times as images selected
         figure, loglog(Radius, smooth(PCF), '-r'),...
             title (str), xlabel ('Radius'), ylabel('PCF(r)')
         hold on;
-        loglog(Aggs(ll).pcm_dp_simple,PCF_simple,'*')
+        loglog(aggs(ll).pcm_dp_simple,PCF_simple,'*')
         close all;
     end
     

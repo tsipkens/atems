@@ -7,20 +7,20 @@
 %=========================================================================%
 
 function [img_binary,moreaggs,choice] = ...
-    Agg_det_Hough(img_cropped,npix,moreaggs,minparticlesize,coeffs,bool_plot) 
+    Agg_det_Hough(img,npix,moreaggs,minparticlesize,coeffs,bool_plot) 
 
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
 
 
 %== Step 1: Apply intensity threshold ====================================%
-level = graythresh(img_cropped);
-BW = imbinarize(img_cropped,level);
+level = graythresh(img);
+bw = imbinarize(img,level);
 if bool_plot
     figure;
     hold on;
-    subplot(3,3,1);imshow(img_cropped)
-    subplot(3,3,2); imshow(BW)
+    subplot(3,3,1);imshow(img)
+    subplot(3,3,2); imshow(bw)
 end
 a = coeffs(1);
 b = coeffs(2);
@@ -30,68 +30,68 @@ e = coeffs(5);
 
 
 %== Step 2: Remove aggregates touching the edge of the image =============%
-BWedge = BW;
-BWedge(2:size(BW,1)-1,2:size(BW,2)-1) = 1;
+BWedge = bw;
+BWedge(2:size(bw,1)-1,2:size(bw,2)-1) = 1;
 [x,y] = find(BWedge == 0);
 p = length(x);
 q = 1;
 while q<=p
-    if x(q)+1 <= size(BW,1)
-        if BW(x(q)+1,y(q)) == 0
+    if x(q)+1 <= size(bw,1)
+        if bw(x(q)+1,y(q)) == 0
             p = p+1;
             x(p) = x(q)+1;
             y(p) = y(q);
-            BW(x(q)+1,y(q)) = 1;
+            bw(x(q)+1,y(q)) = 1;
         end
     end
     if x(q)-1 >= 1 
-        if BW(x(q)-1,y(q)) == 0
+        if bw(x(q)-1,y(q)) == 0
             p = p+1;
             x(p) = x(q)-1;
             y(p) = y(q);
-            BW(x(q)-1,y(q)) = 1;
+            bw(x(q)-1,y(q)) = 1;
         end
     end
-    if y(q)+1 <= size(BW,2) 
-        if BW(x(q),y(q)+1) == 0
+    if y(q)+1 <= size(bw,2) 
+        if bw(x(q),y(q)+1) == 0
             p = p+1;
             x(p) = x(q);
             y(p) = y(q)+1;
-            BW(x(q),y(q)+1) = 1;
+            bw(x(q),y(q)+1) = 1;
         end
     end
     if y(q)-1 >= 1 
-        if BW(x(q),y(q)-1) == 0
+        if bw(x(q),y(q)-1) == 0
             p = p+1;
             x(p) = x(q);
             y(p) = y(q)-1;
-            BW(x(q),y(q)-1) = 1;
+            bw(x(q),y(q)-1) = 1;
         end
     end
     q = q+1;
 end
-if bool_plot; subplot(3,3,3); imshow(BW); end
+if bool_plot; subplot(3,3,3); imshow(bw); end
 
 
 %== Step 3: Rolling Ball Transformation ==================================%
 %   imclose opens white areas
 %   imopen opens black areas
-disp('Closing image...');
+disp('Morphologically closing image...');
 se = strel('disk',round(a*minparticlesize/npix));
-img_bewBW = imclose(BW,se);
+img_bewBW = imclose(bw,se);
 if bool_plot; subplot(3,3,4); imshow(img_bewBW); end
 
-disp('Opening image...');
+disp('Morphologically opening image...');
 se = strel('disk',round(b*minparticlesize/npix));
 img_bewBW = imopen(img_bewBW,se);
 if bool_plot; subplot(3,3,5); imshow(img_bewBW); end
 
-disp('Closing image...');
+disp('Morphologically closing image...');
 se = strel('disk',round(c*minparticlesize/npix));
 img_bewBW = imclose(img_bewBW,se);
 if bool_plot; subplot(3,3,6); imshow(img_bewBW); end
 
-disp('Opening image...');
+disp('Morphologically opening image...');
 se = strel('disk',round(d*minparticlesize/npix));
 img_bewBW = imopen(img_bewBW,se);
 if bool_plot; subplot(3,3,7); imshow(img_bewBW); end
@@ -118,8 +118,8 @@ for kk = 1:nparts
 end
 if bool_plot; subplot(3,3,8); imshow(img_bewBW); end
 
-figure(gcf);
-tools.plot_binary_overlay(img_cropped,img_bewBW);
+h = figure(gcf);
+tools.plot_binary_overlay(img,img_bewBW);
 
 
 %== Step 5: User interaction =============================================%
@@ -138,5 +138,7 @@ elseif strcmp(choice,'No') % semi-automatic or manual methods will be used
     img_binary = [];
     moreaggs = 1;
 end
+
+close(h);
 
 end

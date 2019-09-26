@@ -21,7 +21,7 @@ if isempty(coeff)
     coeff_matrix = [0.2 0.8 0.4 1.1 0.4;0.2 0.3 0.7 1.1 1.8;...
         0.3 0.8 0.5 2.2 3.5;0.1 0.8 0.4 1.1 0.5];
             % coefficient for automatic Hough transformation
-            
+    
     % Build the image processing coefficients for the image based on its
     % magnification
     if pixsize <= 0.181
@@ -36,7 +36,7 @@ end
 
 %== Attempt 1: Hough transformation ======================================%
 [img_binary,moreaggs,choice] = ...
-    thresholding_ui.Agg_det_Hough(img.Cropped,pixsize,moreaggs,minparticlesize,coeffs);
+    thresholding_ui.Agg_det_Hough(img,pixsize,moreaggs,minparticlesize,coeffs);
 
 %-- Showing detected particles -------------------------------------------%
 %   Make masked image so that user can see if particles have been 
@@ -46,7 +46,8 @@ if size(img_binary,1)~=0
     se = strel('disk',1);
     img_dilated = imdilate(img_edge,se);
     
-    img_final_imposed = imimposemin(img.Cropped,img_dilated);
+    img_final_imposed = imimposemin(img,img_dilated);
+    h = figure;
     imshow(img_final_imposed);
 end
 
@@ -64,69 +65,50 @@ else
     img_binary = [];
 end
 
+if size(img_binary,1)~=0; close(h); end
 img_cropped = [];
 
-%== Attempt 2: Crop image and then Hough =================================%
+
+%== Attempt 2: Manual thresholding ===================================%
 while moreaggs==1
-    clear choice
-    uiwait(msgbox('Please crop the image around missing particle'));
-    [img_cropped,rect] = imcrop(img.Cropped); % user crops the image
-    [img_temp,~,choice] = ...
-        thresholding_ui.Agg_det_Hough(img_cropped,pixsize,moreaggs,minparticlesize,coeffs);
+    [img_temp,rect,~,img_cropped] = thresholding_ui.Agg_det_Slider(img,1);
+        % used previously cropped image
+        % img_temp temporarily stores binary image
+    
+    img_edge = edge(img_temp,'sobel');
+    se = strel('disk',1);
+    img_dilated = imdilate(img_edge,se);
+    
+    img_final_imposed = imimposemin(img_cropped,img_dilated);
+    h = figure;
+    imshow(img_final_imposed);
+    choice2 = questdlg('Satisfied with aggregate detection? If not, try drawing an edge around the aggregate manually...',...
+        'Agg detection','Yes','No','Yes');
+    close(h);
     
     
-    %== Attempt 3: Manual thresholding ===================================%
-    if strcmp(choice,'No')
+    %== Attempt 3: Manual thresholding, again ========================%
+    if strcmp(choice2,'No')
+        clear TempBW NewBW_lasoo NewBW
+        [img_temp,rect] = thresholding_ui.Agg_det_Slider(img_cropped,0);
+            % image is stored in a temporary image
         
-        [img_temp,rect,~,img_cropped] = thresholding_ui.Agg_det_Slider(img.Cropped,1);
-            % used previously cropped image
-            % img_temp temporarily stores binary image
-        
-        %{
-        TempBW = img_binary; % intermediate images are stored in temporary matrices
-        
-        TempBW(round(rect(2)):round(rect(2)+rect(4))-1,round(rect(1)):round(rect(1)+rect(3)-1)) = ...
-            img_binary(1:round(rect(4))-1,1:round(rect(3))-1).*TempBW(round(rect(2)):round(rect(2)+rect(4))-1,round(rect(1)):round(rect(1)+rect(3)-1));
+        TempBW = img_temp;
             % the black part of the small cropped image is placed on the image
         
+        TempBW(round(rect(2)):round(rect(2)+rect(4))-1,round(rect(1)):round(rect(1)+rect(3)-1)) = ...
+            NewBW_lasoo(1:round(rect(4))-1,1:round(rect(3))-1).*...
+            TempBW(round(rect(2)):round(rect(2)+rect(4))-1,round(rect(1)):round(rect(1)+rect(3)-1));
         imshow(TempBW);
         NewBW = TempBW;
-        %}
-        
-        img_edge = edge(img_temp,'sobel');
-        se = strel('disk',1);
-        img_dilated = imdilate(img_edge,se);
-        
-        img_final_imposed = imimposemin(img_cropped,img_dilated);
-        imshow(img_final_imposed);
-        
-        
-        %== Attempt 4: Manual thresholding, again ========================%
-        choice2 = questdlg('Satisfied with aggregate detection? If not, try drawing an edge around the aggregate manually...',...
-            'Agg detection','Yes','No','Yes');
-        
-        if strcmp(choice2,'No')
-            clear TempBW NewBW_lasoo NewBW
-            [img_temp,rect] = thresholding_ui.Agg_det_Slider(img_cropped,0);
-                % image is stored in a temporary image
-            
-            TempBW = img_temp;
-                % the black part of the small cropped image is placed on the image
-            
-            TempBW(round(rect(2)):round(rect(2)+rect(4))-1,round(rect(1)):round(rect(1)+rect(3)-1)) = ...
-            NewBW_lasoo(1:round(rect(4))-1,1:round(rect(3))-1).* TempBW(round(rect(2)):round(rect(2)+rect(4))-1,round(rect(1)):round(rect(1)+rect(3)-1));
-            imshow(TempBW);
-            NewBW = TempBW;
-        end
-        
-        agg_binary_bin  = [agg_binary_bin, img_temp];
-        agg_cropped_bin = [agg_cropped_bin, img_cropped];
-                
     end
+    
+    agg_binary_bin  = [agg_binary_bin, img_temp];
+    agg_cropped_bin = [agg_cropped_bin, img_cropped];
     
     %-- Subsitute rectangle back into orignal image ----------------------%
     if isempty(img_binary)
-        img_binary = ones(size(img.Cropped));
+        img_binary = ones(size(img));
     end
     rect = round(rect);
     size_temp = size(img_temp);
@@ -138,9 +120,9 @@ while moreaggs==1
     se = strel('disk',1);
     img_dilated = imdilate(img_edge,se);
     
-    img_final_imposed = imimposemin(img.Cropped,img_dilated);
+    img_final_imposed = imimposemin(img,img_dilated);
+    h = figure;
     imshow(img_final_imposed);
-    
     choice = questdlg('Are there any particles not detected?',...
         'Missing particles','Yes','No','No');
     if strcmp(choice,'Yes')
@@ -148,6 +130,7 @@ while moreaggs==1
     else
         moreaggs=0;
     end
+    close(h);
 end
 
 end

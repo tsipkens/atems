@@ -2,53 +2,53 @@
 % GET_FOOTER_SCALE Crops the footer from the image and determines the scale.
 %=========================================================================%
 
-function [img,pixsize] = get_footer_scale(img)
+function [Imgs,pixsize] = get_footer_scale(Imgs)
 
-for jj=1:length(img)
-
+for jj=1:length(Imgs)
+    
     %-- Step 1-3: Crop footer away ---------------------------------------%
     % when the program reaches a row of only white pixels, removes
     % everything below it (specific to ubc photos). It will do nothing if
     % there is no footer or the footer is not pure white.
     footer_found = 0;
-    WHITE = 255;
-
-    for ii = 1:size(img(jj).RawImage,1)
-        if sum(img(jj).RawImage(ii,:)) == size(img(jj).RawImage,2)*WHITE && ...
+    white = 255;
+    
+    for ii = 1:size(Imgs(jj).RawImage,1)
+        if sum(Imgs(jj).RawImage(ii,:)) == size(Imgs(jj).RawImage,2)*white && ...
                 footer_found == 0
             FooterEdge = ii;
             footer_found = 1;
-            img(jj).Cropped = img(jj).RawImage(1:FooterEdge-1, :);
-            img(jj).Footer  = img(jj).RawImage(FooterEdge:end, :);
-
+            Imgs(jj).Cropped = Imgs(jj).RawImage(1:FooterEdge-1, :);
+            Imgs(jj).Footer  = Imgs(jj).RawImage(FooterEdge:end, :);
+            
             break;
         end
     end
-
+    
     if footer_found == 0
-        img(jj).Cropped = img(jj).RawImage;
+        Imgs(jj).Cropped = Imgs(jj).RawImage;
     end
 
 
     %-- Step 1-2: Detecting Magnification and/or pixel size --------------%
-    img(jj).ocr = ocr(img(jj).Footer);
+    Imgs(jj).ocr = ocr(Imgs(jj).Footer);
     bool_nm = 1;
 
-    pixsize_end = strfind(img(jj).ocr.Text,' nm/pix')-1;
+    pixsize_end = strfind(Imgs(jj).ocr.Text,' nm/pix')-1;
     if isempty(pixsize_end) % if not found, try nmlpix
-        pixsize_end = strfind(img(jj).ocr.Text,' nmlpix')-1;
+        pixsize_end = strfind(Imgs(jj).ocr.Text,' nmlpix')-1;
         if isempty(pixsize_end)
-            pixsize_end = strfind(img(jj).ocr.Text,' pm/pix')-1;
+            pixsize_end = strfind(Imgs(jj).ocr.Text,' pm/pix')-1;
             if isempty(pixsize_end)
-                pixsize_end = strfind(img(jj).ocr.Text,' pmlpix')-1;
+                pixsize_end = strfind(Imgs(jj).ocr.Text,' pmlpix')-1;
             end
             bool_nm = 0;
         end
     end
 
-    pixsize_start = strfind(img(jj).ocr.Text,'Cal')+5;
-    img(jj).pixsize = str2double(img(jj).ocr.Text(pixsize_start:pixsize_end));
-    if bool_nm==0; img(jj).pixsize = img(jj).pixsize*1e3; end
+    pixsize_start = strfind(Imgs(jj).ocr.Text,'Cal')+5;
+    Imgs(jj).pixsize = str2double(Imgs(jj).ocr.Text(pixsize_start:pixsize_end));
+    if bool_nm==0; Imgs(jj).pixsize = Imgs(jj).pixsize*1e3; end
     
     %{
     %-- Step1-2: Detecting Magnification and/or pixel size ---------------%
@@ -108,7 +108,7 @@ for jj=1:length(img)
 
 end
 
-pixsize = [img(1).pixsize];
+pixsize = [Imgs(1).pixsize];
 
 end
 

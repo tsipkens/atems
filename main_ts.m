@@ -3,22 +3,24 @@ clear;
 close all;
 clc;
 
-img_ref = tools.get_img_ref;
+Imgs_ref = tools.get_img_ref;
     % generates a reference to a set of images to be analyzed
-Imgs = tools.get_imgs(img_ref); % load a single image
+Imgs = tools.get_imgs(Imgs_ref); % load a single image
 Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
-% imshow(imgs(1).RawImage);
+% imshow(Imgs(1).RawImage);
 % colormap('gray');
 
 
 %-- Run thresholding for all of the images -------------------------------%
-Aggs = thresholding_ui.perform_th(Imgs);
+[imgs_aggs,imgs_binary,Aggs] = ...
+    thresholding_ui.perform_th(Imgs);
 
 
-[Aggs_manual,Data_manual] = manual.perform_man(Aggs);
+% [Aggs_manual,Data_manual] = ...
+%     manual.perform_man(Aggs);
 
 
-% Aggs_pcm = pcm.perform_pcm(Aggs);
+Aggs_pcm = pcm.perform_pcm(Aggs);
 
 
 % Aggs_kook = kook.perform_kook(Imgs);
