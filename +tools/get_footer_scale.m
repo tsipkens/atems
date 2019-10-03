@@ -13,25 +13,25 @@ for jj=1:length(Imgs)
     footer_found = 0;
     white = 255;
     
-    for ii = 1:size(Imgs(jj).RawImage,1)
-        if sum(Imgs(jj).RawImage(ii,:)) == size(Imgs(jj).RawImage,2)*white && ...
+    for ii = 1:size(Imgs(jj).raw,1)
+        if sum(Imgs(jj).raw(ii,:)) == size(Imgs(jj).raw,2)*white && ...
                 footer_found == 0
             FooterEdge = ii;
             footer_found = 1;
-            Imgs(jj).Cropped = Imgs(jj).RawImage(1:FooterEdge-1, :);
-            Imgs(jj).Footer  = Imgs(jj).RawImage(FooterEdge:end, :);
+            Imgs(jj).cropped = Imgs(jj).raw(1:FooterEdge-1, :);
+            Imgs(jj).footer  = Imgs(jj).raw(FooterEdge:end, :);
             
             break;
         end
     end
     
     if footer_found == 0
-        Imgs(jj).Cropped = Imgs(jj).RawImage;
+        Imgs(jj).cropped = Imgs(jj).raw;
     end
 
 
     %-- Step 1-2: Detecting Magnification and/or pixel size --------------%
-    Imgs(jj).ocr = ocr(Imgs(jj).Footer);
+    Imgs(jj).ocr = ocr(Imgs(jj).footer);
     bool_nm = 1;
 
     pixsize_end = strfind(Imgs(jj).ocr.Text,' nm/pix')-1;
@@ -69,9 +69,9 @@ for jj=1:length(Imgs)
     if strcmp(pixsize_choise,'Use scale bar')
         % manually choosing the magnification
         uiwait(msgbox('Please crop the image close enough to the magnification bar'))
-        img.mag_crop = imcrop(img.RawImage); % crop image
+        img.mag_crop = imcrop(img.raw); % crop image
         close (gcf);
-        imshow(img.mag_crop); % Show Cropped image
+        imshow(img.mag_crop); % Show cropped image
         set(gcf,'Position',get(0,'Screensize')); % Maximize figure.
         hold on
         uiwait(msgbox('Click on a point at the start (left) of the scale bar, then on a point at the end (right) of the scale bar'));
@@ -93,9 +93,9 @@ for jj=1:length(Imgs)
         close all
     elseif strcmp(pixsize_choise,'Insert pixel size manually')
         close (gcf);
-        img.mag_crop = imcrop(img.RawImage); %crop image
+        img.mag_crop = imcrop(img.raw); %crop image
         close (gcf);
-        imshow(img.mag_crop); % Show Cropped image
+        imshow(img.mag_crop); % Show cropped image
         set(gcf,'Position',get(0,'Screensize')); % Maximize figure.
         dlg_title = 'Pixel size';
         promt1 = {'Please insert the pixel size in nm/pixel:'};

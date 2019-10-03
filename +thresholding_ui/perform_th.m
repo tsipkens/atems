@@ -13,7 +13,7 @@ function [imgs_aggs,imgs_binary,Aggs] = perform_th(imgs,pixsize,fname)
 %-- Parse inputs ---------------------------------------------------------%
 if isstruct(imgs)
     Imgs_str = imgs;
-    imgs = {Imgs_str.Cropped};
+    imgs = {Imgs_str.cropped};
     pixsize = [Imgs_str.pixsize];
     fname = {Imgs_str.fname};
 elseif ~iscell(imgs)

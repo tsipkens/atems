@@ -14,6 +14,7 @@ Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 %-- Run thresholding for all of the images -------------------------------%
 [imgs_aggs,imgs_binary,Aggs] = ...
     thresholding_ui.perform_th(Imgs);
+[Imgs.binary] = imgs_binary{:};
 
 
 % [Aggs_manual,Data_manual] = ...

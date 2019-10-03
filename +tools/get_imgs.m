@@ -3,7 +3,7 @@
 % Author:   Timothy Sipkens, 2019-07-04
 %=========================================================================%
 
-function [Imgs,RawImage] = get_imgs(Imgs_ref,n)
+function [Imgs,img_raw] = get_imgs(Imgs_ref,n)
 
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('n','var'); n = []; end
@@ -13,10 +13,10 @@ if isempty(n); n = 1:length(Imgs_ref.fname); end
 %-- Read in image --------------------------------------------------------%
 for ii=length(n):-1:1
     Imgs(ii).fname = Imgs_ref.fname{ii};
-    Imgs(ii).RawImage = imread([Imgs_ref.dir,Imgs_ref.fname{n(ii)}]);
+    Imgs(ii).raw = imread([Imgs_ref.dir,Imgs_ref.fname{n(ii)}]);
 end
 
-RawImage = Imgs(1).RawImage;
+img_raw = Imgs(1).raw;
 
 end
 
