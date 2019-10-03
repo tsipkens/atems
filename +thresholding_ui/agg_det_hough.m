@@ -59,7 +59,7 @@ CC = bwconncomp(abs(img_bewBW-1));
 if nparts>50 % if a lot of particles, remove more particles
     mod = 10;
     disp(['Found too many particles, removing particles below: ',...
-        num2str(e*10),' nm.']);
+        num2str(e*mod),' nm.']);
 else
     mod = 1;
 end
@@ -75,6 +75,8 @@ if bool_plot; subplot(3,3,8); imshow(img_bewBW); end
 
 h = figure(gcf);
 tools.plot_binary_overlay(img,img_bewBW);
+f = gcf;
+f.WindowState = 'maximized'; % maximize figure
 
 
 %== Step 5: User interaction =============================================%

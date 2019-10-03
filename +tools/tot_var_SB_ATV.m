@@ -1,4 +1,4 @@
-function u = SB_ATV(g,mu,N)
+function u = tot_var_SB_ATV(g,mu,N)
 % Split Bregman Anisotropic Total Variation Denoising
 %
 %   u = arg min_u 1/2||u-g||_2^2 + mu*ATV(u)
@@ -27,6 +27,7 @@ u = g;
 err = 1;k = 1;
 tol = 1e-3;
 lambda = 1;
+
 while err > tol
     fprintf('it. %g ',k);
     up = u;
@@ -38,30 +39,20 @@ while err > tol
     fprintf('err=%g \n',err);
     k = k+1;
 end
+
 fprintf('Stopped because norm(up-u)/norm(u) <= tol=%.1e\n',tol);
+
 end
 
+
 function [B Bt BtB] = DiffOper(N)
+
 D = spdiags([-ones(N(2),1) ones(N(2),1)], [0 1], N(2),N(2)+1);
 D(:,1) = [];
 D(1,1) = 0;
 B = [ kron(speye(N(1)),D) ; kron(D,speye(N(1))) ];
+
 Bt = B';
 BtB = Bt*B;
-end
-
-
-function Lx = DiffOper2(N)
-
-ind1 = 1:N(1);
-ind2 = 1:N(1);
-
-ind1 = [ind1,1:(N(1)-1)];
-ind2 = [ind2,2:N(1)];
-
-ind1 = [ind1,];
-
-
-
 
 end
