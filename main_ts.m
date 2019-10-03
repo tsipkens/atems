@@ -17,6 +17,11 @@ Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 [Imgs.binary] = imgs_binary{:};
 
 
+% for ii=1:length(Imgs)
+%     imwrite(Imgs(ii).binary,['../train-labels/img_',Imgs(ii).fname,'.jpg']);
+%     imwrite(Imgs(ii).cropped,['../train-images/img_',Imgs(ii).fname,'.jpg']);
+% end
+
 % [Aggs_manual,Data_manual] = ...
 %     manual.perform_man(Aggs);
 
