@@ -36,7 +36,7 @@ end
 
 %== Attempt 1: Hough transformation ======================================%
 [img_binary,moreaggs,choice] = ...
-    thresholding_ui.Agg_det_Hough(img,pixsize,moreaggs,minparticlesize,coeffs);
+    thresholding_ui.agg_det_hough2(img,pixsize,moreaggs,minparticlesize,coeffs);
 
 %-- Showing detected particles -------------------------------------------%
 %   Make masked image so that user can see if particles have been 
@@ -112,9 +112,11 @@ while moreaggs==1
     end
     rect = round(rect);
     size_temp = size(img_temp);
-    img_binary(rect(2):(rect(2)+size_temp(1)-1),...
-        rect(1):(rect(1)+size_temp(2)-1)) = ...
-        img_temp;
+    
+    inds1 = rect(2):(rect(2)+size_temp(1)-1);
+    inds2 = rect(1):(rect(1)+size_temp(2)-1);
+    img_binary(inds1,inds2) = ...
+        img_binary(inds1,inds2).*img_temp;
     
     img_edge = edge(img_binary,'sobel');
     se = strel('disk',1);
