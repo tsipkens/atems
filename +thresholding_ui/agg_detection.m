@@ -38,32 +38,11 @@ end
 [img_binary,moreaggs,choice] = ...
     thresholding_ui.agg_det_kmeans(img,pixsize,moreaggs,minparticlesize,coeffs);
 
-%-- Showing detected particles -------------------------------------------%
-%   Make masked image so that user can see if particles have been 
-%   erased or not
-if size(img_binary,1)~=0
-    img_edge = edge(img_binary,'sobel');
-    se = strel('disk',1);
-    img_dilated = imdilate(img_edge,se);
-    
-    img_final_imposed = imimposemin(img,img_dilated);
-    h = figure;
-    imshow(img_final_imposed);
-end
 
-%-- User interaction -----------------------------------------------------%
-if strcmp(choice,'Yes') || strcmp(choice,'Yes, but reduce noise')
-    clear choice;
-    choice = questdlg('Are there any particles not detected?',...
-        'Missing particles',...
-        'Yes','No','No');
-    if strcmp(choice,'Yes')
-        moreaggs = 1;
-    end
-else
+%== Attempt 2: Hough transformation ======================================%
+if ~(strcmp(choice,'Yes') || strcmp(choice,'Yes, but more particles?'))
     
-    %== Attempt 2: Hough transformation ======================================%
-    [img_binary,moreaggs,choice] = ...
+    [img_binary,~,choice] = ...
         thresholding_ui.agg_det_hough(img,pixsize,moreaggs,minparticlesize,coeffs);
 
     %-- Showing detected particles -------------------------------------------%
@@ -87,6 +66,8 @@ else
             'Yes','No','No');
         if strcmp(choice,'Yes')
             moreaggs = 1;
+        else
+            moreaggs = 0;
         end
     else
         moreaggs = 1;
@@ -95,7 +76,6 @@ else
     
 end
 
-if size(img_binary,1)~=0; close(h); end
 img_cropped = [];
 
 
