@@ -1,21 +1,57 @@
 
-% AGG_DET_HOUGH  Hough Transformation and Rolling Ball Transformation
+% AGG_DET_KMEANS Hough Transformation and Rolling Ball Transformation
 %                Automatic detection of the aggregates on TEM images
-% Authors:  Ramin Dastanpour & Steven N. Rogak
+% Authors:  Timothy A. Sipkens
 % Notes:    Developed at the University of British Columbia
-%           Last updated in Feb. 2016
+%           Last updated in October 2019
 %=========================================================================%
 
 function [img_binary,moreaggs,choice] = ...
-    agg_det_hough(img,npix,moreaggs,minparticlesize,coeffs,bool_plot) 
+    agg_det_kmeans(img,npix,moreaggs,minparticlesize,coeffs,bool_plot) 
 
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
 
 
 %== Step 1: Apply intensity threshold ====================================%
+%-- Perform total variation denoising ------------------------------------%
+% N = size(img);
+% mu = 15;
+% disp('Performing total var. denoising...');
+% img_atv = reshape(...
+%     tools.tot_var_SB_ATV(double(img(:)),mu,N),N);
+% img_atv = uint8(img_atv);
+% disp('Complete.');
+% disp(' ');
+
 level = graythresh(img);
-bw = imbinarize(img,level);
+bw_thresh = 255.*imbinarize(img,level);
+
+se = strel('disk',40);
+bw_thresh2 = imopen(bw_thresh,se);
+
+se = strel('disk',20);
+img_bh = imbothat(img,se);
+img_th = imtophat(img,se);
+img_op = imopen(255-img,se);
+img_cl = imclose(255-img,se);
+featureSet = cat(3,...
+    repmat(bw_thresh2,[1,1,2]),...
+    repmat(img_bh,[1,1,2]),...
+    repmat(255-img_th,[1,1,2]),...
+    repmat(img,[1,1,3]),...
+    repmat(255-img,[1,1,3])); % img2
+
+SE = strel('disk',1);
+img_dilated = imdilate(zeros(size(img)),SE);
+    % use dilation to strengthen the aggregate's outline
+
+bw = imsegkmeans(featureSet,2,'NormalizeInput',true);
+bw = ~(bw==1);
+
+[~,ind_min] = min([mean(img(bw)),mean(img(~bw))]);
+bw = bw==(ind_min-1);
+
 
 
 %== Step 2: Remove aggregates touching the edge of the image =============%
@@ -57,7 +93,7 @@ disp('Completed morphological operations.');
 CC = bwconncomp(abs(img_bewBW-1));
 [~,nparts] = size(CC.PixelIdxList);
 if nparts>50 % if a lot of particles, remove more particles
-    mod = 10;
+    mod = 8;
     disp(['Found too many particles, removing particles below: ',...
         num2str(e*10),' nm.']);
 else

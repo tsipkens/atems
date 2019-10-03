@@ -58,6 +58,10 @@ for ii=length(imgs):-1:1 % loop through provided images
     total_binary = ~total_binary; % invert the binary
     imgs_binary{ii} = total_binary;
     
+    disp('Completed thresholding.');
+    disp(' ');
+    
+    disp('Calculating aggregate areas...');
     CC = bwconncomp(abs(total_binary-1)); % find seperate aggregates
     naggs = CC.NumObjects; % count number of aggregates
     Aggs(aa+naggs).fname = []; % pre-allocate new space for aggregates
@@ -120,13 +124,15 @@ for ii=length(imgs):-1:1 % loop through provided images
             Aggs(aa).Rg/pixsize(ii));
         hold off;
     end
+    
+    disp('Completed aggregate analysis.');
+    disp(' ');
     pause(1);
 end
 
 close(gcf); % close image with overlaid da
 imgs_aggs = {Aggs.img_cropped};
-
-disp('Completed thresholding.');
+disp('Complete.');
 disp(' ');
 
 end

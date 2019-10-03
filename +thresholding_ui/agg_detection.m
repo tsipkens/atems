@@ -34,9 +34,9 @@ if isempty(coeff)
 end
 
 
-%== Attempt 1: Hough transformation ======================================%
+%== Attempt 1: k-means segmentation ======================================%
 [img_binary,moreaggs,choice] = ...
-    thresholding_ui.agg_det_hough(img,pixsize,moreaggs,minparticlesize,coeffs);
+    thresholding_ui.agg_det_kmeans(img,pixsize,moreaggs,minparticlesize,coeffs);
 
 %-- Showing detected particles -------------------------------------------%
 %   Make masked image so that user can see if particles have been 
@@ -61,15 +61,45 @@ if strcmp(choice,'Yes') || strcmp(choice,'Yes, but reduce noise')
         moreaggs = 1;
     end
 else
-    moreaggs = 1;
-    img_binary = [];
+    
+    %== Attempt 2: Hough transformation ======================================%
+    [img_binary,moreaggs,choice] = ...
+        thresholding_ui.agg_det_hough(img,pixsize,moreaggs,minparticlesize,coeffs);
+
+    %-- Showing detected particles -------------------------------------------%
+    %   Make masked image so that user can see if particles have been 
+    %   erased or not
+    if size(img_binary,1)~=0
+        img_edge = edge(img_binary,'sobel');
+        se = strel('disk',1);
+        img_dilated = imdilate(img_edge,se);
+
+        img_final_imposed = imimposemin(img,img_dilated);
+        h = figure;
+        imshow(img_final_imposed);
+    end
+
+    %-- User interaction -----------------------------------------------------%
+    if strcmp(choice,'Yes') || strcmp(choice,'Yes, but reduce noise')
+        clear choice;
+        choice = questdlg('Are there any particles not detected?',...
+            'Missing particles',...
+            'Yes','No','No');
+        if strcmp(choice,'Yes')
+            moreaggs = 1;
+        end
+    else
+        moreaggs = 1;
+        img_binary = [];
+    end
+    
 end
 
 if size(img_binary,1)~=0; close(h); end
 img_cropped = [];
 
 
-%== Attempt 2: Manual thresholding ===================================%
+%== Attempt 3: Manual thresholding ===================================%
 while moreaggs==1
     [img_temp,rect,~,img_cropped] = thresholding_ui.Agg_det_Slider(img,1);
         % used previously cropped image
@@ -87,7 +117,7 @@ while moreaggs==1
     close(h);
     
     
-    %== Attempt 3: Manual thresholding, again ========================%
+    %== Attempt 4: Manual thresholding, again ========================%
     if strcmp(choice2,'No')
         clear TempBW NewBW_lasoo NewBW
         [img_temp,rect] = thresholding_ui.Agg_det_Slider(img_cropped,0);

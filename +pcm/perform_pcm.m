@@ -60,9 +60,6 @@ for ll = 1:nAggs % run loop as many times as images selected
     Data = Aggs(ll); % initialize data structure for current aggregate
     Data.method = 'pcm';
     
-    figure(gcf);
-    tools.plot_binary_overlay(img_cropped,img_binary); % show aggregate currently being analyzed
-    
     
     %== Step 3-3: Development of the pair correlation function (PCF) -%
     %-- 3-3-1: Find the skeleton of the aggregate --------------------%
