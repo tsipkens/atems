@@ -36,7 +36,7 @@ end
 
 %== Attempt 1: Hough transformation ======================================%
 [img_binary,moreaggs,choice] = ...
-    thresholding_ui.agg_det_hough2(img,pixsize,moreaggs,minparticlesize,coeffs);
+    thresholding_ui.agg_det_hough(img,pixsize,moreaggs,minparticlesize,coeffs);
 
 %-- Showing detected particles -------------------------------------------%
 %   Make masked image so that user can see if particles have been 

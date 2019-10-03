@@ -7,7 +7,7 @@
 %=========================================================================%
 
 function [img_binary,moreaggs,choice] = ...
-    Agg_det_Hough(img,npix,moreaggs,minparticlesize,coeffs,bool_plot) 
+    agg_det_hough(img,npix,moreaggs,minparticlesize,coeffs,bool_plot) 
 
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
