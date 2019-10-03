@@ -30,9 +30,9 @@ e = coeffs(5);
 
 
 %== Step 2: Remove aggregates touching the edge of the image =============%
-BWedge = bw;
-BWedge(2:size(bw,1)-1,2:size(bw,2)-1) = 1;
-[x,y] = find(BWedge == 0);
+bw_edge = bw;
+bw_edge(2:size(bw,1)-1,2:size(bw,2)-1) = 1;
+[x,y] = find(bw_edge == 0);
 p = length(x);
 q = 1;
 while q<=p
