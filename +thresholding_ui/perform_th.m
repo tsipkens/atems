@@ -121,7 +121,7 @@ for ii=length(imgs):-1:1 % loop through provided images
         hold on;
         plot(Aggs(aa).center_mass(2),Aggs(aa).center_mass(1),'rx');
         viscircles(fliplr(Aggs(aa).center_mass'),...
-            Aggs(aa).Rg/pixsize(ii));
+            Aggs(aa).Rg./Aggs(aa).pixsize);
         hold off;
     end
     

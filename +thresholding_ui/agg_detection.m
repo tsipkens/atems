@@ -5,7 +5,7 @@
 %=========================================================================%
 
 function [img_binary,img_cropped,agg_binary_bin,agg_cropped_bin] = ...
-    Agg_detection(img,pixsize,moreaggs,minparticlesize,coeffs) 
+    agg_detection(img,pixsize,moreaggs,minparticlesize,coeffs) 
 
 agg_binary_bin = {};    % Bin of binary aggregate images
 agg_cropped_bin = {};   % Bin of cropped aggregated images

@@ -7,7 +7,7 @@
 %=========================================================================%
 
 function [img_binary,moreaggs,choice] = ...
-    agg_det_hough(img,npix,moreaggs,minparticlesize,coeffs,bool_plot) 
+    agg_det_hough(img,pixsize,moreaggs,minparticlesize,coeffs,bool_plot) 
 
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
@@ -32,22 +32,22 @@ d = coeffs(4);
 e = coeffs(5);
 
 disp('Morphologically closing image...');
-se = strel('disk',round(a*minparticlesize/npix));
+se = strel('disk',round(a*minparticlesize/pixsize));
 img_bewBW = imclose(bw,se);
 if bool_plot; subplot(3,3,4); imshow(img_bewBW); end
 
 disp('Morphologically opening image...');
-se = strel('disk',round(b*minparticlesize/npix));
+se = strel('disk',round(b*minparticlesize/pixsize));
 img_bewBW = imopen(img_bewBW,se);
 if bool_plot; subplot(3,3,5); imshow(img_bewBW); end
 
 disp('Morphologically closing image...');
-se = strel('disk',round(c*minparticlesize/npix));
+se = strel('disk',round(c*minparticlesize/pixsize));
 img_bewBW = imclose(img_bewBW,se);
 if bool_plot; subplot(3,3,6); imshow(img_bewBW); end
 
 disp('Morphologically opening image...');
-se = strel('disk',round(d*minparticlesize/npix));
+se = strel('disk',round(d*minparticlesize/pixsize));
 img_bewBW = imopen(img_bewBW,se);
 if bool_plot; subplot(3,3,7); imshow(img_bewBW); end
 disp('Completed morphological operations.');
@@ -65,9 +65,9 @@ else
 end
     
 for kk = 1:nparts
-    area = length(CC.PixelIdxList{1,kk})*npix^2;
+    area = length(CC.PixelIdxList{1,kk})*pixsize^2;
     
-    if area <= (mod*e*minparticlesize/npix)^2
+    if area <= (mod*e*minparticlesize/pixsize)^2
         img_bewBW(CC.PixelIdxList{1,kk}) = 1;
     end
 end
