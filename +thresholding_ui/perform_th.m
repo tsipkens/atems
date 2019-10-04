@@ -123,12 +123,17 @@ for ii=length(imgs):-1:1 % loop through provided images
         plot(Aggs(aa).center_mass(2),Aggs(aa).center_mass(1),'rx');
         viscircles(fliplr(Aggs(aa).center_mass'),...
             Aggs(aa).Rg./Aggs(aa).pixsize);
+        text(Aggs(aa).center_mass(2)+2,Aggs(aa).center_mass(1)+2,...
+            num2str(jj),'Color','red');
         hold off;
     end
+    
+    % saveas(gcf,['..\images-processed\',Aggs(aa).fname(1:end-4),'.jpg']);
     
     disp('Completed aggregate analysis.');
     disp(' ');
     pause(1);
+    
 end
 
 close(gcf); % close image with overlaid da
