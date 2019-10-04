@@ -18,10 +18,10 @@ Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 
 
 %-- Save images and labels to JPGs ------------------%
-for ii=1:length(Imgs)
-    imwrite(Imgs(ii).binary,['../train-labels/img_',Imgs(ii).fname(1:end-4),'.jpg']);
-    imwrite(Imgs(ii).cropped,['../train-images/img_',Imgs(ii).fname(1:end-4),'.jpg']);
-end
+% for ii=1:length(Imgs)
+%     imwrite(Imgs(ii).binary,['../train-labels/img_',Imgs(ii).fname(1:end-4),'.jpg']);
+%     imwrite(Imgs(ii).cropped,['../train-images/img_',Imgs(ii).fname(1:end-4),'.jpg']);
+% end
 
 
 % [Aggs_manual,Data_manual] = ...

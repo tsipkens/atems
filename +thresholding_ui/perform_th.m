@@ -124,7 +124,7 @@ for ii=length(imgs):-1:1 % loop through provided images
         viscircles(fliplr(Aggs(aa).center_mass'),...
             Aggs(aa).Rg./Aggs(aa).pixsize);
         text(Aggs(aa).center_mass(2)+2,Aggs(aa).center_mass(1)+2,...
-            num2str(jj),'Color','red');
+            num2str(jj),'Color','green');
         hold off;
     end
     
