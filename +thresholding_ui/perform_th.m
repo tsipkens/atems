@@ -77,6 +77,7 @@ for ii=length(imgs):-1:1 % loop through provided images
         
         if exist('fname','var'); Aggs(aa).fname = fname{ii}; end % file name for aggregate
         Aggs(aa).pixsize = pixsize(ii);
+        Aggs(aa).id = jj;
         
         Aggs(aa).image = imgs{ii};
             % store image that the aggregate occurs in
