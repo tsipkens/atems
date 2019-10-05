@@ -69,7 +69,7 @@ disp('Thresholding is applied.');
 %== Select particles and format output ===================================%
 uiwait(msgbox('Please selects (left click) particles satisfactorily detected; and press enter'));
 img_binary = bwselect(Binary_Image_4,8);
+close(gcf);
 img_binary = ~img_binary; % formatted for PCA, other codes should reverse this
-
 
 end

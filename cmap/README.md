@@ -39,6 +39,7 @@ From cmocean:
 9. *dense*
 10. *matter*
 11. *tempo*
+12. *speed* - Yellow, green colormap
 
 ##### Divergent colormaps
 

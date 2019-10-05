@@ -19,7 +19,6 @@ if bool_type==1 % original impose from PCM code
 
     t0 = imimposemin(img,img_dilated);
     imshow(t0);
-    f.WindowState = 'maximized'; % maximize figure
 
 else % updates module for manual sizing
     SE = strel('disk',2);
@@ -32,7 +31,6 @@ else % updates module for manual sizing
     t1 = w2.*img.*uint8(img_edge)+(1-w2).*img;
 
     imshow(w1.*t1 + (1-w1).*t0);
-    f.WindowState = 'maximized'; % maximize figure
 end
 
 if nargout>0; h = gca; end

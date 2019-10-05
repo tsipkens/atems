@@ -22,6 +22,20 @@ if isempty(bool_backup); bool_backup = 0; end
 
 disp('Performing PCM analysis...');
 
+% if isstruct(aggs)
+%     Aggs_str = aggs;
+%     aggs = {Aggs_str.Cropped};
+%     pixsize = [Aggs_str.pixsize];
+%     fname = {Aggs_str.fname};
+% elseif ~iscell(aggs)
+%     aggs = {aggs};
+% end
+% 
+% if ~exist('pixsize','var'); pixsize = []; end
+% if isempty(pixsize); pixsize = ones(size(aggs)); end
+%-------------------------------------------------------------------------%
+
+
 %-- Check whether the data folder is available ---------------------------%
 if exist('data','dir') ~= 7 % 7 if exist parameter is a directory
     mkdir('data') % make output folder
@@ -45,9 +59,6 @@ for ll = 1:nAggs % run loop as many times as images selected
     %-- Loop through aggregates ------------------------------------------%
     Data = Aggs(ll); % initialize data structure for current aggregate
     Data.method = 'pcm';
-    
-    figure(gcf);
-    tools.plot_binary_overlay(img_cropped,img_binary); % show aggregate currently being analyzed
     
     
     %== Step 3-3: Development of the pair correlation function (PCF) -%
@@ -126,7 +137,7 @@ for ll = 1:nAggs % run loop as many times as images selected
     %-- 3-5-1: Simple PCM ------------------------------------------------%
     PCF_simple   = .913;
     Aggs(ll).dp_pcm_simple = ...
-        interp1(PCF_smoothed, Radius, PCF_simple);
+        2*interp1(PCF_smoothed, Radius, PCF_simple);
         % dp from simple PCM
     
     %-- 3-5-2: Generalized PCM ---------------------------------------%
@@ -139,7 +150,7 @@ for ll = 1:nAggs % run loop as many times as images selected
 
     PCF_generalized   = (.913/.84)*(0.7+0.003*PRgslope^(-0.24)+0.2*Data.aspect_ratio^-1.13);
     Aggs(ll).dp_pcm_general = ...
-        interp1(PCF_smoothed, Radius, PCF_generalized);
+        2*interp1(PCF_smoothed, Radius, PCF_generalized);
         % dp from generalized PCM
     
         
@@ -166,7 +177,6 @@ for ll = 1:nAggs % run loop as many times as images selected
     end
     
     tools.textbar(ll/nAggs);
-    
 end
 
 close; % close current figure

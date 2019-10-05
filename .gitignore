@@ -1,4 +1,5 @@
-manual_orig/
 data/
 data\
-pcm_orig/
+images/
+images\
+*.asv
