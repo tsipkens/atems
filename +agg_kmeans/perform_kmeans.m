@@ -1,10 +1,27 @@
 
-% PERFORM_KMEANS A function to perform kmeans clusteting on an aggregate image
+% PERFORM_KMEANS A function to perform kmeans clustering on an aggregate image
 % Author:   Timothy Sipkes
 % Date:     October 4, 2019
 
-function bw = perform_km(img)
+function [img_binary] = perform_kmeans(imgs,pixsize,fname))
 
+
+%-- Parse inputs ---------------------------------------------------------%
+if isstruct(imgs)
+    Imgs_str = imgs;
+    imgs = {Imgs_str.cropped};
+    pixsize = [Imgs_str.pixsize];
+    fname = {Imgs_str.fname};
+elseif ~iscell(imgs)
+    imgs = {imgs};
+end
+
+if ~exist('pixsize','var'); pixsize = []; end
+if isempty(pixsize); pixsize = ones(size(imgs)); end
+%-------------------------------------------------------------------------%
+
+
+img = imgs{1};
 
 [X,Y] = meshgrid(1:size(img,2),1:size(img,1));
 bg_fit = fit([X(:),Y(:)],img(:),'poly11');
@@ -58,6 +75,41 @@ bw = ~(bw==1);
 
 [~,ind_min] = min([mean(img_atv(bw)),mean(img_atv(~bw))]);
 bw = bw==(ind_min-1);
+
+
+
+%== Step 2: Remove aggregates touching the edge of the image =============%
+bw = ~imclearborder(~bw); % clear aggregates on border
+
+
+%== Step 3: Rolling ball transformation ==================================%
+%   imclose opens white areas
+%   imopen opens black areas
+a = coeffs(1);
+b = coeffs(2);
+c = coeffs(3);
+d = coeffs(4);
+e = coeffs(5);
+
+
+disp('Morphologically closing image...');
+se = strel('disk',round(a*minparticlesize/pixsize));
+img_bewBW1 = imclose(bw,se);
+
+disp('Morphologically opening image...');
+se = strel('disk',round(b*minparticlesize/pixsize));
+img_bewBW2 = imopen(img_bewBW1,se);
+
+disp('Morphologically closing image...');
+se = strel('disk',round(c*minparticlesize/pixsize));
+img_bewBW3 = imclose(img_bewBW2,se);
+
+disp('Morphologically opening image...');
+se = strel('disk',round(d*minparticlesize/pixsize));
+img_bewBW = imopen(img_bewBW3,se);
+disp('Completed morphological operations.');
+
+img_binary = img_bewBW;
 
 
 end
