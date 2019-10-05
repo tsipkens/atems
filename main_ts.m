@@ -15,6 +15,7 @@ Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 [imgs_aggs,imgs_binary,Aggs] = ...
     thresholding_ui.perform_th(Imgs);
 [Imgs.binary] = imgs_binary{:};
+% NOTE / TO DO: Pull kmeans/thresholding into seperate package? 
 
 
 %-- Save images and labels to JPGs ------------------%
@@ -23,10 +24,10 @@ Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 %     imwrite(Imgs(ii).cropped,['images/train/',Imgs(ii).fname(1:end-4),'.jpg']);
 % end
 
-for ii=1:length(Imgs)
-    tools.plot_aggregates(Imgs,Aggs,ii);
-    saveas(gcf,['images/kmeans/',Imgs(ii).fname(1:end-4),'.jpg']);
-end
+% for ii=1:length(Imgs)
+%     tools.plot_aggregates(Imgs,Aggs,ii);
+%     saveas(gcf,['images/kmeans/',Imgs(ii).fname(1:end-4),'.jpg']);
+% end
 
 
 % [Aggs_manual,Data_manual] = ...
