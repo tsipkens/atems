@@ -5,11 +5,11 @@
 % end
 
 
-imds = imageDatastore('../train-images');
+imds = imageDatastore('images/train');
 
 classes = ["background" "particle"];
 labels = [0 1];
-pxds = pixelLabelDatastore('../train-labels',classes,labels);
+pxds = pixelLabelDatastore('images/train-labels',classes,labels);
 
 tbl = countEachLabel(pxds)
 
