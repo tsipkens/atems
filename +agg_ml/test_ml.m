@@ -1,4 +1,5 @@
 
+
 load('data/agg_net.mat')
 
 Imgs_ref = tools.get_img_ref;
@@ -7,7 +8,21 @@ Imgs = tools.get_imgs(Imgs_ref); % load a single image
 Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 
 I_test = Imgs(1).cropped;
-C_test = semanticseg(I_test',net);
+
+
+%-- Attempt to remove background gradient --------------------------------%
+[X,Y] = meshgrid(1:size(I_test,2),1:size(I_test,1));
+bg_fit = fit(double([X(:),Y(:)]),double(I_test(:)),'poly11');
+bg = uint8(round(bg_fit(X,Y)));
+
+t0 = double(max(max(bg))-bg);
+t1 = double(I_test)+t0;
+t2 = t1-min(min(t1));
+I_test0 = uint8(round(255.*t2./max(max(t2))));
+
+
+%-- Proceed with segmentation --------------------------------------------%
+C_test = semanticseg(I_test0',net);
 
 bw = ((C_test')=='background');
 
@@ -64,6 +79,6 @@ imshow(E_test);
 
 
 figure(3);
-imshow(I_test);
+imshow(I_test0);
 
 
