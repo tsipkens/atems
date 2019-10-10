@@ -97,10 +97,17 @@ for ii=length(imgs):-1:1 % loop through provided images
         img_edge = img_dilated-img_binary;
         % img_edge = edge(img_binary,'sobel'); % currently causes an error
         
+        [row, col] = find(Aggs(aa).img_cropped_binary);
+        Aggs(aa).length = max((max(row)-min(row)),(max(col)-min(col)))*pixsize;
+        Aggs(aa).width = min((max(row)-min(row)),(max(col)-min(col)))*pixsize;
+        Aggs(aa).aspect_ratio = Aggs(aa).length/Aggs(aa).width;
+        
+        %{
         [Aggs(aa).length, Aggs(aa).width] = ...
             thresholding_ui.agg_dimension(img_edge,pixsize(ii));
             % calculate aggregate length and width
         Aggs(aa).aspect_ratio = Aggs(aa).length/Aggs(aa).width;
+        %}
         
         Aggs(aa).num_pixels = nnz(img_binary); % number of non-zero pixels
         Aggs(aa).da = ((Aggs(aa).num_pixels/pi)^.5)*2*pixsize(ii); % area-equialent diameter
