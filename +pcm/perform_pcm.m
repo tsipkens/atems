@@ -98,8 +98,8 @@ for ll = 1:nAggs % run loop as many times as images selected
     Radius       = 1:dr:nbins;
     
     % Pair correlation function (PCF)
-    PCF = histcounts(Distance_mat,[Radius-dr/2,Radius(end)+dr/2]);
-    % PCF = hist(Distance_mat,Radius);
+    % PCF = histcounts(Distance_mat,[Radius-dr/2,Radius(end)+dr/2]);
+    PCF = hist(Distance_mat,Radius); % UPDATE REMOVED
 
     % Smoothing the pair correlation function (PCF)
     %   Updated to remove number of variables
@@ -115,8 +115,8 @@ for ll = 1:nAggs % run loop as many times as images selected
     [row,col] = find(~BW);
     Distance_Denaminator = ((row-Distance_max+3).^2+(col-Distance_max+3).^2).^.5;
     Distance_Denaminator = nonzeros(Distance_Denaminator).*pixsize;
-    Denamonator = histcounts(Distance_Denaminator,[Radius-dr/2,Radius(end)+dr/2]);
-    % Denamonator = hist(Distance_Denaminator,Radius);
+    % Denamonator = histcounts(Distance_Denaminator,[Radius-dr/2,Radius(end)+dr/2]);
+    Denamonator = hist(Distance_Denaminator,Radius); % UPDATE REMOVED
     Denamonator = Denamonator.*length(skeletonX)./density;
     Denamonator(Denamonator==0) = 1; % bug fix, overcomes division by zero
     PCF = PCF./Denamonator;
@@ -127,11 +127,13 @@ for ll = 1:nAggs % run loop as many times as images selected
             PCF_smoothed(kk+1) = PCF_smoothed(kk)-1e-4;
         end
     end
-    
+    %{
+    % UPDATE REMOVED
     [~,ia] = unique(PCF_smoothed); % bug fix, remove non-unique entries
     ia = sort(ia);
     PCF_smoothed = PCF_smoothed(ia);
     Radius = Radius(ia);
+    %}
     
     %== 3-5: Primary particle sizing =====================================%
     %-- 3-5-1: Simple PCM ------------------------------------------------%
@@ -148,7 +150,8 @@ for ll = 1:nAggs % run loop as many times as images selected
     PCFLRg   = interp1(Radius, PCF_smoothed, LRg); % P at LRg
     PRgslope = (PCFURg+PCFLRg-PCFRg)/(URg-LRg); % dp/dr(Rg)
 
-    PCF_generalized   = (.913/.84)*(0.7+0.003*PRgslope^(-0.24)+0.2*Data.aspect_ratio^-1.13);
+    PCF_generalized   = (.913/.84)*...
+        (0.7+0.003*PRgslope^(-0.24)+0.2*Data.aspect_ratio^-1.13);
     Aggs(ll).dp_pcm_general = ...
         2*interp1(PCF_smoothed, Radius, PCF_generalized);
         % dp from generalized PCM
