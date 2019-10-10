@@ -98,7 +98,7 @@ for ii=length(imgs):-1:1 % loop through provided images
         % img_edge = edge(img_binary,'sobel'); % currently causes an error
         
         [Aggs(aa).length, Aggs(aa).width] = ...
-            thresholding_ui.Agg_Dimension(img_edge,pixsize(ii));
+            thresholding_ui.agg_dimension(img_edge,pixsize(ii));
             % calculate aggregate length and width
         Aggs(aa).aspect_ratio = Aggs(aa).length/Aggs(aa).width;
         
