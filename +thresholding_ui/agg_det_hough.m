@@ -6,8 +6,8 @@
 %           Last updated in Feb. 2016
 %=========================================================================%
 
-function [img_binary,moreaggs,choice] = ...
-    agg_det_hough(img,pixsize,moreaggs,minparticlesize,coeffs,bool_plot) 
+function [img_binary] = ...
+    agg_det_hough(img,pixsize,minparticlesize,coeffs,bool_plot) 
 
 if ~exist('bool_plot','var'); bool_plot = []; end
 if isempty(bool_plot); bool_plot = 0; end
@@ -78,24 +78,7 @@ tools.plot_binary_overlay(img,img_bewBW);
 f = gcf;
 f.WindowState = 'maximized'; % maximize figure
 
+img_binary = img_bewBW;
 
-%== Step 5: User interaction =============================================%
-choice = questdlg('Satisfied with automatic aggregate detection? You will be able to delete non-aggregate noises and add missing particles later. If not, other methods will be used',...
-     'Agg detection','Yes','Yes, but reduce noise','No','Yes'); 
-
-if strcmp(choice,'Yes')
-    img_binary = img_bewBW;
-elseif strcmp(choice,'Yes, but reduce noise')
-    % to further reduce the noise, and solve the area calculation problems
-    % of images with multiple particles
-    uiwait(msgbox('Please selects (left click) particles satisfactorily detected and press enter'));
-    img_binary_int = bwselect(~img_bewBW,8);
-    img_binary = ~img_binary_int;
-elseif strcmp(choice,'No') % semi-automatic or manual methods will be used
-    img_binary = [];
-    moreaggs = 1;
-end
-
-close(h);
 
 end

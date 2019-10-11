@@ -1,15 +1,31 @@
 
-% AGG_DET_KMEANS Hough Transformation and Rolling Ball Transformation
-%                Automatic detection of the aggregates on TEM images
-% Authors:  Timothy A. Sipkens
-% Notes:    Developed at the University of British Columbia
-%           Last updated in October 2019
+% AGG_DET_KMEANS A function to perform kmeans clustering on an aggregate image
+% Author:   Timothy Sipkes, 2019-10-04
 %=========================================================================%
 
-function [img_binary,moreaggs,choice] = ...
-    agg_det_kmeans(img,pixsize,moreaggs,minparticlesize,coeffs) 
+function [img_binary] = ...
+    agg_det_kmeans(imgs,pixsize)
 
 
+%-- Parse inputs ---------------------------------------------------------%
+if isstruct(imgs)
+    Imgs_str = imgs;
+    imgs = {Imgs_str.cropped};
+    pixsize = [Imgs_str.pixsize];
+elseif ~iscell(imgs)
+    imgs = {imgs};
+end
+
+if ~exist('pixsize','var'); pixsize = []; end
+if isempty(pixsize); pixsize = ones(size(imgs)); end
+%-------------------------------------------------------------------------%
+
+
+img = imgs{1};
+
+
+
+%== Step 1: k-Means clustering ===========================================%
 %-- Attempt to remove background gradient --------------------------------%
 [X,Y] = meshgrid(1:size(img,2),1:size(img,1));
 bg_fit = fit(double([X(:),Y(:)]),double(img(:)),'poly11');
@@ -64,21 +80,33 @@ bw = ~(bw==1);
 [~,ind_min] = min([mean(img_atv(bw)),mean(img_atv(~bw))]);
 bw = bw==(ind_min-1);
 
-
-
-%== Step 2: Remove aggregates touching the edge of the image =============%
+%-- Remove aggregates touching the edge of the image ---------------------%
 bw = ~imclearborder(~bw); % clear aggregates on border
 
 
-%== Step 3: Rolling ball transformation ==================================%
+
+%== Step 2: Rolling ball transformation ==================================%
 %   imclose opens white areas
 %   imopen opens black areas
+minparticlesize = 4.9; % to filter out noises
+
+coeff_matrix = [0.2 0.8 0.4 1.1 0.4;0.2 0.3 0.7 1.1 1.8;...
+    0.3 0.8 0.5 2.2 3.5;0.1 0.8 0.4 1.1 0.5];
+    % coefficients for automatic Hough transformation
+
+if pixsize <= 0.181
+    coeffs = coeff_matrix(1,:);
+elseif pixsize <= 0.361
+    coeffs = coeff_matrix(2,:);
+else 
+    coeffs = coeff_matrix(3,:);
+end
+    
 a = coeffs(1);
 b = coeffs(2);
 c = coeffs(3);
 d = coeffs(4);
 e = coeffs(5);
-
 
 disp('Morphologically closing image...');
 se = strel('disk',round(a*minparticlesize/pixsize));
@@ -98,7 +126,8 @@ img_bewBW = imopen(img_bewBW3,se);
 disp('Completed morphological operations.');
 
 
-%== Step 4: Delete blobs under a threshold area size =====================%
+
+%== Step 3: Delete blobs under a threshold area size =====================%
 CC = bwconncomp(abs(img_bewBW-1));
 [~,nparts] = size(CC.PixelIdxList);
 if nparts>25 % if a lot of particles, remove more particles
@@ -117,26 +146,8 @@ for kk = 1:nparts
     end
 end
 
-h = figure(gcf);
-tools.plot_binary_overlay(img,img_bewBW);
-f = gcf;
-f.WindowState = 'maximized'; % maximize figure
+img_binary = img_bewBW;
 
 
-%== Step 5: User interaction =============================================%
-choice = questdlg('Satisfied with automatic aggregate detection? You will be able to delete non-aggregate noises and add missing particles later. If not, other methods will be used',...
-     'Agg detection','Yes','Yes, but more particles?','No','Yes'); 
-
-if strcmp(choice,'Yes')
-    img_binary = img_bewBW;
-elseif strcmp(choice,'Yes, but more particles?')
-    img_binary = img_bewBW;
-    moreaggs = 1;
-elseif strcmp(choice,'No') % semi-automatic or manual methods will be used
-    img_binary = [];
-    moreaggs = 1;
 end
 
-close(h);
-
-end

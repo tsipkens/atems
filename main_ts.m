@@ -40,7 +40,7 @@ Aggs_pcm = pcm.perform_pcm(Aggs);
 % Aggs_kook = kook.perform_kook(Imgs);
 
 
-% Aggs_kook_mod = kook_mod.perform_km(Aggs);
+% Aggs_kook_mod = kook_mod.perform_kookm(Aggs);
 
 
 % load('data\data_FlareNet.mat');

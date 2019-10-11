@@ -5,10 +5,11 @@
 %=========================================================================%
 
 function [img_binary,img_cropped,agg_binary_bin,agg_cropped_bin] = ...
-    agg_detection(img,pixsize,moreaggs,minparticlesize,coeffs) 
+    agg_detection(img,pixsize,minparticlesize,coeffs) 
 
 agg_binary_bin = {};    % Bin of binary aggregate images
 agg_cropped_bin = {};   % Bin of cropped aggregated images
+
 
 %== Parse inputs =========================================================%
 if ~exist('pixsize','var'); pixsize = []; end
@@ -35,45 +36,19 @@ end
 
 
 %== Attempt 1: k-means segmentation ======================================%
-[img_binary,moreaggs,choice] = ...
-    thresholding_ui.agg_det_kmeans(img,pixsize,moreaggs,minparticlesize,coeffs);
+img_binary = ...
+    thresholding_ui.agg_det_kmeans(img,pixsize);
+[moreaggs,choice] = ...
+    thresholding_ui.user_input(img,img_binary);
 
 
 %== Attempt 2: Hough transformation ======================================%
-if ~(strcmp(choice,'Yes') || strcmp(choice,'Yes, but more particles?'))
-    
-    [img_binary,~,choice] = ...
-        thresholding_ui.agg_det_hough(img,pixsize,moreaggs,minparticlesize,coeffs);
-
-    %-- Showing detected particles -------------------------------------------%
-    %   Make masked image so that user can see if particles have been 
-    %   erased or not
-    if size(img_binary,1)~=0
-        img_edge = edge(img_binary,'sobel');
-        se = strel('disk',1);
-        img_dilated = imdilate(img_edge,se);
-
-        img_final_imposed = imimposemin(img,img_dilated);
-        h = figure;
-        imshow(img_final_imposed);
-    end
-
-    %-- User interaction -----------------------------------------------------%
-    if strcmp(choice,'Yes') || strcmp(choice,'Yes, but reduce noise')
-        clear choice;
-        choice = questdlg('Are there any particles not detected?',...
-            'Missing particles',...
-            'Yes','No','No');
-        if strcmp(choice,'Yes')
-            moreaggs = 1;
-        else
-            moreaggs = 0;
-        end
-    else
-        moreaggs = 1;
-        img_binary = [];
-    end
-    
+if strcmp(choice,'No')
+    img_binary = thresholding_ui.agg_det_hough(...
+        img,pixsize,minparticlesize,coeffs);
+    [moreaggs,choice] = thresholding_ui.user_input(...
+        img,img_binary);
+    if strcmp(choice,'No'); img_binary = ones(size(img)); end
 end
 
 img_cropped = [];
@@ -85,16 +60,13 @@ while moreaggs==1
         % used previously cropped image
         % img_temp temporarily stores binary image
     
-    img_edge = edge(img_temp,'sobel');
-    se = strel('disk',1);
-    img_dilated = imdilate(img_edge,se);
+    [~,f] = tools.plot_binary_overlay(...
+        img_cropped,img_temp);
     
-    img_final_imposed = imimposemin(img_cropped,img_dilated);
-    h = figure;
-    imshow(img_final_imposed);
     choice2 = questdlg('Satisfied with aggregate detection? If not, try drawing an edge around the aggregate manually...',...
         'Agg detection','Yes','No','Yes');
-    close(h);
+    
+    close(f);
     
     
     %== Attempt 4: Manual thresholding, again ========================%
@@ -128,13 +100,12 @@ while moreaggs==1
     img_binary(inds1,inds2) = ...
         img_binary(inds1,inds2).*img_temp;
     
-    img_edge = edge(img_binary,'sobel');
-    se = strel('disk',1);
-    img_dilated = imdilate(img_edge,se);
+    %-- Query user -------------------------------------------------------%
+    h = figure(gcf);
+    tools.plot_binary_overlay(img,img_binary);
+    f = gcf;
+    f.WindowState = 'maximized'; % maximize figure
     
-    img_final_imposed = imimposemin(img,img_dilated);
-    h = figure;
-    imshow(img_final_imposed);
     choice = questdlg('Are there any particles not detected?',...
         'Missing particles','Yes','No','No');
     if strcmp(choice,'Yes')
@@ -142,6 +113,7 @@ while moreaggs==1
     else
         moreaggs=0;
     end
+    
     close(h);
 end
 

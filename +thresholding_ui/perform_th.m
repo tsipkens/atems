@@ -35,7 +35,6 @@ for ii=length(imgs):-1:1 % loop through provided images
     coeff_matrix = [0.2 0.8 0.4 1.1 0.4;0.2 0.3 0.7 1.1 1.8;...
         0.3 0.8 0.5 2.2 3.5;0.1 0.8 0.4 1.1 0.5];
         % coefficients for automatic Hough transformation
-    more_aggs = 0;
     
     
     % Build the image processing coefficients for the image based on its
@@ -50,8 +49,8 @@ for ii=length(imgs):-1:1 % loop through provided images
     
     %-- Run slider to obtain binary image --------------------------------%
     [total_binary,~,~,~] = ... 
-        thresholding_ui.agg_detection(imgs{ii},pixsize(ii), ...
-        more_aggs,minparticlesize,coeffs);
+        thresholding_ui.agg_detection(imgs{ii},pixsize(ii),...
+        minparticlesize,coeffs);
     
     %-- Remove aggregates touching the edge ------%
     total_binary = imclearborder(~total_binary); % clear border on negative of binary
