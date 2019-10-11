@@ -6,7 +6,7 @@
 %%%% "Observations of a Correlation between Primary Particle and Aggregate
 %%%% Size for Soot Particles", J. of Aerosol Sci. & Tech.
 
-function [ A_length, A_width ] = Agg_Dimension(img_edge,pixsize)
+function [ A_length, A_width ] = agg_dimension(img_edge,pixsize)
 %Aggregate_Dimension etermines the length & width of the agglomerate, and
 %provides a rotated image of the particle with length and width axis
 %   Based on function_length_width3 (Arka and Hugo) with memory saving improvement
@@ -89,10 +89,8 @@ Rotated_Final_Edge = imrotate(Temp_Final_Edge, theta);
 
 % to find the maximum and minimum x values to calculate the width
 [ROW2, COL2] = find (Rotated_Final_Edge > 0);
-[x1_w_rit, i]  = max(COL2);
-y1_w_rit = ROW2(i);
-[x2_w_lef, i] = min(COL2);
-y2_w_lef = ROW2(i);    
+[x1_w_rit]  = max(COL2);
+[x2_w_lef] = min(COL2);  
     
 width = x1_w_rit - x2_w_lef;
 

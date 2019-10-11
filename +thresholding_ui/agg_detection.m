@@ -81,7 +81,7 @@ img_cropped = [];
 
 %== Attempt 3: Manual thresholding ===================================%
 while moreaggs==1
-    [img_temp,rect,~,img_cropped] = thresholding_ui.Agg_det_Slider(img,1);
+    [img_temp,rect,~,img_cropped] = thresholding_ui.agg_det_slider(img,1);
         % used previously cropped image
         % img_temp temporarily stores binary image
     
@@ -100,7 +100,7 @@ while moreaggs==1
     %== Attempt 4: Manual thresholding, again ========================%
     if strcmp(choice2,'No')
         clear TempBW NewBW_lasoo NewBW
-        [img_temp,rect] = thresholding_ui.Agg_det_Slider(img_cropped,0);
+        [img_temp,rect] = thresholding_ui.agg_det_slider(img_cropped,0);
             % image is stored in a temporary image
         
         TempBW = img_temp;

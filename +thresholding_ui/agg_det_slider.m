@@ -1,4 +1,5 @@
-function [img_binary,rect,thresh_slider_in,img_cropped] = Agg_det_Slider(img,bool_crop) 
+
+function [img_binary,rect,thresh_slider_in,img_cropped] = agg_det_slider(img,bool_crop) 
 % Semi-automatic detection of the aggregates on TEM images
 % Function to be used with the Pair Correlation Method (PCM) package
 % Ramin Dastanpour & Steven N. Rogak
