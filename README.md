@@ -13,7 +13,7 @@ pair correlation method (PCM), Kook, and manual methods. Each method
 is contained in a package, with a corresponding `perform_*` function that
 can be used to call the method.
 
-#### Data structure
+### Data structure
 
 Images are handled primarily by two variables: `Imgs_ref`
 and `Imgs`. The former contains a reference to the images,
@@ -25,9 +25,9 @@ The output data itself, `Aggs`, is a structure array with one
 entry per aggregate. This data can then be exported to a JSON
 format to be analyzed in other software and languages.
 
-#### Packages
+### Packages
 
-##### Semantic segmentation
+#### Semantic segmentation
 
 ###### +agg_segment
 
@@ -38,7 +38,7 @@ the thresholding user interface associated with the distribution of the original
 University of British Columbia. The code is to be implemented prior to primary 
 particle sizing and is critical to the PCM primary particle size estimation.
 
-##### Primary particle sizing
+#### Primary particle sizing
 
 ###### +pcm
 
