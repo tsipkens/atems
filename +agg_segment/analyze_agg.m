@@ -53,8 +53,7 @@ for jj = 1:naggs % loop through number of found aggregates
     Aggs(jj).num_pixels = nnz(img_binary); % number of non-zero pixels
     Aggs(jj).da = ((Aggs(jj).num_pixels/pi)^.5)*2*pixsize; % area-equialent diameter
     Aggs(jj).area = nnz(img_binary).*pixsize^2; % aggregate area
-    Aggs(jj).Rg = ...
-        agg_segment.gyration(img_binary,pixsize);
+    Aggs(jj).Rg = gyration(img_binary,pixsize);
         % calculate radius of gyration
     
     Aggs(jj).perimeter = sum(sum(img_edge~=0))*pixsize;
@@ -78,3 +77,29 @@ pause(1);
 
 end
 
+
+
+%== GYRATION =============================================================%
+%   Gyration calculates radius of gyration by assuming every pixel as an area
+%   of pixsize^2
+%   Author: Ramin Dastanpour
+
+function [Rg] = gyration(Final_Binary, pixsize)
+
+
+total_area = nnz(Final_Binary)*pixsize^2;
+
+[xpos,ypos] = find(Final_Binary);
+n_pix = size(xpos,1);
+Centroid.x = sum(xpos)/n_pix;
+Centroid.y = sum(ypos)/n_pix;
+
+Ar2 = zeros(n_pix,1);
+
+for kk = 1:n_pix
+    Ar2(kk,1) = (((xpos(kk,1)-Centroid.x)*pixsize)^2+((ypos(kk,1)-Centroid.y)*pixsize)^2)*pixsize^2;
+end
+
+Rg = (sum(Ar2)/total_area)^0.5;
+
+end
