@@ -17,12 +17,11 @@ if isempty(bool_plot); bool_plot = 0; end
 level = graythresh(img);
 bw = imbinarize(img,level);
 
-
-%== Step 2: Remove aggregates touching the edge of the image =============%
 bw = ~imclearborder(~bw); % clear aggregates on border
 
 
-%== Step 3: Rolling Ball Transformation ==================================%
+
+%== Step 2: Rolling Ball Transformation ==================================%
 %   imclose opens white areas
 %   imopen opens black areas
 a = coeffs(1);
@@ -53,7 +52,7 @@ if bool_plot; subplot(3,3,7); imshow(img_bewBW); end
 disp('Completed morphological operations.');
 
 
-%== Step 4: Delete blobs under a threshold area size =====================%
+%== Step 3: Delete blobs under a threshold area size =====================%
 CC = bwconncomp(abs(img_bewBW-1));
 [~,nparts] = size(CC.PixelIdxList);
 if nparts>50 % if a lot of particles, remove more particles
@@ -79,6 +78,5 @@ f = gcf;
 f.WindowState = 'maximized'; % maximize figure
 
 img_binary = img_bewBW;
-
 
 end

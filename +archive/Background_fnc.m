@@ -1,49 +1,56 @@
-function Refined_surf_img = Background_fnc(binaryImage,Cropped_img)
-% Semi-automatic detection of the aggregates on TEM images
-% Function to be used with the Pair Correlation Method (PCM) package
-% Ramin Dastanpour & Steven N. Rogak
-% Developed at the University of British Columbia
-% Last updated in Feb. 2016
-% This function smoothens background brightness, specially on the edges of
-% the image where intensity (brightness) has a curved planar distribution.
-% This improves thresholding in the following steps of image processing
 
-%% Number of the pixels within the aggregate
-Npix_agg = sum(sum(binaryImage));
+% BACKGROUND_FNC    Smooths out background using curve fitting
+% Originally by:    Ramin Dastanpour, Steven N. Rogak, Last updated in Feb. 2016
+% Modified by:      Timothy Sipkens, 2019-07-16
+%
+% Notes:
+%   This function smoothens background brightness, specially on the edges of
+%   the image where intensity (brightness) has a curved planar distribution.
+%   This improves thresholding in the following steps of image processing
+%=========================================================================%
 
-%% Number of the pixels within the whole cropped image 
-Npix_tot = size(Cropped_img,1)*size(Cropped_img,2);
+function img_refined = background_fnc(img_binary,img_cropped)
 
-%% Number of the pixels in the backgound of the aggregate
-Npix_bckgrnd = Npix_tot - Npix_agg;
+nagg = nnz(img_binary); % pixels within the aggregate
+ntot = numel(img_cropped); % pixels within the whole cropped image 
+nbg = ntot-nagg; % pixels in the backgound of the aggregate
 
-%% Computing average background intensity
-burned_img = Cropped_img;
-burned_img(binaryImage) = 0;
-mean_bckgrnd = mean(mean(burned_img))*Npix_tot/Npix_bckgrnd;
 
-%% Replace aggregate pixels' intensities with the average value of the background intensity
-Filled_img = Cropped_img;
-Filled_img(binaryImage) = mean_bckgrnd;
+%-- Computing average background intensity -------------------------------%
+burned_img = img_cropped;
+burned_img(img_binary) = 0;
+mean_bg =  mean(mean(burned_img))*ntot/nbg;
 
-%% Fitting a curved surface into Filled_img data
-[x_d,y_d] = meshgrid(1:size(Filled_img,2),1:size(Filled_img,1));
+
+%-- Replace aggregate pixels' with intensity from the background ---------%
+img_bg = img_cropped;
+img_bg(img_binary) = mean_bg;
+
+
+%-- Fit a curved surface into Filled_img data ----------------------------%
+[x_d,y_d] = meshgrid(1:size(img_bg,2),1:size(img_bg,1));
 xdata = {x_d,y_d};
 fun = @(c,xdata) c(1).*xdata{1}.^2+c(2).*xdata{2}.^2+c(3).*xdata{1}.*xdata{2}+...
     c(4).*xdata{1}+c(5).*xdata{2}+c(6);
 
-c_start=[0 0 0 0 0 mean_bckgrnd];
+c_start = [0 0 0 0 0 mean_bg];
 options = optimset('MaxFunEvals',1000);
 options = optimset(options,'MaxIter',1000); 
-[c] = lsqcurvefit(fun,c_start,xdata,double(Filled_img),[],[],options);
+[c] = lsqcurvefit(fun,c_start,xdata,double(img_bg),[],[],options);
 
-%% Building the fitted surface
-for i=1:size(Filled_img,1)
-    for j=1:size(Filled_img,2)
-        fitted_surf(i,j)=c(1)*i^2+c(2)*j^2+c(3)*i*j+c(4)*i+c(5)*j+c(6);
+
+%-- Build the fitted surface ---------------------------------------------%
+img_bg_fit = zeros(size(img_bg));
+for ii = 1:size(img_bg,1)
+    for jj = 1:size(img_bg,2)
+        img_bg_fit(ii,jj) = ...
+            c(1)*ii^2+c(2)*jj^2+c(3)*ii*jj+c(4)*ii+c(5)*jj+c(6);
     end
 end
 
-%% Refining Cropped_img, using fitted surface
-refined_Surf_img_int=mean_bckgrnd+double(Cropped_img)-fitted_surf;
-Refined_surf_img=uint8(refined_Surf_img_int);
+
+%-- Refine Cropped_img, using fitted surface -----------------------------%
+img_refined = mean_bg+double(img_cropped)-img_bg_fit;
+img_refined = uint8(img_refined);
+
+end

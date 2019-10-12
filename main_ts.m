@@ -7,15 +7,15 @@ Imgs_ref = tools.get_img_ref;
     % generates a reference to a set of images to be analyzed
 Imgs = tools.get_imgs(Imgs_ref); % load a single image
 Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
+imgs = {Imgs.cropped};
 % imshow(Imgs(1).RawImage);
 % colormap('gray');
 
 
 %-- Run thresholding for all of the images -------------------------------%
-[imgs_aggs,imgs_binary,Aggs] = ...
-    thresholding_ui.perform_th(Imgs);
+[imgs_binary,imgs_aggs,Aggs] = ...
+    agg_segment.perform_seg(Imgs);
 [Imgs.binary] = imgs_binary{:};
-% NOTE / TO DO: Pull kmeans/thresholding into seperate package? 
 
 
 %-- Save images and labels to JPGs ------------------%
@@ -48,4 +48,7 @@ Aggs_pcm = pcm.perform_pcm(Aggs);
 % data(1).dp(2) = dp;
 % fname = 'sample2.json'; % json file name
 % tools.write_json(fname,data); % write formatted json file
+
+tools.plot_aggregates(Aggs,Imgs,1);
+
 

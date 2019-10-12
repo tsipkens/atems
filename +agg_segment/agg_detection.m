@@ -1,6 +1,7 @@
-% Automatic detection of the aggregates on TEM images
-% Function to be used with the Pair Correlation Method (thresholding_ui) package
-% Ramin Dastanpour & Steven N. Rogak
+
+% AGG_DETECTION Detection of the aggregates on TEM images
+% Author:   Ramin Dastanpour, Steven N. Rogak
+% Modified: Timothy Sipkens
 % Developed at the University of British Columbia
 %=========================================================================%
 
@@ -33,30 +34,33 @@ if isempty(coeff)
         coeffs = coeff_matrix(3,:);
     end
 end
+%-------------------------------------------------------------------------%
 
 
 %== Attempt 1: k-means segmentation ======================================%
-img_binary = ...
-    thresholding_ui.agg_det_kmeans(img,pixsize);
+img_binary = agg_segment.agg_det_kmeans(...
+    img,pixsize,minparticlesize,coeffs);
 [moreaggs,choice] = ...
-    thresholding_ui.user_input(img,img_binary);
+    agg_segment.user_input(img,img_binary); % prompt user
+img_binary = ~imclearborder(~img_binary); % clear aggregates on border
 
 
-%== Attempt 2: Hough transformation ======================================%
+%== Attempt 2: Ostu + rolling ball transformation ========================%
 if strcmp(choice,'No')
-    img_binary = thresholding_ui.agg_det_hough(...
+    img_binary = agg_segment.agg_det_hough(...
         img,pixsize,minparticlesize,coeffs);
-    [moreaggs,choice] = thresholding_ui.user_input(...
-        img,img_binary);
+    [moreaggs,choice] = agg_segment.user_input(...
+        img,img_binary); % prompt user
     if strcmp(choice,'No'); img_binary = ones(size(img)); end
 end
 
 img_cropped = [];
 
 
-%== Attempt 3: Manual thresholding ===================================%
+
+%== Attempt 3: Manual thresholding =======================================%
 while moreaggs==1
-    [img_temp,rect,~,img_cropped] = thresholding_ui.agg_det_slider(img,1);
+    [img_temp,rect,~,img_cropped] = agg_segment.agg_det_slider(img,1);
         % used previously cropped image
         % img_temp temporarily stores binary image
     
@@ -69,10 +73,10 @@ while moreaggs==1
     close(f);
     
     
-    %== Attempt 4: Manual thresholding, again ========================%
+    %== Attempt 4: Manual thresholding, again ============================%
     if strcmp(choice2,'No')
         clear TempBW NewBW_lasoo NewBW
-        [img_temp,rect] = thresholding_ui.agg_det_slider(img_cropped,0);
+        [img_temp,rect] = agg_segment.agg_det_slider(img_cropped,0);
             % image is stored in a temporary image
         
         TempBW = img_temp;

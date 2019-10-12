@@ -4,10 +4,10 @@
 %=========================================================================%
 
 function [img_binary] = ...
-    agg_det_kmeans(imgs,pixsize)
+    agg_det_kmeans(imgs,pixsize,minparticlesize,coeffs)
 
 
-%-- Parse inputs ---------------------------------------------------------%
+%== Parse inputs =========================================================%
 if isstruct(imgs)
     Imgs_str = imgs;
     imgs = {Imgs_str.cropped};
@@ -18,6 +18,23 @@ end
 
 if ~exist('pixsize','var'); pixsize = []; end
 if isempty(pixsize); pixsize = ones(size(imgs)); end
+
+if ~exist('minparticlesize','var'); minparticlesize = []; end
+if isempty(minparticlesize); minparticlesize = 4.9; end
+
+if ~exist('coeffs','var'); coeffs = []; end
+if isempty(coeffs)
+    coeff_matrix = [0.2 0.8 0.4 1.1 0.4;0.2 0.3 0.7 1.1 1.8;...
+        0.3 0.8 0.5 2.2 3.5;0.1 0.8 0.4 1.1 0.5];
+        % coefficients for automatic Hough transformation
+    if pixsize <= 0.181
+        coeffs = coeff_matrix(1,:);
+    elseif pixsize <= 0.361
+        coeffs = coeff_matrix(2,:);
+    else 
+        coeffs = coeff_matrix(3,:);
+    end
+end
 %-------------------------------------------------------------------------%
 
 
@@ -25,8 +42,7 @@ img = imgs{1};
 
 
 
-%== Step 1: k-Means clustering ===========================================%
-%-- Attempt to remove background gradient --------------------------------%
+%== Step 1: Attempt to the remove background gradient ====================%
 [X,Y] = meshgrid(1:size(img,2),1:size(img,1));
 bg_fit = fit(double([X(:),Y(:)]),double(img(:)),'poly11');
 bg = uint8(round(bg_fit(X,Y)));
@@ -37,6 +53,8 @@ t2 = t1-min(min(t1));
 img = uint8(round(255.*t2./max(max(t2))));
 
 
+
+%== Step 2: k-Means clustering ===========================================%
 %-- Get rough mask using thresholding ------------------------------------%
 level = graythresh(img);
 bw_thresh = 255.*imbinarize(img,level);
@@ -80,28 +98,11 @@ bw = ~(bw==1);
 [~,ind_min] = min([mean(img_atv(bw)),mean(img_atv(~bw))]);
 bw = bw==(ind_min-1);
 
-%-- Remove aggregates touching the edge of the image ---------------------%
-bw = ~imclearborder(~bw); % clear aggregates on border
 
 
-
-%== Step 2: Rolling ball transformation ==================================%
+%== Step 3: Rolling ball transformation ==================================%
 %   imclose opens white areas
 %   imopen opens black areas
-minparticlesize = 4.9; % to filter out noises
-
-coeff_matrix = [0.2 0.8 0.4 1.1 0.4;0.2 0.3 0.7 1.1 1.8;...
-    0.3 0.8 0.5 2.2 3.5;0.1 0.8 0.4 1.1 0.5];
-    % coefficients for automatic Hough transformation
-
-if pixsize <= 0.181
-    coeffs = coeff_matrix(1,:);
-elseif pixsize <= 0.361
-    coeffs = coeff_matrix(2,:);
-else 
-    coeffs = coeff_matrix(3,:);
-end
-    
 a = coeffs(1);
 b = coeffs(2);
 c = coeffs(3);
@@ -130,14 +131,14 @@ disp('Completed morphological operations.');
 %== Step 3: Delete blobs under a threshold area size =====================%
 CC = bwconncomp(abs(img_bewBW-1));
 [~,nparts] = size(CC.PixelIdxList);
-if nparts>25 % if a lot of particles, remove more particles
+if nparts>40 % if a lot of particles, remove more particles
     mod = 10;
     disp(['Found too many particles, removing particles below: ',...
         num2str(e*mod),' nm.']);
 else
     mod = 1;
 end
-    
+
 for kk = 1:nparts
     area = length(CC.PixelIdxList{1,kk})*pixsize^2;
     

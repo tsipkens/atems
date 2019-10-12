@@ -20,15 +20,17 @@ if bool_type==1 % original impose from PCM code
     t0 = imimposemin(img,img_dilated);
     imshow(t0);
     
+    
 elseif bool_type==2 % overlay labels with transparency
     img_edge = edge(img_binary,'sobel');
     SE = strel('disk',1);
     img_dilated = imdilate(img_edge,SE);
         % use dilation to strengthen the aggregate's outline
     
-    t0 = labeloverlay(img,~img_binary,'Transparency',0.75);
+    t0 = labeloverlay(img,~img_binary,'Transparency',0.90);
     imshow(uint8(~img_dilated).*t0);
 
+    
 else % updates module for manual sizing
     SE = strel('disk',2);
     img_dilated = imdilate(img_binary,SE);

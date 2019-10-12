@@ -1,4 +1,4 @@
-function binaryImage = Lasso_fnc(Cropped_im)
+
 % Semi-automatic detection of the aggregates on TEM images
 % Function to be used with the Pair Correlation Method (PCM) package
 % Ramin Dastanpour & Steven N. Rogak
@@ -11,6 +11,9 @@ function binaryImage = Lasso_fnc(Cropped_im)
 %   - Asks user if their lasso selection is correct before applying the
 %     data
 %   - QOL - User will not have to restart program if they mess up the lasso
+%=========================================================================%
+
+function binaryImage = lasso_fnc(Cropped_im)
 
 fontsize = 10;
 
