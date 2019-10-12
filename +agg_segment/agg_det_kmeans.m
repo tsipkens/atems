@@ -132,9 +132,9 @@ disp('Completed morphological operations.');
 CC = bwconncomp(abs(img_bewBW-1));
 [~,nparts] = size(CC.PixelIdxList);
 if nparts>40 % if a lot of particles, remove more particles
-    mod = 10;
+    mod = minparticlesize/2;
     disp(['Found too many particles, removing particles below: ',...
-        num2str(e*mod),' nm.']);
+        num2str(mod),' nm.']);
 else
     mod = 1;
 end
