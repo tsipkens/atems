@@ -1,12 +1,12 @@
 
-% AGG_DETECTION Detection of the aggregates on TEM images
+% AGG_DET	Detection of the aggregates on TEM images
 % Author:   Ramin Dastanpour, Steven N. Rogak
 % Modified: Timothy Sipkens
 % Developed at the University of British Columbia
 %=========================================================================%
 
 function [img_binary,img_cropped,agg_binary_bin,agg_cropped_bin] = ...
-    agg_detection(img,pixsize,minparticlesize,coeffs) 
+    agg_det(img,pixsize,minparticlesize,coeffs,opts) 
 
 agg_binary_bin = {};    % Bin of binary aggregate images
 agg_cropped_bin = {};   % Bin of cropped aggregated images
@@ -34,19 +34,28 @@ if isempty(coeff)
         coeffs = coeff_matrix(3,:);
     end
 end
+
+bool_kmeans = 1;
+if ~exist('opts','var'); opts = []; end
+if isfield(opts,'bool_kmeans'); bool_kmeans = opts.bool_kmeans; end
 %-------------------------------------------------------------------------%
 
 
 %== Attempt 1: k-means segmentation ======================================%
-img_binary = agg_segment.agg_det_kmeans(...
-    img,pixsize,minparticlesize,coeffs);
-[moreaggs,choice] = ...
-    agg_segment.user_input(img,img_binary); % prompt user
-img_binary = ~imclearborder(~img_binary); % clear aggregates on border
+if bool_kmeans
+    img_binary = agg_segment.agg_det_kmeans(...
+        img,pixsize,minparticlesize,coeffs);
+    [moreaggs,choice] = ...
+        agg_segment.user_input(img,img_binary); % prompt user
+    img_binary = ~imclearborder(~img_binary); % clear aggregates on border
+else
+    choice = 'No';
+end
+
 
 
 %== Attempt 2: Ostu + rolling ball transformation ========================%
-if strcmp(choice,'No')
+if or(strcmp(choice,'No'),~bool_kmeans)
     img_binary = agg_segment.agg_det_hough(...
         img,pixsize,minparticlesize,coeffs);
     [moreaggs,choice] = agg_segment.user_input(...

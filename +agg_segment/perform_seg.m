@@ -8,7 +8,7 @@
 %   Vanouver, BC, Canada
 %=========================================================================%
 
-function [imgs_binary,imgs_aggs,Aggs] = perform_seg(imgs,pixsize,fname)
+function [imgs_binary,imgs_aggs,Aggs] = perform_seg(imgs,pixsize,fname,opts)
 
 %-- Parse inputs ---------------------------------------------------------%
 if isstruct(imgs)
@@ -22,9 +22,14 @@ end
 
 if ~exist('pixsize','var'); pixsize = []; end
 if isempty(pixsize); pixsize = ones(size(imgs)); end
+
+%-- Partially parse name-value pairs --%
+if ~exist('opts','var'); opts = []; end
+if isfield(opts,'fname'); fname = opts; end
 %-------------------------------------------------------------------------%
 
 
+imgs_binary = cell(length(imgs),1); % pre-allocate
 for ii=1:length(imgs)%:-1:1 % loop through provided images
     
     disp(['<== IMAGE ',num2str(ii),' =================================>']);
@@ -48,10 +53,9 @@ for ii=1:length(imgs)%:-1:1 % loop through provided images
     end
     
     %-- Run slider to obtain binary image --------------------------------%
-    [img_binary,~,~,~] = agg_segment.agg_detection(...
-        imgs{ii},pixsize(ii),...
-        minparticlesize,coeffs);
-            % includes removing aggregates from border
+    [img_binary,~,~,~] = agg_segment.agg_det(...
+        imgs{ii},pixsize(ii),minparticlesize,coeffs,...
+        opts); % includes removing aggregates from border
     imgs_binary{ii} = img_binary;
     
     disp('Completed thresholding.');
