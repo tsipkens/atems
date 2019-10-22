@@ -13,7 +13,7 @@ imgs = {Imgs.cropped};
 
 
 %-- Run thresholding for all of the images -------------------------------%
-opts.bool_kmeans = 1;
+opts.bool_kmeans = 0;
 [imgs_binary,imgs_aggs,Aggs] = ...
     agg_segment.perform_seg(Imgs,[],[],opts);
 [Imgs.binary] = imgs_binary{:};
