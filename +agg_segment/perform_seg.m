@@ -1,11 +1,11 @@
 
 % PERFORM_SEG  Automatically detects and segments aggregates in an image
 % Authors:     Timothy Sipkens, Yeshun (Samuel) Ma, 2019
-
+% 
 % Note:
-%   Originally written by Ramin Dastanpour, Steve Rogak, Hugo Tjong,
+%   Originally structure given by Ramin Dastanpour, Hugo Tjong,
 %   Arka Soewono from the University of British Columbia, 
-%   Vanouver, BC, Canada
+%   Vanouver, BC, Canada.
 %=========================================================================%
 
 function [imgs_binary,imgs_aggs,Aggs] = perform_seg(imgs,pixsize,fname,opts)
@@ -35,26 +35,11 @@ for ii=1:length(imgs)%:-1:1 % loop through provided images
     disp(['<== IMAGE ',num2str(ii),' =================================>']);
     
     %-- Initialize parameters --------------------------------------------%
-    minparticlesize = 4.9; % to filter out noises
-    
-    coeff_matrix = [0.2 0.8 0.4 1.1 0.4;0.2 0.3 0.7 1.1 1.8;...
-        0.3 0.8 0.5 2.2 3.5;0.1 0.8 0.4 1.1 0.5];
-        % coefficients for automatic Hough transformation
-    
-    
-    % Build the image processing coefficients for the image based on its
-    % magnification ------------------------------------------------------%
-    if pixsize(ii) <= 0.181
-        coeffs = coeff_matrix(1,:);
-    elseif pixsize(ii) <= 0.361
-        coeffs = coeff_matrix(2,:);
-    else 
-        coeffs = coeff_matrix(3,:);
-    end
+    %   use defaults defined in agg_det instead
     
     %-- Run slider to obtain binary image --------------------------------%
     [img_binary,~,~,~] = agg_segment.agg_det(...
-        imgs{ii},pixsize(ii),minparticlesize,coeffs,...
+        imgs{ii},pixsize(ii),[],[],...
         opts); % includes removing aggregates from border
     imgs_binary{ii} = img_binary;
     

@@ -11,7 +11,6 @@ naggs = CC.NumObjects; % count number of aggregates
 Aggs(naggs).fname = ''; % pre-allocate new space for aggregates
 
 
-
 %== Main loop to analyze each aggregate ==============================%
 figure(gcf);
 tools.plot_binary_overlay(img,img_binary);
@@ -79,11 +78,11 @@ end
 
 
 
+
 %== GYRATION =============================================================%
 %   Gyration calculates radius of gyration by assuming every pixel as an area
 %   of pixsize^2
 %   Author: Ramin Dastanpour
-
 function [Rg] = gyration(Final_Binary, pixsize)
 
 
@@ -103,3 +102,38 @@ end
 Rg = (sum(Ar2)/total_area)^0.5;
 
 end
+
+
+
+
+%== PERIMETER_LENGTH =====================================================%
+%   Perimeter_Length calculates the lengt of aggregate perimeter
+%   Written by Ramin Dastanpour, Steve Rogak, Hugo Tjong, Arka Soewono %%%
+%   The University of British Columbia, Vanouver, BC, Canada, Jul. 2014%%%
+%   (Currently depreciated)
+function [perimeter] = perimeter_length(img_binary,pixsize,pixels)
+
+[row, col]=find(img_binary);
+
+perimeter_pixelcount=0;
+
+for kk = 1:1:pixels
+    if (img_binary(row(kk)-1, col(kk)) == 0)
+        perimeter_pixelcount = perimeter_pixelcount + 1;
+    elseif (img_binary(row(kk), col(kk)+1) == 0)
+        perimeter_pixelcount = perimeter_pixelcount + 1;
+    elseif (img_binary(row(kk), col(kk)-1) == 0)
+        perimeter_pixelcount = perimeter_pixelcount + 1;
+    elseif (img_binary(row(kk)+1, col(kk)) == 0)
+        perimeter_pixelcount = perimeter_pixelcount + 1;
+    end
+end
+
+perimeter=perimeter_pixelcount * pixsize;
+
+end
+
+
+
+
+

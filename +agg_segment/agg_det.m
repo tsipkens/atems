@@ -1,8 +1,10 @@
 
-% AGG_DET	Detection of the aggregates on TEM images
+% AGG_DET	Sequential attempts at semi-automatic detection of the aggregates on TEM images.
+%           Attempts k-means + rolling ball, Otsu + rolling ball, slider
+%           thresholding.
 % Author:   Ramin Dastanpour, Steven N. Rogak
-% Modified: Timothy Sipkens
-% Developed at the University of British Columbia
+%           Developed at the University of British Columbia
+% Modified: Timothy Sipkens, 2019
 %=========================================================================%
 
 function [img_binary,img_cropped,agg_binary_bin,agg_cropped_bin] = ...
@@ -41,9 +43,9 @@ if isfield(opts,'bool_kmeans'); bool_kmeans = opts.bool_kmeans; end
 %-------------------------------------------------------------------------%
 
 
-%== Attempt 1: k-means segmentation ======================================%
+%== Attempt 1: k-means segmentation + rolling ball transformation ========%
 if bool_kmeans
-    img_binary = agg_segment.agg_det_kmeans(...
+    img_binary = agg_segment.agg_det_kmeans_rb(...
         img,pixsize,minparticlesize,coeffs);
     [moreaggs,choice] = ...
         agg_segment.user_input(img,img_binary); % prompt user
@@ -56,7 +58,7 @@ end
 
 %== Attempt 2: Ostu + rolling ball transformation ========================%
 if or(strcmp(choice,'No'),~bool_kmeans)
-    img_binary = agg_segment.agg_det_hough(...
+    img_binary = agg_segment.agg_det_otsu_rb(...
         img,pixsize,minparticlesize,coeffs);
     [moreaggs,choice] = agg_segment.user_input(...
         img,img_binary); % prompt user

@@ -15,6 +15,7 @@ if isstruct(imgs)
 elseif ~iscell(imgs)
     imgs = {imgs};
 end
+img = imgs{1}; % currently only operated on first image
 
 if ~exist('pixsize','var'); pixsize = []; end
 if isempty(pixsize); pixsize = ones(size(imgs)); end
@@ -36,9 +37,6 @@ if isempty(coeffs)
     end
 end
 %-------------------------------------------------------------------------%
-
-
-img = imgs{1};
 
 
 
@@ -64,12 +62,9 @@ bw_thresh2 = imopen(bw_thresh,se);
 
 
 %-- Perform total variation denoising ------------------------------------%
-N = size(img);
 mu = 15;
 disp('Performing total var. denoising...');
-img_atv = reshape(...
-    tools.tot_var_SB_ATV(double(img(:)),mu,N),N);
-img_atv = uint8(img_atv);
+img_atv = tools.imtotvar_sb_atv(img,mu);
 disp('Complete.');
 disp(' ');
 % increases the interconnectedness when

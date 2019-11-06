@@ -5,7 +5,8 @@ Adapted from Kook et al. 2016, SAE
 Modified By: Yiling Kang, Timothy Sipkens, Yeshun (Samuel) Ma
 
 This code was modified to provide more accurate primary particle size data with
-fuzzier and lower quality backgrounds. The code now saves the data as a MATLAB file. This needs to be updated to output the different processing steps.
+fuzzier and lower quality backgrounds. The code now saves the data as a MATLAB 
+file. This needs to be updated to output the different processing steps.
 
 Pre-processing steps are as follows:
 1. Select individual particle to be processed

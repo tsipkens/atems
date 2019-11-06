@@ -1,15 +1,8 @@
 
-% AGG_DET_SLIDER Semi-automatic detection of the aggregates on TEM images
-% 
-% This function applies background correction and thresholding on the
-% user-defined portion of the image.
-% 
-% Function to be used with the Pair Correlation Method (PCM) package
-%
+% AGG_DET_SLIDER Applies background correction and thresholding on the user-defined portion of the image.
 % Author:       Ramin Dastanpour, Steven N. Rogak, 2016-02 (originally)
-% Developed at the University of British Columbia
-%
-% Edited by:    Timothy Sipkens, 2019-10-11
+%               Developed at the University of British Columbia
+% Modified:     Tmothy Sipkens, 2019-10-11
 %=========================================================================%
 
 function [img_binary,rect,thresh_slider_in,img_cropped] = agg_det_slider(img,bool_crop) 
@@ -19,10 +12,10 @@ if ~exist('bool_crop','var'); bool_crop = []; end
 if isempty(bool_crop); bool_crop = 1; end
 
 
-img_binary_4 = []; % declare nested variable
+img_binary_4 = []; % declare nested variable (allows GUI feedback)
 
 
-%-- Crop image ----------------------%
+%-- Crop image -----------------------------------------------------------%
 if bool_crop
     uiwait(msgbox('Please crop the image around missing particle'));
     [img_cropped, rect] = imcrop(img); % user crops image
@@ -30,6 +23,7 @@ else
 	img_cropped = img; % originally bypassed in Kook code
     rect = [];
 end
+
 
 %== Step 1: Image refinment ==============================================%
 %-- Step 1-1: Apply Lasso tool -------------------------------------------%
@@ -83,12 +77,12 @@ img_binary = ~img_binary; % formatted for PCA, other codes should reverse this
 
 
 
-
+%== Sub-functions ==% 
 %=========================================================================%
 %== BACKGROUND_FNC =======================================================%
 % Smooths out background using curve fitting
-% Originally by:    Ramin Dastanpour, Steven N. Rogak, Last updated in Feb. 2016
-% Modified by:      Timothy Sipkens, 2019-07-16
+% Author:    Ramin Dastanpour, Steven N. Rogak, Last updated in Feb. 2016
+% Modified:  Timothy Sipkens, 2019-07-16
 %
 % Notes:
 %   This function smoothens background brightness, specially on the edges of
@@ -124,7 +118,6 @@ options = optimset('MaxFunEvals',1000);
 options = optimset(options,'MaxIter',1000); 
 [c] = lsqcurvefit(fun,c_start,xdata,double(img_bg),[],[],options);
 
-
 %-- Build the fitted surface ---------------------------------------------%
 img_bg_fit = zeros(size(img_bg));
 for ii = 1:size(img_bg,1)
@@ -133,7 +126,6 @@ for ii = 1:size(img_bg,1)
             c(1)*ii^2+c(2)*jj^2+c(3)*ii*jj+c(4)*ii+c(5)*jj+c(6);
     end
 end
-
 
 %-- Refine Cropped_img, using fitted surface -----------------------------%
 img_refined = mean_bg+double(img_cropped)-img_bg_fit;
@@ -146,15 +138,14 @@ end
 
 %=========================================================================%
 %== LASSO_FNC ============================================================%
-% Semi-automatic detection of the aggregates on TEM images
-% Function to be used with the Pair Correlation Method (PCM) package
-% Ramin Dastanpour & Steven N. Rogak
-% Developed at the University of British Columbia
-% This function allows user to draw an approximate boundary around the
-% particle. Region of interest (ROI))
-
-% Updated by Yiling Kang on May. 10, 2018
-% Updates/QOL Changes:
+%   This function allows user to draw an approximate boundary around the
+%   particle. Region of interest (ROI))
+%   Author:   Ramin Dastanpour & Steven N. Rogak
+%             Developed at the University of British Columbia
+%   Modified: Yiling Kang, 2018-05-10
+%             Timothy Sipkens
+% 
+%   Yiling Kang updates/QOL changes:
 %   - Asks user if their lasso selection is correct before applying the
 %     data
 %   - QOL - User will not have to restart program if they mess up the lasso
@@ -173,7 +164,7 @@ drawing_correct = 0; % this variable is used to check if the user drew the lasso
 while drawing_correct == 0 
     message = sprintf('Please draw an approximate boundary around the aggregate.\nLeft click and hold to begin drawing.\nLift mouse button to finish');
     uiwait(msgbox(message));
-    hFH = imfreehand(); 
+    hFH = imfreehand(); % alternate for MATLAB 2019b+: drawfreehand();
     finished_check = questdlg('Are you satisfied with your drawing?','Lasso Complete?','Yes','No','No');
     
     % if user is happy with their selection...
@@ -195,15 +186,13 @@ end
 
 
 
-
 %=========================================================================%
 %== THRESH_SLIDER ========================================================%
-% Thresholding the image as a part of semi-automatic particle detection
-% Function to be used with the Pair Correlation Method (PCM) package
-% Ramin Dastanpour & Steven N. Rogak
-% Developed at the University of British Columbia
-% Last updated in Feb. 2016
-% Slider method
+%   Thresholding the image using a slider GUI
+%   Function to be used with the pair correlation method (PCM) package
+%   Author:   Ramin Dastanpour & Steven N. Rogak, 2016-02
+%             Developed at the University of British Columbia
+%   Modified: Timothy Sipkens
 
 function thresh_slider(hObj,event,hax,thresh_slider_in,binaryImage) %#ok<INUSL>
 

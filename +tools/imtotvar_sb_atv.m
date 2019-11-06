@@ -1,7 +1,5 @@
 
 % TOT_VAR_SB_ATV Split Bregman Anisotropic Total Variation Denoising
-% Author: Timothy Sipkens
-% Date:   10-10-2019
 %
 % Split Bregman Anisotropic Total Variation Denoising
 %
@@ -27,9 +25,10 @@
 % October 2019
 %=========================================================================%
 
-function u = tot_var_SB_ATV(g,mu,N)
+function u = imtotvar_sb_atv(g,mu)
 
-g = g(:); % vectorize data
+N = size(g);
+g = double(g(:)); % vectorize data
 
 n = length(g);
 [B,Bt,BtB] = diff_oper(N);
@@ -52,6 +51,8 @@ while err > tol % iterate until error drop below tolerance
     
     kk = kk+1;
 end
+
+u = uint8(reshape(u,N));
 
 end
 
