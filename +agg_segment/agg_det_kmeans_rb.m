@@ -1,10 +1,12 @@
 
-% AGG_DET_KMEANS A function to perform kmeans clustering on an aggregate image
-% Author:   Timothy Sipkes, 2019-10-04
+% AGG_DET_KMEANS_RB A function to perform kmeans clustering on an aggregate image.
+%                   Includes a rolling ball transformation for
+%                   post-processing
+% Author:   Timothy Sipkens, 2019-10-04
 %=========================================================================%
 
 function [img_binary] = ...
-    agg_det_kmeans(imgs,pixsize,minparticlesize,coeffs)
+    agg_det_kmeans_rb(imgs,pixsize,minparticlesize,coeffs)
 
 
 %== Parse inputs =========================================================%
@@ -62,9 +64,9 @@ bw_thresh2 = imopen(bw_thresh,se);
 
 
 %-- Perform total variation denoising ------------------------------------%
-mu = 15;
 disp('Performing total var. denoising...');
-img_atv = tools.imtotvar_sb_atv(img,mu);
+img_denoise = imbilatfilt(img);
+% img_denoise = tools.imtotvar_sb_atv(img,15); % alternate total variation denoise
 disp('Complete.');
 disp(' ');
 % increases the interconnectedness when
@@ -73,14 +75,14 @@ disp(' ');
 
 %-- Use morphological operations to improve kmeans -----------------------%
 se = strel('disk',20);
-img_bh = imbothat(img_atv,se);
-img_th = imtophat(img_atv,se);
+img_bh = imbothat(img_denoise,se);
+img_th = imtophat(img_denoise,se);
 featureSet = cat(3,...
     repmat(bw_thresh2,[1,1,3]),... % aggregates disappear if too large
     repmat(img_bh,[1,1,3]),...
     repmat(img_th,[1,1,3]),... % expands aggregate slightly
-    repmat(img_atv,[1,1,3]),...
-    repmat(255-img_atv,[1,1,3]),...
+    repmat(img_denoise,[1,1,3]),...
+    repmat(255-img_denoise,[1,1,3]),...
     repmat(img,[1,1,0]),... % decreases interconnectedness
     repmat(255-img,[1,1,0])...
     ); % img2
@@ -90,7 +92,7 @@ featureSet = cat(3,...
 bw = imsegkmeans(featureSet,2,'NormalizeInput',true);
 bw = ~(bw==1);
 
-[~,ind_min] = min([mean(img_atv(bw)),mean(img_atv(~bw))]);
+[~,ind_min] = min([mean(img_denoise(bw)),mean(img_denoise(~bw))]);
 bw = bw==(ind_min-1);
 
 

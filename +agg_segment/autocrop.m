@@ -1,6 +1,6 @@
 
 % AUTOCROP Automatically crops an image based on binary information
-% Author:  Yeshun (Samuel Ma), Timothy Sipkens, 2019-07-23
+% Author:  Yeshun (Samuel) Ma, Timothy Sipkens, 2019-07-23
 %=========================================================================%
 
 function [img_cropped,img_binary,rect] = autocrop(img_orig,img_binary)
