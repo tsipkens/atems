@@ -3,7 +3,7 @@
 % Author:          Timothy Sipkens, 2019-07-24
 %=========================================================================%
 
-function [h,f] = plot_aggregates(Aggs,Imgs,ind,bool_img)
+function [h,f,i0] = plot_aggregates(Aggs,Imgs,ind,bool_img,cmap)
 
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('ind','var'); ind = []; end
@@ -11,6 +11,8 @@ if isempty(ind); ind = 1; end
 
 if ~exist('bool_img','var'); bool_img = []; end
 if isempty(bool_img); bool_img = 1; end
+
+if ~exist('cmap','var'); cmap = []; end
 
 if ~isempty(Imgs) % if Imgs provided, find the aggregates in that file
     ind0 = strcmp({Aggs.fname},{Imgs(ind).fname});
@@ -25,8 +27,8 @@ end
 %-- Plot labelled image by default ---------------------------------------%
 if bool_img
     figure(gcf);
-    tools.plot_binary_overlay(Imgs(ind).cropped,...
-        Imgs(ind).binary);
+    [~,~,i0] = tools.plot_binary_overlay(Imgs(ind).cropped,...
+        Imgs(ind).binary,[],cmap);
 end % else: plot circles on existing image
 
 

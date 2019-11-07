@@ -35,7 +35,7 @@ opts.bool_kmeans = 1;
 %     manual.perform_man(Aggs);
 
 
-Aggs_pcm = pcm.perform_pcm(Aggs);
+% Aggs_pcm = pcm.perform_pcm(Aggs);
 
 
 % Aggs_kook = kook.perform_kook(Imgs);
@@ -50,6 +50,13 @@ Aggs_pcm = pcm.perform_pcm(Aggs);
 % fname = 'sample2.json'; % json file name
 % tools.write_json(fname,data); % write formatted json file
 
-tools.plot_aggregates(Aggs,Imgs,1);
+% figure(1);
+% [~,~,i0] = tools.plot_aggregates(Aggs,Imgs,1);
+
+figure(2);
+[~,~,i0] = tools.plot_binary_overlay(imgs{1},imgs_binary{1},[],[0,1,0]);
+
+figure(3);
+montage({i0,imgs{1}});
 
 
