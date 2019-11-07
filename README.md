@@ -1,31 +1,62 @@
-# ubc-tem-analysis
+
+# UBC tools for TEM image analysis (ubc-tem-analysis)
 
 This program contains several methods of characterizing aggregates from
 TEM images, including evaluating the aggregate projected area, perimeter,
 and primary particle diameter.
 
-
-### Description
+## Description
 
 The software contains MATLAB designed to compare multiple
 methods of analyzing TEM images of aggregates. These include the
-pair correlation method (PCM), Kook, and manual methods. Each method is contained in a package, with a corresponding `evaluate_*` function that
+pair correlation method (PCM), Kook, and manual methods. Each method 
+is contained in a package, with a corresponding `perform_*` function that
 can be used to call the method.
 
-#### Data structure
+## Data structure
 
-Images are handled primarily by two variables: `img_ref`
+Images are handled primarily by two variables: `Imgs_ref`
 and `Imgs`. The former contains a reference to the images,
 including file name and containing directory. The latter
 contains both the imported raw image, as well as processed
-versions of the image, such as those that have been
-denoised.
+versions of the image, such as those with the footer removed.
 
 The output data itself, `Aggs`, is a structure array with one
 entry per aggregate. This data can then be exported to a JSON
 format to be analyzed in other software and languages.
 
-#### Packages
+## Packages
+
+#### Aggregate detection and segmentation (+agg_segment)
+
+This package contains an expanding library of functions aimed at performing semantic
+segmentation of the TEM images of aggregated. Some of the functions are modeled
+after the code of [Dastanpour et al. (2016)][dastanpour2016], though
+significantly streamlined. 
+
+Current methods for aggregate-level segmentation include:
+
+1. Otsu thresholding with a rolling ball transformation, 
+
+2. adaptive thresholding with a rolling ball transformation, and
+
+3. a GUI method with a slider for manual thresholding of the image.
+
+Other methods are currently under development. 
+
+#### Primary particle sizing
+
+###### +pcm
+
+The University of British Columbia's pair correlation method (PCM) MATLAB code for processing TEM images of soot to determine morphological properties. This package contains a significant update to the previous code provided with [Dastanpour et al. (2016)][dastanpour2016].
+
+###### +manual
+
+Code to be used in the manual sizing of soot primary particles developed
+at the University of British Columbia. The current method uses crosshairs
+to select the length and width of the particle. This is converted to
+various quantities, such as the mean primary particle diameter. The manual
+code is a heavily modified version of the code associated with [Dastanpour and Rogak (2014)][dastanpour2014].
 
 ###### +kook
 
@@ -37,23 +68,6 @@ other packages.
 
 This package contains a heavily modified version of the method proposed
 by [Kook et al. (2015)][kook].
-
-###### +manual
-
-Code to be used in the manual sizing of soot primary particles developed
-at the University of British Columbia. The current method uses crosshairs
-to select the length and width of the particle. This is converted to
-various quantities, such as the mean primary particle diameter. The manual
-code is a heavily modified version of the code associated with [Dastanpour and Rogak (2014)][dastanpour2014].
-
-###### +pcm
-
-The University of British Columbia's pair correlation method (PCM) MATLAB code for processing TEM images of soot to determine morphological properties. This package contains a significant update to the previous code provided with [Dastanpour et al. (2016)][dastanpour2016].
-
-###### +thresholding_ui
-
-This package contains a unified implementation of the thresholding user
-interface associated with the PCM code of [Dastanpour et al. (2016)][dastanpour2016] and manual code developed at the University of British Columbia. The code is to be implemented prior to primary particle sizing and is critical to the PCM primary particle size estimation.
 
 --------------------------------------------------------------------------
 
