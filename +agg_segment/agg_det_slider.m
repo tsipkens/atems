@@ -1,31 +1,32 @@
 
-% AGG_DET_SLIDER Applies background correction and thresholding on the user-defined portion of the image.
+% AGG_DET_SLIDER Performs background correction and manual thresholding on a user-defined portion of the image.
 % Author:       Ramin Dastanpour, Steven N. Rogak, 2016-02 (originally)
 %               Developed at the University of British Columbia
 % Modified:     Tmothy Sipkens, 2019-10-11
 %=========================================================================%
 
-function [img_binary,rect,thresh_slider_in,img_cropped] = agg_det_slider(img,bool_crop) 
+function [img_binary,rect,img_refined,img_cropped] = agg_det_slider(img,bool_crop) 
 
 %== Parse input ==========================================================%
 if ~exist('bool_crop','var'); bool_crop = []; end
 if isempty(bool_crop); bool_crop = 1; end
+%=========================================================================%
 
 
-img_binary_4 = []; % declare nested variable (allows GUI feedback)
+img_binary = []; % declare nested variable (allows GUI feedback)
 
 
-%-- Crop image -----------------------------------------------------------%
+%== STEP 1: Crop image ===================================================%
 if bool_crop
     uiwait(msgbox('Please crop the image around missing particle'));
-    [img_cropped, rect] = imcrop(img); % user crops image
+    [img_cropped,rect] = imcrop(img); % user crops image
 else
 	img_cropped = img; % originally bypassed in Kook code
     rect = [];
 end
 
 
-%== Step 1: Image refinment ==============================================%
+%== STEP 2: Image refinment ==============================================%
 %-- Step 1-1: Apply Lasso tool -------------------------------------------%
 img_binary = lasso_fnc(img_cropped);
 
@@ -33,24 +34,21 @@ img_binary = lasso_fnc(img_cropped);
 img_refined = background_fnc(img_binary,img_cropped);
 
 
-%== Step 2: Thresholding =================================================%
-thresh_slider_in = img_refined;
+
+%== STEP 3: Thresholding =================================================%
 f = figure;
 screen_size = get(0,'Screensize');
-set(gcf,'Position',screen_size); % maximize figure
+set(f,'Position',screen_size); % maximize figure
+% f.WindowState = 'maximized'; % maximize figure
 
-% axis_size = round(0.7*min(screen_size(3:4)));
-% hax = axes('Units','Pixels','Position',...
-%     [min(screen_size(3:4)-100-axis_size),...
-%     50,axis_size,axis_size]);
 hax = axes('Units','Pixels');
-imshow(thresh_slider_in);
+imshow(img_refined);
 
-level = graythresh(thresh_slider_in);
+level = graythresh(img_refined); % Otsu thresholding
 hst = uicontrol('Style', 'slider',...
     'Min',0-level,'Max',1-level,'Value',.5-level,...
     'Position', [20 390 150 15],...
-    'Callback', {@thresh_slider,hax,thresh_slider_in,img_binary});
+    'Callback', {@thresh_slider,hax,img_refined,img_binary});
 get(hst,'value'); % add a slider uicontrol
 
 uicontrol('Style','text',...
@@ -68,9 +66,10 @@ uiwait(gcf);
 close(gcf);
 disp('Thresholding is applied.');
 
-%-- Select particles and format output -----------------------------------%
+
+%== STEP 4: Select particles and format output ===========================%
 uiwait(msgbox('Please selects (left click) particles satisfactorily detected; and press enter'));
-img_binary = bwselect(img_binary_4,8);
+img_binary = bwselect(img_binary,8);
 close(gcf);
 img_binary = ~img_binary; % formatted for PCA, other codes should reverse this
 
@@ -194,7 +193,7 @@ end
 %             Developed at the University of British Columbia
 %   Modified: Timothy Sipkens
 
-function thresh_slider(hObj,event,hax,thresh_slider_in,binaryImage) %#ok<INUSL>
+function thresh_slider(hObj,event,hax,thresh_slider_in,binaryImage)
 
 %-- Average filter -------------------------------------------------------%
 hav = fspecial('average');
@@ -205,7 +204,13 @@ img_filtered = imfilter(thresh_slider_in, hav);
 % Examines a neighborhood of WxW matrix, takes and makes the centre of that
 % matrix the median of the original neighborhood
 W = 5;
-thresh_slider_in = medfilt2(img_filtered,[W W]);
+thresh_slider_in = img_filtered;
+for ii=1:8 % repeatedly apply median filter
+    thresh_slider_in = medfilt2(thresh_slider_in,[W W]);
+end
+% NOTE: The loop is intended to imitate the increasing amounts of 
+% median filter that is applied each time the slider button is clicked
+% in the original code. This was a bug in the previous software. 
 
 
 %-- Binary image via threshold value -------------------------------------%
@@ -227,12 +232,11 @@ img_binary2 = imdilate(~img_binary1,SE1);
 %   eliminate detection errors in the background region.
 img_binary3 = 0.*img_binary2;
 img_binary3(binaryImage) = img_binary2(binaryImage);
-img_binary_4 = logical(img_binary3);
+img_binary = logical(img_binary3);
 
-img_temp2 = imimposemin(thresh_slider_in,img_binary_4);
+img_temp2 = imimposemin(thresh_slider_in,img_binary);
 
 axes(hax);
-% cla;
 imshow(img_temp2);
 
 end

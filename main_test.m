@@ -11,7 +11,6 @@ imgs = {Imgs.cropped};
 
 %%
 [imgs_binary] = ...
-    agg_segment.agg_det_test(Imgs);
+    agg_segment.agg_det_kmeans_rb(Imgs);
 
 tools.plot_binary_overlay(imgs{1},imgs_binary);
- 

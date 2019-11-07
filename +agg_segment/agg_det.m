@@ -1,7 +1,8 @@
 
 % AGG_DET	Sequential attempts at semi-automatic detection of the aggregates on TEM images.
 %           Attempts k-means + rolling ball, Otsu + rolling ball, slider
-%           thresholding.
+%           thresholding. Acts as a wrapper function for implementing 
+%           several other agg_det*.m methods
 % Author:   Ramin Dastanpour, Steven N. Rogak
 %           Developed at the University of British Columbia
 % Modified: Timothy Sipkens, 2019
@@ -17,29 +18,13 @@ agg_cropped_bin = {};   % Bin of cropped aggregated images
 %== Parse inputs =========================================================%
 if ~exist('pixsize','var'); pixsize = []; end
 if ~exist('minparticlesize','var'); minparticlesize = []; end
-if ~exist('coeff','var'); coeff = []; end
-
-if isempty(pixsize); pixsize = 0.1; end % only used for coeffs (?)
-if isempty(minparticlesize); minparticlesize = 4.9; end % to filter out noises
-if isempty(coeff)
-    coeff_matrix = [0.2 0.8 0.4 1.1 0.4;0.2 0.3 0.7 1.1 1.8;...
-        0.3 0.8 0.5 2.2 3.5;0.1 0.8 0.4 1.1 0.5];
-            % coefficient for automatic Hough transformation
-    
-    % Build the image processing coefficients for the image based on its
-    % magnification
-    if pixsize <= 0.181
-        coeffs = coeff_matrix(1,:);
-    elseif pixsize <= 0.361
-        coeffs = coeff_matrix(2,:);
-    else 
-        coeffs = coeff_matrix(3,:);
-    end
-end
+if ~exist('coeffs','var'); coeffs = []; end
 
 bool_kmeans = 1;
+bool_otsu = 1;
 if ~exist('opts','var'); opts = []; end
 if isfield(opts,'bool_kmeans'); bool_kmeans = opts.bool_kmeans; end
+if isfield(opts,'bool_otsu'); bool_otsu = opts.bool_otsu; end
 %-------------------------------------------------------------------------%
 
 
@@ -58,10 +43,14 @@ end
 
 %== Attempt 2: Ostu + rolling ball transformation ========================%
 if or(strcmp(choice,'No'),~bool_kmeans)
-    img_binary = agg_segment.agg_det_otsu_rb(...
-        img,pixsize,minparticlesize,coeffs);
-    [moreaggs,choice] = agg_segment.user_input(...
-        img,img_binary); % prompt user
+    if bool_otsu
+        img_binary = agg_segment.agg_det_otsu_rb(...
+            img,pixsize,minparticlesize,coeffs);
+        [moreaggs,choice] = agg_segment.user_input(...
+            img,img_binary); % prompt user
+    else
+        choice = 'No'; moreaggs = 1;
+    end
     if strcmp(choice,'No'); img_binary = ones(size(img)); end
 end
 

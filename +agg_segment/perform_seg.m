@@ -46,7 +46,7 @@ for ii=1:length(imgs)%:-1:1 % loop through provided images
     disp('Completed thresholding.');
     disp(' ');
     
-    Aggs0 = agg_segment.analyze_agg(...
+    Aggs0 = agg_segment.analyze_binary(...
         img_binary,imgs{ii},pixsize(ii));
     
     if exist('fname','var')

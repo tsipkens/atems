@@ -46,6 +46,7 @@ end
 
 if nargout>0; h = gca; end
 if nargout>1; f = gcf; end
+if ~exist('i0','var'); i0 = []; end
 
 end
 

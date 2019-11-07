@@ -1,9 +1,9 @@
 
-% ANALYZE_AGG Analyze the binary mask to determine aggregate properties (e.g. Rg)
-% Author:     Timothy Sipkens
+% ANALYZE_BINARY Label and analyze a binary mask to determine aggregate properties (e.g. Rg).
+% Author:  Timothy Sipkens
 %=========================================================================%
 
-function [Aggs] = analyze_agg(img_binary,img,pixsize)
+function [Aggs] = analyze_binary(img_binary,img,pixsize)
 
 disp('Calculating aggregate areas...');
 CC = bwconncomp(abs(img_binary-1)); % find seperate aggregates

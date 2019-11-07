@@ -1,10 +1,10 @@
 
-% AGG_DET_KMEANS_V2 A function to perform kmeans clustering on an aggregate image
+% AGG_DET_TEST A function for testing new aggregate segmentations.
 % Author:   Timothy Sipkes, 2019-10-04
 %=========================================================================%
 
 function [img_binary] = ...
-    agg_det_kmeans_v2(imgs,pixsize,minparticlesize,coeffs)
+    agg_det_test(imgs,pixsize,minparticlesize,coeffs)
 
 
 %== Parse inputs =========================================================%

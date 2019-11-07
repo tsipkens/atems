@@ -8,12 +8,11 @@ Imgs_ref = tools.get_img_ref;
 Imgs = tools.get_imgs(Imgs_ref); % load a single image
 Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 imgs = {Imgs.cropped};
-% imshow(Imgs(1).RawImage);
-% colormap('gray');
 
 
 %-- Run thresholding for all of the images -------------------------------%
-opts.bool_kmeans = 1;
+opts.bool_kmeans = 0;
+opts.bool_otsu = 0;
 [imgs_binary,imgs_aggs,Aggs] = ...
     agg_segment.perform_seg(Imgs,[],[],opts);
 [Imgs.binary] = imgs_binary{:};
@@ -35,7 +34,7 @@ opts.bool_kmeans = 1;
 %     manual.perform_man(Aggs);
 
 
-% Aggs_pcm = pcm.perform_pcm(Aggs);
+Aggs_pcm = pcm.perform_pcm(Aggs);
 
 
 % Aggs_kook = kook.perform_kook(Imgs);
@@ -50,13 +49,13 @@ opts.bool_kmeans = 1;
 % fname = 'sample2.json'; % json file name
 % tools.write_json(fname,data); % write formatted json file
 
-% figure(1);
-% [~,~,i0] = tools.plot_aggregates(Aggs,Imgs,1);
+figure(1);
+tools.plot_aggregates(Aggs,Imgs,1,[],[0,1,0]);
 
-figure(2);
-[~,~,i0] = tools.plot_binary_overlay(imgs{1},imgs_binary{1},[],[0,1,0]);
+% figure(2);
+% [~,~,i0] = tools.plot_binary_overlay(imgs{1},imgs_binary{1},[],[0,1,0]);
 
-figure(3);
-montage({i0,imgs{1}});
+% figure(3);
+% montage({i0,imgs{1}});
 
 
