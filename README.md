@@ -2,12 +2,11 @@
 # UBC tools for TEM image analysis (ubc-tem-analysis)
 
 This program contains several methods of characterizing aggregates from
-TEM images, including evaluating the aggregate projected area, perimeter,
+TEM images for image analysis at the Univesity of British Columbia (UBC). 
+This includes methods for evaluating the aggregate projected area, perimeter,
 and primary particle diameter.
 
-## Description
-
-The software contains MATLAB designed to compare multiple
+The software contains MATLAB code designed to compare multiple
 methods of analyzing TEM images of aggregates. These include the
 pair correlation method (PCM), Kook, and manual methods. Each method 
 is contained in a package, with a corresponding `perform_*` function that
@@ -29,18 +28,20 @@ format to be analyzed in other software and languages.
 
 #### Aggregate detection and segmentation (+agg_segment)
 
-This package contains an expanding library of functions aimed at performing semantic
-segmentation of the TEM images of aggregated. Some of the functions are modeled
-after the code of [Dastanpour et al. (2016)][dastanpour2016], though
-significantly streamlined. 
+This package contains an expanding library of functions aimed at 
+performing semantic segmentation of the TEM images of aggregates. 
+Some of the functions are modeled after the code of 
+[Dastanpour et al. (2016)][dastanpour2016], though the code was
+significantly streamlined in the present implementation. 
 
-Current methods for aggregate-level segmentation include:
+Current methods for aggregate-level semantic segmentation include:
 
 1. Otsu thresholding with a rolling ball transformation, 
 
-2. adaptive thresholding with a rolling ball transformation, and
+2. a GUI method with a slider for manual thresholding of the image, and
 
-3. a GUI method with a slider for manual thresholding of the image.
+3. a wrapper function (agg_det.m) that runs a series of these other methods 
+in series. 
 
 Other methods are currently under development. 
 
