@@ -1,11 +1,11 @@
-# ubc-tem-analysis
+
+# UBC tools for TEM image analysis (ubc-tem-analysis)
 
 This program contains several methods of characterizing aggregates from
 TEM images, including evaluating the aggregate projected area, perimeter,
 and primary particle diameter.
 
-
-### Description
+## Description
 
 The software contains MATLAB designed to compare multiple
 methods of analyzing TEM images of aggregates. These include the
@@ -13,7 +13,7 @@ pair correlation method (PCM), Kook, and manual methods. Each method
 is contained in a package, with a corresponding `perform_*` function that
 can be used to call the method.
 
-### Data structure
+## Data structure
 
 Images are handled primarily by two variables: `Imgs_ref`
 and `Imgs`. The former contains a reference to the images,
@@ -25,18 +25,24 @@ The output data itself, `Aggs`, is a structure array with one
 entry per aggregate. This data can then be exported to a JSON
 format to be analyzed in other software and languages.
 
-### Packages
+## Packages
 
-#### Semantic segmentation
+#### Aggregate detection and segmentation (+agg_segment)
 
-###### +agg_segment
+This package contains an expanding library of functions aimed at performing semantic
+segmentation of the TEM images of aggregated. Some of the functions are modeled
+after the code of [Dastanpour et al. (2016)][dastanpour2016], though
+significantly streamlined. 
 
-This package contains an expanding library of functions aimed at perform semantic
-segmentation of the TEM images of aggregated. This includes a unified implementation of 
-the thresholding user interface associated with the distribution of the original PCM code of 
-[Dastanpour et al. (2016)][dastanpour2016]. Also included is the manual code developed at the
-University of British Columbia. The code is to be implemented prior to primary 
-particle sizing and is critical to the PCM primary particle size estimation.
+Current methods for aggregate-level segmentation include:
+
+1. Otsu thresholding with a rolling ball transformation, 
+
+2. adaptive thresholding with a rolling ball transformation, and
+
+3. a GUI method with a slider for manual thresholding of the image.
+
+Other methods are currently under development. 
 
 #### Primary particle sizing
 
