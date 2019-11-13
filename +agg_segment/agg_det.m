@@ -75,18 +75,8 @@ while moreaggs==1
     
     %== Attempt 4: Manual thresholding, again ============================%
     if strcmp(choice2,'No')
-        clear TempBW NewBW_lasoo NewBW
-        [img_temp,rect] = agg_segment.agg_det_slider(img_cropped,0);
+        [img_temp,rect,~,img_cropped] = agg_segment.agg_det_slider(img,1);
             % image is stored in a temporary image
-        
-        TempBW = img_temp;
-            % the black part of the small cropped image is placed on the image
-        
-        TempBW(round(rect(2)):round(rect(2)+rect(4))-1,round(rect(1)):round(rect(1)+rect(3)-1)) = ...
-            NewBW_lasoo(1:round(rect(4))-1,1:round(rect(3))-1).*...
-            TempBW(round(rect(2)):round(rect(2)+rect(4))-1,round(rect(1)):round(rect(1)+rect(3)-1));
-        imshow(TempBW);
-        NewBW = TempBW;
     end
     
     agg_binary_bin  = [agg_binary_bin, img_temp];
