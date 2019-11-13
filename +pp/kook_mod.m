@@ -1,5 +1,5 @@
 
-% PERFORM_KM  Performs modified Kook algorithm
+% KOOK_MOD  Performs modified Kook algorithm
 %
 % Code written by Ben Gigone and Emre Karatas, PhD
 % Adapted from Kook et al. 2016, SAE
@@ -42,7 +42,7 @@
 % can be adjusted to filter out outliers in line 31-32 with rmax and rmin
 %=========================================================================%
 
-function Aggs = perform_km(Aggs,bool_plot)
+function Aggs = kook_mod(Aggs,bool_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
 if ~exist('bool_plot','var'); bool_plot = []; end

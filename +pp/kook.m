@@ -1,5 +1,5 @@
 
-% PERFORM_KOOK  Original Kook function, modified only to be incorporated as a function.
+% KOOK  Original Kook function, modified only to be incorporated as a function.
 %
 % Automatic primary particle finder v1.2 (works on Matlab 2012a or higher + 
 % Image Processing Toolbox)
@@ -18,7 +18,7 @@
 % 5. Added option as to whether of not to generate plots
 %=========================================================================%
 
-function [Agg,dp,dpdist] = perform_kook(Imgs,bool_plot)
+function [Agg,dp,dpdist] = kook(Imgs,bool_plot)
 %-------------------------------------------------------------------------%
 % Inputs:
 %   Imgs       Image struct to be analyzed
