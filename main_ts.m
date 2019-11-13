@@ -11,7 +11,7 @@ imgs = {Imgs.cropped};
 
 
 %-- Run thresholding for all of the images -------------------------------%
-opts.bool_kmeans = 0;
+opts.bool_kmeans = 1;
 opts.bool_otsu = 0;
 [imgs_binary,imgs_aggs,Aggs] = ...
     agg_segment.perform_seg(Imgs,[],[],opts);
@@ -31,16 +31,16 @@ opts.bool_otsu = 0;
 
 
 % [Aggs_manual,Data_manual] = ...
-%     manual.perform_man(Aggs);
+%     pp_manual.perform_man(Aggs);
 
 
-Aggs_pcm = pcm.perform_pcm(Aggs);
+Aggs_pcm = pp.pcm(Aggs);
 
 
-% Aggs_kook = kook.perform_kook(Imgs);
+% Aggs_kook = pp.kook(Imgs);
 
 
-% Aggs_kook_mod = kook_mod.perform_kookm(Aggs);
+% Aggs_kook_mod = pp.kook_mod(Aggs);
 
 
 % load('data\data_FlareNet.mat');
@@ -50,7 +50,7 @@ Aggs_pcm = pcm.perform_pcm(Aggs);
 % tools.write_json(fname,data); % write formatted json file
 
 figure(1);
-tools.plot_aggregates(Aggs,Imgs,1,[],[0,1,0]);
+tools.plot_aggregates(Aggs_pcm,Imgs,1,[],[0,0,1]);
 
 % figure(2);
 % [~,~,i0] = tools.plot_binary_overlay(imgs{1},imgs_binary{1},[],[0,1,0]);

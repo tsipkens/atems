@@ -45,30 +45,40 @@ in series.
 
 Other methods are currently under development. 
 
-#### Primary particle sizing
+#### Primary particle sizing (+pp)
 
-###### +pcm
+The +pp package contains multiple methods for determining the primary 
+particle size of the aggregates of interest. Often this requires a binary 
+mask of the image that can be generated using the +agg package methods. 
 
-The University of British Columbia's pair correlation method (PCM) MATLAB code for processing TEM images of soot to determine morphological properties. This package contains a significant update to the previous code provided with [Dastanpour et al. (2016)][dastanpour2016].
+###### pcm
 
-###### +manual
+The University of British Columbia's pair correlation method (PCM) 
+MATLAB code for processing TEM images of soot to determine morphological 
+properties. This package contains a significant update to the previous 
+code provided with [Dastanpour et al. (2016)][dastanpour2016].
+
+###### kook
+
+This method contains a copy of the code provided by [Kook et al. (2015)][kook],
+with minor modifications to match in the input/output of some of the
+other packages.
+
+###### kook_mod
+
+This method contains a heavily modified version of the method proposed
+by [Kook et al. (2015)][kook].
+
+###### manual
+
+*This is currently contained in a seperate package (+pp_manual).*
 
 Code to be used in the manual sizing of soot primary particles developed
 at the University of British Columbia. The current method uses crosshairs
 to select the length and width of the particle. This is converted to
 various quantities, such as the mean primary particle diameter. The manual
-code is a heavily modified version of the code associated with [Dastanpour and Rogak (2014)][dastanpour2014].
-
-###### +kook
-
-This package contains a copy of the code provided by [Kook et al. (2015)][kook],
-with minor modifications to match in the input/output of some of the
-other packages.
-
-###### +kook_mod
-
-This package contains a heavily modified version of the method proposed
-by [Kook et al. (2015)][kook].
+code is a heavily modified version of the code associated 
+with [Dastanpour and Rogak (2014)][dastanpour2014].
 
 --------------------------------------------------------------------------
 

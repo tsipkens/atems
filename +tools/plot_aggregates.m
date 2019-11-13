@@ -38,8 +38,13 @@ for aa=ind_agg
     plot(Aggs(aa).center_mass(2),Aggs(aa).center_mass(1),'rx');
     viscircles(fliplr(Aggs(aa).center_mass'),...
         Aggs(aa).Rg./Aggs(aa).pixsize);
-    text(Aggs(aa).center_mass(2)+12,Aggs(aa).center_mass(1),...
+    text(Aggs(aa).center_mass(2)+20,Aggs(aa).center_mass(1),...
         num2str(Aggs(aa).id),'Color','white');
+    
+    if isfield(Aggs,'dp_pcm_simple') % if available plto reference dp
+        viscircles(fliplr(Aggs(aa).center_mass'),...
+            Aggs(aa).dp_pcm_simple/2./Aggs(aa).pixsize,'Color','b');
+    end
     hold off;
 end
 
