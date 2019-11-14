@@ -10,7 +10,9 @@ Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 imgs = {Imgs.cropped};
 
 %%
-[imgs_binary] = ...
+% [imgs_binary] = ...
+%     agg_segment.agg_det_test(Imgs);
+[imgs_binary_km] = ...
     agg_segment.agg_det_kmeans_rb(Imgs);
 
-tools.plot_binary_overlay(imgs{1},imgs_binary);
+tools.plot_binary_overlay(imgs{1},imgs_binary_km);

@@ -59,6 +59,25 @@ se = strel('disk',20);
 img_both = imbothat(img_denoise,se);
 img_toph = imtophat(img_denoise,se);
 
+%-- Perform multi-thresholding -------------------------------------------%
+i1 = img_denoise;
+i1 = imgaussfilt(i1,5);
+
+lvl = graythresh(i1);
+i2b = ~im2bw(i1,lvl);
+i2 = ~im2bw(i1,lvl*1.15);
+
+se3 = strel('disk',4);
+i3 = imclose(i2,se3);
+
+i5 = zeros(size(i2));
+bw1 = bwlabel(i3);
+for ii=1:max(max(bw1))
+    if any(i2b(bw1==ii)==1)
+        i5(bw1==ii) = 1;
+    end
+end
+
 %-- Combine feature set --------------------------------------------------%
 featureSet = cat(3,...
     repmat(bw_thresh2,[1,1,3]),... % aggregates disappear if too large
@@ -67,7 +86,8 @@ featureSet = cat(3,...
     repmat(img_denoise,[1,1,3]),... % increases the interconnectedness (w/ bot. and tophat)
     repmat(255-img_denoise,[1,1,3]),...
     repmat(img,[1,1,0]),... % decreases interconnectedness
-    repmat(255-img,[1,1,0])...
+    repmat(255-img,[1,1,0]),...
+    repmat(i5,[1,1,0])...
     ); % img2
 
 
@@ -85,9 +105,13 @@ bw = bw==(ind_min-1);
 
 
 %== STEP 4: Rolling Ball Transformation ==================================%
-img_binary = agg_segment.rolling_ball(bw,pixsize,minparticlesize,coeffs);
-img_binary = ~img_binary;
+img_binary = ~agg_segment.rolling_ball(bw,pixsize,minparticlesize,coeffs);
 
+% i6 = ~bw;
+% 
+% se6 = strel('disk',10);
+% i7 = imclose(i6,se6);
+% img_binary = imopen(i7,se3);
 
 end
 
