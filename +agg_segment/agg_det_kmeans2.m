@@ -24,6 +24,7 @@ if ~exist('minparticlesize','var'); minparticlesize = []; end
 if ~exist('coeffs','var'); coeffs = []; end
 %=========================================================================%
 
+morph_param = 0.8/pixsize 
 
 
 %== STEP 1: Attempt to the remove background gradient ====================%
@@ -39,14 +40,6 @@ img = uint8(round(255.*t2./max(max(t2))));
 
 
 %== STEP 2: Pre-process image ============================================%
-%-- Get rough mask using thresholding ------------------------------------%
-level = graythresh(img); % Otsu thresholding
-bw_thresh = 255.*imbinarize(img,level);
-
-se = strel('disk',40);
-bw_thresh2 = imopen(bw_thresh,se);
-    % attains rough estimates of particle boundaries
-
 %-- Perform denoising ----------------------------------------------------%
 disp('Performing denoising...');
 img_denoise = imbilatfilt(img);
@@ -54,20 +47,37 @@ img_denoise = imbilatfilt(img);
 disp('Complete.');
 disp(' ');
 
+
+%-- Get rough mask using thresholding ------------------------------------%
+lvl = graythresh(img); % Otsu thresholding
+bw_thresh = 255.*(~imbinarize(img,lvl));
+
+se = strel('disk',round(40*morph_param));
+bw_thresh2 = imclose(bw_thresh,se);
+    % attains rough estimates of particle boundaries
+
+
 %-- Use morphological operations to improve kmeans -----------------------%
 se = strel('disk',20);
 img_both = imbothat(img_denoise,se);
-img_toph = imtophat(img_denoise,se);
+
+i10 = imbilatfilt(img_both,1e20);
+i11 = entropyfilt(i10,true(15));
+se12 = strel('disk',max(round(5*morph_param),1));
+i12 = imclose(i11,se12);
+i12 = uint8(i12./max(max(i12)).*255);
+
 
 %-- Perform multi-thresholding -------------------------------------------%
-i1 = img_denoise;
-i1 = imgaussfilt(i1,5);
+i1 = double(img_denoise);
+i1 = i1./max(max(i1));
+i1 = imgaussfilt(i1,max(round(5*morph_param),1));
 
-lvl = graythresh(i1);
-i2b = ~im2bw(i1,lvl);
-i2 = ~im2bw(i1,lvl*1.15);
+lvl2 = graythresh(i1);
+i2b = ~im2bw(i1,lvl2);
+i2 = ~im2bw(i1,lvl2*1.15);
 
-se3 = strel('disk',4);
+se3 = strel('disk',max(round(5*morph_param),1));
 i3 = imclose(i2,se3);
 
 i5 = zeros(size(i2));
@@ -77,18 +87,18 @@ for ii=1:max(max(bw1))
         i5(bw1==ii) = 1;
     end
 end
+i5 = uint8(i5.*255);
+
 
 %-- Combine feature set --------------------------------------------------%
 feature_set = cat(3,...
     repmat(bw_thresh2,[1,1,3]),... % aggregates disappear if too large
-    repmat(img_both,[1,1,3]),...
-    repmat(img_toph,[1,1,3]),... % expands aggregate slightly
-    repmat(img_denoise,[1,1,3]),... % increases the interconnectedness (w/ bot. and tophat)
-    repmat(255-img_denoise,[1,1,3]),...
+    repmat(img_both,[1,1,0]),...
+    repmat(img_denoise,[1,1,6]),... % increases the interconnectedness (w/ bot. and tophat)
     repmat(img,[1,1,0]),... % decreases interconnectedness
-    repmat(255-img,[1,1,0]),...
-    repmat(i5,[1,1,0])...
-    ); % img2
+    repmat(i5,[1,1,2]),...
+    repmat(i12,[1,1,8])...
+    );
 
 
 
@@ -97,21 +107,27 @@ disp('Performing k-means clustering...');
 bw = imsegkmeans(feature_set,2,'NormalizeInput',true);
 disp('Complete.');
 disp(' ');
-bw = ~(bw==1);
+bw = bw==1;
 
-[~,ind_min] = min([mean(img_denoise(bw)),mean(img_denoise(~bw))]);
-img_kmeans = ~(bw==(ind_min-1));
+[~,ind_max] = max([mean(img_denoise(bw)),mean(img_denoise(~bw))]);
+img_kmeans = bw==(ind_max-1);
 
 
 
 %== STEP 4: Rolling Ball Transformation ==================================%
-img_binary = ~agg_segment.rolling_ball(~img_kmeans,pixsize,minparticlesize,coeffs);
+% img_binary = ~agg_segment.rolling_ball(...
+%     ~img_kmeans,pixsize,minparticlesize,coeffs);
 
-% i6 = ~bw;
-% 
-% se6 = strel('disk',10);
-% i7 = imclose(i6,se6);
-% img_binary = imopen(i7,se3);
+ds = round(6*morph_param);
+se6 = strel('disk',max(ds,2));
+    % disk size limited by size of holes in particle
+i7 = imclose(img_kmeans,se6);
+
+se7 = strel('disk',max(ds-1,1));
+    % disk size must be less than se6 to maintain connectivity
+img_rb = imopen(i7,se7);
+
+img_binary = bwareaopen(img_rb,3); % remove particles below 3 pixels
 
 end
 
