@@ -18,7 +18,7 @@
 % 5. Added option as to whether of not to generate plots
 %=========================================================================%
 
-function [Agg,dp,dpdist] = kook(Imgs,bool_plot)
+function [Aggs,dp,dpdist] = kook(Imgs,bool_plot)
 %-------------------------------------------------------------------------%
 % Inputs:
 %   Imgs       Image struct to be analyzed
@@ -28,15 +28,15 @@ function [Agg,dp,dpdist] = kook(Imgs,bool_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
 if ~exist('bool_plot','var'); bool_plot = []; end
-if isempty(bool_plot); bool_plot = 0; end
+if isempty(bool_plot); bool_plot = 1; end
 
 disp('Performing original Kook analysis...');
 
-Agg = struct; % initialize aggregate data structure
+Aggs = struct; % initialize aggregate data structure
 
 pixsize = Imgs(1).pixsize;
 
-II1 = Imgs(1).Cropped;
+II1 = Imgs(1).cropped;
 
 
 %-- Set relevant parameter values ----------------------------------------%
@@ -48,13 +48,13 @@ rmax = 30; % Maximum radius in pixel
 rmin = 4; % Minimun radius in pixel
 sens_val = 0.75; % the sensitivity (0->1) for the circular Hough transform
 
-OriginalImg = II1;
+img_original = II1;
 
 
 
 %== Pre-processing =======================================================% 
 %-- Step 1: Invert image greyscale ---------------------------------------%
-if size(OriginalImg,1) > 900
+if size(img_original,1) > 900
 	II1(950:size(II1,1), 1:250) = 0;% ignore scale bar in the TEM image x 1-250 pixel and y 950-max pixel
 end
 
@@ -62,20 +62,20 @@ II1_bg=SelfSubt*II1; % Self-subtration from the original image
 II1=maxImgCount-II1;
 II1=II1-II1_bg;
 II1(II1<0)=0;
-if bool_plot; figure();imshow(II1, []);title('Step 1: Inversion and self-subtraction'); end
+if bool_plot==2; figure();imshow(II1, []);title('Step 1: Inversion and self-subtraction'); end
 
 %-- Step 2: median filter to remove noise --------------------------------%
 II1_mf=medfilt2(II1, [mf mf]);
-if bool_plot; figure();imshow(II1_mf, []);title('Step 2: Median filter'); end
+if bool_plot==2; figure();imshow(II1_mf, []);title('Step 2: Median filter'); end
 
 %-- Step 3: Unsharp filter------------------------------------------------%
 f = fspecial('unsharp', alpha);
 II1_lt = imfilter(II1_mf, f);
-if bool_plot; figure();imshow(II1_lt, []);title('Step 3: Unsharp filter'); end
+if bool_plot==2; figure();imshow(II1_lt, []);title('Step 3: Unsharp filter'); end
 
 %-- Step 4: Canny edge detection -----------------------------------------%
 BWCED = edge(II1_lt,'canny'); % perfrom Canny edge detection
-if bool_plot; figure();imshow(BWCED);title('Step 4: Canny edge detection'); end
+if bool_plot==2; figure();imshow(BWCED);title('Step 4: Canny edge detection'); end
 
 
 
@@ -84,8 +84,8 @@ if bool_plot; figure();imshow(BWCED);title('Step 4: Canny edge detection'); end
 [centers, radii] = imfindcircles(BWCED,[rmin rmax],...
     'objectpolarity', 'bright', 'sensitivity', sens_val, 'method', 'TwoStage');
 % - draw circles
-if bool_plot
-    figure();imshow(OriginalImg,[]);hold;
+if bool_plot==2
+    figure(gcf);imshow(img_original,[]);hold;
     h = viscircles(centers, radii, 'EdgeColor','r');
     title('Step 5: Parimary particles overlaid on the original TEM image');
 end
@@ -93,19 +93,22 @@ end
 
 %-- Check the circle finder ----------------------------------------------%
 %-- Overlaying the CHT boundaries on the original image. 
-if bool_plot
-    R = imfuse(BWCED, OriginalImg,'blend');
-    figure();imshow(R,[],'InitialMagnification',500);hold;h = viscircles(centers, radii, 'EdgeColor','r');
+if bool_plot>=1
+    figure;
+    imshow(img_original);
+    hold on;
+    viscircles(centers, radii, 'EdgeColor','r');
+    hold off;
     title('Step 6: Primary particles overlaid on the Canny edges and the original TEM image');
 end
 
 
 %== Generate outputs =====================================================%
-Agg(1).kook.centers = centers; % output in px
-Agg(1).kook.radii = radii; % output in px
-Agg(1).kook.diameters = radii*pixsize*2; % output in nm
+Aggs(1).kook.centers = centers; % output in px
+Aggs(1).kook.radii = radii; % output in px
+Aggs(1).kook.diameters = radii*pixsize*2; % output in nm
 
-dp = Agg(1).kook.diameters;
+dp = Aggs(1).kook.diameters;
 dpdist = radii*pixsize*2;
 
 disp('Complete.');

@@ -86,7 +86,7 @@ bw = bw==(ind_min-1);
 
 %== STEP 4: Rolling Ball Transformation ==================================%
 img_binary = agg_segment.rolling_ball(bw,pixsize,minparticlesize,coeffs);
-
+img_binary = ~img_binary;
 
 
 end

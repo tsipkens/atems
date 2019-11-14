@@ -133,8 +133,7 @@ for kk = 1:nparts
     end
 end
 
-img_binary = img_bewBW;
-
+img_binary = ~img_bewBW;
 
 end
 

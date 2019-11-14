@@ -34,7 +34,7 @@ if bool_kmeans
         img,pixsize,minparticlesize,coeffs);
     [moreaggs,choice] = ...
         agg_segment.user_input(img,img_binary); % prompt user
-    img_binary = ~imclearborder(~img_binary); % clear aggregates on border
+    img_binary = imclearborder(img_binary); % clear aggregates on border
 else
     choice = 'No';
 end
@@ -51,7 +51,7 @@ if or(strcmp(choice,'No'),~bool_kmeans)
     else
         choice = 'No'; moreaggs = 1;
     end
-    if strcmp(choice,'No'); img_binary = ones(size(img)); end
+    if strcmp(choice,'No'); img_binary = zeros(size(img)); end
 end
 
 img_cropped = [];
@@ -92,7 +92,7 @@ while moreaggs==1
     inds1 = rect(2):(rect(2)+size_temp(1)-1);
     inds2 = rect(1):(rect(1)+size_temp(2)-1);
     img_binary(inds1,inds2) = ...
-        img_binary(inds1,inds2).*img_temp;
+        or(img_binary(inds1,inds2),img_temp);
     
     %-- Query user -------------------------------------------------------%
     h = figure(gcf);

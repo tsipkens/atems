@@ -37,10 +37,10 @@ opts.bool_otsu = 0;
 Aggs_pcm = pp.pcm(Aggs);
 
 
-% Aggs_kook = pp.kook(Imgs);
+% Aggs_kook = pp.kook(Imgs,1);
 
 
-% Aggs_kook_mod = pp.kook_mod(Aggs);
+% Aggs_kook_mod = pp.kook_yl(Aggs,1);
 
 
 % load('data\data_FlareNet.mat');

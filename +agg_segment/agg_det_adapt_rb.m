@@ -40,7 +40,7 @@ bw = imbinarize(img,level);
 
 %== Step 2: Rolling Ball Transformation ==================================%
 img_binary = agg_segment.rolling_ball(bw,pixsize,minparticlesize,coeffs);
-
+img_binary = ~img_binary;
 
 
 end

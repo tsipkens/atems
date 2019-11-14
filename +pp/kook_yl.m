@@ -1,11 +1,13 @@
 
-% KOOK_MOD  Performs modified Kook algorithm
+% KOOK_YL  Performs modified Kook algorithm
 %
 % Code written by Ben Gigone and Emre Karatas, PhD
 % Adapted from Kook et al. 2016, SAE
 % Works on Matlab 2012a or higher + Image RawImage Toolbox
 %
-% This code is modified by Yiling Kang, Timothy Sipkens, and
+% This code is modified by Yiling Kang
+% 
+% Compatability updates by Timothy Sipkens, and
 % Yeshun (Samuel) Ma at the University of British Columbia
 %-------------------------------------------------------------------------%
 %
@@ -42,7 +44,7 @@
 % can be adjusted to filter out outliers in line 31-32 with rmax and rmin
 %=========================================================================%
 
-function Aggs = kook_mod(Aggs,bool_plot)
+function Aggs = kook_yl(Aggs,bool_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
 if ~exist('bool_plot','var'); bool_plot = []; end
@@ -66,6 +68,7 @@ rmin = 4; % Minimum radius in pixel (Keep high enough to eliminate dummies)
 sens_val = 0.75; % the sensitivity (0?1) for the circular Hough transform 
 edge_threshold = [0.125 0.190]; % the threshold for finding edges with edge detection
 
+if bool_plot>=1; figure(1); imshow(Aggs(1).image); end
 
 %== Main image processing loop ===========================================%
 for ll = 1:length(Aggs) % run loop as many times as images selected
@@ -75,9 +78,6 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     img_cropped = Aggs(ll).img_cropped;
     img_binary = Aggs(ll).img_cropped_binary;
     
-    %if bool_plot
-        figure(gcf); imshow(img_cropped);
-    %end
     
     %-- Creating a new folder to store data from this image processing program --%
     % TODO : Add new directory folder for each image and input overlayed image,
@@ -96,28 +96,6 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     Data.centers = centers;
     Data.radii = radii;
     
-    
-    % Draw circles (Figure 7)
-    figure();
-    imshow(img_cropped,[]);
-    hold on;
-    h = viscircles(centers, radii, 'EdgeColor','r');
-    hold off;
-    title('Step 7: Parimary particles overlaid on the original TEM image');
-    pause(0.2);
-
-    %-- Check the circle finder by overlaying the CHT boundaries on the original image 
-    %-- Remove circles out of the aggregate (?)
-    R = imfuse(img_Canny,img_cropped,'blend'); 
-
-    % Draw modified circles (Figure 8)
-    if bool_plot
-        figure();imshow(R,[],'InitialMagnification',500);hold;h = viscircles(centers, radii, 'EdgeColor','r'); 
-        title('Step 8: Primary particles overlaid on the Canny edges and the original TEM image');
-        saveas(gcf, [folder_save_img,'\circAll_',int2str(ll)], 'tif')
-    end
-
-
     %-- Calculate Parameters (Add Histogram) -----------------------------%
     Data.dp = radii*pixsize*2;
     Data.dpg = nthroot(prod(Data.dp),1/length(Data.dp)); % geometric mean
@@ -125,12 +103,14 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     
     Data.Np = length(Data.dp); % number of particles
     
-    if bool_plot
-        figure();
-        imshow(img_binary, []);
-        title('Image Binarized'); 
-        text(0.25 * size(img_binary, 1), 0.1 * size(img_binary, 2), sprintf('Radius of gyration = %6.2f nm', (Data.Rg)),...
-            'fontsize', 12, 'fontname','TimesNewRoman');
+    %-- Check the circle finder by overlaying the CHT boundaries on the original image 
+    %-- Remove circles out of the aggregate (?)
+    if and(bool_plot>=1,~isempty(centers))
+        figure(1);
+        hold on;
+        viscircles(centers+repmat(Aggs(ll).rect([1,2]),[size(centers,1),1]), ...
+            radii', 'EdgeColor','r');
+        hold off;
     end
     
     %== Save results =====================================================%
@@ -142,9 +122,9 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
         disp('Save complete');
         disp(' ');
     end
-    close all;
     
 end % end of aggregate loop
+
 
 disp('Complete.');
 disp(' ');
