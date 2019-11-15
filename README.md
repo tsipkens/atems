@@ -12,7 +12,7 @@ pair correlation method (PCM), Kook, and manual methods. Each method
 is contained in a package, with a corresponding `perform_*` function that
 can be used to call the method.
 
-## 1.0 Data structure
+## 1. Data structure
 
 Images are handled primarily by two variables: `Imgs_ref`
 and `Imgs`. The former contains a reference to the images,
@@ -24,7 +24,7 @@ The output data itself, `Aggs`, is a structure array with one
 entry per aggregate. This data can then be exported to a JSON
 format to be analyzed in other software and languages.
 
-## 2.0 Packages
+## 2. Packages
 
 #### 2.1 Aggregate detection and segmentation (+agg_segment)
 
