@@ -12,7 +12,7 @@ pair correlation method (PCM), Kook, and manual methods. Each method
 is contained in a package, with a corresponding `perform_*` function that
 can be used to call the method.
 
-## Data structure
+## 1.0 Data structure
 
 Images are handled primarily by two variables: `Imgs_ref`
 and `Imgs`. The former contains a reference to the images,
@@ -24,9 +24,9 @@ The output data itself, `Aggs`, is a structure array with one
 entry per aggregate. This data can then be exported to a JSON
 format to be analyzed in other software and languages.
 
-## Packages
+## 2.0 Packages
 
-#### Aggregate detection and segmentation (+agg_segment)
+#### 2.1 Aggregate detection and segmentation (+agg_segment)
 
 This package contains an expanding library of functions aimed at 
 performing semantic segmentation of the TEM images of aggregates. 
@@ -45,31 +45,31 @@ in series.
 
 Other methods are currently under development. 
 
-#### Primary particle sizing (+pp)
+#### 2.2 Primary particle sizing (+pp)
 
 The +pp package contains multiple methods for determining the primary 
 particle size of the aggregates of interest. Often this requires a binary 
 mask of the image that can be generated using the +agg package methods. 
 
-###### pcm
+###### 2.2.1 pcm
 
 The University of British Columbia's pair correlation method (PCM) 
 MATLAB code for processing TEM images of soot to determine morphological 
 properties. This package contains a significant update to the previous 
 code provided with [Dastanpour et al. (2016)][dastanpour2016].
 
-###### kook
+###### 2.2.2 kook
 
 This method contains a copy of the code provided by [Kook et al. (2015)][kook],
 with minor modifications to match in the input/output of some of the
 other packages.
 
-###### kook_mod
+###### 2.2.3 kook_mod
 
 This method contains a heavily modified version of the method proposed
 by [Kook et al. (2015)][kook].
 
-###### manual
+###### 2.2.4 manual
 
 *This is currently contained in a seperate package (+pp_manual).*
 
