@@ -43,4 +43,8 @@ imshow(imgs{1});
 %     perim_err(ii) = sum(sum(bwperim(imgs_binary{ii})))/...
 %         sum(sum(man.imgs_binary{ii}==1));
 % end
-% tools.plot_binary_overlay(imgs{1},im_diff,[0,1,0;1,0,0],[],0,0.2);
+% 
+% im_diff(im_diff==-1) = 2;
+% opts.cmap = [0,1,0;1,0,0];
+% opts.bool_outline = 0;
+% tools.plot_binary_overlay(imgs{1},im_diff,opts);
