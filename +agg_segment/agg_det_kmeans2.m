@@ -1,10 +1,10 @@
 
-% AGG_DET_KMEANS_RB Performs kmeans clustering + a rolling ball transformation.
-% Author:   Timothy Sipkens, 2019-10-04
+% AGG_DET_KMEANS2 Performs kmeans clustering on a modified feature set.
+% Author:   Timothy Sipkens, 2019-11-19
 %=========================================================================%
 
 function [img_binary,img_kmeans,feature_set] = ...
-    agg_det_kmeans_rb(imgs,pixsize,minparticlesize,coeffs)
+    agg_det_kmeans2(imgs,pixsize)
 
 
 %== Parse inputs =========================================================%
@@ -19,28 +19,31 @@ img = imgs{1}; % currently only operated on first image
 
 if ~exist('pixsize','var'); pixsize = []; end
 if isempty(pixsize); pixsize = ones(size(imgs)); end
-
-if ~exist('minparticlesize','var'); minparticlesize = []; end
-if ~exist('coeffs','var'); coeffs = []; end
 %=========================================================================%
 
-morph_param = 0.8/pixsize 
+morph_param = 0.8/pixsize
 
 
 %== STEP 1: Attempt to the remove background gradient ====================%
+disp('Performing background subtraction...');
+se_bg = strel('disk',80);
+pre_bg = imclose(img,se_bg);
+
 [X,Y] = meshgrid(1:size(img,2),1:size(img,1));
-bg_fit = fit(double([X(:),Y(:)]),double(img(:)),'poly11');
+bg_fit = fit(double([X(:),Y(:)]),double(pre_bg(:)),'poly22');
 bg = uint8(round(bg_fit(X,Y)));
 
 t0 = double(max(max(bg))-bg);
 t1 = double(img)+t0;
 t2 = t1-min(min(t1));
 img = uint8(round(255.*t2./max(max(t2))));
+disp('Complete.');
+disp(' ');
 
 
 
 %== STEP 2: Pre-process image ============================================%
-%-- Perform denoising ----------------------------------------------------%
+%-- A: Perform denoising --------------------------------------------------%
 disp('Performing denoising...');
 img_denoise = imbilatfilt(img);
 % img_denoise = tools.imtotvar_sb_atv(img,15); % alternate total variation denoise
@@ -48,16 +51,16 @@ disp('Complete.');
 disp(' ');
 
 
-%-- Get rough mask using thresholding ------------------------------------%
+%-- B: Get rough mask using thresholding ---------------------------------%
 lvl = graythresh(img); % Otsu thresholding
 bw_thresh = 255.*(~imbinarize(img,lvl));
 
-se = strel('disk',round(40*morph_param));
+se = strel('disk',round(30*morph_param));
 bw_thresh2 = imclose(bw_thresh,se);
     % attains rough estimates of particle boundaries
 
 
-%-- Use morphological operations to improve kmeans -----------------------%
+%-- C: Use texture in bottom hat images ----------------------------------%
 se = strel('disk',20);
 img_both = imbothat(img_denoise,se);
 
@@ -68,7 +71,7 @@ i12 = imclose(i11,se12);
 i12 = uint8(i12./max(max(i12)).*255);
 
 
-%-- Perform multi-thresholding -------------------------------------------%
+%-- D: Perform multi-thresholding ----------------------------------------%
 i1 = double(img_denoise);
 i1 = i1./max(max(i1));
 i1 = imgaussfilt(i1,max(round(5*morph_param),1));
@@ -93,9 +96,7 @@ i5 = uint8(i5.*255);
 %-- Combine feature set --------------------------------------------------%
 feature_set = cat(3,...
     repmat(bw_thresh2,[1,1,3]),... % aggregates disappear if too large
-    repmat(img_both,[1,1,0]),...
     repmat(img_denoise,[1,1,6]),... % increases the interconnectedness (w/ bot. and tophat)
-    repmat(img,[1,1,0]),... % decreases interconnectedness
     repmat(i5,[1,1,2]),...
     repmat(i12,[1,1,8])...
     );
