@@ -30,8 +30,8 @@ if isfield(opts,'bool_otsu'); bool_otsu = opts.bool_otsu; end
 
 %== Attempt 1: k-means segmentation + rolling ball transformation ========%
 if bool_kmeans
-    img_binary = agg_segment.agg_det_kmeans_rb(...
-        img,pixsize,minparticlesize,coeffs);
+    img_binary = agg_segment.agg_det_kmeans2(...
+        img,pixsize);
     [moreaggs,choice] = ...
         agg_segment.user_input(img,img_binary); % prompt user
     img_binary = imclearborder(img_binary); % clear aggregates on border
