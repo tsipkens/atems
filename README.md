@@ -36,7 +36,8 @@ significantly streamlined in the present implementation.
 
 Current methods for aggregate-level semantic segmentation include:
 
-1. Otsu thresholding with a rolling ball transformation, 
+1. Otsu thresholding with a rolling ball transformation 
+(as per [Dastanpour et al. (2016)][dastanpour2016]), 
 
 2. a GUI method with a slider for manual thresholding of the image, and
 
