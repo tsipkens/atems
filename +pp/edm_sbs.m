@@ -8,5 +8,17 @@ function [Aggs] = edm_sbs(Aggs,bool_plot)
 
 
 
+%== Morphological opening of binary image =====%
+
+
+
+%== Bin data after covering to nm =======%
+
+
+
+%== Fit inverse CDF to data ========%
+
+
+
 
 end
