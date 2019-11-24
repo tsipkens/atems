@@ -48,3 +48,9 @@ imshow(imgs{1});
 % opts.cmap = [0,1,0;1,0,0];
 % opts.bool_outline = 0;
 % tools.plot_binary_overlay(imgs{1},im_diff,opts);
+
+
+
+[Aggs] = pp.edm_sbs(imgs_binary{1},Imgs(1).pixsize);
+
+
