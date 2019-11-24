@@ -12,13 +12,18 @@ function [Aggs] = edm_sbs(img_binary,pixsize)
 se_max = 100;
 se_vec = 0:se_max;
 
+disp('Performing morphological operations:');
+tools.textbar(0);
 count = zeros(length(se_vec),1);
 for ii=1:length(se_vec)
     se = strel('disk',se_vec(ii));
     img_opened = imopen(img_binary,se);
     count(ii) = nnz(img_opened);
+    
+    tools.textbar(ii/length(se_vec));
 end
 count = count./count(1);
+disp(' ');
 
 dp_count = (se_vec.*pixsize)';
 S = count;
@@ -57,10 +62,14 @@ Omega = 0.8;
 sigmoid = @(x) 1-1./(1+exp(((log(x(1))-log(dp_count))./log(x(2))-beta)./Omega));
     % x(1) = dpg, x(2) = spg
 
+disp('Fitting curve to data...');
+opts = optimset('Display','off');
 x0 = [30,1.5];
-x1 = lsqnonlin(@(x) sigmoid(x)-S, x0);
+x1 = lsqnonlin(@(x) sigmoid(x)-S, x0, [], [], opts);
+disp('Complete.');
+disp(' ');
 
-Aggs.dpg = x0(1);
-Aggs.sg = x0(2);
+Aggs.dpg = x1(1);
+Aggs.sg = x1(2);
 
 end
