@@ -241,5 +241,6 @@ imshow(img_temp2);
 
 end
 
+img_binary = ~img_binary;
 
 end

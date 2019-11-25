@@ -1,7 +1,7 @@
 
 % ROLLING_BALL Perform a rolling ball transformation.
-% Author: Timothy Sipkens, 2019-11-06
-% Adapted from: Ramin Dastanpour
+% Author: Ramin Dastanpour
+% Modified: Ramin DastanpourTimothy Sipkens, 2019-11-06
 %=========================================================================%
 
 function [img_binary] = ...

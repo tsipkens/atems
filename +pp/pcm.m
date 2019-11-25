@@ -1,5 +1,5 @@
 
-% PERFORM_PCM  Performs the pair correlation method (PCM) of aggregate characterization
+% PCM  Performs the pair correlation method (PCM) of aggregate characterization
 % 
 % Developed at the University of British Columbia by Ramin Dastanpour and
 % Steven N. Rogak.
@@ -11,7 +11,7 @@
 % of British Columbia
 %=========================================================================%
 
-function [Aggs] = perform_pcm(Aggs,bool_plot,bool_backup)
+function [Aggs] = pcm(Aggs,bool_plot,bool_backup)
 
 %-- Parse inputs and load image ------------------------------------------%
 if ~exist('bool_plot','var'); bool_plot = []; end

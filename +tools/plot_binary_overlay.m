@@ -3,53 +3,46 @@
 % Author:              Timothy Sipkens, 2019-07-24
 %=========================================================================%
 
-function [h,f,i0] = plot_binary_overlay(img,img_binary,bool_type,cmap)
+function [h,f,i0] = plot_binary_overlay(img,img_binary,opts,...
+    cmap,bool_type,bool_outline,label_alpha)
 
-if ~exist('bool_type','var'); bool_type = []; end
-if isempty(bool_type); bool_type = 2; end
+%-- Parse inputs ---------------------------------------------------------%
+if ~exist('opts','var'); opts = struct(); end
 
-if ~exist('cmap','var'); cmap = []; end
-if isempty(cmap); cmap = [0,0,1]; end
-
-
-gcf;
-clf;
-
-if bool_type==1 % original impose from PCM code
-    img_edge = edge(img_binary,'sobel');
-    SE = strel('disk',1);
-    img_dilated = imdilate(img_edge,SE);
-        % use dilation to strengthen the aggregate's outline
-
-    i0 = imimposemin(img,img_dilated);
-    
-elseif bool_type==2 % overlay labels with transparency
-    img_edge = edge(img_binary,'sobel');
-    SE = strel('disk',1);
-    img_dilated = imdilate(img_edge,SE);
-        % use dilation to strengthen the aggregate's outline
-    
-    t0 = labeloverlay(img,~img_binary,...
-        'Transparency',0.90,...
-        'Colormap',cmap);
-    i0 = uint8(~img_dilated).*t0;
-    
-else % updates module for manual sizing
-    SE = strel('disk',2);
-    img_dilated = imdilate(img_binary,SE);
-    img_edge = ~(img_binary-img_dilated);
-
-    w1 = 1; % brightness of aggregate
-    w2 = 0.3;
-    t0 = img.*uint8(~img_binary);
-    t1 = w2.*img.*uint8(img_edge)+(1-w2).*img;
-    i0 = w1.*t1 + (1-w1).*t0;
-    
+if ~isfield(opts,'cmap')
+    opts.cmap = ones(max(max(img_binary)),1)*[0,0,1];
+        % blue, repeated for as many labels as exist in img_binary
 end
 
-imshow(i0);
+if ~isfield(opts,'bool_outline'); opts.bool_outline = 1; end
+if ~isfield(opts,'label_alpha'); opts.label_alpha = 0.7; end
+%-------------------------------------------------------------------------%
 
-if nargout>0; h = gca; end
+
+gcf; % get and clear figure
+clf;
+
+t0 = labeloverlay(img,img_binary,...
+    'Transparency',opts.label_alpha,...
+    'Colormap',opts.cmap);
+
+
+if ~opts.bool_outline
+    i0 = t0;
+else % if adding an outline
+    img_edge = edge(img_binary,'sobel');
+    SE = strel('disk',1);
+    img_dilated = imdilate(img_edge,SE);
+        % use dilation to strengthen the aggregate's outline
+    i0 = uint8(~img_dilated).*t0;
+        % adds borders to labeled regions
+end
+
+
+imshow(i0); % show labelled image
+
+
+if nargout>0; h = gca; end % organize outputs
 if nargout>1; f = gcf; end
 
 end

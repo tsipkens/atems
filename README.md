@@ -12,7 +12,7 @@ pair correlation method (PCM), Kook, and manual methods. Each method
 is contained in a package, with a corresponding `perform_*` function that
 can be used to call the method.
 
-## Data structure
+## 1. Data structure
 
 Images are handled primarily by two variables: `Imgs_ref`
 and `Imgs`. The former contains a reference to the images,
@@ -24,9 +24,9 @@ The output data itself, `Aggs`, is a structure array with one
 entry per aggregate. This data can then be exported to a JSON
 format to be analyzed in other software and languages.
 
-## Packages
+## 2. Packages
 
-#### Aggregate detection and segmentation (+agg_segment)
+#### 2.1 Aggregate detection and segmentation (+agg_segment)
 
 This package contains an expanding library of functions aimed at 
 performing semantic segmentation of the TEM images of aggregates. 
@@ -36,7 +36,8 @@ significantly streamlined in the present implementation.
 
 Current methods for aggregate-level semantic segmentation include:
 
-1. Otsu thresholding with a rolling ball transformation, 
+1. Otsu thresholding with a rolling ball transformation 
+(as per [Dastanpour et al. (2016)][dastanpour2016]), 
 
 2. a GUI method with a slider for manual thresholding of the image, and
 
@@ -45,30 +46,40 @@ in series.
 
 Other methods are currently under development. 
 
-#### Primary particle sizing
+#### 2.2 Primary particle sizing (+pp)
 
-###### +pcm
+The +pp package contains multiple methods for determining the primary 
+particle size of the aggregates of interest. Often this requires a binary 
+mask of the image that can be generated using the +agg package methods. 
 
-The University of British Columbia's pair correlation method (PCM) MATLAB code for processing TEM images of soot to determine morphological properties. This package contains a significant update to the previous code provided with [Dastanpour et al. (2016)][dastanpour2016].
+###### 2.2.1 pcm
 
-###### +manual
+The University of British Columbia's pair correlation method (PCM) 
+MATLAB code for processing TEM images of soot to determine morphological 
+properties. This package contains a significant update to the previous 
+code provided with [Dastanpour et al. (2016)][dastanpour2016].
+
+###### 2.2.2 kook
+
+This method contains a copy of the code provided by [Kook et al. (2015)][kook],
+with minor modifications to match in the input/output of some of the
+other packages.
+
+###### 2.2.3 kook_mod
+
+This method contains a heavily modified version of the method proposed
+by [Kook et al. (2015)][kook].
+
+###### 2.2.4 manual
+
+*This is currently contained in a seperate package (+pp_manual).*
 
 Code to be used in the manual sizing of soot primary particles developed
 at the University of British Columbia. The current method uses crosshairs
 to select the length and width of the particle. This is converted to
 various quantities, such as the mean primary particle diameter. The manual
-code is a heavily modified version of the code associated with [Dastanpour and Rogak (2014)][dastanpour2014].
-
-###### +kook
-
-This package contains a copy of the code provided by [Kook et al. (2015)][kook],
-with minor modifications to match in the input/output of some of the
-other packages.
-
-###### +kook_mod
-
-This package contains a heavily modified version of the method proposed
-by [Kook et al. (2015)][kook].
+code is a heavily modified version of the code associated 
+with [Dastanpour and Rogak (2014)][dastanpour2014].
 
 --------------------------------------------------------------------------
 

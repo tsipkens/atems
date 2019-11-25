@@ -3,7 +3,7 @@
 % Author:          Timothy Sipkens, 2019-07-24
 %=========================================================================%
 
-function [h,f,i0] = plot_aggregates(Aggs,Imgs,ind,bool_img,cmap)
+function [h,f,i0] = plot_aggregates(Aggs,Imgs,ind,bool_img,opts)
 
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('ind','var'); ind = []; end
@@ -12,7 +12,7 @@ if isempty(ind); ind = 1; end
 if ~exist('bool_img','var'); bool_img = []; end
 if isempty(bool_img); bool_img = 1; end
 
-if ~exist('cmap','var'); cmap = []; end
+if ~exist('opts','var'); opts = struct(); end
 
 if ~isempty(Imgs) % if Imgs provided, find the aggregates in that file
     ind0 = strcmp({Aggs.fname},{Imgs(ind).fname});
@@ -28,7 +28,7 @@ end
 if bool_img
     figure(gcf);
     [~,~,i0] = tools.plot_binary_overlay(Imgs(ind).cropped,...
-        Imgs(ind).binary,[],cmap);
+        Imgs(ind).binary,opts);
 end % else: plot circles on existing image
 
 
@@ -38,8 +38,13 @@ for aa=ind_agg
     plot(Aggs(aa).center_mass(2),Aggs(aa).center_mass(1),'rx');
     viscircles(fliplr(Aggs(aa).center_mass'),...
         Aggs(aa).Rg./Aggs(aa).pixsize);
-    text(Aggs(aa).center_mass(2)+12,Aggs(aa).center_mass(1),...
+    text(Aggs(aa).center_mass(2)+20,Aggs(aa).center_mass(1),...
         num2str(Aggs(aa).id),'Color','white');
+    
+    if isfield(Aggs,'dp_pcm_simple') % if available plto reference dp
+        viscircles(fliplr(Aggs(aa).center_mass'),...
+            Aggs(aa).dp_pcm_simple/2./Aggs(aa).pixsize,'Color','b');
+    end
     hold off;
 end
 

@@ -30,11 +30,11 @@ if isfield(opts,'bool_otsu'); bool_otsu = opts.bool_otsu; end
 
 %== Attempt 1: k-means segmentation + rolling ball transformation ========%
 if bool_kmeans
-    img_binary = agg_segment.agg_det_kmeans_rb(...
-        img,pixsize,minparticlesize,coeffs);
+    img_binary = agg_segment.agg_det_kmeans2(...
+        img,pixsize);
     [moreaggs,choice] = ...
         agg_segment.user_input(img,img_binary); % prompt user
-    img_binary = ~imclearborder(~img_binary); % clear aggregates on border
+    img_binary = imclearborder(img_binary); % clear aggregates on border
 else
     choice = 'No';
 end
@@ -51,7 +51,7 @@ if or(strcmp(choice,'No'),~bool_kmeans)
     else
         choice = 'No'; moreaggs = 1;
     end
-    if strcmp(choice,'No'); img_binary = ones(size(img)); end
+    if strcmp(choice,'No'); img_binary = zeros(size(img)); end
 end
 
 img_cropped = [];
@@ -75,18 +75,8 @@ while moreaggs==1
     
     %== Attempt 4: Manual thresholding, again ============================%
     if strcmp(choice2,'No')
-        clear TempBW NewBW_lasoo NewBW
-        [img_temp,rect] = agg_segment.agg_det_slider(img_cropped,0);
+        [img_temp,rect,~,img_cropped] = agg_segment.agg_det_slider(img,1);
             % image is stored in a temporary image
-        
-        TempBW = img_temp;
-            % the black part of the small cropped image is placed on the image
-        
-        TempBW(round(rect(2)):round(rect(2)+rect(4))-1,round(rect(1)):round(rect(1)+rect(3)-1)) = ...
-            NewBW_lasoo(1:round(rect(4))-1,1:round(rect(3))-1).*...
-            TempBW(round(rect(2)):round(rect(2)+rect(4))-1,round(rect(1)):round(rect(1)+rect(3)-1));
-        imshow(TempBW);
-        NewBW = TempBW;
     end
     
     agg_binary_bin  = [agg_binary_bin, img_temp];
@@ -102,7 +92,7 @@ while moreaggs==1
     inds1 = rect(2):(rect(2)+size_temp(1)-1);
     inds2 = rect(1):(rect(1)+size_temp(2)-1);
     img_binary(inds1,inds2) = ...
-        img_binary(inds1,inds2).*img_temp;
+        or(img_binary(inds1,inds2),img_temp);
     
     %-- Query user -------------------------------------------------------%
     h = figure(gcf);

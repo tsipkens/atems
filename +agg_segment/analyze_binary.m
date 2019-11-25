@@ -6,7 +6,7 @@
 function [Aggs] = analyze_binary(img_binary,img,pixsize)
 
 disp('Calculating aggregate areas...');
-CC = bwconncomp(abs(img_binary-1)); % find seperate aggregates
+CC = bwconncomp(img_binary); % find seperate aggregates
 naggs = CC.NumObjects; % count number of aggregates
 Aggs(naggs).fname = ''; % pre-allocate new space for aggregates
 
@@ -28,7 +28,9 @@ for jj = 1:naggs % loop through number of found aggregates
     Aggs(jj).binary = img_binary;
     
     [Aggs(jj).img_cropped,Aggs(jj).img_cropped_binary,Aggs(jj).rect] = ...
-        agg_segment.autocrop(img,img_binary);
+        autocrop(img,img_binary);
+        % get a cropped version of the aggregate
+        % 'autocrop' method included below
     
     
     %== Compute aggregate dimensions/parameters ======================%
@@ -64,7 +66,6 @@ for jj = 1:naggs % loop through number of found aggregates
     [x,y] = find(img_binary ~= 0);
     Aggs(jj).center_mass = [mean(x); mean(y)];
     
-    figure(gcf);
     tools.plot_aggregates(Aggs,[],jj,0);
 end
 
@@ -83,12 +84,12 @@ end
 %   Gyration calculates radius of gyration by assuming every pixel as an area
 %   of pixsize^2
 %   Author: Ramin Dastanpour
-function [Rg] = gyration(Final_Binary, pixsize)
+function [Rg] = gyration(img_binary, pixsize)
 
 
-total_area = nnz(Final_Binary)*pixsize^2;
+total_area = nnz(img_binary)*pixsize^2;
 
-[xpos,ypos] = find(Final_Binary);
+[xpos,ypos] = find(img_binary);
 n_pix = size(xpos,1);
 Centroid.x = sum(xpos)/n_pix;
 Centroid.y = sum(ypos)/n_pix;
@@ -106,11 +107,37 @@ end
 
 
 
+%== AUTOCROP =============================================================%
+%   Automatically crops an image based on binary information
+%   Author:  Yeshun (Samuel) Ma, Timothy Sipkens, 2019-07-23
+function [img_cropped,img_binary,rect] = autocrop(img_orig,img_binary)
+
+[x,y] = find(img_binary);
+
+space = 25;
+size_img = size(img_orig);
+
+% Find coordinates of top and bottom of aggregate
+x_top = min(max(x)+space,size_img(1)); 
+x_bottom = max(min(x)-space,1);
+y_top = min(max(y)+space,size_img(2)); 
+y_bottom = max(min(y)-space,1);
+
+
+img_binary = img_binary(x_bottom:x_top,y_bottom:y_top);
+img_cropped = img_orig(x_bottom:x_top,y_bottom:y_top);
+rect = [y_bottom,x_bottom,(y_top-y_bottom),(x_top-x_bottom)];
+
+end
+
+
+
+
 %== PERIMETER_LENGTH =====================================================%
+%   (DEPRECIATED)
 %   Perimeter_Length calculates the lengt of aggregate perimeter
 %   Written by Ramin Dastanpour, Steve Rogak, Hugo Tjong, Arka Soewono %%%
 %   The University of British Columbia, Vanouver, BC, Canada, Jul. 2014%%%
-%   (Currently depreciated)
 function [perimeter] = perimeter_length(img_binary,pixsize,pixels)
 
 [row, col]=find(img_binary);
@@ -132,8 +159,4 @@ end
 perimeter=perimeter_pixelcount * pixsize;
 
 end
-
-
-
-
 
