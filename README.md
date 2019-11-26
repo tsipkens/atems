@@ -26,7 +26,7 @@ entry per aggregate. This data can then be exported to a JSON
 format to be analyzed in other software and languages.
 
 
-## 2. Aggregate segmentation package (+agg_segment)
+## 2. Aggregate segmentation package (+agg)
 
 This package contains an expanding library of functions aimed at
 performing semantic segmentation of the TEM images into aggregate
@@ -34,10 +34,10 @@ and background areas. Some of the functions are modeled after the code of
 [Dastanpour et al. (2016)][dastanpour2016], though code from that project has been
 significantly altered in the present program.
 
-#### 2.1 agg_det* functions
+#### 2.1 agg_seg* functions
 
 Functions implementing different methods of aggregate-level semantic
-segmentation have filenames starting with `agg_det*`. The available methods are
+segmentation have filenames starting with `agg_seg*`. The available methods are
 summarized below. In each case, efforts are ongoing to standardize
 the outputs, which primarily consist of binary images in which pixels
 identified as part of the aggregate are assigned a value of `1`
@@ -45,14 +45,14 @@ and pixels in the background are assigned a value of `0`.
 
 Other methods, beyond those below, are currently under development.
 
-###### 2.1.1 agg_det_otsu_rb
+###### 2.1.1 agg_seg_otsu_rb
 
 This method applies Otsu thresholding followed by a rolling ball transformation
 that fills gaps in the particles (as per [Dastanpour et al. (2016)][dastanpour2016]).
 This method uses the `rolling_ball` function included with this
 package to perform the rolling ball transformation.
 
-###### 2.1.2 agg_det_slider
+###### 2.1.2 agg_seg_slider
 
 This is a GUI method with a slider for manual thresholding of the image. Gaussian
 denoising is first performed on the image to reduce the noise in
@@ -63,7 +63,7 @@ since that implementation.
 
 Several subfunctions are included within the main file.
 
-###### 2.1.3 agg_det
+###### 2.1.3 agg_seg
 
 This is included as a wrapper function (agg_det.m) that runs a
 series of these other methods in series, prompting the user
@@ -72,7 +72,7 @@ if adequate thresholding was achieved by a given method.
 #### 2.2 analyze_aggregate
 
 This function analyzes the binary image output using any of
-the `agg_det*` functions. The output is a MATLAB structured array
+the `agg_seg_*` functions. The output is a MATLAB structured array
 containing information about the aggregate, such as area
 in pixels, radius of gyration, area-equivalent diameter, aspect ratio
 etc.
