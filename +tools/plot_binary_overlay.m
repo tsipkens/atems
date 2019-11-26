@@ -3,8 +3,7 @@
 % Author:              Timothy Sipkens, 2019-07-24
 %=========================================================================%
 
-function [h,f,i0] = plot_binary_overlay(img,img_binary,opts,...
-    cmap,bool_type,bool_outline,label_alpha)
+function [h,f,i0] = plot_binary_overlay(img,img_binary,opts)
 
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('opts','var'); opts = struct(); end

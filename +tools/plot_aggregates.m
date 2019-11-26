@@ -35,15 +35,17 @@ end % else: plot circles on existing image
 %-- Plot circles and identify aggregates ---------------------------------%
 for aa=ind_agg
     hold on;
-    plot(Aggs(aa).center_mass(2),Aggs(aa).center_mass(1),'rx');
+    plot(Aggs(aa).center_mass(2),Aggs(aa).center_mass(1),...
+        'yx','LineWidth',1);
     viscircles(fliplr(Aggs(aa).center_mass'),...
         Aggs(aa).Rg./Aggs(aa).pixsize);
     text(Aggs(aa).center_mass(2)+20,Aggs(aa).center_mass(1),...
         num2str(Aggs(aa).id),'Color','white');
     
-    if isfield(Aggs,'dp_pcm_simple') % if available plto reference dp
+    if isfield(Aggs,'dp_pcm_simple') % if available plot reference dp
         viscircles(fliplr(Aggs(aa).center_mass'),...
-            Aggs(aa).dp_pcm_simple/2./Aggs(aa).pixsize,'Color','b');
+            Aggs(aa).dp_pcm_simple/2./Aggs(aa).pixsize,...
+            'Color','y','LineWidth',1);
     end
     hold off;
 end

@@ -1,65 +1,63 @@
 
 % EDM_SBS Performs Euclidean distance mapping-scale based analysis. 
-% Based on the work of Bescond et al. (2014)
+%         Based on the work of Bescond et al., Aerosol Sci. Technol. (2014).
 % Author: Timothy Sipkens, 2019-11-23
 %=========================================================================%
 
-function [Aggs] = edm_sbs(img_binary,pixsize)
+function [Aggs,S,dp_bin] = edm_sbs(img_binary,pixsize)
 
+
+%-- Parse inputs ---------------------------------------------------------%
+if ~exist('pixsize','var'); pixsize = []; end
+%-------------------------------------------------------------------------%
 
 
 %== STEP 1: Morphological opening of binary image ========================%
-se_max = 100;
-se_vec = 0:se_max;
+se_max = 150;
+se_vec = 0:se_max; % vector of disk sizes (in pixels) used in opening
 
 disp('Performing morphological operations:');
 tools.textbar(0);
-count = zeros(length(se_vec),1);
-for ii=1:length(se_vec)
-    se = strel('disk',se_vec(ii));
+counts = zeros(length(se_vec),1); % initialize counts
+
+for ii=1:length(se_vec) % loop with increasing disk size
+    se = strel('disk',se_vec(ii),8);
     img_opened = imopen(img_binary,se);
-    count(ii) = nnz(img_opened);
+        % open the image using a disk of size se_vec(ii)
+        
+    counts(ii) = nnz(img_opened);
+        % count the number of non-zero pixels remaining
     
     tools.textbar(ii/length(se_vec));
+    
+    if counts(ii)==0 % if all of the pixels are gone, exit loop
+        counts(ii:end) = 0;
+        tools.textbar(1);
+        break;
+    end
+        
 end
-count = count./count(1);
+counts = counts./counts(1);
 disp(' ');
 
 dp_count = (se_vec.*pixsize)';
-S = count;
 
 
-%== STEP 2: Bin data after covering to nm ================================%
-nb_classes = 20;
-d_max = 125;
+%== STEP 2: Interpolate data to a common set of sizes ====================%
+%   Accommodates images with different pixel size onto a common scale
+d_max = 120;
+nb_classes = 200;
 dp_bin_delta = d_max/(nb_classes-1);
 dp_bin = (0:dp_bin_delta:d_max)';
 
-% S = zeros(nb_classes,1);
-% A = repmat(dp_bin,[1,length(dp_count)]);
-% [~,ind_closest] = min(abs(bsxfun(@minus, A, dp_count')));
-% for ii=1:length(count)
-%     S(ind_closest(ii)) = S(ind_closest(ii)) + count(ii);
-% end
-% 
-% t0 = 1-bsxfun(@minus, A, dp_count');
-% t0(t0<=-1) = 0;
-% t0(t0>1) = 0;
-% t0 = abs(t0);
-% 
-% t0 = min(1,max(0,...
-%     (dp_bin(2:end)-dp_count(1:(end-1))')./dp_bin_delta...
-%     ));
-% t1 = min(1,max(0,...
-%     (dp_count(2:end)'-dp_bin(1:(end-1)))./dp_bin_delta...
-%     ));
-% t2 = min(t0,t1);
+gi = griddedInterpolant(dp_count,counts);
+S = gi(dp_bin);
 
 
 %== Fit a sigmoid function to the data ===================================%
-beta = 1.9;
-Omega = 0.8;
-sigmoid = @(x) 1-1./(1+exp(((log(x(1))-log(dp_count))./log(x(2))-beta)./Omega));
+bet = 1.9; % beta parameter in sigmoid function
+ome = 0.8; % Omega parameter in sigmoid function
+sigmoid = @(x) 1-1./(1+exp(((log(x(1))-log(dp_bin))./log(x(2))-bet)./ome));
     % x(1) = dpg, x(2) = spg
 
 disp('Fitting curve to data...');

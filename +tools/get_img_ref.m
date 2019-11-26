@@ -8,7 +8,7 @@ img.num = 0; % 0: no image loaded; 1: at least one image loaded
 % loop continues until at least image is selected or the program is stopped
 
 while img.num == 0
-    dir_start = '..\Images'; % initial directory to look for images
+    dir_start = '..\images'; % initial directory to look for images
     
     [img.fname,img.dir] = uigetfile({'*.tif;*.jpg',...
         'TEM image (*.tif;*.jpg)'},'Select Images',dir_start,'MultiSelect',...

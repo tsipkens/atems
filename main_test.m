@@ -51,6 +51,6 @@ imshow(imgs{1});
 
 
 
-[Aggs] = pp.edm_sbs(imgs_binary{1},Imgs(1).pixsize);
+[Aggs,S,dp_bin] = pp.edm_sbs(imgs_binary{1},Imgs(1).pixsize);
 
 
