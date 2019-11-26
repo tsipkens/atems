@@ -35,10 +35,10 @@ for ii=1:length(imgs)%:-1:1 % loop through provided images
     disp(['<== IMAGE ',num2str(ii),' =================================>']);
     
     %-- Initialize parameters --------------------------------------------%
-    %   use defaults defined in agg_det instead
+    %   use defaults defined in seg instead
     
     %-- Run slider to obtain binary image --------------------------------%
-    [img_binary,~,~,~] = agg_segment.agg_det(...
+    [img_binary,~,~,~] = agg.seg(...
         imgs{ii},pixsize(ii),[],[],...
         opts); % includes removing aggregates from border
     imgs_binary{ii} = img_binary;
@@ -46,7 +46,7 @@ for ii=1:length(imgs)%:-1:1 % loop through provided images
     disp('Completed thresholding.');
     disp(' ');
     
-    Aggs0 = agg_segment.analyze_binary(...
+    Aggs0 = agg.analyze_binary(...
         img_binary,imgs{ii},pixsize(ii));
     
     if exist('fname','var')

@@ -46,7 +46,7 @@ for jj = 1:naggs % loop through number of found aggregates
     
     %{
     [Aggs(aa).length, Aggs(aa).width] = ...
-        agg_segment.agg_dimension(img_edge,pixsize);
+        agg.agg_dimension(img_edge,pixsize);
         % calculate aggregate length and width
     Aggs(aa).aspect_ratio = Aggs(aa).length/Aggs(aa).width;
     %}
@@ -60,7 +60,7 @@ for jj = 1:naggs % loop through number of found aggregates
     Aggs(jj).perimeter = sum(sum(img_edge~=0))*pixsize;
         % calculate aggregate perimeter
     % Aggs(ll).perimeter = ...
-    %     agg_segment.perimeter_length(img_binary,...
+    %     agg.perimeter_length(img_binary,...
     %     pixsize,Aggs(ll).num_pixels); % alternate perimeter
     
     [x,y] = find(img_binary ~= 0);

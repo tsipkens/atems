@@ -1,10 +1,10 @@
 
-% AGG_DET_TEST A function for testing new aggregate segmentations.
+% SEG_TEST A function for testing new aggregate segmentations.
 % Author:   Timothy Sipkes, 2019-10-04
 %=========================================================================%
 
 function [img_binary] = ...
-    agg_det_test(imgs,pixsize,minparticlesize,coeffs)
+    seg_test(imgs,pixsize,minparticlesize,coeffs)
 
 
 %== Parse inputs =========================================================%
@@ -41,7 +41,7 @@ end
 
 img = imgs{1};
 
-[img0,bg] = agg_segment.background_subtract(img);
+[img0,bg] = agg.background_subtract(img);
 img1 = imbilatfilt(img0);
 
 i1 = img1;

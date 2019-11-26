@@ -1,10 +1,10 @@
 
-% AGG_DET_KMEANS_RB Performs kmeans clustering + a rolling ball transformation.
+% SEG_KMEANS_RB Performs kmeans clustering + a rolling ball transformation.
 % Author:   Timothy Sipkens, 2019-10-04
 %=========================================================================%
 
 function [img_binary,img_kmeans,feature_set] = ...
-    agg_det_kmeans_rb(imgs,pixsize,minparticlesize,coeffs)
+    seg_kmeans_rb(imgs,pixsize,minparticlesize,coeffs)
 
 
 %== Parse inputs =========================================================%
@@ -105,7 +105,7 @@ img_kmeans = ~(bw==(ind_min-1));
 
 
 %== STEP 4: Rolling Ball Transformation ==================================%
-img_binary = ~agg_segment.rolling_ball(~img_kmeans,pixsize,minparticlesize,coeffs);
+img_binary = ~agg.rolling_ball(~img_kmeans,pixsize,minparticlesize,coeffs);
 
 % i6 = ~bw;
 % 

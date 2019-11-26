@@ -1,12 +1,12 @@
 
-% AGG_DET_OTSU_RB  Performs Otsu thresholding + a rolling ball transformation.
+% SEG_OTSU_RB  Performs Otsu thresholding + a rolling ball transformation.
 % Authors:  Ramin Dastanpour, Steven N. Rogak, 2016-02
 %           Developed at the University of British Columbia
 % Modified: Timothy Sipkens
 %=========================================================================%
 
 function [img_binary] = ...
-    agg_det_otsu_rb(imgs,pixsize,minparticlesize,coeffs) 
+    seg_otsu_rb(imgs,pixsize,minparticlesize,coeffs) 
 
 %== Parse inputs =========================================================%
 if isstruct(imgs)
@@ -35,7 +35,7 @@ bw = ~imclearborder(~bw); % clear aggregates on border
 
 
 %== Step 2: Rolling Ball Transformation ==================================%
-img_binary = agg_segment.rolling_ball(bw,pixsize,minparticlesize,coeffs);
+img_binary = agg.rolling_ball(bw,pixsize,minparticlesize,coeffs);
 img_binary = ~img_binary;
 
 

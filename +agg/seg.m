@@ -1,15 +1,15 @@
 
-% AGG_DET	Sequential attempts at semi-automatic detection of the aggregates on TEM images.
+% SEG	Sequential attempts at semi-automatic detection of the aggregates on TEM images.
 %           Attempts k-means + rolling ball, Otsu + rolling ball, slider
 %           thresholding. Acts as a wrapper function for implementing 
-%           several other agg_det*.m methods
+%           several other seg*.m methods
 % Author:   Ramin Dastanpour, Steven N. Rogak
 %           Developed at the University of British Columbia
 % Modified: Timothy Sipkens, 2019
 %=========================================================================%
 
 function [img_binary,img_cropped,agg_binary_bin,agg_cropped_bin] = ...
-    agg_det(img,pixsize,minparticlesize,coeffs,opts) 
+    seg(img,pixsize,minparticlesize,coeffs,opts) 
 
 agg_binary_bin = {};    % Bin of binary aggregate images
 agg_cropped_bin = {};   % Bin of cropped aggregated images
@@ -30,10 +30,10 @@ if isfield(opts,'bool_otsu'); bool_otsu = opts.bool_otsu; end
 
 %== Attempt 1: k-means segmentation + rolling ball transformation ========%
 if bool_kmeans
-    img_binary = agg_segment.agg_det_kmeans2(...
+    img_binary = agg.seg_kmeans2(...
         img,pixsize);
     [moreaggs,choice] = ...
-        agg_segment.user_input(img,img_binary); % prompt user
+        agg.user_input(img,img_binary); % prompt user
     img_binary = imclearborder(img_binary); % clear aggregates on border
 else
     choice = 'No';
@@ -44,9 +44,9 @@ end
 %== Attempt 2: Ostu + rolling ball transformation ========================%
 if or(strcmp(choice,'No'),~bool_kmeans)
     if bool_otsu
-        img_binary = agg_segment.agg_det_otsu_rb(...
+        img_binary = agg.seg_otsu_rb(...
             img,pixsize,minparticlesize,coeffs);
-        [moreaggs,choice] = agg_segment.user_input(...
+        [moreaggs,choice] = agg.user_input(...
             img,img_binary); % prompt user
     else
         choice = 'No'; moreaggs = 1;
@@ -60,7 +60,7 @@ img_cropped = [];
 
 %== Attempt 3: Manual thresholding =======================================%
 while moreaggs==1
-    [img_temp,rect,~,img_cropped] = agg_segment.agg_det_slider(img,1);
+    [img_temp,rect,~,img_cropped] = agg.seg_slider(img,1);
         % used previously cropped image
         % img_temp temporarily stores binary image
     
@@ -75,7 +75,7 @@ while moreaggs==1
     
     %== Attempt 4: Manual thresholding, again ============================%
     if strcmp(choice2,'No')
-        [img_temp,rect,~,img_cropped] = agg_segment.agg_det_slider(img,1);
+        [img_temp,rect,~,img_cropped] = agg.seg_slider(img,1);
             % image is stored in a temporary image
     end
     

@@ -16,7 +16,7 @@ imgs_kmeans = {};
 feature_set = {};
 for ii=1:length(imgs)
     [imgs_binary{ii},imgs_kmeans{ii},feature_set{ii}] = ...
-        agg_segment.agg_det_kmeans3(Imgs(ii));
+        agg_segment.agg_det_fcm(Imgs(ii));
 end
 
 figure(1);

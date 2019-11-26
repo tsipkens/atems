@@ -1,10 +1,10 @@
 
-% AGG_DET_ADAPT_RB  Performs adaptive thresholding + a rolling ball transformation.
+% SEG_ADAPT_RB  Performs adaptive thresholding + a rolling ball transformation.
 % Author: Timothy Sipkens, 2019-11-06
 %=========================================================================%
 
 function [img_binary] = ...
-    agg_det_adapt_rb(imgs,sensitivity,pixsize,minparticlesize,coeffs) 
+    seg_adapt_rb(imgs,sensitivity,pixsize,minparticlesize,coeffs) 
 
 %== Parse inputs =========================================================%
 if isstruct(imgs)
@@ -39,7 +39,7 @@ bw = imbinarize(img,level);
 
 
 %== Step 2: Rolling Ball Transformation ==================================%
-img_binary = agg_segment.rolling_ball(bw,pixsize,minparticlesize,coeffs);
+img_binary = agg.rolling_ball(bw,pixsize,minparticlesize,coeffs);
 img_binary = ~img_binary;
 
 
