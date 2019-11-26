@@ -3,7 +3,7 @@
 % Author:          Timothy Sipkens, 2019-07-24
 %=========================================================================%
 
-function [h,f,i0] = plot_aggregates(Aggs,Imgs,ind,bool_img,opts)
+function [h,f,i0] = plot_aggregates(Aggs,ind,bool_img,opts)
 
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('ind','var'); ind = []; end
@@ -14,21 +14,23 @@ if isempty(bool_img); bool_img = 1; end
 
 if ~exist('opts','var'); opts = struct(); end
 
-if ~isempty(Imgs) % if Imgs provided, find the aggregates in that file
-    ind0 = strcmp({Aggs.fname},{Imgs(ind).fname});
-    ind_agg = 1:length(Aggs);
-    ind_agg = ind_agg(ind0);
-else % otherwise, plot aggregate specified by 'ind'
-    ind_agg = ind;
-end
+% find the aggregates in that file
+ind0 = strcmp({Aggs.fname},{Aggs(ind).fname});
+ind_agg = 1:length(Aggs);
+ind_agg = ind_agg(ind0);
 %-------------------------------------------------------------------------%
 
 
 %-- Plot labelled image by default ---------------------------------------%
 if bool_img
+    img_binary = zeros(size(Aggs(ind0(1)).image));
+    for aa=ind_agg
+        img_binary = or(img_binary,Aggs(aa).binary);
+    end
+    
     figure(gcf);
-    [~,~,i0] = tools.plot_binary_overlay(Imgs(ind).cropped,...
-        Imgs(ind).binary,opts);
+    [~,~,i0] = tools.plot_binary_overlay(Aggs(ind0(1)).image,...
+        img_binary,opts);
 end % else: plot circles on existing image
 
 

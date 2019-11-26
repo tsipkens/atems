@@ -8,14 +8,25 @@ Imgs_ref = tools.get_img_ref;
 Imgs = tools.get_imgs(Imgs_ref); % load a single image
 Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 imgs = {Imgs.cropped};
+pixsize = [Imgs.pixsize];
+fname = {Imgs.fname};
 
 
 %-- Run thresholding for all of the images -------------------------------%
-opts.bool_kmeans = 1;
-opts.bool_otsu = 0;
-[imgs_binary,imgs_aggs,Aggs] = ...
-    agg_segment.perform_seg(Imgs,[],[],opts);
-[Imgs.binary] = imgs_binary{:};
+% opts.bool_kmeans = 0;
+% opts.bool_otsu = 0;
+% imgs_binary = ...
+%     agg.perform_seg(imgs,pixsize,opts);
+% [Imgs.binary] = imgs_binary{:};
+
+for ii=1:length(Imgs)
+    imgs_binary{ii} = ...
+        imread(['..\images\test\binary_manual\',fname{ii}]);
+end
+
+Aggs = agg.analyze_binary(...
+    imgs_binary,imgs,pixsize,fname);
+        % determine aggregate properties
 
 
 %-- Save images and labels to JPGs ------------------%
@@ -50,7 +61,7 @@ Aggs_pcm = pp.pcm(Aggs);
 % tools.write_json(fname,data); % write formatted json file
 
 figure(1);
-tools.plot_aggregates(Aggs_pcm,Imgs);
+tools.plot_aggregates(Aggs_pcm);
 
 % figure(2);
 % [~,~,i0] = tools.plot_binary_overlay(imgs{1},imgs_binary{1});

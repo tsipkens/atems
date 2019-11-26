@@ -114,6 +114,18 @@ various quantities, such as the mean primary particle diameter. The manual
 code is a heavily modified version of the code associated
 with [Dastanpour and Rogak (2014)][dastanpour2014].
 
+
+## 4. Additional tools package (+tools)
+
+This package contains a series of functions that help in visualizing or
+analyzing the aggregates.
+
+#### Plotting functions (plot*)
+
+These functions aid in visualizing the results. For example, `plot_binary_overlay(...)`
+will plot the image and overlay labels for the aggregates in a corresponding
+binary image.
+
 --------------------------------------------------------------------------
 
 #### License
