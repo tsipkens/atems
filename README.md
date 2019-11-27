@@ -12,14 +12,30 @@ pair correlation method (PCM), Kook, and manual methods. The program
 is primarily composed of two packages: +agg_segment and +pp, which perform
 aggregate-level segmentation and primarily particle detection respectively.
 
+## 1. Data structures
 
-## 1. Data structure
+#### 1.1 Imgs and Imgs_ref
 
-Images are handled primarily by two variables: `Imgs_ref`
+Images are handled primarily by two MATLAB structured arrays:`Imgs_ref`
 and `Imgs`. The former contains a reference to the images,
-including file name and containing directory. The latter
-contains both the imported raw image, as well as processed
-versions of the image, such as those with the footer removed.
+including file name and containing directory. 
+
+The latter contains both the imported raw image, as well as processed
+versions of the image, such as those with the footer removed, 
+and information extracted from the footer of the image. 
+This structure can be used as input to most of the aggregate
+segmentation and primary particle analysis functions. Typical
+fields include: 
+
+| Field | Description |
+| :---  | :--- |
+| raw | The raw unprocessed image, as imported. |
+| cropped | A version of the image with the footer removed. |
+| fname | The filename from which the image originated. |
+| pixsize | The size, in nanometers, of the pixels in a given image. |
+| binary | Used to store a binary version of the image resulting from aggregate segmentstion, if desired. |
+
+#### Aggs
 
 The output data itself, `Aggs`, is a MATLAB structured array with one
 entry per aggregate. This data can then be exported to a JSON
