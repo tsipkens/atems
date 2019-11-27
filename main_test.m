@@ -16,7 +16,7 @@ imgs_kmeans = {};
 feature_set = {};
 for ii=1:length(imgs)
     [imgs_binary{ii},imgs_kmeans{ii},feature_set{ii}] = ...
-        agg_segment.agg_det_kmeans2(Imgs(ii));
+        agg.seg_kmeans2(Imgs(ii));
 end
 
 figure(1);
@@ -49,8 +49,8 @@ imshow(imgs{1});
 % opts.bool_outline = 0;
 % tools.plot_binary_overlay(imgs{1},im_diff,opts);
 
+figure(1);
 
-
-[Aggs] = pp.edm_sbs(imgs_binary{1},Imgs(1).pixsize);
+% [Aggs,S,dp_bin] = pp.edm_sbs(imgs_binary{1},Imgs(1).pixsize);
 
 

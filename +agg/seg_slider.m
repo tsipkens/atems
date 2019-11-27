@@ -1,11 +1,11 @@
 
-% AGG_DET_SLIDER Performs background correction and manual thresholding on a user-defined portion of the image.
+% SEG_SLIDER Performs background correction and manual thresholding on a user-defined portion of the image.
 % Author:       Ramin Dastanpour, Steven N. Rogak, 2016-02 (originally)
 %               Developed at the University of British Columbia
 % Modified:     Tmothy Sipkens, 2019-10-11
 %=========================================================================%
 
-function [img_binary,rect,img_refined,img_cropped] = agg_det_slider(img,bool_crop) 
+function [img_binary,rect,img_refined,img_cropped] = seg_slider(img,bool_crop) 
 
 %== Parse input ==========================================================%
 if ~exist('bool_crop','var'); bool_crop = []; end
