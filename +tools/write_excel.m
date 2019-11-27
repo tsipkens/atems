@@ -1,6 +1,10 @@
 
-
 function [] = write_excel(fname,Aggs)
+
+data_folder = fileparts(fname); % get folder name
+if ~exist(data_folder,'dir') % check if folder exists
+   mkdir(data_folder); % create the folder if it does not exist
+end
 
 Aggs_fields = fields(Aggs); % get field names
 
