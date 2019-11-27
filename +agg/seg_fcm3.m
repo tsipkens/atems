@@ -1,10 +1,10 @@
 
-% SEG_FCM Performs kmeans clustering on a modified feature set.
-% Author:   Timothy Sipkens, 2019-11-19
+% SEG_FCM3 Performs kmeans clustering on a modified feature set.
+% Author:  Timothy Sipkens, 2019-11-26
 %=========================================================================%
 
 function [img_binary,img_kmeans,feature_set] = ...
-    seg_fcm(imgs,pixsize)
+    seg_fcm3(imgs,pixsize)
 
 
 %== Parse inputs =========================================================%

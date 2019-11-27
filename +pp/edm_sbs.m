@@ -87,8 +87,8 @@ x1 = lsqnonlin(@(x) sigmoid(x)-S, x0, [], [], opts);
 disp('Complete.');
 disp(' ');
 
-Aggs(aa).dpg = x1(1);
-Aggs(aa).sg = x1(2);
+Aggs(aa).dpg_edm = x1(1);
+Aggs(aa).sg_edm = x1(2);
 
 end % end loop over aggregates
 

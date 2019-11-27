@@ -1,9 +1,13 @@
 
-function [] = write_excel(fname,Aggs)
+% WRITE_EXCEL Write aggregate data to an Excel file.
+% Author: Timothy Sipkens, 2019-11-26
+%=========================================================================%
 
-data_folder = fileparts(fname); % get folder name
-if ~exist(data_folder,'dir') % check if folder exists
-   mkdir(data_folder); % create the folder if it does not exist
+function [] = write_excel(Aggs,fname)
+
+foldname = fileparts(fname); % get folder name
+if ~exist(foldname,'dir') % check if folder exists
+   mkdir(foldname); % create the folder if it does not exist
 end
 
 Aggs_fields = fields(Aggs); % get field names

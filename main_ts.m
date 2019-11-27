@@ -32,10 +32,10 @@ Aggs = agg.analyze_binary(...
 
 
 Aggs_pcm = pp.pcm(Aggs);
-tools.write_excel('data\Aggs_pcm.xlsx',Aggs_pcm);
 
 
-Aggs_edm = pp.edm_sbs(Aggs);
+Aggs_edm = pp.edm_sbs(Aggs_pcm);
+tools.write_excel(Aggs_edm,'data\Aggs.xlsx');
 
 
 % Aggs_kook = pp.kook(Imgs,1);
