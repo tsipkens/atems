@@ -1,6 +1,9 @@
 
 # UBC tools for TEM image analysis (ubc-tem-analysis)
 
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
+[![Version](https://img.shields.io/badge/Version-0.4-blue.svg)]()
+
 This program contains several methods of characterizing aggregates from
 TEM images for image analysis at the Univesity of British Columbia (UBC).
 This includes methods for evaluating the aggregate projected area, perimeter,
@@ -18,14 +21,14 @@ aggregate-level segmentation and primarily particle detection respectively.
 
 Images are handled primarily by two MATLAB structured arrays:`Imgs_ref`
 and `Imgs`. The former contains a reference to the images,
-including file name and containing directory. 
+including file name and containing directory.
 
 The latter contains both the imported raw image, as well as processed
-versions of the image, such as those with the footer removed, 
-and information extracted from the footer of the image. 
+versions of the image, such as those with the footer removed,
+and information extracted from the footer of the image.
 This structure can be used as input to most of the aggregate
 segmentation and primary particle analysis functions. Typical
-fields include: 
+fields include:
 
 | Field | Description |
 | :---  | :--- |
@@ -39,7 +42,8 @@ fields include:
 
 The output data itself, `Aggs`, is a MATLAB structured array with one
 entry per aggregate. This data can then be exported to a JSON
-format to be analyzed in other software and languages.
+format or an Excel spreadsheet, to be analyzed in other
+software and languages.
 
 
 ## 2. Aggregate segmentation package (+agg)
