@@ -37,7 +37,7 @@ fields include:
 | cropped | A version of the image with the footer removed. |
 | fname | The filename from which the image originated. |
 | pixsize | The size, in nanometers, of the pixels in a given image. |
-| binary | Used to store a binary version of the image resulting from aggregate segmentstion, if desired. |
+| binary | Used to store a binary version of the image resulting from aggregate segmentation, if desired. |
 
 #### Aggs
 
