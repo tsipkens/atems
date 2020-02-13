@@ -14,16 +14,16 @@ fname = {Imgs.fname};
 
 
 %-- Run thresholding for all of the images -------------------------------%
-% opts.bool_kmeans = 0;
-% opts.bool_otsu = 0;
-% imgs_binary = ...
-%     agg.perform_seg(imgs,pixsize,opts);
-% [Imgs.binary] = imgs_binary{:};
+opts.bool_kmeans = 1;
+opts.bool_otsu = 0;
+imgs_binary = ...
+    agg.perform_seg(imgs,pixsize,opts);
+[Imgs.binary] = imgs_binary{:};
 
-for ii=1:length(Imgs)
-    imgs_binary{ii} = ...
-        imread(['..\images\test\binary_manual\',fname{ii}]);
-end
+% for ii=1:length(Imgs)
+%     imgs_binary{ii} = ...
+%         imread(['..\images\test\binary_manual\',fname{ii}]);
+% end
 
 
 Aggs = agg.analyze_binary(...
