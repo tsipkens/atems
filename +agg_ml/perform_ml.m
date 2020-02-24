@@ -11,7 +11,7 @@ classes = ["background" "particle"];
 labels = [0 1];
 pxds = pixelLabelDatastore('images/train-labels',classes,labels);
 
-tbl = countEachLabel(pxds)
+tbl = countEachLabel(pxds);
 
 % Specify the network image size. This is typically the same as the traing image sizes.
 imageSize = [2240,1952];
@@ -31,6 +31,7 @@ pxLayer = pixelClassificationLayer('Name','labels','Classes',tbl.Name,...
     'ClassWeights',classWeights);
 net = replaceLayer(net,"classification",pxLayer);
 %}
+
 %%
 %-- Custom layers ----------------------------------------%
 numFilters = 64;
@@ -73,8 +74,5 @@ net = trainNetwork(pximds,layers,opts);
 
 
 
-
-
-%-- Test network -----------%
 
 
