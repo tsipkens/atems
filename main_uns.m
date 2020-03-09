@@ -16,11 +16,13 @@ feature_set = {};
 for ii=1:length(imgs)
     [imgs_binary{ii},imgs_kmeans{ii},feature_set{ii}] = ...
         agg.seg_kmeans2(Imgs(ii));
+%     [imgs_binary{ii},imgs_kmeans{ii},feature_set{ii}] = ...
+%         agg.seg_kmeans2(Imgs(ii));
 end
 
 
 figure(1);
-ind = 1;
+ind = 2;
 tools.plot_binary_overlay(imgs{ind},imgs_binary{ind});
 
 

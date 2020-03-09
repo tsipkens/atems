@@ -20,9 +20,9 @@ aggregate-level segmentation and primarily particle detection respectively.
 
 #### 1.1 Imgs and Imgs_ref
 
-Images are handled primarily by two MATLAB structured arrays:`Imgs_ref`
-and `Imgs`. The former contains a reference to the images,
-including file name and containing directory.
+Images in this program are handled primarily by two MATLAB structured arrays: `Imgs_ref` and `Imgs`. 
+
+The former contains a reference to the images, including file name and containing directory. The reference can be generated manually or by using a file explorer by calling the `tools.get_img_ref()` function. 
 
 The latter contains both the imported raw image, as well as processed
 versions of the image, such as those with the footer removed,
