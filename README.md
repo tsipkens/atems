@@ -90,13 +90,13 @@ This is included as a wrapper function (agg_det.m) that runs a
 series of these other methods in series, prompting the user
 if adequate thresholding was achieved by a given method.
 
-#### 2.2 analyze_aggregate
+#### 2.2 analyze_binary
 
-This function analyzes the binary image output using any of
+This function analyzes the binary image output which is previously produced using any of
 the `agg_seg_*` functions. The output is a MATLAB structured array
 containing information about the aggregate, such as area
 in pixels, radius of gyration, area-equivalent diameter, aspect ratio
-etc.
+etc., in an `Aggs` structured array. 
 
 
 ## 3. Primary particle analysis package (+pp)
