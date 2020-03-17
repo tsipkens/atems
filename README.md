@@ -43,7 +43,7 @@ fields include:
 
 The output data itself, `Aggs`, is a MATLAB structured array with one
 entry per aggregate. This data can then be exported to a JSON
-format or an Excel spreadsheet, to be analyzed in other
+format using `tools.write_json()` or an Excel spreadsheet using `tools.write_excel()`, to be analyzed in other
 software and languages.
 
 
