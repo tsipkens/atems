@@ -92,11 +92,21 @@ if adequate thresholding was achieved by a given method.
 
 #### 2.2 analyze_binary
 
-This function analyzes the binary image output which is previously produced using any of
+This function analyzes the binary image output from any of
 the `agg_seg_*` functions. The output is a MATLAB structured array
 containing information about the aggregate, such as area
 in pixels, radius of gyration, area-equivalent diameter, aspect ratio
-etc., in an `Aggs` structured array. 
+etc., in an `Aggs` structured array. The array has one entry for 
+each aggregate found in the image, defined as independent groupings of pixels. 
+The function itself takes a binary image, 
+the original image, and the pixel size as inputs, generating an `Aggs` structure by
+
+```Matlab
+Aggs = analyze_binary(imgs_binary,imgs,pixsize,fname);
+```
+
+The `fname` argument is optional and adds this tag to the information 
+in the output `Aggs` structure. 
 
 
 ## 3. Primary particle analysis package (+pp)
