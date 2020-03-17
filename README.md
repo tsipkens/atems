@@ -136,8 +136,6 @@ by [Kook et al. (2015)][kook].
 
 #### 3.4 manual
 
-*This is currently contained in a seperate package (+pp_manual).*
-
 Code to be used in the manual sizing of soot primary particles developed
 at the University of British Columbia. The current method uses crosshairs
 to select the length and width of the particle. This is converted to
