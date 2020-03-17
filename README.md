@@ -43,7 +43,7 @@ fields include:
 
 The output data itself, `Aggs`, is a MATLAB structured array with one
 entry per aggregate. This data can then be exported to a JSON
-format using `tools.write_json()` or an Excel spreadsheet using `tools.write_excel()`, to be analyzed in other
+format using `tools.write_json(...)` or an Excel spreadsheet using `tools.write_excel(...)`, to be analyzed in other
 software and languages.
 
 
@@ -55,7 +55,7 @@ and background areas. Some of the functions are modeled after the code of
 [Dastanpour et al. (2016)][dastanpour2016], though code from that project has been
 significantly altered in the present program.
 
-#### 2.1 agg_seg* functions
+#### 2.1 agg.seg* functions
 
 Functions implementing different methods of aggregate-level semantic
 segmentation have filenames starting with `agg_seg*`. The available methods are
@@ -66,25 +66,30 @@ and pixels in the background are assigned a value of `0`.
 
 Other methods, beyond those below, are currently under development.
 
-###### 2.1.1 agg_seg_otsu_rb
+###### 2.1.1 seg_otsu_rb
 
 This method applies Otsu thresholding followed by a rolling ball transformation
 that fills gaps in the particles (as per [Dastanpour et al. (2016)][dastanpour2016]).
 This method uses the `rolling_ball` function included with this
 package to perform the rolling ball transformation.
 
-###### 2.1.2 agg_seg_slider
+###### 2.1.2 seg_slider
 
-This is a GUI method with a slider for manual thresholding of the image. Gaussian
-denoising is first performed on the image to reduce the noise in
+This is a GUI-based method with a slider for *adaptive* manual thresholding of the image
+(adaptive in that small sections of the image can be cropped and thresholded independently). 
+Gaussian denoising is first performed on the image to reduce the noise in
 the thresholded image. Then, a slider is used to manually adjust
-the level of the threshold. This method was also included with distribution of the PCM
-code by [Dastanpour et al. (2016)][dastanpour2016]) but has seen considerable updates
+the level of the threshold. This is a variant of the method included with the distribution of the PCM
+code by [Dastanpour et al. (2016)][dastanpour2016], though it has seen considerable updates
 since that implementation.
 
 Several subfunctions are included within the main file.
 
-###### 2.1.3 agg_seg
+*We note that this code saw several important bug updates since the original code by [Dastanpour et al. (2016)][dastanpour2016]. 
+This includes fixing how the original code would repeatadly apply a Gaussian filter everytime the user interacted
+with the slider in the GUI, a reduction in the use of global variables, and significant memory savings.*
+
+###### 2.1.3 seg
 
 This is included as a wrapper function (agg_det.m) that runs a
 series of these other methods in series, prompting the user
@@ -93,7 +98,7 @@ if adequate thresholding was achieved by a given method.
 #### 2.2 analyze_binary
 
 This function analyzes the binary image output from any of
-the `agg_seg_*` functions. The output is a MATLAB structured array
+the `agg.seg_*` functions. The output is a MATLAB structured array
 containing information about the aggregate, such as area
 in pixels, radius of gyration, area-equivalent diameter, aspect ratio
 etc., in an `Aggs` structured array. The array has one entry for 
@@ -102,7 +107,7 @@ The function itself takes a binary image,
 the original image, and the pixel size as inputs, generating an `Aggs` structure by
 
 ```Matlab
-Aggs = analyze_binary(imgs_binary,imgs,pixsize,fname);
+Aggs = agg.analyze_binary(imgs_binary,imgs,pixsize,fname);
 ```
 
 The `fname` argument is optional and adds this tag to the information 
@@ -170,10 +175,10 @@ University of British Columbia (UBC), who can be contacted at
 [tsipkens@mail.ubc.ca](mailto:tsipkens@mail.ubc.ca).
 
 The code itself was compiled from various sources and features code written by
-several individuals at UBC, including Yeshun (Samuel) Ma, Ramin Dastanpour,
-Yiling Kang, Una Trivanovic, and Steven Rogak, among others.
+several individuals at UBC, including Ramin Dastanpour,
+Yiling Kang, Una Trivanovic, Yeshun (Samuel) Ma, and Steven Rogak, among others.
 
-Included with this program is original MATLAB code of [Kook et al. (2015)][kook],
+Included with this program is the original MATLAB code of [Kook et al. (2015)][kook],
 modified to accommodate the expected inputs and outputs common
 to the other functions.
 
