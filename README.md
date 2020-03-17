@@ -58,7 +58,7 @@ significantly altered in the present program.
 #### 2.1 agg.seg* functions
 
 Functions implementing different methods of aggregate-level semantic
-segmentation have filenames starting with `agg_seg*`. The available methods are
+segmentation have filenames starting with `agg.seg*`. The available methods are
 summarized below. In each case, efforts are ongoing to standardize
 the outputs, which primarily consist of binary images in which pixels
 identified as part of the aggregate are assigned a value of `1`
