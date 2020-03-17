@@ -58,7 +58,17 @@ significantly altered in the present program.
 #### 2.1 agg.seg* functions
 
 Functions implementing different methods of aggregate-level semantic
-segmentation have filenames starting with `agg.seg*`. The available methods are
+segmentation have filenames starting with `agg.seg*`. The functions generally 
+share two common inputs:
+
+1. `imgs` - An unmodified (save for removing the footer) single image or cellular array of images
+of the aggregates. 
+
+2. `pixsize` - The size of each pixel in the image (often used in the rolling ball transformation). 
+
+Other arguments depend on the function. 
+
+The available methods are
 summarized below. In each case, efforts are ongoing to standardize
 the outputs, which primarily consist of binary images in which pixels
 identified as part of the aggregate are assigned a value of `1`
