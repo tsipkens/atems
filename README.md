@@ -1,5 +1,5 @@
 
-# UBC tools for TEM image analysis (ubc-tem-analysis)
+# *A*nalysis tools for *TEM* images of *S*oot (ATEMS)
 
 [![DOI](https://zenodo.org/badge/190795680.svg)](https://zenodo.org/badge/latestdoi/190795680)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
