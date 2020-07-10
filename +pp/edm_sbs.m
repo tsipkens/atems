@@ -35,7 +35,8 @@ S = zeros(size(dp_bin)); % initialize S curve
 
 %-- Main loop over images ------------------------------------------------%
 for aa=1:length(imgs_binary)  % loop over aggregates
-    disp(['<== AGGREGATE ',num2str(aa),' of ',num2str(length(imgs_binary)),' ==>']);
+    disp(['[== AGGREGATE ',num2str(aa), ...
+        ' of ',num2str(length(imgs_binary)),' ================]']);
 
     img_binary = imgs_binary{aa};
     pixsize = pixsizes(aa);
