@@ -1,9 +1,24 @@
 
-% PCM_POST_SEG  Script for extracting the outline of aggregates from archive PCM output images.
+% SGE_PCM_LEGACY  Script for extracting the outline of aggregates from archived PCM output images.
+%     This script is used to extract the binary mask from legacy PCM output 
+%     images, where an outline is drawn on top of the TEM image but 
+%     the binary was not saved. The original TEM is required for 
+%     reconstructing the mask; the outline is extracted from the 
+%     difference of the two images, then binarized and filled. The 
+%     process is repeated for all images and the output is stored 
+%     in a separate folder.
+% 
+%     Developed and tested using flare TEM iamges from 2018, with 
+%     L9_DW having a blurry fill for the result. Theorised 
+%     to be due to the blurry nature of that set of TEM images 
+%     which caused the binarization to erroenous recognize edges inside 
+%     of aggregates.
+%     
+%     Last known to work on Matlab version 2019b, no additional 
+%     libraries necessary.
+% 
 % Author:   Lawrence Zhou, 2020-06-25
 % Updated:  Timothy Sipkens,2020-07-09
-% Input:    TEM image folder, PCM image folder, Output image folder
-% Outputs:  Binary masks of TEM images
 %=========================================================================%
 
 clear;
@@ -68,4 +83,5 @@ for ii = 1:length(data_pcm)
         imwrite(img_cropped, [f_crop, f_name]);
     end
 end
+
 
