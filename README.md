@@ -7,7 +7,7 @@
 
 This program contains several methods of characterizing aggregates from TEM images for image analysis at the University of British Columbia (UBC). This includes methods for evaluating the aggregate projected area, perimeter, and primary particle diameter.
 
-The software contains MATLAB code designed to compare multiple methods of analyzing TEM images of aggregates. These include the pair correlation method (PCM), Kook, and manual methods. The program is primarily composed of two packages: +agg_segment and +pp, which perform aggregate-level segmentation and primarily particle detection respectively.
+The software contains MATLAB code designed to compare multiple methods of analyzing TEM images of aggregates. These include the pair correlation method (PCM), Kook, and manual methods. The program is primarily composed of two packages: +agg and +pp, which perform aggregate-level segmentation to output a binary image and primarily particle detection, respectively. 
 
 ## 1. Data structures
 

@@ -33,7 +33,7 @@ dp_bin = logspace(log10(1),log10(d_max),nb_classes)';
 S = zeros(size(dp_bin)); % initialize S curve
 
 
-%-- Main loop over images ------------------------------------------------%
+%-- Main loop over binary images -----------------------------------------%
 for aa=1:length(imgs_binary)  % loop over aggregates
     disp(['[== AGGREGATE ',num2str(aa), ...
         ' of ',num2str(length(imgs_binary)),' ================]']);
@@ -50,7 +50,22 @@ for aa=1:length(imgs_binary)  % loop over aggregates
     disp('Performing morphological operations:');
     tools.textbar(0);
     counts = zeros(length(se_vec),1); % initialize counts
-
+    
+    img_dist = bwdist(~img_binary); % Euclidean distance to outside of aggregate
+    for ii=1:se_max
+        counts(ii) = nnz(img_dist>se_vec(ii));
+            % count the number of non-zero pixels remaining
+            
+        tools.textbar(ii/length(se_vec));
+        if counts(ii)==0 % if all of the pixels are gone, exit loop
+            counts(ii:end) = 0;
+            tools.textbar(1);
+            break;
+        end
+    end
+    
+    %{
+    % deprecated method, inaccurate and slow
     for ii=1:length(se_vec) % loop with increasing disk size
         se = strel('disk',se_vec(ii),8);
         img_opened = imopen(img_binary./255,se);
@@ -68,6 +83,8 @@ for aa=1:length(imgs_binary)  % loop over aggregates
         end
 
     end
+    %}
+    
     counts = counts./counts(1);
     disp(' ');
 
@@ -79,18 +96,21 @@ for aa=1:length(imgs_binary)  % loop over aggregates
     gi = griddedInterpolant(dp_count,counts);
     Sa = gi(dp_bin);
     
+    
     %== STEP 3: Fit a sigmoid function to the data =======================%
     %   This consistutes aggregate-level fitting. Aerosol-level fitting is
     %   done at the end of this function.
-    bet = 1.9; % beta parameter in sigmoid function
-    ome = 0.8; % Omega parameter in sigmoid function
-    sigmoid = @(x) 1-1./(1+exp(((log(x(1))-log(dp_bin))./log(x(2))-bet)./ome));
+    bet = 1.9658; % beta parameter in sigmoid function
+    ome = -0.8515; % Omega parameter in sigmoid function
+    a = 0.9966;
+    sigmoid = @(x) a./(1+exp(((log(x(1))-log(dp_bin))./log(x(2))-bet)./ome));
         % x(1) = dpg, x(2) = spg
-
+    
     disp('Fitting curve to data...');
     opts = optimset('Display','off');
-    x0 = [30,1.5];
-    x1 = lsqnonlin(@(x) sigmoid(x)-S, x0, [], [], opts);
+    x0 = [25,1.5];
+    x1 = lsqnonlin(@(x) (sigmoid(x) - Sa) ./ 100, x0, [], [], opts);
+    Sa_fit = sigmoid(x1);
     disp('Complete.');
     disp(' ');
     disp(' ');
@@ -102,19 +122,20 @@ for aa=1:length(imgs_binary)  % loop over aggregates
     S = S+Sa; % add to assumulated S curve
 
 end % end loop over aggregates
-S = S./S(1); % normalize S curve
+S = S./length(imgs_binary); % normalize S curve
 
 
 %== Fit a sigmoid function to all of the data ============================%
-bet = 1.9; % beta parameter in sigmoid function
-ome = 0.8; % Omega parameter in sigmoid function
-sigmoid = @(x) 1-1./(1+exp(((log(x(1))-log(dp_bin))./log(x(2))-bet)./ome));
+bet = 1.9658; % beta parameter in sigmoid function
+ome = -0.8515; % Omega parameter in sigmoid function
+a = 0.9966;
+sigmoid = @(x) a./(1+exp(((log(x(1))-log(dp_bin))./log(x(2))-bet)./ome));
     % x(1) = dpg, x(2) = spg
 
 disp('Fitting curve to all of the data...');
 opts = optimset('Display','off');
-x0 = [30,1.5];
-x1 = lsqnonlin(@(x) sigmoid(x)-S, x0, [], [], opts);
+x0 = [25,1.5];
+x1 = lsqnonlin(@(x) (sigmoid(x) - S) ./ 100, x0, [], [], opts);
 S_fit = sigmoid(x1);
 disp('Complete.');
 disp(' ');

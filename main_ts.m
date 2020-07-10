@@ -42,7 +42,7 @@ tools.write_excel(Aggs_edm,'data\Aggs.xlsx');
 
 
 figure(1);
-tools.plot_aggregates(Aggs_pcm);
+tools.plot_aggregates(Aggs_edm);
 
 
 
