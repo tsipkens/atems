@@ -131,7 +131,7 @@ This software is licensed under an MIT license (see the corresponding file for d
 
 #### Contributors and acknowledgements
 
-This code was primarily compiled by Timothy A. Sipkens while at the University of British Columbia (UBC), who can be contacted at [tsipkens@mail.ubc.ca](mailto:tsipkens@mail.ubc.ca). The code itself was compiled from various sources and features code written by several individuals at UBC, including Ramin Dastanpour, Una Trivanovic (@unatriva), Yiling Kang, Yeshun (Samuel) Ma, and Steven Rogak, among others.
+This code was primarily compiled by Timothy A. Sipkens while at the University of British Columbia (UBC), who can be contacted at [tsipkens@mail.ubc.ca](mailto:tsipkens@mail.ubc.ca). The code itself was compiled from various sources and features code written by several individuals at UBC, including Ramin Dastanpour, [Una Trivanovic](https://github.com/unatriva), Yiling Kang, Yeshun (Samuel) Ma, and Steven Rogak, among others.
 
 Included with this program is the MATLAB code of [Kook et al. (2015)][kook], modified to accommodate the expected inputs and outputs common to the other functions.
 
