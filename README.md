@@ -7,7 +7,11 @@
 
 This program contains several methods of characterizing aggregates from TEM images for image analysis at the University of British Columbia (UBC). This includes methods for evaluating the aggregate projected area, perimeter, and primary particle diameter.
 
-The software contains MATLAB code designed to compare multiple methods of analyzing TEM images of aggregates. These include the pair correlation method (PCM), Kook, and manual methods. The program is primarily composed of two packages: +agg and +pp, which perform aggregate-level segmentation to output a binary image and primarily particle detection, respectively. 
+The software contains MATLAB code designed to compare multiple methods of analyzing TEM images of aggregates. These include the pair correlation method (PCM), Kook, and manual methods. The program is primarily composed of two packages: 
+
+1. +agg, which performs aggregate-level segmentation to output a binary image, and 
+
+2. +pp, which determines the primarily particle detection. 
 
 ## 1. Data structures
 
@@ -127,9 +131,9 @@ This software is licensed under an MIT license (see the corresponding file for d
 
 #### Contributors and acknowledgements
 
-This code was primarily compiled by Timothy A. Sipkens while at the University of British Columbia (UBC), who can be contacted at [tsipkens@mail.ubc.ca](mailto:tsipkens@mail.ubc.ca). The code itself was compiled from various sources and features code written by several individuals at UBC, including Ramin Dastanpour, Una Trivanovic, Yiling Kang, Yeshun (Samuel) Ma, and Steven Rogak, among others.
+This code was primarily compiled by Timothy A. Sipkens while at the University of British Columbia (UBC), who can be contacted at [tsipkens@mail.ubc.ca](mailto:tsipkens@mail.ubc.ca). The code itself was compiled from various sources and features code written by several individuals at UBC, including Ramin Dastanpour, Una Trivanovic (@unatriva), Yiling Kang, Yeshun (Samuel) Ma, and Steven Rogak, among others.
 
-Included with this program is the original MATLAB code of [Kook et al. (2015)][kook], modified to accommodate the expected inputs and outputs common to the other functions.
+Included with this program is the MATLAB code of [Kook et al. (2015)][kook], modified to accommodate the expected inputs and outputs common to the other functions.
 
 This program also contains heavily modified versions of the code distributed with [Dastanpour et al. (2016)][dastanpour2016]. This includes much of the manual processing codes and the PCM method, as noted in the README above.
 
