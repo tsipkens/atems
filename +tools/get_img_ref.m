@@ -1,5 +1,8 @@
 
 % GET_IMG_REF Loads references to image files, including their name and directory.
+% Expects data to be located at '../data', that is in a folder named 'data'
+% up a single directory. 
+% Author: Timothy Sipkens
 %=========================================================================%
 
 function img = get_img_ref()
@@ -8,7 +11,7 @@ img.num = 0; % 0: no image loaded; 1: at least one image loaded
 % loop continues until at least image is selected or the program is stopped
 
 while img.num == 0
-    dir_start = '..\images'; % initial directory to look for images
+    dir_start = '..\data'; % initial directory to look for images
     
     [img.fname,img.dir] = uigetfile({'*.tif;*.jpg',...
         'TEM image (*.tif;*.jpg)'},'Select Images',dir_start,'MultiSelect',...

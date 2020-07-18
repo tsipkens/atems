@@ -4,11 +4,16 @@
 %=========================================================================%
 
 clear;
-close all;
+close all; fclose all;
 clc;
 
-Imgs_ref = tools.get_img_ref;
-    % generates a reference to a set of images to be analyzed
+fd = '..\data\2018-carleton\';
+case_name = 'RUKM1_C9';
+
+Imgs_ref.dir = [fd,'images\',case_name,'\'];
+Imgs_ref.data = dir([Imgs_ref.dir,'*.tif']);
+Imgs_ref.fname = {Imgs_ref.data.name};
+
 Imgs = tools.get_imgs(Imgs_ref); % load actual image data
 Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 
@@ -16,7 +21,7 @@ Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 imgs = {Imgs.cropped};
 
 
-fold_name = replace(Imgs_ref.dir, 'pooyan\images', 'pooyan\cropped[ts]');
+fold_name = replace(Imgs_ref.dir, '\images\', '\cropped[ts]\');
 status = mkdir(fold_name);
 
 

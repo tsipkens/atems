@@ -1,7 +1,10 @@
+
 data/
 data\
 images/
 images\
 +archive/
 +archive\
+archive/
+archive\
 *.asv

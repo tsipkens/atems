@@ -5,13 +5,12 @@
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 [![Version](https://img.shields.io/badge/Version-0.4+-blue.svg)]()
 
-This program contains several methods of characterizing aggregates from TEM images for image analysis at the University of British Columbia (UBC). This includes methods for evaluating the aggregate projected area, perimeter, and primary particle diameter.
+This program contains Matlab code for several methods of characterizing soot aggregates in TEM images. This includes methods for evaluating the aggregate projected area, perimeter, and primary particle diameter. Methods include Otsu thresholding, the pair correlation method (PCM), Hough circle transform (following [Kook](kook)), and tools to aid in manual analysis. The program is primarily composed of two packages: 
 
-The software contains MATLAB code designed to compare multiple methods of analyzing TEM images of aggregates. These include the pair correlation method (PCM), Kook, and manual methods. The program is primarily composed of two packages: 
+1. +agg - which performs aggregate-level segmentation to output a binary image, and 
 
-1. +agg, which performs aggregate-level segmentation to output a binary image, and 
+2. +pp - which determines the primarily particle. 
 
-2. +pp, which determines the primarily particle detection. 
 
 ## 1. Data structures
 
@@ -19,24 +18,23 @@ The software contains MATLAB code designed to compare multiple methods of analyz
 
 Images in this program are handled primarily by two MATLAB structured arrays: `Imgs_ref` and `Imgs`. 
 
-The former contains a reference to the images, including file name and containing directory. The reference can be generated manually or by using a file explorer by calling the `tools.get_img_ref()` function. 
+The former contains a reference to the images, including file name and containing directory. The reference can be generated manually or by using a file explorer by calling the `tools.get_img_ref(...)` function. 
 
 The latter contains both the imported raw image, as well as processed versions of the image, such as those with the footer removed, and information extracted from the footer of the image. This structure can be used as input to most of the aggregate
 segmentation and primary particle analysis functions. Typical fields include:
 
-| Field | Description |
-| :---  | :--- |
-| raw | The raw unprocessed image, as imported. |
-| cropped | A version of the image with the footer removed. |
-| fname | The filename from which the image originated. |
-| pixsize | The size, in nanometers, of the pixels in a given image. |
-| binary | Used to store a binary version of the image resulting from aggregate segmentation, if desired. |
+| Field 	| Description |
+| :---  	| :--- |
+| raw 		| The raw unprocessed image, as imported. |
+| cropped 	| A version of the image with the footer removed. |
+| fname 	| The filename from which the image originated. |
+| pixsize 	| The size, in nanometers, of the pixels in a given image. |
+| binary 	| Used to store a binary version of the image resulting from aggregate segmentation, if desired. |
 
 #### Aggs
 
 The output data itself, `Aggs`, is a MATLAB structured array with one entry per aggregate. This data can then be exported to a JSON format using `tools.write_json(...)` or an Excel spreadsheet using `tools.write_excel(...)`, to be analyzed in other
 software and languages.
-
 
 ## 2. Aggregate segmentation package (+agg)
 
@@ -51,7 +49,7 @@ significantly altered in the present program.
 Functions implementing different methods of aggregate-level semantic segmentation have filenames starting with `agg.seg*`. The functions generally share two common inputs:
 
 1. `imgs` - An unmodified (save for removing the footer) single image or cellular array of images
-of the aggregates. 
+   of the aggregates. 
 
 2. `pixsize` - The size of each pixel in the image (often used in the rolling ball transformation). 
 
