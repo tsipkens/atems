@@ -33,8 +33,19 @@ segmentation and primary particle analysis functions. Typical fields include:
 
 #### Aggs
 
-The output data itself, `Aggs`, is a MATLAB structured array with one entry per aggregate. This data can then be exported to a JSON format using `tools.write_json(...)` or an Excel spreadsheet using `tools.write_excel(...)`, to be analyzed in other
-software and languages.
+The output data itself, `Aggs`, is a MATLAB structured array with one entry per aggregate. This data can then be exported to a JSON file using 
+
+```Matlab
+tools.write_json(Aggs, fname);
+```
+
+or an Excel spreadsheet using 
+
+```Matlab
+tools.write_excel(Aggs, fname);
+```
+
+to be analyzed in other software and languages, where `fname` is the filename. 
 
 ## 2. Aggregate segmentation package (+agg)
 
