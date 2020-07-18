@@ -18,9 +18,13 @@ This program contains Matlab code for several methods of characterizing soot agg
 
 Images in this program are handled primarily by two MATLAB structured arrays: `Imgs_ref` and `Imgs`. 
 
-The former contains a reference to the images, including file name and containing directory. The reference can be generated manually or by using a file explorer by calling the `tools.get_img_ref(...)` function. 
+The former structure contains a reference to the images, including file name and containing directory. The reference can be generated manually or by using a file explorer by calling 
 
-The latter contains both the imported raw image, as well as processed versions of the image, such as those with the footer removed, and information extracted from the footer of the image. This structure can be used as input to most of the aggregate
+```Matlab
+Imgs_ref = tools.get_img_ref;
+```
+
+The latter structure contains both the imported raw image, as well as processed versions of the image, such as those with the footer removed, and information extracted from the footer of the image. This structure can be used as input to most of the aggregate
 segmentation and primary particle analysis functions. Typical fields include:
 
 | Field 	| Description |
@@ -31,7 +35,7 @@ segmentation and primary particle analysis functions. Typical fields include:
 | pixsize 	| The size, in nanometers, of the pixels in a given image. |
 | binary 	| Used to store a binary version of the image resulting from aggregate segmentation, if desired. |
 
-#### Aggs
+#### 1.2 Aggs
 
 The output data itself, `Aggs`, is a MATLAB structured array with one entry per aggregate. This data can then be exported to a JSON file using 
 
