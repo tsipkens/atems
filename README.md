@@ -74,28 +74,34 @@ tools.write_excel(Aggs, fname);
 
 to be analyzed in other software and languages, where `fname` is the filename of the file to write to. 
 
-Primary particle size information can finally be determined using the `pp` package. The original pair correlation method (PCM), for example, can be applied by using the `Agg` output from the `agg.analyze_binary(...)` function as
+Primary particle size information can finally be determined using the `pp` package. The original pair correlation method (PCM), for example, can be applied by using the `Aggs` output from the `agg.analyze_binary` function as
 
 ```Matlab
 Aggs_pcm = pp.pcm(Aggs); % apply PCM
 ```
 
-The output is an updates `Agg` structure that also contain the primary particle size information for each aggregate. 
+The output is an updates `Aggs` structure that also contain the primary particle size information for each aggregate. Having done this, visuzlized the result using
+
+```Matlab
+figure(1);
+tools.plot_aggregates(Aggs_edm);
+```
+
+As a sample, one can go from this image (with the footer already cropped) to a classified image that looks as follows:
+
+![Fig1_Example](docs/f1_example.png)
+
+Here, the blue highlighting indicates pixels that are part of the aggregate, the red circle indicated the projected-area equivalent diameter, the yellow circle the primary particle size from PCM, and the number indicating the index used by the program to identify each aggregate. 
 
 ## 2. Aggregate segmentation package (+agg)
 
-This package contains an expanding library of functions aimed at
-performing semantic segmentation of the TEM images into aggregate
-and background areas. Some of the functions are modeled after the code of
-[Dastanpour et al. (2016)][dastanpour2016], though code from that project has been
-significantly altered in the present program.
+This package contains an expanding library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background areas. Some of the functions are modeled after the code of [Dastanpour et al. (2016)][dastanpour2016], though code from that project has been significantly altered in the present program.
 
 #### 2.1 agg.seg* functions
 
 Functions implementing different methods of aggregate-level semantic segmentation have filenames starting with `agg.seg*`. The functions generally share two common inputs:
 
-1. `imgs` - An unmodified (save for removing the footer) single image or cellular array of images
-   of the aggregates. 
+1. `imgs` - An unmodified (save for removing the footer) single image or cellular array of images  of the aggregates. 
 
 2. `pixsize` - The size of each pixel in the image (often used in the rolling ball transformation). 
 
@@ -151,7 +157,7 @@ This method contains a copy of the code provided by [Kook et al. (2015)][kook], 
 
 #### 3.3 kook_yl
 
-This method contains a modified version of the method proposed by [Kook et al. (2015)][kook].
+This method contains a University of British Columbia-modified version of the method proposed by [Kook et al. (2015)][kook].
 
 #### 3.4 manual
 
@@ -177,10 +183,9 @@ This software is licensed under an MIT license (see the corresponding file for d
 
 This code was primarily compiled by Timothy A. Sipkens while at the University of British Columbia (UBC), who can be contacted at [tsipkens@mail.ubc.ca](mailto:tsipkens@mail.ubc.ca). The code itself was compiled from various sources and features code written by several individuals at UBC, including Ramin Dastanpour, [Una Trivanovic](https://github.com/unatriva), Yiling Kang, Yeshun (Samuel) Ma, and Steven Rogak, among others.
 
-Included with this program is the MATLAB code of [Kook et al. (2015)][kook], modified to accommodate the expected inputs and outputs common to the other functions.
+This program also contains modified versions of the code distributed with [Dastanpour et al. (2016)][dastanpour2016]. This includes the basis for much of code underlying the manual processing and the PCM method, as noted in the README above. 
 
-This program also contains heavily modified versions of the code distributed with [Dastanpour et al. (2016)][dastanpour2016]. This includes much of the manual processing codes and the PCM method, as noted in the README above.
-
+Also included with this program is the MATLAB code of [Kook et al. (2015)][kook], modified to accommodate the expected inputs and outputs common to the other functions.
 
 #### References
 
