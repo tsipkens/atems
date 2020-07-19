@@ -12,20 +12,21 @@ This program contains Matlab code for several methods of characterizing soot agg
 2. +pp - which determines the primarily particle. 
 
 
-## 1. Data structures
+## 1. Demonstration
 
-#### 1.1 Imgs and Imgs_ref
-
-Images in this program are handled primarily by two MATLAB structured arrays: `Imgs_ref` and `Imgs`. 
-
-The former structure contains a reference to the images, including file name and containing directory. The reference can be generated manually or by using a file explorer by calling 
+The first step in this process is to import images. Images in this program are designed to be handled primarily by two MATLAB structured arrays: `Imgs_ref` and `Imgs`. The former structure contains a reference to the images, including file name and containing directory. The reference can be generated manually or by using a file explorer by calling 
 
 ```Matlab
-Imgs_ref = tools.get_img_ref;
+Imgs_ref = tools.get_img_ref; % get location of files
 ```
 
-The latter structure contains both the imported raw image, as well as processed versions of the image, such as those with the footer removed, and information extracted from the footer of the image. This structure can be used as input to most of the aggregate
-segmentation and primary particle analysis functions. Typical fields include:
+The latter structure can then be generated using
+
+```Matlab
+Imgs = tools.get_imgs(Imgs_ref); % load the images
+```
+
+This structure contains both the imported raw image, as well as processed versions of the image, such as those with the footer removed, and information extracted from the footer of the image. This structure can be used as input to most of the aggregate segmentation functions. Typical fields include:
 
 | Field 	| Description |
 | :---  	| :--- |
@@ -33,11 +34,34 @@ segmentation and primary particle analysis functions. Typical fields include:
 | cropped 	| A version of the image with the footer removed. |
 | fname 	| The filename from which the image originated. |
 | pixsize 	| The size, in nanometers, of the pixels in a given image. |
-| binary 	| Used to store a binary version of the image resulting from aggregate segmentation, if desired. |
 
-#### 1.2 Aggs
+Using the default TEM footer from the University of British Columbia (and perhaps other microscopes), the footer can be cropped out and have optical character recognition applied to determine the image scale used 
 
-The output data itself, `Aggs`, is a MATLAB structured array with one entry per aggregate. This data can then be exported to a JSON file using 
+```Matlab
+Imgs = tools.get_imgs(Imgs_ref); % load the images
+
+imgs = {Imgs.cropped}; % copy variables locally
+pixsize = [Imgs.pixsize];
+fname = {Imgs.fname};
+```
+
+where the second set of commands combines some of the image information, such at the pixel size for `pixsize`, into summary variables. 
+
+The next step is to evaluate binaries that seperate parts of the image that are part of the background and parts that are aggregate. This is done using the `agg` package. A general, multipurpose segmentation can be evaluated using
+
+```Matlab
+imgs_binary = agg.perform_seg(imgs,pixsize,opts); % segment aggregates
+```
+
+The result, `imgs_binary` is a cell or image binaries, with `1` if a pixel is considered part of the background and `0` if it is not. Aggregate characteristics can be determined by passing this binary image to an analysis function, specifically
+
+```Matlab
+Aggs = agg.analyze_binary(...
+    imgs_binary,imgs,pixsize,fname);
+        % determine aggregate properties
+```
+
+The output data itself, `Aggs`, is a MATLAB structured array with one entry per aggregate, containing properties like the location of the aggregate, perimeter, and projected-area. This data can then be exported to a JSON file using 
 
 ```Matlab
 tools.write_json(Aggs, fname);
@@ -49,7 +73,15 @@ or an Excel spreadsheet using
 tools.write_excel(Aggs, fname);
 ```
 
-to be analyzed in other software and languages, where `fname` is the filename. 
+to be analyzed in other software and languages, where `fname` is the filename of the file to write to. 
+
+Primary particle size information can finally be determined using the `pp` package. The original pair correlation method (PCM), for example, can be applied by using the `Agg` output from the `agg.analyze_binary(...)` function as
+
+```Matlab
+Aggs_pcm = pp.pcm(Aggs); % apply PCM
+```
+
+The output is an updates `Agg` structure that also contain the primary particle size information for each aggregate. 
 
 ## 2. Aggregate segmentation package (+agg)
 
