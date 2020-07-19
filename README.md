@@ -11,7 +11,6 @@ This program contains Matlab code for several methods of characterizing soot agg
 
 2. +pp - which determines the primarily particle. 
 
-
 ## 1. Demonstration
 
 The first step in this process is to import images. Images in this program are designed to be handled primarily by two MATLAB structured arrays: `Imgs_ref` and `Imgs`. The former structure contains a reference to the images, including file name and containing directory. The reference can be generated manually or by using a file explorer by calling 
@@ -115,9 +114,9 @@ This method applies Otsu thresholding followed by a rolling ball transformation 
 This is a GUI-based method with a slider for *adaptive* manual thresholding of the image (adaptive in that small sections of the image can be cropped and thresholded independently). Gaussian denoising is first performed on the image to reduce the noise in the thresholded image. Then, a slider is used to manually adjust the level of the threshold. This is a variant of the method included with the distribution of the PCM code by [Dastanpour et al. (2016)][dastanpour2016], though it has seen considerable updates
 since that implementation. 
 
-Several subfunctions are included within the main file.
+Several sub-functions are included within the main file.
 
-*We note that this code saw several important bug updates since the original code by [Dastanpour et al. (2016)][dastanpour2016]. This includes fixing how the original code would repeatedly apply a Gaussian filter every time the user interacted with the slider in the GUI (which may cause some backward compatibility issues), a reduction in the use of global variables, and significant memory savings.*
+> We note that this code saw several important bug updates since the original code by [Dastanpour et al. (2016)][dastanpour2016]. This includes fixing how the original code would repeatedly apply a Gaussian filter every time the user interacted with the slider in the GUI (which may cause some backward compatibility issues), a reduction in the use of global variables, and significant memory savings.
 
 ###### 2.1.3 seg
 
