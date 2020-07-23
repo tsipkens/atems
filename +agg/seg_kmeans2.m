@@ -29,8 +29,8 @@ disp('Performing background subtraction...');
 se_bg = strel('disk',80);
 pre_bg = imclose(img,se_bg);
 
-[X,Y] = meshgrid(1:size(img,2),1:size(img,1));
-bg_fit = fit(double([X(:),Y(:)]),double(pre_bg(:)),'poly22');
+[X,Y] = meshgrid(1:size(img,2), 1:size(img,1));
+bg_fit = fit(double([X(:),Y(:)]), double(pre_bg(:)), 'poly22');
 bg = uint8(round(bg_fit(X,Y)));
 
 t0 = double(max(max(bg))-bg);

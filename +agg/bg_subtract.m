@@ -14,8 +14,8 @@ pre_bg = imopen(imclose(img,se),se); % rolling rectangle transformation
 %-- Fit linear surface ---------------------------------------------------%
 %   Performs the role of removing foreground particles remaining in
 %   background correction above.
-[X,Y] = meshgrid(1:size(img,2),1:size(img,1));
-bg_fit = fit(double([X(:),Y(:)]),double(pre_bg(:)),'poly11');
+[X,Y] = meshgrid(1:size(img,2), 1:size(img,1));
+bg_fit = fit(double([X(:),Y(:)]), double(pre_bg(:)), 'poly11');
 pre_bg_fit = uint8(round(bg_fit(X,Y)));
 
 

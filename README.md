@@ -51,7 +51,7 @@ where the second set of commands combines some of the image information, such at
 The next step is to evaluate binaries that seperate parts of the image that are part of the background and parts that are aggregate. This is done using the `agg` package. A general, multipurpose segmentation can be evaluated using
 
 ```Matlab
-imgs_binary = agg.perform_seg(imgs,pixsize,opts); % segment aggregates
+imgs_binary = agg.multi_seg(imgs,pixsize,opts); % segment aggregates
 ```
 
 The result, `imgs_binary` is a cell or image binaries, with `1` if a pixel is considered part of the background and `0` if it is not. Aggregate characteristics can be determined by passing this binary image to an analysis function, specifically

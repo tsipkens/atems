@@ -1,5 +1,5 @@
 
-% PERFORM_SEG  Automatically detects and segments aggregates in an image
+% MULTI_SEG  Wrapper function for other segmentation methods, allowing for looping through images.
 % Authors:     Timothy Sipkens, Yeshun (Samuel) Ma, 2019
 % 
 % Note:
@@ -8,7 +8,7 @@
 %   Vanouver, BC, Canada.
 %=========================================================================%
 
-function [imgs_binary] = perform_seg(imgs,pixsize,opts)
+function [imgs_binary] = multi_seg(imgs,pixsize,opts)
 
 %-- Parse inputs ---------------------------------------------------------%
 if isstruct(imgs)
@@ -40,6 +40,12 @@ for ii=1:length(imgs) % loop through provided images
         imgs{ii},pixsize(ii),[],[],...
         opts); % includes removing aggregates from border
     imgs_binary{ii} = img_binary;
+    
+    if ~exist('temp', 'dir')
+       mkdir('temp')
+    end
+    imwrite(imgs_binary{ii},['temp/',num2str(ii),'.tiff']);
+        % write binaries to temporary file
     
     disp('Completed thresholding.');
     disp(' ');
