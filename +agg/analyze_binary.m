@@ -174,32 +174,3 @@ rect = [y_bottom,x_bottom,(y_top-y_bottom),(x_top-x_bottom)];
 end
 
 
-
-
-%== PERIMETER_LENGTH =====================================================%
-%   (DEPRECIATED)
-%   Perimeter_Length calculates the lengt of aggregate perimeter
-%   Written by Ramin Dastanpour, Steve Rogak, Hugo Tjong, Arka Soewono %%%
-%   The University of British Columbia, Vanouver, BC, Canada, Jul. 2014%%%
-function [perimeter] = perimeter_length(img_binary,pixsize,pixels)
-
-[row, col]=find(img_binary);
-
-perimeter_pixelcount=0;
-
-for kk = 1:1:pixels
-    if (img_binary(row(kk)-1, col(kk)) == 0)
-        perimeter_pixelcount = perimeter_pixelcount + 1;
-    elseif (img_binary(row(kk), col(kk)+1) == 0)
-        perimeter_pixelcount = perimeter_pixelcount + 1;
-    elseif (img_binary(row(kk), col(kk)-1) == 0)
-        perimeter_pixelcount = perimeter_pixelcount + 1;
-    elseif (img_binary(row(kk)+1, col(kk)) == 0)
-        perimeter_pixelcount = perimeter_pixelcount + 1;
-    end
-end
-
-perimeter=perimeter_pixelcount * pixsize;
-
-end
-

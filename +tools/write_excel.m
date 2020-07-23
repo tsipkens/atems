@@ -5,6 +5,8 @@
 
 function [] = write_excel(Aggs,fname)
 
+disp('Writing aggregate data to an Excel file...');
+
 foldname = fileparts(fname); % get folder name
 if ~exist(foldname,'dir') % check if folder exists
    mkdir(foldname); % create the folder if it does not exist
@@ -27,6 +29,9 @@ end
 
 t0 = struct2table(Aggs);
 writetable(t0,fname);
+
+disp('Complete.');
+disp(' ');
 
 end
 
