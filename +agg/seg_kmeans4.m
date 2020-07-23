@@ -4,7 +4,7 @@
 %=========================================================================%
 
 function [img_binary,img_kmeans,feature_set] = ...
-    seg_kmeans2(imgs,pixsize)
+    seg_kmeans4(imgs,pixsize)
 
 
 %== Parse inputs =========================================================%
@@ -95,23 +95,17 @@ i5 = uint8(i5.*255);
 
 %-- Combine feature set --------------------------------------------------%
 feature_set = single(cat(3,...
-    repmat(bw_thresh2,[1,1,1]),... % aggregates disappear if too large
-    repmat(img_denoise,[1,1,1]),... % increases the interconnectedness (w/ bot. and tophat)
-    repmat(i5,[1,1,1]),...
-    repmat(i12,[1,1,1])...
+    bw_thresh2,... % aggregates disappear if too large
+    img_denoise,... % increases the interconnectedness (w/ bot. and tophat)
+    i5,...
+    i12...
     ));
-% feature_set = single(cat(3,...
-%     bw_thresh2,... % aggregates disappear if too large
-%     img_denoise,... % increases the interconnectedness (w/ bot. and tophat)
-%     i5,...
-%     i12...
-%     ));
-weights = [3,6,2,8];
+weights = [0,0,0,90];
 for kk=1:size(feature_set,3)
     t0 = feature_set(:,:,kk);
     t0 = t0(:); % linearize
     t0 = t0-mean(t0);
-    t0 = t0./var(t0) .*weights(kk)./max(weights);
+    t0 = t0./var(t0) .*weights(kk);
     feature_set(:,:,kk) = reshape(t0,size(feature_set,1:2));
 end
 

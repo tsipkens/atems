@@ -30,7 +30,7 @@ if ~exist('opts','var'); opts = []; end
 imgs_binary = cell(length(imgs),1); % pre-allocate
 for ii=1:length(imgs) % loop through provided images
     
-    disp(['<== IMAGE ',num2str(ii),' =================================>']);
+    disp(['[== IMAGE ',num2str(ii),' =================================]']);
     
     %-- Initialize parameters --------------------------------------------%
     %   use defaults defined in seg instead

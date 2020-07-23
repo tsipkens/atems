@@ -9,9 +9,9 @@ function [Data] = refine_circles(img,Data)
 
 radii = Data.radii;
 centers = Data.centers;
+pixsize = Data.dp./(2.*Data.radii); % get pixel size from radii/dp ratio
 
 f = figure; % generate new figure for refine circles step
-clf;
 imshow(img); % display current image
 f.WindowState = 'maximized';
 
@@ -29,6 +29,7 @@ if sum(iv)==0; disp('Figure closed: no update occurred.'); return; end
 
 Data.radii = vertcat(h(iv).Radius); % prepare output
 Data.centers = vertcat(h(iv).Center);
+Data.dp = 2.*pixsize.*Data.radii;
 
 close(gcf);
 

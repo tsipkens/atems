@@ -14,16 +14,16 @@ fname = {Imgs.fname};
 
 
 %-- Run thresholding for all of the images -------------------------------%
-% opts.bool_kmeans = 0;
-% opts.bool_otsu = 0;
-% imgs_binary = ...
-%     agg.perform_seg(imgs,pixsize,opts);
-% [Imgs.binary] = imgs_binary{:};
+opts.bool_kmeans = 1;
+opts.bool_otsu = 0;
+imgs_binary = ...
+    agg.perform_seg(imgs,pixsize,opts);
+[Imgs.binary] = imgs_binary{:};
 
-for ii=1:length(Imgs)
-    imgs_binary{ii} = ...
-        imread(['..\images\test\binary_manual\',fname{ii}]);
-end
+% for ii=1:length(Imgs)
+%     imgs_binary{ii} = ...
+%         imread(['..\images\test\binary_manual\',fname{ii}]);
+% end
 
 
 Aggs = agg.analyze_binary(...
@@ -42,7 +42,14 @@ tools.write_excel(Aggs_edm,'data\Aggs.xlsx');
 
 
 figure(1);
-tools.plot_aggregates(Aggs_pcm);
+tools.plot_aggregates(Aggs_edm);
 
+
+
+figure(4);
+loglog([Aggs_edm.dp_pcm_simple],real([Aggs_edm.dpg_edm]),'.');
+hold on;
+loglog(xlim,xlim);
+hold off;
 
 
