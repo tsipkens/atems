@@ -39,7 +39,7 @@ This structure contains both the imported raw image, as well as processed versio
 Using the default TEM footer from the University of British Columbia (and perhaps other microscopes), the footer can be cropped out and have optical character recognition applied to determine the image scale used 
 
 ```Matlab
-Imgs = tools.get_imgs(Imgs_ref); % load the images
+Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 
 imgs = {Imgs.cropped}; % copy variables locally
 pixsize = [Imgs.pixsize];
