@@ -97,7 +97,7 @@ Here, the blue highlighting indicates pixels that are part of the aggregate, the
 
 ## 2. Aggregate segmentation package (+agg)
 
-This package contains an expanding library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background areas. Some of the functions are modeled after the code of [Dastanpour et al. (2016)][dastanpour2016], though code from that project has been significantly altered in the present program.
+This package contains an expanding library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background areas. 
 
 #### 2.1 agg.seg* functions
 
