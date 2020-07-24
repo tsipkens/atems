@@ -22,11 +22,8 @@ fname = {Imgs.fname};
 % imgs_binary = agg.seg_kmeans4multi_seg(imgs,pixsize,opts);
 % [Imgs.binary] = imgs_binary{:};
 
-imgs_binary = agg.seg_kmeans3(imgs{1},pixsize);
+imgs_binary = agg.seg_kmeans2(imgs{1},pixsize);
 imgs_binary = {imgs_binary};
-
-imgs_binary2 = agg.seg_kmeans2(imgs{1},pixsize);
-imgs_binary2 = {imgs_binary2};
 
 
 % for ii=1:length(Imgs)
@@ -37,11 +34,6 @@ imgs_binary2 = {imgs_binary2};
 figure(3);
 Aggs = agg.analyze_binary(...
     imgs_binary,imgs,pixsize,fname);
-        % determine aggregate properties
-
-figure(2);
-Aggs2 = agg.analyze_binary(...
-    imgs_binary2,imgs,pixsize,fname);
         % determine aggregate properties
 
 tools.write_images(imgs_binary,fname,'temp');

@@ -25,20 +25,7 @@ morph_param = 0.8/pixsize
 
 
 %== STEP 1: Attempt to the remove background gradient ====================%
-disp('Performing background subtraction...');
-se_bg = strel('disk',80);
-pre_bg = imclose(img,se_bg);
-
-[X,Y] = meshgrid(1:size(img,2), 1:size(img,1));
-bg_fit = fit(double([X(:),Y(:)]), double(pre_bg(:)), 'poly22');
-bg = uint8(round(bg_fit(X,Y)));
-
-t0 = double(max(max(bg))-bg);
-t1 = double(img)+t0;
-t2 = t1-min(min(t1));
-img = uint8(round(255.*t2./max(max(t2))));
-disp('Complete.');
-disp(' ');
+img = agg.bg_subtract(img); % background subtraction
 
 
 
@@ -100,20 +87,15 @@ feature_set = single(cat(3,...
     repmat(i5,[1,1,1]),...
     repmat(i12,[1,1,1])...
     ));
-% feature_set = single(cat(3,...
-%     bw_thresh2,... % aggregates disappear if too large
-%     img_denoise,... % increases the interconnectedness (w/ bot. and tophat)
-%     i5,...
-%     i12...
-%     ));
-weights = [3,6,2,8];
-for kk=1:size(feature_set,3)
-    t0 = feature_set(:,:,kk);
-    t0 = t0(:); % linearize
-    t0 = t0-mean(t0);
-    t0 = t0./var(t0) .*weights(kk)./max(weights);
-    feature_set(:,:,kk) = reshape(t0,size(feature_set,1:2));
-end
+
+% weights = [3,6,2,8];
+% for kk=1:size(feature_set,3)
+%     t0 = feature_set(:,:,kk);
+%     t0 = t0(:); % linearize
+%     t0 = t0-mean(t0);
+%     t0 = t0./var(t0) .* weights(kk)./max(weights);
+%     feature_set(:,:,kk) = reshape(t0,size(feature_set,1:2));
+% end
 
 
 
