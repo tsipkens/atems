@@ -23,13 +23,14 @@ ind_agg = ind_agg(ind0);
 
 %-- Plot labelled image by default ---------------------------------------%
 if bool_img
-    img_binary = zeros(size(Aggs(ind0(1)).image));
+    ind1 = find(ind0);
+    img_binary = zeros(size(Aggs(ind1(1)).image));
     for aa=ind_agg
         img_binary = or(img_binary,Aggs(aa).binary);
     end
     
     figure(gcf);
-    [~,~,i0] = tools.plot_binary_overlay(Aggs(ind0(1)).image,...
+    [~,~,i0] = tools.plot_binary_overlay(Aggs(ind1(1)).image,...
         img_binary,opts);
 end % else: plot circles on existing image
 
