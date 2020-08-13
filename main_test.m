@@ -17,7 +17,7 @@ fname = {Imgs.fname};
 opts.bool_kmeans = 1;
 opts.bool_otsu = 0;
 imgs_binary = ...
-    agg.perform_seg(imgs,pixsize,opts);
+    agg.multi_seg(imgs,pixsize,opts);
 [Imgs.binary] = imgs_binary{:};
 
 % for ii=1:length(Imgs)
@@ -51,5 +51,8 @@ loglog([Aggs_edm.dp_pcm_simple],real([Aggs_edm.dpg_edm]),'.');
 hold on;
 loglog(xlim,xlim);
 hold off;
+
+xlabel('PCM, dp [nm]');
+ylabel('EDM-SBS, dp [nm]');
 
 

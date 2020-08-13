@@ -1,9 +1,9 @@
 
 % MULTI_SEG  Wrapper function for other segmentation methods, allowing for looping through images.
-% Authors:     Timothy Sipkens, Yeshun (Samuel) Ma, 2019
+% Authors:   Timothy Sipkens, 2019
 % 
 % Note:
-%   Originally structure given by Ramin Dastanpour, Hugo Tjong,
+%   Original structure given by Ramin Dastanpour, Hugo Tjong,
 %   Arka Soewono from the University of British Columbia, 
 %   Vanouver, BC, Canada.
 %=========================================================================%
