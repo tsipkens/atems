@@ -26,7 +26,7 @@ for ii=1:length(imgs) % loop through images and apply k-means
     disp(['[ IMAGE ',num2str(ii), ' OF ', ...
         num2str(length(imgs)), ...
         ' ============================]']);
-    imgs_binary{ii} = agg.seg_kmeans2(imgs{ii},pixsize(ii));
+    imgs_binary{ii} = archive.seg_kmeans6(imgs{ii},pixsize(ii));
 end
 disp('[ Complete. ==============================]');
 disp(' ');
