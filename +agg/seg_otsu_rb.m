@@ -31,21 +31,27 @@ if ~exist('coeffs','var'); coeffs = []; end
 img_binary{n} = []; % pre-allocate cells
 img_kmeans{n} = [];
 feature_set{n} = [];
+
+disp('Performing Otsu thresholding:');
+tools.textbar(0);
 for ii=1:n
-    
-    if n>1 % if more than one image, output text indicating image number
-        disp(['[== IMAGE ',num2str(ii), ' OF ', ...
-            num2str(length(imgs)), ' ============================]']);
-    end
-    
     img = imgs{ii}; pixsize = pixsizes(ii); % values for this iteration
     
-    
 %== CORE FUNCTION ========================================================%
+    %== Step 0a: Remove the background. ==================================%
+    %   New to this implementation.
+    img = agg.bg_subtract(img);
+    
+    
+    %== Step 0b: Perform denoising of the image ==========================%
+    %   New to this implementation.
+    img = imbilatfilt(img);
+    
+    
     %== Step 1: Apply intensity threshold (Otsu) =========================%
     level = graythresh(img); % applies Otsu thresholding
-    bw = imbinarize(img,level);
-
+    bw = imbinarize(img, level);
+    
     % bw = ~imclearborder(~bw); % clear aggregates on border
 
 
@@ -54,13 +60,7 @@ for ii=1:n
     img_binary{ii} = ~img_binary{ii};
 %=========================================================================%
     
-    
-    if n>1 % if more than one image, output text
-        disp('[== Complete. ==============================]');
-        disp(' ');
-        disp(' ');
-    end
-
+    tools.textbar(ii / n);
 end
 
 % If a single image, cell arrays are unnecessary.

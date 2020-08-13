@@ -103,9 +103,9 @@ This package contains an expanding library of functions aimed at performing sema
 
 Functions implementing different methods of aggregate-level semantic segmentation have filenames starting with `agg.seg*`. The functions generally share two common inputs:
 
-1. `imgs` - An unmodified (save for removing the footer) single image or cellular array of images  of the aggregates. 
+1. imgs - An unmodified (save for removing the footer) single image or cellular array of images  of the aggregates. 
 
-2. `pixsize` - The size of each pixel in the image (often used in the rolling ball transformation). 
+2. pixsize - The size of each pixel in the image (often used in the rolling ball transformation). 
 
 Other arguments depend on the function. 
 
