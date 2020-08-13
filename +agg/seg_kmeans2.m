@@ -25,7 +25,22 @@ morph_param = 0.8/pixsize
 
 
 %== STEP 1: Attempt to the remove background gradient ====================%
-img = agg.bg_subtract(img); % background subtraction
+% img = agg.bg_subtract(img); % background subtraction
+
+disp('Performing background subtraction...');
+se_bg = strel('disk',80);	
+pre_bg = imclose(img,se_bg);	
+
+[X,Y] = meshgrid(1:size(img,2), 1:size(img,1));	
+bg_fit = fit(double([X(:),Y(:)]), double(pre_bg(:)), 'poly22');	
+bg = uint8(round(bg_fit(X,Y)));	
+
+t0 = double(max(max(bg))-bg);	
+t1 = double(img)+t0;	
+t2 = t1-min(min(t1));	
+img = uint8(round(255.*t2./max(max(t2))));	
+disp('Complete.');	
+disp(' ');
 
 
 
@@ -63,7 +78,7 @@ i1 = double(img_denoise);
 i1 = i1./max(max(i1));
 i1 = imgaussfilt(i1,max(round(5*morph_param),1));
 
-lvl2 = graythresh(i1);
+lvl2 = graythresh(i1); % simple threshold
 i2b = ~im2bw(i1,lvl2);
 i2 = ~im2bw(i1,lvl2*1.15);
 

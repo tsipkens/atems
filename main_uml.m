@@ -19,11 +19,17 @@ fname = {Imgs.fname};
 %-- Run thresholding for all of the images -------------------------------%
 % opts.bool_kmeans = 1;
 % opts.bool_otsu = 0;
-% imgs_binary = agg.seg_kmeans4multi_seg(imgs,pixsize,opts);
+% imgs_binary = agg.multi_seg(imgs,pixsize,opts);
 % [Imgs.binary] = imgs_binary{:};
 
-imgs_binary = agg.seg_kmeans2(imgs{1},pixsize);
-imgs_binary = {imgs_binary};
+for ii=1:length(imgs) % loop through images and apply k-means
+    disp(['[ IMAGE ',num2str(ii), ' OF ', ...
+        num2str(length(imgs)), ...
+        ' ============================]']);
+    imgs_binary{ii} = agg.seg_kmeans2(imgs{ii},pixsize(ii));
+end
+disp('[ Complete. ==============================]');
+disp(' ');
 
 
 % for ii=1:length(Imgs)
@@ -36,5 +42,5 @@ Aggs = agg.analyze_binary(...
     imgs_binary,imgs,pixsize,fname);
         % determine aggregate properties
 
-tools.write_images(imgs_binary,fname,'temp');
+tools.write_images(imgs_binary,fname,'temp\a');
 

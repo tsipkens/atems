@@ -18,8 +18,8 @@ pre_bg = imclose(img,se_bg);
 bg_fit = fit(double([X(:),Y(:)]), double(pre_bg(:)), 'poly22');
 pre_bg_fit = uint8(round(bg_fit(X,Y)));
 
-% bg = pre_bg_fit;
-bg = imgaussfilt(min(pre_bg, pre_bg_fit), 20);
+bg = pre_bg_fit;
+% bg = imgaussfilt(min(pre_bg, pre_bg_fit), 20);
     % blurr together resultant background
     
 t0 = double(max(max(bg)) - bg); % inverted background
