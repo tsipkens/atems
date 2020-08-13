@@ -21,35 +21,19 @@ fname = {Imgs.fname};
 
 
 %-- Run thresholding for all of the images -------------------------------%
-% opts.bool_kmeans = 1;
-% opts.bool_otsu = 0;
-% imgs_binary = agg.multi_seg(imgs,pixsize,opts);
-% [Imgs.binary] = imgs_binary{:};
+% imgs_binary = agg.seg_kmeans6(imgs, pixsize);
+% imgs_binary = agg.seg_kmeans2(imgs, pixsize);
+imgs_binary = agg.seg_otsu_rb(imgs, pixsize);
 
-for ii=1:length(imgs) % loop through images and apply k-means
-    disp(['[ IMAGE ',num2str(ii), ' OF ', ...
-        num2str(length(imgs)), ...
-        ' ============================]']);
-    
-    imgs_binary{ii} = archive.seg_kmeans6(imgs{ii},pixsize(ii));
-
-end
-disp('[ Complete. ==============================]');
-disp(' ');
-
-
-% for ii=1:length(Imgs)
-%     imgs_binary{ii} = ...
-%         imread(['..\images\test\binary_manual\',fname{ii}]);
-% end
 
 
 Aggs = agg.analyze_binary(...
-    imgs_binary,imgs,pixsize,fname);
+    imgs_binary, imgs, pixsize, fname);
     % determine aggregate properties
 
 
 %-- Generate plots of images ---------%
+close all; % close pre-existing images
 for ii=1:length(imgs) % loop through images
     jj = find(strcmp(fname{ii}, {Aggs.fname}));
     jj = jj(1);

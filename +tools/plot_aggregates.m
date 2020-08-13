@@ -30,8 +30,8 @@ if bool_img
     end
     
     figure(gcf);
-    [~,~,i0] = tools.plot_binary_overlay(Aggs(ind1(1)).image,...
-        img_binary,opts);
+    [~,~,i0] = tools.plot_binary_overlay( ...
+        Aggs(ind1(1)).image, img_binary, opts);
 end % else: plot circles on existing image
 
 
@@ -39,16 +39,17 @@ end % else: plot circles on existing image
 for aa=ind_agg
     hold on;
     plot(Aggs(aa).center_mass(2),Aggs(aa).center_mass(1),...
-        'yx','LineWidth',1);
+        'kx', 'LineWidth', 0.75);
     viscircles(fliplr(Aggs(aa).center_mass'),...
-        Aggs(aa).Rg./Aggs(aa).pixsize);
-    text(Aggs(aa).center_mass(2)+20,Aggs(aa).center_mass(1),...
-        num2str(Aggs(aa).id),'Color','white');
+        Aggs(aa).Rg ./ Aggs(aa).pixsize, ...
+        'EnhanceVisibility', false, 'Color', [0.92,0.16,0.49]);
+    text(Aggs(aa).center_mass(2) + 20,Aggs(aa).center_mass(1),...
+        num2str(Aggs(aa).id), 'Color', 'white');
     
     if isfield(Aggs,'dp_pcm_simple') % if available plot reference dp
         viscircles(fliplr(Aggs(aa).center_mass'),...
             Aggs(aa).dp_pcm_simple/2./Aggs(aa).pixsize,...
-            'Color','y','LineWidth',1);
+            'Color', [0.99,0.86,0.37], 'LineWidth', 0.75, 'EnhanceVisibility', false);
     end
     hold off;
 end

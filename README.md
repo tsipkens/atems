@@ -13,7 +13,7 @@ This program contains Matlab code for several methods of characterizing soot agg
 
 2. +pp - which determines the primarily particle. 
 
-## 1. Demonstration
+### Quick start
 
 The first step in this process is to import images. Images in this program are designed to be handled primarily by two MATLAB structured arrays: `Imgs_ref` and `Imgs`. The former structure contains a reference to the images, including file name and containing directory. The reference can be generated manually or by using a file explorer by calling 
 
@@ -95,11 +95,11 @@ As a sample, one can go from this image (with the footer already cropped) to a c
 
 Here, the blue highlighting indicates pixels that are part of the aggregate, the red circle indicated the projected-area equivalent diameter, the yellow circle the primary particle size from PCM, and the number indicating the index used by the program to identify each aggregate. 
 
-## 2. Aggregate segmentation package (+agg)
+## 1. Aggregate segmentation package (+agg)
 
 This package contains an expanding library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background areas. 
 
-#### 2.1 agg.seg* functions
+#### 1.1 agg.seg* functions
 
 Functions implementing different methods of aggregate-level semantic segmentation have filenames starting with `agg.seg*`. The functions generally share two common inputs:
 
@@ -113,11 +113,11 @@ The available methods are summarized below. In each case, efforts are ongoing to
 
 Other methods, beyond those below, are currently under development.
 
-###### 2.1.1 seg_otsu_rb
+###### 1.1.1 seg_otsu_rb
 
 This method applies Otsu thresholding followed by a rolling ball transformation that fills gaps in the particles (as per [Dastanpour et al. (2016)][dastanpour2016]). This method uses the `rolling_ball` function included with this package to perform the rolling ball transformation.
 
-###### 2.1.2 seg_slider
+###### 1.1.2 seg_slider
 
 This is a GUI-based method with a slider for *adaptive* manual thresholding of the image (adaptive in that small sections of the image can be cropped and thresholded independently). Gaussian denoising is first performed on the image to reduce the noise in the thresholded image. Then, a slider is used to manually adjust the level of the threshold. This is a variant of the method included with the distribution of the PCM code by [Dastanpour et al. (2016)][dastanpour2016], though it has seen considerable updates
 since that implementation. 
@@ -126,13 +126,13 @@ Several sub-functions are included within the main file.
 
 > We note that this code saw several important bug updates since the original code by [Dastanpour et al. (2016)][dastanpour2016]. This includes fixing how the original code would repeatedly apply a Gaussian filter every time the user interacted with the slider in the GUI (which may cause some backward compatibility issues), a reduction in the use of global variables, and significant memory savings.
 
-###### 2.1.3 seg
+###### 1.1.3 seg
 
 This is included as a wrapper function (agg_det.m) that runs a
 series of these other methods in series, prompting the user
 if adequate thresholding was achieved by a given method.
 
-#### 2.2 analyze_binary
+#### 1.2 analyze_binary
 
 This function analyzes the binary image output from any of the `agg.seg_*` functions. The output is a MATLAB structured array
 containing information about the aggregate, such as area in pixels, radius of gyration, area-equivalent diameter, aspect ratio
@@ -145,32 +145,32 @@ Aggs = agg.analyze_binary(imgs_binary,imgs,pixsize,fname);
 The `fname` argument is optional and adds this tag to the information in the output `Aggs` structure. 
 
 
-## 3. Primary particle analysis package (+pp)
+## 2. Primary particle analysis package (+pp)
 
 The +pp package contains multiple methods for determining the primary particle size of the aggregates of interest. Often this requires a binary mask of the image that can be generated using the +agg package methods.
 
-#### 3.1 pcm
+#### 2.1 pcm
 
 The University of British Columbia's pair correlation method (PCM) MATLAB code for processing TEM images of soot to determine morphological properties. This package contains a significant update to the previous code provided with [Dastanpour et al. (2016)][dastanpour2016].
 
-#### 3.2 kook
+#### 2.2 kook
 
 This method contains a copy of the code provided by [Kook et al. (2015)][kook], with minor modifications to match in the input/output of some of the other packages. The method is based on using the Hough transform on a pre-processed image.
 
-#### 3.3 kook_yl
+#### 2.3 kook_yl
 
 This method contains a University of British Columbia-modified version of the method proposed by [Kook et al. (2015)][kook].
 
-#### 3.4 manual
+#### 2.4 manual
 
 Code to be used in the manual sizing of soot primary particles developed at the University of British Columbia. The current method uses crosshairs to select the length and width of the particle. This is converted to various quantities, such as the mean primary particle diameter. The manual code is a heavily modified version of the code associated with [Dastanpour and Rogak (2014)][dastanpour2014].
 
 
-## 4. Additional tools package (+tools)
+## 3. Additional tools package (+tools)
 
 This package contains a series of functions that help in visualizing or analyzing the aggregates.
 
-#### Plotting functions (plot*)
+#### 3.1 Plotting functions (plot*)
 
 These functions aid in visualizing the results. For example, `plot_binary_overlay(...)` will plot the image and overlay labels for the aggregates in a corresponding binary image.
 
