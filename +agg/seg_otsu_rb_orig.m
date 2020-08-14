@@ -48,6 +48,7 @@ for ii=1:n
     bw = imbinarize(img, level);
     
     bw = ~imclearborder(~bw); % clear aggregates on border
+        % required due to occasional background gradients included in results
     
     
     %== Step 2: Rolling Ball Transformation ==============================%

@@ -54,64 +54,62 @@ for ii=1:n
     % img_denoise = tools.imtotvar_sb_atv(img,15); % alternate total variation denoise
     disp('Complete.');
     disp(' ');
-
-
-    %-- B: Get rough mask using thresholding -----------------------------%
-    %   Applied to original (not denoised) image.
-    lvl = graythresh(img); % Otsu thresholding
-    bw_thresh = 255.*(~imbinarize(img, lvl));
-
-    % Apply morphological closing to combine small, close objects to
-    % to attain rough estimates of particle boundaries
-    % and remove really small objects.
-    se = strel('disk', round(10*morph_param));
-    bw_thresh2 = imclose(bw_thresh, se);
-
-    % Blur edges using Gaussian filter 
-    % to accommodate for some uncertainty in binary edges.
-    i20 = imgaussfilt(im2uint8(bw_thresh2.*255), 10);
-
-
-    %-- C: Use texture in bottom hat images ------------------------------%
+    
+    
+    %-- B: Use texture in bottom hat images ------------------------------%
     se = strel('disk',20);
     img_both = imbothat(img_denoise,se);
 
     i10 = imbilatfilt(img_both); % denoise
-    i11 = entropyfilt(i10, true(15));
+    i11 = entropyfilt(i10, true(15)); % entropy filter, related to texture
     se12 = strel('disk', max(round(5*morph_param),1));
     i12 = imclose(i11, se12);
     i12 = im2uint8(i12 ./ max(max(i12)));
 
 
-    %-- D: Perform multi-thresholding ------------------------------------%
+    %-- C: Perform multi-thresholding ------------------------------------%
     i1 = im2uint8(img_denoise);
     i1 = imgaussfilt(i1,max(round(5*morph_param),1));
 
-    lvl2 = graythresh(i1); % simple threshold
-    i2b = ~im2bw(i1,lvl2);
-    i2 = ~im2bw(i1,lvl2*1.15);
+    lvl2 = graythresh(i1); % simple Otsu threshold
+    i2a = ~im2bw(i1, lvl2); % Otsu binary
+    
+    % now, loop through threshold values above Otsu 
+    % and find number of pixels that are part of the aggregates
+    lvl3 = 1:0.002:1.25;
+    n_in = ones(size(lvl3));
+    for ll=1:length(lvl3)
+        n_in(ll) = sum(sum(~im2bw(i1, lvl2 * lvl3(ll))));
+    end
+    n_in = movmean(n_in, 10); % apply moving average to smooth out curve, remove kinks
+    p = polyfit(lvl3(1:10), n_in(1:10), 1); % fit linear curve to inital points
+    n_in_pred = p(1).*lvl3 + p(2); % predicted values of number of pixels in aggregates
+    lvl4 = find(((n_in - n_in_pred) ./ n_in_pred) > 0.10); % cases that devaite 10% from initial trend
+    lvl4 = lvl3(lvl4(1)); % use the first case found in preceding line
+    i2b = ~im2bw(i1, lvl2 * lvl4); % binary at a fraction above Otsu threshold
 
     se3 = strel('disk',max(round(5*morph_param),1));
-    i3 = imclose(i2,se3);
+    i3 = imclose(i2b,se3);
+        % close the higher threshold image 
+        % to remove noisy points now included in binary
 
-    i5 = zeros(size(i2));
+    i5 = zeros(size(i2b));
     bw1 = bwlabel(i3);
     for jj=1:max(max(bw1))
-        if any(i2b(bw1==jj)==1)
+        if any(i2a(bw1==jj)==1)
             i5(bw1==jj) = 1;
         end
     end
-    i5 = imgaussfilt(im2uint8(i5.*255), 10);
+    i5 = imgaussfilt(im2uint8(i5.*255), 15);
 
 
     %-- Combine feature set ----------------------------------------------%
     feature_set{ii} = single(cat(3,...
-        ... repmat(i20,[1,1,1]),... % aggregates disappear if too large
-        repmat(img_denoise,[1,1,1]),... % increases the interconnectedness (w/ bot. and tophat)
+        repmat(i12,[1,1,1]),...
         repmat(i5,[1,1,1]),...
-        repmat(i12,[1,1,1])...
+        repmat(img_denoise,[1,1,1])...
         ));
-
+    
     
     
     %== STEP 3: Perform kmeans segmentation ==============================%

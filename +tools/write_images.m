@@ -17,7 +17,7 @@ if ~exist(foldname,'dir') % check if folder exists
 end
 
 for ii=1:length(imgs)
-    imwrite(imgs{ii},[foldname,filesep,fnames{ii}]);
+    imwrite(imgs{ii}, [foldname,filesep,fnames{ii}]);
 end
 
 end
