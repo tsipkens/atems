@@ -1,11 +1,16 @@
 
-% SEG_OTSU_RB  Performs Otsu thresholding + a rolling ball transformation.
+% SEG_OTSU_RB_ORIG  Performs Otsu thresholding + a rolling ball transformation (as per Dastanpur et al.).
 % Authors:  Ramin Dastanpour, Steven N. Rogak, 2016-02
 %           Developed at the University of British Columbia
 % Modified: Timothy Sipkens
+% 
+% Note: The method remains true to the original code by Dastanpour et al., 
+%       and differs from the other implementation included with this code
+%       which does not immediately remove boundary aggregates, adds
+%       background subtraction, and adds a denoising step. 
 %=========================================================================%
 
-function [img_binary] = seg_otsu_rb(...
+function [img_binary] = seg_otsu_rb_orig(...
     imgs, pixsizes, minparticlesize, coeffs) 
 
 %-- Parse inputs ---------------------------------------------------------%
@@ -32,25 +37,17 @@ img_binary{n} = []; % pre-allocate cells
 img_kmeans{n} = [];
 feature_set{n} = [];
 
-disp('Performing Otsu thresholding:');
+disp('Performing Otsu thresholding (as per Dastanpour):');
 if n>1; tools.textbar(0); end
 for ii=1:n
     img = imgs{ii}; pixsize = pixsizes(ii); % values for this iteration
     
 %== CORE FUNCTION ========================================================%
-    %== Step 0a: Remove the background. ==================================%
-    %   New to this implementation.
-    img = agg.bg_subtract(img);
-    
-    
-    %== Step 0b: Perform denoising of the image ==========================%
-    %   New to this implementation.
-    img = imbilatfilt(img);
-    
-    
     %== Step 1: Apply intensity threshold (Otsu) =========================%
     level = graythresh(img); % applies Otsu thresholding
     bw = imbinarize(img, level);
+    
+    bw = ~imclearborder(~bw); % clear aggregates on border
     
     
     %== Step 2: Rolling Ball Transformation ==============================%

@@ -6,7 +6,6 @@
 function [img_out, bg] = bg_subtract(img)
 
 %-- Rolling ball transformation to determine the background --------------%
-disp('Performing background subtraction...');
 se_bg = strel('disk',80);
 pre_bg = imclose(img,se_bg);
 
@@ -27,9 +26,6 @@ t1 = double(img) + t0;
 t2 = t1 - min(min(t1));
 img_out = uint8(round(255.*t2./max(max(t2))));
     % to accommodate uint8, background subtract on reversed image
-
-disp('Complete.');
-disp(' ');
 
 
 end

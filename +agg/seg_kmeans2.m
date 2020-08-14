@@ -42,8 +42,11 @@ for ii=1:n
     morph_param = 0.8/pixsize
 
     %== STEP 1: Attempt to the remove background gradient ====================%
+    disp('Performing background subtraction...');
     img = agg.bg_subtract(img); % background subtraction
-
+    disp('Complete.');
+    disp(' ');
+    
 
 
     %== STEP 2: Pre-process image ============================================%
