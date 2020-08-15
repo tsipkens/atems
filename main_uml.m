@@ -5,9 +5,7 @@ close all;
 clc;
 
 %{
-Imgs_ref = tools.get_img_ref; % get location of files
-
-Imgs = tools.get_imgs(Imgs_ref); % load a single image
+Imgs = tools.get_imgs; % load a single image
 Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 %}
 
