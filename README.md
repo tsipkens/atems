@@ -35,7 +35,17 @@ The next step is to evaluate binaries that separate parts of the image that are 
 imgs_binary = agg.seg(imgs, pixsize, opts); % segment aggregates
 ```
 
-The result, `imgs_binary` is a cell or image binaries, with `1` if a pixel is considered part of the background and `0` if it is not. Aggregate characteristics can be determined by passing this binary image to an analysis function, specifically
+The result, `imgs_binary` is a cell or image binaries, with `1` if a pixel is considered part of the background and `0` if it is not. Examples of output from this kind of function include (from top to bottom) adaptive manual thresholding using a slide; Otsu thresholding with a rolling ball transformation; the preceding treatment using background correction; and the output segmented images from k-means. 
+
+![manual](docs/manual.png)
+
+![otsu_rb_orig](docs/otsu_rb_orig.png)
+
+![otsu_rb](docs/otsu_rb.png)
+
+![kmeans](docs/kmeans.png)
+
+Aggregate characteristics can be determined by passing this binary image to an analysis function, specifically
 
 ```Matlab
 Aggs = agg.analyze_binary(...
