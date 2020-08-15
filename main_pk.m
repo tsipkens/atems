@@ -3,9 +3,7 @@ clear;
 close all;
 clc;
 
-Imgs_ref = tools.get_img_ref;
-    % generates a reference to a set of images to be analyzed
-Imgs = tools.get_imgs(Imgs_ref); % load a single image
+Imgs = tools.load_imgs; % load a single image
 Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 
 imgs = {Imgs.cropped}; % copy variables locally

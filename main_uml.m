@@ -4,10 +4,7 @@ clear;
 close all;
 clc;
 
-%{
-Imgs = tools.get_imgs; % load a single image
-Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
-%}
+% Imgs = tools.load_imgs; % load a single image
 
 load('temp/b/Imgs.mat'); % load preset Imgs
 
