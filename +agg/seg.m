@@ -8,8 +8,68 @@
 % Modified: Timothy Sipkens, 2019
 %=========================================================================%
 
+
+%== WRAPPER FUNCTION ====================================================%
+%   Used to loop over multiple images. 
+function [imgs_binary] = seg(imgs,pixsize,opts)
+
+%-- Parse inputs ---------------------------------------------------------%
+if isstruct(imgs)
+    Imgs_str = imgs;
+    imgs = {Imgs_str.cropped};
+    pixsize = [Imgs_str.pixsize];
+elseif ~iscell(imgs)
+    imgs = {imgs};
+end
+
+if ~exist('pixsize','var'); pixsize = []; end
+if isempty(pixsize); pixsize = ones(size(imgs)); end
+
+%-- Partially parse name-value pairs --%
+if ~exist('opts','var'); opts = []; end
+%-------------------------------------------------------------------------%
+
+
+imgs_binary = cell(length(imgs),1); % pre-allocate
+for ii=1:length(imgs) % loop through provided images
+    
+    disp(['[== IMAGE ',num2str(ii),' =================================]']);
+    
+    %-- Initialize parameters --------------------------------------------%
+    %   use defaults defined in seg instead
+    
+    %-- Run slider to obtain binary image --------------------------------%
+    [img_binary,~,~,~] = seg1(...
+        imgs{ii},pixsize(ii),[],[],...
+        opts); % includes removing aggregates from border
+    imgs_binary{ii} = img_binary;
+    
+    if ~exist('temp', 'dir')
+       mkdir('temp')
+    end
+    imwrite(imgs_binary{ii},['temp/',num2str(ii),'.tiff']);
+        % write binaries to temporary file
+    
+    disp('Completed thresholding.');
+    disp(' ');
+    
+end
+
+close(gcf); % close image with overlaid da
+disp('Complete.');
+disp(' ');
+
+end
+
+
+
+
+
+%== SEG1 =================================================================%
+%   Segments a single image by attempting multiple methods. 
+%   Author:  Timothy Sipkens, 10-10-2019
 function [img_binary,img_cropped,agg_binary_bin,agg_cropped_bin] = ...
-    seg(img,pixsize,minparticlesize,coeffs,opts) 
+    seg1(img,pixsize,minparticlesize,coeffs,opts) 
 
 agg_binary_bin = {};    % Bin of binary aggregate images
 agg_cropped_bin = {};   % Bin of cropped aggregated images

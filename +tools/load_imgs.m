@@ -26,7 +26,7 @@ end
 img_raw = Imgs(1).raw;
 
 % crop out footer and get scale from text
-Imgs = get_footer_scale(Imgs);
+Imgs = tools.get_footer_scale(Imgs);
 
 end
 

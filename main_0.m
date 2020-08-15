@@ -14,8 +14,7 @@ fname = {Imgs.fname};
 %-- Run thresholding for all of the images -------------------------------%
 opts.bool_kmeans = 1;
 opts.bool_otsu = 0;
-imgs_binary = ...
-    agg.multi_seg(imgs,pixsize,opts);
+imgs_binary = agg.seg(imgs, pixsize, opts);
 [Imgs.binary] = imgs_binary{:};
 
 % for ii=1:length(Imgs)
