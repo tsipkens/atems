@@ -80,11 +80,7 @@ figure(1);
 tools.plot_aggregates(Aggs_edm);
 ```
 
-As a sample, one can go from this image (with the footer already cropped) to a classified image that looks as follows:
-
-![Fig1_Example](docs/f1_example.png)
-
-Here, the blue highlighting indicates pixels that are part of the aggregate, the red circle indicated the projected-area equivalent diameter, the yellow circle the primary particle size from PCM, and the number indicating the index used by the program to identify each aggregate. 
+The resultant highlighting indicates pixels that are part of the aggregate, the outer circle indicated the projected-area equivalent diameter, the inner circle the primary particle size from PCM, and the number indicating the index used by the program to identify each aggregate. 
 
 ## 1. Aggregate segmentation package (+agg)
 
