@@ -55,7 +55,7 @@ This can result in segmentations like:
 
 ![kmeans](docs/manual.png)
 
-Though, the largely manual aspect of this image will result in variable results that depend on the used. 
+It is worth noting that this latter approach is largely manual, resulting in variability and subjectiveness between users. However, the human input often greatly improves the quality of the segmentations and, while more time-intensive, can acts as a reference in considering the appropriateness of the other segmentation methods. s
 
 Having segmented the image, aggregate characteristics can be determined by passing this binary image to an analysis function:
 
