@@ -38,7 +38,7 @@ for ii=1:length(imgs) % loop through images
         Aggs, jj, 1, opts); % plot aggregates
 end
 
-tools.write_images(imgs_agg, fname, 'temp\b\otsu_o');
+% tools.write_images(imgs_agg, fname, 'temp\b\otsu_o');
 
 
 
