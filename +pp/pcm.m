@@ -94,6 +94,8 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
     
     % Pair correlation function (PCF)
     pcf = histcounts(d_vec, [r-1/2,r(end)+1/2]); % updated call (last entry is different)
+    idx_p = find(pcf~=0); pcf = pcf(idx_p); % remove zero PCFs
+    r1 = r(idx_p); % radius, adjusted for zero PCFs
     
     % Smoothing the pair correlation function (PCF
     % Updated to remove number of variables
@@ -104,14 +106,13 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
     bw  = bw ./ d_max;
     bw  = im2bw(bw, 1);
     
-    
     %-- Prep for PCM -----------------------------------------------------%
     [row, col] = find(~bw); % find non-zero pixels in binary
     d_denominator = sqrt((row - d_max + 3) .^2 + (col - d_max + 3) .^2);
     d_denominator = nonzeros(d_denominator) .* pixsize;
     
     denominator = histcounts(d_denominator, [r-1/2, r(end)+1/2]);
-    denominator = denominator .* length(skel_x) ./ thin;
+    denominator = denominator(idx_p) .* length(skel_x) ./ thin;
     denominator(denominator==0) = 1; % bug fix, overcomes division by zero
     pcf = pcf ./ denominator; % update pair correlation function
     pcf_smooth = smooth(pcf); % smooth the pair correlation function
@@ -119,10 +120,10 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
     % adjust PCF to be monotonically decreasing
     for kk=1:(size(pcf_smooth)-1)
         if pcf_smooth(kk) <= pcf_smooth(kk+1)
-            pcf_smooth(kk+1) = pcf_smooth(kk) - 1e-10;
+            pcf_smooth(kk+1) = pcf_smooth(kk) - 1e-12;
         end
     end
-    pcf_smooth = pcf_smooth ./ pcf_smooth(1); % normalize by initial value
+    pcf_smooth = pcf_smooth ./ max(pcf_smooth); % normalize by initial value
     
     
     
@@ -130,7 +131,7 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
     %-- 3-5-1: Simple PCM ------------------------------------------------%
     pcf_simple = 0.913;
     Aggs(ll).dp_pcm_simple = ...
-        2 * interp1(pcf_smooth, r, pcf_simple);
+        2 * interp1(pcf_smooth, r1, pcf_simple);
         % dp from simple PCM
         % given by diameter corresponding to 91.3% of PCF
     
@@ -138,16 +139,16 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
     %-- 3-5-2: Generalized PCM -------------------------------------------%
     Rg_u     = 1.1 * data.Rg; % perturb Rg, 10% higher
     Rg_l     = 0.9 * data.Rg; % perturb Rg, 10% lower
-    pcf_Rg   = interp1(r, pcf_smooth, data.Rg); % PCF at Rg
-    pcf_Rg_u = interp1(r, pcf_smooth, Rg_u); % PCF at upper Rg
-    pcf_Rg_l = interp1(r, pcf_smooth, Rg_l); % PCF at lower Rg
+    pcf_Rg   = interp1(r1, pcf_smooth, data.Rg); % PCF at Rg
+    pcf_Rg_u = interp1(r1, pcf_smooth, Rg_u); % PCF at upper Rg
+    pcf_Rg_l = interp1(r1, pcf_smooth, Rg_l); % PCF at lower Rg
     Rg_slope = (pcf_Rg_u + pcf_Rg_l - pcf_Rg) / (Rg_u - Rg_l);
         % dp/dr(Rg), slope by finite difference
 
     pcf_general = (0.913 / 0.84) * ...
         (0.7 + 0.003*Rg_slope^-0.24 + 0.2*data.aspect_ratio^-1.13);
     Aggs(ll).dp_pcm_gen = ...
-        2 * interp1(pcf_smooth, r, pcf_general);
+        2 * interp1(pcf_smooth, r1, pcf_general);
         % dp from generalized PCM
        
         

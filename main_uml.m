@@ -4,9 +4,9 @@ clear;
 close all;
 clc;
 
-% Imgs = tools.load_imgs; % load a single image
+Imgs = tools.load_imgs; % load a single image
 
-load('temp/b/Imgs.mat'); % load preset Imgs
+% load('temp/b/Imgs.mat'); % load preset Imgs
 
 imgs = {Imgs.cropped}; % copy variables locally
 pixsize = [Imgs.pixsize];
@@ -24,6 +24,7 @@ Aggs = agg.analyze_binary(...
     imgs_binary, imgs, pixsize, fname);
     % determine aggregate properties
 
+    
 
 %-- Generate plots of images ---------%
 close all; % close pre-existing images
@@ -85,6 +86,9 @@ for ii=1:length(imgs) % loop through images
     [~, imgs_pcm{ii}] = tools.plot_aggregates( ...
         Aggs_pcm, jj, 1, opts); % plot aggregates
 end
+
+figure(20);
+plot([Aggs.da], [Aggs.dp_pcm_simple], '.');
 %=========================================================================%
 %}
 
