@@ -14,13 +14,13 @@
 function [Aggs] = pcm(Aggs, f_plot, f_backup)
 
 %-- Parse inputs and load image ------------------------------------------%
-if ~exist('bool_plot','var'); f_plot = []; end
+% Choose whether to plot pair correlation functions (PCFs).
+if ~exist('bool_plot','var'); f_plot = []; end 
 if isempty(f_plot); f_plot = 0; end
 
+% Choose whether to save backup copies during evaluation to temp/ folder.
 if ~exist('bool_backup','var'); f_backup = []; end
 if isempty(f_backup); f_backup = 0; end
-
-disp('Performing PCM analysis...');
 
 % if isstruct(aggs)
 %     Aggs_str = aggs;
@@ -36,13 +36,16 @@ disp('Performing PCM analysis...');
 %-------------------------------------------------------------------------%
 
 
+disp('Performing PCM analysis...');
+
+
 %-- Check whether the data folder is available ---------------------------%
 if exist('data','dir') ~= 7 % 7 if exist parameter is a directory
     mkdir('data') % make output folder
 end
 
 
-if f_plot; figure; end % generate figure for visualizing current aggregate
+figure; % generate figure for visualizing current aggregate
 
 
 %== Main image processing loop ===========================================%
@@ -60,111 +63,101 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
     data.method = 'pcm';
     
     
+    
     %== Step 3-3: Development of the pair correlation function (PCF) -%
     %-- 3-3-1: Find the skeleton of the aggregate --------------------%
-    Skel = bwmorph(img_binary,'thin',Inf);
-    [skeletonY, skeletonX] = find(Skel);
+    skel = bwmorph(img_binary, 'thin', Inf); % get aggregate skeleton
+    [skel_y, skel_x] = find(skel); % find skeleton pixels
     
-    %-- 3-3-2: Calculate the distances between skeleton pixels and other pixels
+    
+    %-- 3-3-2: Calculate the distances between binary pixels
     [row, col] = find(img_binary);
     
     % to consolidate the pixels of consideration to much smaller arrays
-    p       = 0;
-    X       = 0;
-    Y       = 0;
-    density = 20; % larger densities make the program less computationally expensive
-
-    for kk = 1:density:data.num_pixels
-        p    = p + 1;
-        X(p) = col(kk);
-        Y(p) = row(kk);
-    end
-
+    thin = 20; % larger densities make the program less computationally expensive
+    X = col(1:thin:data.num_pixels);
+    Y = row(1:thin:data.num_pixels);
+    
     % To calculate all the distances with reference to one pixel at a time,
     % using vector algebra, and then adding the results.
-    dist_mat = []; % reinitialize dist_mat
-    for kk = 1:1:length(skeletonX)
-        Distance_int = ((X-skeletonX(kk)).^2+(Y-skeletonY(kk)).^2).^.5;
-        dist_mat(((kk-1)*length(X)+1):(kk*length(X))) = Distance_int;
-    end
-
+    d_vec = sqrt((X - skel_x') .^2 + (Y - skel_y') .^2);
+    d_vec = nonzeros(d_vec(:)'); % vectorize the output and remove zeros
+    
+    
     %-- 3-3-3: Construct the pair correlation ------------------------%
     %   Sort radii into bins and calculate PCF
-    dist_max = double(uint16(max(dist_mat)));
-    dist_mat = nonzeros(dist_mat).*pixsize;
-    nbins        = dist_max * pixsize; % number of radius bins
-    dr           = 1; % interval for radius vector, below
-    r            = 1:dr:nbins; % radius
+    d_max = double(uint16(max(d_vec))); % maximum distance in px
+    d_vec = d_vec .* pixsize; % vector of distances in nm
+    r     = 1:1:(d_max * pixsize); % radius vector in nm
     
     % Pair correlation function (PCF)
-    % PCF = histcounts(Distance_mat,[Radius-dr/2,Radius(end)+dr/2]);
-    pcf = hist(dist_mat, r); % UPDATE REMOVED
-
-    % Smoothing the pair correlation function (PCF)
+    pcf = histcounts(d_vec, [r-1/2,r(end)+1/2]); % updated call (last entry is different)
+    
+    % Smoothing the pair correlation function (PCF
     % Updated to remove number of variables
-    d                          = 5 + 2 * dist_max;
-    bw                         = zeros(d,d);
-    bw(dist_max+3, dist_max+3) = 1;
-    bw                         = bwdist(bw, 'euclidean');
-    bw                         = bw./dist_max;
-    bw                         = im2bw(bw,1);
+    d   = 5 + 2 * d_max;
+    bw  = zeros(d, d);
+    bw(d_max + 3, d_max + 3) = 1;
+    bw  = bwdist(bw, 'euclidean');
+    bw  = bw ./ d_max;
+    bw  = im2bw(bw, 1);
     
     
     %-- Prep for PCM -----------------------------------------------------%
     [row, col] = find(~bw); % find non-zero pixels in binary
-    dist_denominator = ((row-dist_max+3).^2+(col-dist_max+3).^2).^.5;
-    dist_denominator = nonzeros(dist_denominator) .* pixsize;
-    % Denamonator = histcounts(Distance_Denaminator,[Radius-dr/2,Radius(end)+dr/2]);
-    denominator = hist(dist_denominator, r); % UPDATE REMOVED
-    denominator = denominator .* length(skeletonX) ./ density;
+    d_denominator = sqrt((row - d_max + 3) .^2 + (col - d_max + 3) .^2);
+    d_denominator = nonzeros(d_denominator) .* pixsize;
+    
+    denominator = histcounts(d_denominator, [r-1/2, r(end)+1/2]);
+    denominator = denominator .* length(skel_x) ./ thin;
     denominator(denominator==0) = 1; % bug fix, overcomes division by zero
     pcf = pcf ./ denominator; % update pair correlation function
     pcf_smooth = smooth(pcf); % smooth the pair correlation function
-
+    
+    % adjust PCF to be monotonically decreasing
     for kk=1:size(pcf_smooth)-1
         if pcf_smooth(kk) == pcf_smooth(kk+1)
-            pcf_smooth(kk+1) = pcf_smooth(kk) - 1e-4;
+            pcf_smooth(kk+1) = pcf_smooth(kk) - eps;
         end
     end
-    %{
-    % UPDATE REMOVED
-    [~,ia] = unique(PCF_smoothed); % bug fix, remove non-unique entries
-    ia = sort(ia);
-    PCF_smoothed = PCF_smoothed(ia);
-    Radius = Radius(ia);
-    %}
+    
+    
     
     %== 3-5: Primary particle sizing =====================================%
     %-- 3-5-1: Simple PCM ------------------------------------------------%
-    pcf_simple   = .913;
+    pcf_simple = 0.913;
     Aggs(ll).dp_pcm_simple = ...
-        2*interp1(pcf_smooth, r, pcf_simple);
+        2 * interp1(pcf_smooth, r, pcf_simple);
         % dp from simple PCM
+        % given by diameter corresponding to 91.3% of PCF
     
+        
     %-- 3-5-2: Generalized PCM ---------------------------------------%
-    Rg_u     = 1.1 * data.Rg; % 10% higher than Rg
-    Rg_l     = 0.9 * data.Rg; % 10% lower than Rg
-    pcf_Rg   = interp1(r, pcf_smooth, data.Rg); % P at Rg
-    pcf_Rg_u = interp1(r, pcf_smooth, Rg_u); % P at upper Rg
-    pcf_Rg_l = interp1(r, pcf_smooth, Rg_l); % P at lower Rg
-    PRgslope = (pcf_Rg_u+pcf_Rg_l-pcf_Rg)/(Rg_u-Rg_l); % dp/dr(Rg)
+    Rg_u     = 1.1 * data.Rg; % perturb Rg, 10% higher
+    Rg_l     = 0.9 * data.Rg; % perturb Rg, 10% lower
+    pcf_Rg   = interp1(r, pcf_smooth, data.Rg); % PCF at Rg
+    pcf_Rg_u = interp1(r, pcf_smooth, Rg_u); % PCF at upper Rg
+    pcf_Rg_l = interp1(r, pcf_smooth, Rg_l); % PCF at lower Rg
+    Rg_slope = (pcf_Rg_u + pcf_Rg_l - pcf_Rg) / (Rg_u - Rg_l);
+        % dp/dr(Rg), slope by finite difference
 
-    pcf_general = (.913/.84)*...
-        (0.7+0.003*PRgslope^(-0.24)+0.2*data.aspect_ratio^-1.13);
-    Aggs(ll).dp_pcm_general = ...
-        2*interp1(pcf_smooth, r, pcf_general);
+    pcf_general = (0.913 / 0.84) * ...
+        (0.7 + 0.003*Rg_slope^-0.24 + 0.2*data.aspect_ratio^-1.13);
+    Aggs(ll).dp_pcm_gen = ...
+        2 * interp1(pcf_smooth, r, pcf_general);
         % dp from generalized PCM
-    
+       
         
     %-- Plot pair correlation function in line graph format ----------%
     if f_plot
-        str = sprintf('Pair Correlation Line Plot %f ',pcf_simple);
+        str = sprintf('Pair Correlation Line Plot %f ', pcf_simple);
         figure, loglog(r, smooth(pcf), '-r'),...
             title (str), xlabel ('Radius'), ylabel('PCF(r)')
         hold on;
-        loglog(Aggs(ll).pcm_dp_simple,pcf_simple,'*')
+        loglog(Aggs(ll).pcm_dp_simple, pcf_simple,'*')
         close all;
     end
+    
     
 
     %== Step 4: Save results =========================================%
