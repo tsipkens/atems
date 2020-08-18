@@ -73,8 +73,10 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
     %-- 3-3-2: Calculate the distances between binary pixels
     [row, col] = find(img_binary);
     
-    % to consolidate the pixels of consideration to much smaller arrays
-    thin = 20; % larger densities make the program less computationally expensive
+    % To consolidate the pixels of consideration to much smaller arrays, we
+    % apply thinning, which makes the program less computationally
+    % expensive. Thinning aims for a vector of max length of 3,000. 
+    thin = max(round(data.num_pixels/6e3), 1);
     X = col(1:thin:data.num_pixels);
     Y = row(1:thin:data.num_pixels);
     
@@ -84,7 +86,7 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
     d_vec = nonzeros(d_vec(:)'); % vectorize the output and remove zeros
     
     
-    %-- 3-3-3: Construct the pair correlation ------------------------%
+    %-- 3-3-3: Construct the pair correlation ----------------------------%
     %   Sort radii into bins and calculate PCF
     d_max = double(uint16(max(d_vec))); % maximum distance in px
     d_vec = d_vec .* pixsize; % vector of distances in nm
@@ -115,11 +117,12 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
     pcf_smooth = smooth(pcf); % smooth the pair correlation function
     
     % adjust PCF to be monotonically decreasing
-    for kk=1:size(pcf_smooth)-1
-        if pcf_smooth(kk) == pcf_smooth(kk+1)
-            pcf_smooth(kk+1) = pcf_smooth(kk) - eps;
+    for kk=1:(size(pcf_smooth)-1)
+        if pcf_smooth(kk) <= pcf_smooth(kk+1)
+            pcf_smooth(kk+1) = pcf_smooth(kk) - 1e-10;
         end
     end
+    pcf_smooth = pcf_smooth ./ pcf_smooth(1); % normalize by initial value
     
     
     
@@ -132,7 +135,7 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
         % given by diameter corresponding to 91.3% of PCF
     
         
-    %-- 3-5-2: Generalized PCM ---------------------------------------%
+    %-- 3-5-2: Generalized PCM -------------------------------------------%
     Rg_u     = 1.1 * data.Rg; % perturb Rg, 10% higher
     Rg_l     = 0.9 * data.Rg; % perturb Rg, 10% lower
     pcf_Rg   = interp1(r, pcf_smooth, data.Rg); % PCF at Rg
@@ -148,7 +151,7 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
         % dp from generalized PCM
        
         
-    %-- Plot pair correlation function in line graph format ----------%
+    %-- Plot pair correlation function in line graph format --------------%
     if f_plot
         str = sprintf('Pair Correlation Line Plot %f ', pcf_simple);
         figure, loglog(r, smooth(pcf), '-r'),...
@@ -160,7 +163,7 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
     
     
 
-    %== Step 4: Save results =========================================%
+    %== Step 4: Save results =============================================%
     %   Autobackup data (every ten particles)
     if f_backup==1
         if mod(ll,10)==0

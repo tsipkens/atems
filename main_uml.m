@@ -72,11 +72,19 @@ tools.write_images(imgs_agg0, fname, 'temp\b\man');
 
 
 
-%{
+%-{
 %== Primary particle sizing ==============================================%
 Aggs_pcm = pp.pcm(Aggs);
-[~, imgs_pcm{ii}] = tools.plot_aggregates( ...
-	Aggs_pcm, jj, 1, opts); % plot aggregates
+for ii=1:length(imgs) % loop through images
+    jj = find(strcmp(fname{ii}, {Aggs.fname})); % find instance of aggregate in given image
+    jj = jj(1);
+    
+    figure(ii+2);
+    opts.cmap = [0.92,0.16,0.49];
+    % opts.cmap = [0.12,0.59,0.96];
+    [~, imgs_pcm{ii}] = tools.plot_aggregates( ...
+        Aggs_pcm, jj, 1, opts); % plot aggregates
+end
 %=========================================================================%
 %}
 
