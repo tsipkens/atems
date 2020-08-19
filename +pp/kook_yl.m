@@ -48,7 +48,7 @@
 function Aggs = kook_yl(Aggs, f_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
-if ~exist('bool_plot','var'); f_plot = []; end
+if ~exist('f_plot','var'); f_plot = []; end
 if isempty(f_plot); f_plot = 0; end
 
 disp('Performing modified Kook analysis...');
@@ -76,19 +76,19 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     
     
     %== Image preprocessing ==============================================%
-    Data.img_bothat = imbothat(img_cropped,strel('disk',85)); % fix background illumination
-    Data.img_contrast = imadjust(Data.img_bothat); % enhance contrast
-    Data.img_medfilter = medfilt2(Data.img_contrast); % median filterting to remove noise
+    Pp.img_bothat = imbothat(img_cropped,strel('disk',85)); % fix background illumination
+    Pp.img_contrast = imadjust(Pp.img_bothat); % enhance contrast
+    Pp.img_medfilter = medfilt2(Pp.img_contrast); % median filterting to remove noise
     
     % erase background by multiplying binary image with grayscale image
-    Data.img_analyze = uint8(img_binary) .* Data.img_medfilter ;
+    Pp.img_analyze = uint8(img_binary) .* Pp.img_medfilter ;
     
-    img_canny0 = edge(Data.img_analyze,'Canny'); % Canny edge detection
+    img_canny0 = edge(Pp.img_analyze,'Canny'); % Canny edge detection
     
     % Imposing white background onto image. 
     % This prevents the program from detecting any background particles. 
     img_canny = double(~img_binary) + double(img_canny0);
-    Data.img_Canny = img_canny;
+    Pp.img_Canny = img_canny;
     %=====================================================================%
     
     
@@ -97,15 +97,15 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     [centers, radii] = imfindcircles(img_canny,[rmin rmax],...
         'ObjectPolarity', 'bright', ...
         'Sensitivity', sens_val, 'Method', 'TwoStage'); 
-    Data.centers = centers;
-    Data.radii = radii;
+    Pp.centers = centers;
+    Pp.radii = radii;
     
     %-- Calculate Parameters (Add Histogram) -----------------------------%
-    Data.dp = radii*pixsize*2;
-    Data.dpg = nthroot(prod(Data.dp),1/length(Data.dp)); % geometric mean
-    Data.sg = log(std(Data.dp)); % geometric standard deviation
+    Pp.dp = radii*pixsize*2;
+    Pp.dpg = nthroot(prod(Pp.dp),1/length(Pp.dp)); % geometric mean
+    Pp.sg = log(std(Pp.dp)); % geometric standard deviation
     
-    Data.Np = length(Data.dp); % number of particles
+    Pp.Np = length(Pp.dp); % number of particles
     
     %-- Check the circle finder by overlaying the CHT boundaries on the original image 
     %-- Remove circles out of the aggregate (?)
@@ -119,8 +119,8 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     
     %== Save results =====================================================%
     %   Format output and autobackup data --------------------------------%
-    Aggs(ll).kook_mod = Data; % copy data structure into img_data
-    Aggs(ll).dp = mean(Data.dp);
+    Aggs(ll).kook_mod = Pp; % copy data structure into img_data
+    Aggs(ll).dp = mean(Pp.dp);
     if mod(ll,10)==0 % save data every 10 aggregates
         disp('Saving data...');
         save(['temp',filesep,'kook_mod_data.mat'],'Aggs'); % backup img_data

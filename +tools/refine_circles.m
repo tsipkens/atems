@@ -5,7 +5,7 @@
 %                   roi.Circles objects.
 %=========================================================================%
 
-function [Data] = refine_circles(img, Data)
+function [Pp] = refine_circles(img, Pp)
 
 % generate new figure for refine circles step
 f0 = figure;
@@ -17,9 +17,9 @@ colormap gray; axis image off;
 
 
 % get particle properties
-radii = Data.radii;
-centers = Data.centers;
-pixsize = Data.dp./(2.*Data.radii); % get pixel size from radii/dp ratio
+radii = Pp.radii;
+centers = Pp.centers;
+pixsize = Pp.dp./(2.*Pp.radii); % get pixel size from radii/dp ratio
 
 
 % generate a series of roi.Circles objects (with handles)
@@ -37,9 +37,9 @@ if sum(iv)==0; disp('Figure closed: no update occurred.'); return; end
 
 
 % update data parameters for output
-Data.radii = vertcat(h(iv).Radius); % prepare output
-Data.centers = vertcat(h(iv).Center);
-Data.dp = 2.*pixsize.*Data.radii;
+Pp.radii = vertcat(h(iv).Radius); % prepare output
+Pp.centers = vertcat(h(iv).Center);
+Pp.dp = 2.*pixsize.*Pp.radii;
 
 close(f0);
 

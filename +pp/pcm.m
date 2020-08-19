@@ -15,11 +15,11 @@ function [Aggs] = pcm(Aggs, f_plot, f_backup)
 
 %-- Parse inputs and load image ------------------------------------------%
 % Choose whether to plot pair correlation functions (PCFs).
-if ~exist('bool_plot','var'); f_plot = []; end 
+if ~exist('f_plot','var'); f_plot = []; end 
 if isempty(f_plot); f_plot = 0; end
 
 % Choose whether to save backup copies during evaluation to temp/ folder.
-if ~exist('bool_backup','var'); f_backup = []; end
+if ~exist('f_backup','var'); f_backup = []; end
 if isempty(f_backup); f_backup = 0; end
 
 % if isstruct(aggs)

@@ -4,7 +4,7 @@
 % Author: Timothy Sipkens, 2019-11-23
 %=========================================================================%
 
-function [Aggs,dp_bin,S,S_fit] = edm_sbs(imgs_binary,pixsizes)
+function [Aggs, dp_bin, S, S_fit] = edm_sbs(imgs_binary, pixsizes)
 
 
 %-- Parse inputs ---------------------------------------------------------%

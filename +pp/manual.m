@@ -6,7 +6,7 @@
 %   Vanouver, BC, Canada. 
 %=========================================================================%
 
-function [Aggs, dp] = manual(Aggs,ind)
+function [Aggs, dp] = manual(Aggs, ind)
 
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('ind','var'); ind = []; end
@@ -28,7 +28,7 @@ f0.WindowState = 'maximized';
 %== Process image ========================================================%
 for ll = 1:length(ind) % run loop as many times as images selected
     
-    Data = struct(); % re-initialize data structure
+    Pp = struct(); % re-initialize data structure
     
     pixsize = Aggs(ll).pixsize; % copy pixel size locally
     img_cropped = Aggs(ll).img_cropped;
@@ -53,20 +53,20 @@ for ll = 1:length(ind) % run loop as many times as images selected
         
         % prompt user to draw first line
         [x,y] = ginput(2);
-        Data.length(jj,1) = pixsize*sqrt((x(2)-x(1))^2+(y(2) - y(1))^2);
+        Pp.length(jj,1) = pixsize*sqrt((x(2)-x(1))^2+(y(2) - y(1))^2);
         line([x(1),x(2)],[y(1),y(2)], 'linewidth', 3);
         
         % prompt user to draw second line
         [a,b] = ginput(2);
-        Data.width(jj,1) = pixsize*sqrt((a(2)-a(1))^2+(b(2) - b(1))^2);
+        Pp.width(jj,1) = pixsize*sqrt((a(2)-a(1))^2+(b(2) - b(1))^2);
         line([a(1),a(2)],[b(1),b(2)],'Color', 'r', 'linewidth', 3);
         
         %-- Save center of the primary particle --------------------------%
-        Data.centers(jj,:) = find_centers(x,y,a,b);
-        Data.radii(jj,:) = (sqrt((a(2)-a(1))^2 + (b(2)-b(1))^2)+...
+        Pp.centers(jj,:) = find_centers(x,y,a,b);
+        Pp.radii(jj,:) = (sqrt((a(2)-a(1))^2 + (b(2)-b(1))^2)+...
         	sqrt((x(2)-x(1))^2 + (y(2)-y(1))^2)) / 4;
             % takes an average over drawn lines (given in pixels)
-        Data.dp = 2 .* pixsize .* Data.radii; % particle diameter (given in nm)
+        Pp.dp = 2 .* pixsize .* Pp.radii; % particle diameter (given in nm)
         
         %-- Check if there are more primary particles --------------------%
         choice = questdlg('Do you want to analyze another primary particle ?',...
@@ -79,14 +79,14 @@ for ll = 1:length(ind) % run loop as many times as images selected
         
     end
     
-    Data = tools.refine_circles(img_cropped, Data);
+    Pp = tools.refine_circles(img_cropped, Pp);
         % allow for refinement of circles
         % uses handles and prompts the user
     
     %== Save results =====================================================%
     %   Format output and autobackup data ------------------------%
-    Aggs(ll).dp_manual = Data; % copy Dp data structure into img_data
-    Aggs(ll).dp = mean(Data.dp);
+    Aggs(ll).dp_manual = Pp; % copy Dp data structure into img_data
+    Aggs(ll).dp = mean(Pp.dp);
     save(['temp',filesep,'manual_data.mat'],'Aggs'); % backup img_data
 
 end

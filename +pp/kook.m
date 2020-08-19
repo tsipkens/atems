@@ -25,11 +25,11 @@
 % 
 %=========================================================================%
 
-function [Aggs,dp,dpdist] = kook(Imgs,bool_plot)
+function [Aggs, dp, dpdist] = kook(Imgs, f_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
-if ~exist('bool_plot','var'); bool_plot = []; end
-if isempty(bool_plot); bool_plot = 1; end
+if ~exist('f_plot','var'); f_plot = []; end
+if isempty(f_plot); f_plot = 1; end
 %-------------------------------------------------------------------------%
 
 
@@ -63,20 +63,20 @@ II1_bg = SelfSubt*II1; % Self-subtration from the original image
 II1 = maxImgCount-II1;
 II1 = II1-II1_bg; % subtract background
 II1(II1<0)=0;
-if bool_plot==2; figure(); imshow(II1, []); title('Step 1: Inversion and self-subtraction'); end
+if f_plot==2; figure(); imshow(II1, []); title('Step 1: Inversion and self-subtraction'); end
 
 %-- STEP 2: median filter to remove noise --------------------------------%
 II1_mf=medfilt2(II1, [mf mf]);
-if bool_plot==2; figure();imshow(II1_mf, []);title('Step 2: Median filter'); end
+if f_plot==2; figure();imshow(II1_mf, []);title('Step 2: Median filter'); end
 
 %-- STEP 3: Unsharp filter------------------------------------------------%
 f = fspecial('unsharp', alpha);
 II1_lt = imfilter(II1_mf, f);
-if bool_plot==2; figure();imshow(II1_lt, []);title('Step 3: Unsharp filter'); end
+if f_plot==2; figure();imshow(II1_lt, []);title('Step 3: Unsharp filter'); end
 
 %-- STEP 4: Canny edge detection -----------------------------------------%
 BWCED = edge(II1_lt,'canny'); % perfrom Canny edge detection
-if bool_plot==2; figure();imshow(BWCED);title('Step 4: Canny edge detection'); end
+if f_plot==2; figure();imshow(BWCED);title('Step 4: Canny edge detection'); end
 
 
 
@@ -85,7 +85,7 @@ if bool_plot==2; figure();imshow(BWCED);title('Step 4: Canny edge detection'); e
 [centers, radii] = imfindcircles(BWCED,[rmin rmax],...
     'objectpolarity', 'bright', 'sensitivity', sens_val, 'method', 'TwoStage');
 % - draw circles
-if bool_plot==2
+if f_plot==2
     figure(gcf);imshow(img_original,[]);hold;
     h = viscircles(centers, radii, 'EdgeColor','r');
     title('Step 5: Parimary particles overlaid on the original TEM image');
@@ -94,7 +94,7 @@ end
 
 %-- Check the circle finder ----------------------------------------------%
 %-- Overlaying the CHT boundaries on the original image. 
-if bool_plot>=1
+if f_plot>=1
     figure;
     imshow(img_original);
     hold on;
