@@ -4,9 +4,9 @@ clear;
 close all;
 clc;
 
-% Imgs = tools.load_imgs; % load a single image
+Imgs = tools.load_imgs; % load a single image
 
-load('temp/b/Imgs.mat'); % load preset Imgs
+% load('temp/b/Imgs.mat'); % load preset Imgs
 
 imgs = {Imgs.cropped}; % copy variables locally
 pixsize = [Imgs.pixsize];

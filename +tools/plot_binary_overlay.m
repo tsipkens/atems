@@ -3,16 +3,14 @@
 % Author:              Timothy Sipkens, 2019-07-24
 %=========================================================================%
 
-function [h,f,i0] = plot_binary_overlay(img,img_binary,opts)
+function [h,f,i0] = plot_binary_overlay(img, img_binary, opts)
 
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('opts','var'); opts = struct(); end
-
 if ~isfield(opts,'cmap')
     opts.cmap = ones(max(max(img_binary)),1) * [0.12,0.59,0.96];
         % blue, repeated for as many labels as exist in img_binary
 end
-
 if ~isfield(opts,'f_outline'); opts.f_outline = 1; end
 if ~isfield(opts,'label_alpha'); opts.label_alpha = 0.7; end
 %-------------------------------------------------------------------------%

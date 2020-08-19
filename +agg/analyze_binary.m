@@ -3,7 +3,7 @@
 % Author:  Timothy Sipkens
 %=========================================================================%
 
-function [Aggs] = analyze_binary(imgs_binary,imgs,pixsize,fname)
+function [Aggs] = analyze_binary(imgs_binary, imgs, pixsize, fname)
 
 %-- Parse inputs ---------------------------------------------------------%
 if isstruct(imgs_binary) % consider case that structure is given as input
@@ -12,9 +12,10 @@ if isstruct(imgs_binary) % consider case that structure is given as input
     imgs = {Imgs_str.cropped};
     pixsize = [Imgs_str.pixsize];
     fname = {Imgs_str.fname};
-elseif ~iscell(imgs_binary) % consider case that a single image is given
-    imgs_binary = {imgs_binary};
-    imgs = {imgs};
+else
+    % consider case that a single image is given
+    if ~iscell(imgs_binary); imgs_binary = {imgs_binary}; end
+    if ~iscell(imgs); imgs = {imgs}; end
 end
 
 if ~exist('pixsize','var'); pixsize = []; end
@@ -44,7 +45,7 @@ for ii=1:length(imgs_binary) % loop through provided images
 
     %== Main loop to analyze each aggregate ==============================%
     figure(gcf);
-    tools.plot_binary_overlay(img,img_binary);
+    tools.plot_binary_overlay(img, img_binary);
     for jj = 1:naggs % loop through number of found aggregates
         
         id = id + 1; % increment global index counter
