@@ -16,8 +16,6 @@ if ~isfield(opts,'label_alpha'); opts.label_alpha = 0.7; end
 %-------------------------------------------------------------------------%
 
 
-gcf; % get and clear figure
-clf;
 
 t0 = labeloverlay(img,img_binary, ...
     'Transparency', opts.label_alpha,...

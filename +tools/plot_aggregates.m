@@ -32,7 +32,6 @@ if bool_img
         img_binary = or(img_binary,Aggs(aa).binary);
     end
     
-    figure(gcf);
     [~,~,i0] = tools.plot_binary_overlay( ...
         Aggs(ind1(1)).image, img_binary, opts);
 end % else: plot circles on existing image

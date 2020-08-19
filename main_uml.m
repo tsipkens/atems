@@ -35,8 +35,15 @@ for ii=1:length(imgs) % loop through images
     figure(ii);
     opts.cmap = [0.92,0.16,0.49];
     % opts.cmap = [0.12,0.59,0.96];
+    
+    subplot(1,2,2);
     [~, imgs_agg{ii}] = tools.plot_aggregates( ...
         Aggs, jj, 1, opts); % plot aggregates
+    
+    subplot(1,2,1);
+    imagesc(imgs{ii});
+    colormap gray;
+    axis image off;
 end
 
 % tools.write_images(imgs_agg, fname, 'temp\b\otsu_o');
