@@ -80,18 +80,31 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     img_binary = Aggs(ll).img_cropped_binary;
     
     
-    %-- Creating a new folder to store data from this image processing program --%
-    % TODO : Add new directory folder for each image and input overlayed image,
-    % original image, edge detection results, and histogram for each one
+    %== Image preprocessing ==============================================%    
+    % fix background illumination
+    se = strel('disk',85);
+    Data.img_bothat = imbothat(img_cropped,se);
     
+    Data.img_contrast = imadjust(Data.img_bothat); % enhance contrast
     
-    %== Begin image processing ===========================================%
-    [img_canny, Data] = preprocess(img_cropped,img_binary);
-    Data.method = 'kook_mod';
+    % median filterting to remove noise
+    Data.img_medfilter = medfilt2(Data.img_contrast); %, [mf mf]); 
+    
+    % erasing background by multiplying binary image with grayscale image
+    Data.img_analyze = uint8(img_binary) .* Data.img_medfilter ;
+    
+    img_canny0 = edge(Data.img_analyze,'Canny'); % Canny edge detection
+
+
+    % Imposing white background onto image. 
+    % This prevents the program from detecting any background particles. 
+    img_canny = double(~img_binary) + double(img_canny0);
+    Data.img_Canny = img_canny;
+    %=====================================================================%
     
     
     %== Find and draw circles within aggregates ==========================%
-    % Find circles within soot aggregates 
+    %   Find circles within soot aggregates 
     [centers, radii] = imfindcircles(img_canny,[rmin rmax],...
         'ObjectPolarity', 'bright', 'Sensitivity', sens_val, 'Method', 'TwoStage'); 
     Data.centers = centers;
@@ -120,7 +133,7 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     Aggs(ll).dp = Data.dp;
     if mod(ll,10)==0 % save data every 10 aggregates
         disp('Saving data...');
-        save(['data',filesep,'kook_mod_data.mat'],'Aggs'); % backup img_data
+        save(['temp',filesep,'kook_mod_data.mat'],'Aggs'); % backup img_data
         disp('Save complete');
         disp(' ');
     end
@@ -134,55 +147,5 @@ disp(' ');
 
 end
 
-
-
-%== PREPROCESS ===========================================================%
-%   Perform preprocessing of image.
-%   Author:       Timothy Sipkens, 2019-06-24; Yiling Kang, 2018
-%   Originally:   Ben Gigone and Emre Karatas, PhD
-%   Citations:    Kook et al. 2016, SAE
-%
-% Preprocesses the cropped aggregate using background subtraction and
-% various techniques.  Works on one aggregate.
-%
-% Parameters:   agg_cropped - cropped image of aggregate
-%               agg_binary - cropped binary image of aggregate
-
-function [img_Canny,Data] = ...
-    preprocess(img_cropped,img_binary)
-
-
-%-- Fix background illumination ------------------------------------------%
-se = strel('disk',85);
-Data.img_bothat = imbothat(img_cropped,se);
-
-
-%-- Enhance Contrast -----------------------------------------------------%
-Data.img_contrast = imadjust(Data.img_bothat);
-
-
-%-- Median Filtering -----------------------------------------------------%
-%   Step 3: median filter to remove noise 
-Data.img_medfilter = medfilt2(Data.img_contrast); %, [mf mf]); 
-
-    
-%== RawImage processing ==================================================%
-%   Background erasing, Canny edge detection, background inversion, 
-%   Circular Hough Transform
-
-%-- Erasing background by multiplying binary image with grayscale image --%
-Data.img_analyze = uint8(img_binary).*Data.img_medfilter ;
-
-
-%-- Canny Edge Detection -------------------------------------------------%
-img_Canny0 = edge(Data.img_analyze,'Canny'); % MATLAB Canny edge detection
-
-
-%-- Imposing white background onto image ---------------------------------%
-%   This prevents the program from detecting any background particles
-img_Canny = double(~img_binary) + double(img_Canny0);
-Data.img_Canny = img_Canny;
-
-end
 
 

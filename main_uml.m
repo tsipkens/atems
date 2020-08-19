@@ -4,9 +4,9 @@ clear;
 close all;
 clc;
 
-Imgs = tools.load_imgs; % load a single image
+% Imgs = tools.load_imgs; % load a single image
 
-% load('temp/b/Imgs.mat'); % load preset Imgs
+load('temp/b/Imgs.mat'); % load preset Imgs
 
 imgs = {Imgs.cropped}; % copy variables locally
 pixsize = [Imgs.pixsize];
@@ -91,11 +91,12 @@ for ii=1:length(imgs) % loop through images
 end
 
 figure(20);
-loglog([Aggs_pcm.da], [Aggs_pcm.dp_pcm_simple], '.');
+loglog([Aggs_pcm.da], [Aggs_pcm.dp_pcm1], '.');
 
 figure(21);
-loglog([Aggs_edm.dp_pcm_simple], [Aggs_edm.dpg_edm], '.');
+loglog([Aggs_edm.dp_pcm1], [Aggs_edm.dp_edm], '.');
 hold on;
+ylims = ylim;
 plot(ylims, ylims);
 hold off;
 %=========================================================================%
