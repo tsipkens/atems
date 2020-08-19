@@ -32,7 +32,7 @@ for ii=1:length(imgs) % loop through images
     jj = find(strcmp(fname{ii}, {Aggs.fname})); % find instance of aggregate in given image
     jj = jj(1);
     
-    figure(ii+2);
+    figure(ii);
     opts.cmap = [0.92,0.16,0.49];
     % opts.cmap = [0.12,0.59,0.96];
     [~, imgs_agg{ii}] = tools.plot_aggregates( ...
@@ -76,19 +76,28 @@ tools.write_images(imgs_agg0, fname, 'temp\b\man');
 %-{
 %== Primary particle sizing ==============================================%
 Aggs_pcm = pp.pcm(Aggs);
+Aggs_edm = pp.edm_sbs(Aggs_pcm);
 for ii=1:length(imgs) % loop through images
     jj = find(strcmp(fname{ii}, {Aggs.fname})); % find instance of aggregate in given image
     jj = jj(1);
     
-    figure(ii+2);
+    %{
+    figure(ii);
     opts.cmap = [0.92,0.16,0.49];
     % opts.cmap = [0.12,0.59,0.96];
     [~, imgs_pcm{ii}] = tools.plot_aggregates( ...
         Aggs_pcm, jj, 1, opts); % plot aggregates
+    %}
 end
 
 figure(20);
-plot([Aggs.da], [Aggs.dp_pcm_simple], '.');
+loglog([Aggs_pcm.da], [Aggs_pcm.dp_pcm_simple], '.');
+
+figure(21);
+loglog([Aggs_edm.dp_pcm_simple], [Aggs_edm.dpg_edm], '.');
+hold on;
+plot(ylims, ylims);
+hold off;
 %=========================================================================%
 %}
 
