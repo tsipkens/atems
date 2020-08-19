@@ -83,12 +83,11 @@ while moreaggs==1
     uiwait(msgbox(['Please selects (left click) particles satisfactorily ', ...
         'detected; and press enter']));
     img_binary = bwselect(img_binary,8);
-    img_binary = ~img_binary; % formatted for PCA, other codes should reverse this
     
     
     %-- Check if result is satisfactory ----------------------------------%
     figure(f0); clf;
-    tools.plot_binary_overlay(img_cropped, ~img_binary);
+    tools.plot_binary_overlay(img_cropped, img_binary);
     choice2 = questdlg(['Satisfied with aggregate detection? ', ...
         'If not, try drawing an edge around the aggregate manually...'], ...
         'Agg detection','Yes','No','Yes');
@@ -106,7 +105,7 @@ while moreaggs==1
     inds1 = rect(2):(rect(2)+size_temp(1)-1);
     inds2 = rect(1):(rect(1)+size_temp(2)-1);
     img_binary0(inds1,inds2) = ...
-        or(img_binary0(inds1,inds2), ~img_binary);
+        or(img_binary0(inds1,inds2), img_binary);
 
 
     %-- Query user -------------------------------------------------------%
@@ -245,7 +244,7 @@ end
 %             Developed at the University of British Columbia
 %   Modified: Timothy Sipkens
 
-function thresh_slider(hObj,event,hax,img_cropped,binaryImage)
+function thresh_slider(hObj,~,hax,img_cropped,img_binary0)
 
 %-- Average filter -------------------------------------------------------%
 hav = fspecial('average');
@@ -281,7 +280,7 @@ img_binary2 = imdilate(~img_binary1, strel('square',1));
 %   this section, external boundary, or background region, is utilized to
 %   eliminate detection errors in the background region.
 img_binary3 = 0 .* img_binary2;
-img_binary3(binaryImage) = img_binary2(binaryImage);
+img_binary3(img_binary0) = img_binary2(img_binary0);
 img_binary = logical(img_binary3);
 
 img_temp2 = imimposemin(img_cropped,img_binary);
