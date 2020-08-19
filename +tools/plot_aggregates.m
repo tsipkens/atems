@@ -59,7 +59,7 @@ for aa=ind_agg
     % plot primary particle diameter from PCM if available
     if isfield(Aggs,'dp_pcm_simple') % if available plot reference dp
         viscircles(fliplr(Aggs(aa).center_mass'),...
-            Aggs(aa).dp_pcm_simple/2./Aggs(aa).pixsize,...
+            Aggs(aa).dp / 2 ./ Aggs(aa).pixsize,... % use default value of dp
             'Color', [0.92,0.16,0.49], 'LineWidth', 0.75, 'EnhanceVisibility', false);
     end
     hold off;
