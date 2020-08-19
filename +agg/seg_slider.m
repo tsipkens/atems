@@ -26,6 +26,7 @@ while moreaggs==1
 
     %== STEP 1: Crop image ===============================================%
     if f_crop
+        figure(f0); clf;
         imagesc(img);
         colormap gray;
         axis image off;
@@ -48,7 +49,7 @@ while moreaggs==1
 
 
     %== STEP 3: Thresholding =============================================%
-    figure(f0);
+    figure(f0); clf;
 
     hax = axes('Units','Pixels');
     imagesc(img_refined);
@@ -83,7 +84,17 @@ while moreaggs==1
         'detected; and press enter']));
     img_binary = bwselect(img_binary,8);
     img_binary = ~img_binary; % formatted for PCA, other codes should reverse this
-
+    
+    
+    %-- Check if result is satisfactory ----------------------------------%
+    figure(f0); clf;
+    tools.plot_binary_overlay(img_cropped, ~img_binary);
+    choice2 = questdlg(['Satisfied with aggregate detection? ', ...
+        'If not, try drawing an edge around the aggregate manually...'], ...
+        'Agg detection','Yes','No','Yes');
+    if strcmp(choice2,'No'); continue; end
+        % if 'No', then go back to crop without incorporating binarys
+    
 
     %-- Subsitute rectangle back into orignal image ----------------------%
     if isempty(img_binary0)
@@ -99,7 +110,7 @@ while moreaggs==1
 
 
     %-- Query user -------------------------------------------------------%
-    figure(f0);
+    figure(f0); clf;
     tools.plot_binary_overlay(img, img_binary0);
 
     choice = questdlg('Are there any particles not detected?',...
@@ -194,6 +205,7 @@ function binaryImage = lasso_fnc(Cropped_im)
 fontsize = 10;
 
 %-- Displaying cropped image ---------------------------------------------%
+clf;
 imagesc(Cropped_im);
 colormap gray; axis image off;
 title('Original CROPPED Image', 'FontSize', fontsize);
@@ -233,20 +245,19 @@ end
 %             Developed at the University of British Columbia
 %   Modified: Timothy Sipkens
 
-function thresh_slider(hObj,event,hax,thresh_slider_in,binaryImage)
+function thresh_slider(hObj,event,hax,img_cropped,binaryImage)
 
 %-- Average filter -------------------------------------------------------%
 hav = fspecial('average');
-img_filtered = imfilter(thresh_slider_in, hav);
+img_cropped = imfilter(img_cropped, hav);
 
 
 %-- Median ---------------------------------------------------------------%
 % Examines a neighborhood of WxW matrix, takes and makes the centre of that
 % matrix the median of the original neighborhood
 W = 5;
-thresh_slider_in = img_filtered;
 for ii=1:8 % repeatedly apply median filter
-    thresh_slider_in = medfilt2(thresh_slider_in,[W W]);
+    img_cropped = medfilt2(img_cropped,[W W]);
 end
 % NOTE: The loop is intended to imitate the increasing amounts of 
 % median filter that is applied each time the slider button is clicked
@@ -255,9 +266,9 @@ end
 
 %-- Binary image via threshold value -------------------------------------%
 adj = get(hObj,'Value');
-level = graythresh(thresh_slider_in);
-level = level+adj;
-img_binary1 = imbinarize(thresh_slider_in,level);
+level = graythresh(img_cropped);
+level = level + adj;
+img_binary1 = imbinarize(img_cropped,level);
 
 
 %-- Binary image via dilation --------------------------------------------%
@@ -273,7 +284,7 @@ img_binary3 = 0 .* img_binary2;
 img_binary3(binaryImage) = img_binary2(binaryImage);
 img_binary = logical(img_binary3);
 
-img_temp2 = imimposemin(thresh_slider_in,img_binary);
+img_temp2 = imimposemin(img_cropped,img_binary);
 
 axes(hax);
 imagesc(img_temp2);
