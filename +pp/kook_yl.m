@@ -45,18 +45,13 @@
 % can be adjusted to filter out outliers in line 31-32 with rmax and rmin
 %=========================================================================%
 
-function Aggs = kook_yl(Aggs,dp,f_plot)
+function Aggs = kook_yl(Aggs, f_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
 if ~exist('bool_plot','var'); f_plot = []; end
 if isempty(f_plot); f_plot = 0; end
 
 disp('Performing modified Kook analysis...');
-
-%-- Check whether the data folder is available ---------------------------%
-if exist('data','dir') ~= 7 % 7 if exist parameter is a directory
-    mkdir('data') % make output folder
-end
 
 
 %-- Sensitivity and Scaling Parameters -----------------------------------%
@@ -74,28 +69,22 @@ if f_plot>=1; figure(1); imshow(Aggs(1).image); end
 %== Main image processing loop ===========================================%
 for ll = 1:length(Aggs) % run loop as many times as images selected
 
-    %-- Crop footer and get scale --------------------------------------------%
+    %-- Crop footer and get scale ----------------------------------------%
     pixsize = Aggs(ll).pixsize; 
     img_cropped = Aggs(ll).img_cropped;
     img_binary = Aggs(ll).img_cropped_binary;
     
     
-    %== Image preprocessing ==============================================%    
-    % fix background illumination
-    se = strel('disk',85);
-    Data.img_bothat = imbothat(img_cropped,se);
-    
+    %== Image preprocessing ==============================================%
+    Data.img_bothat = imbothat(img_cropped,strel('disk',85)); % fix background illumination
     Data.img_contrast = imadjust(Data.img_bothat); % enhance contrast
+    Data.img_medfilter = medfilt2(Data.img_contrast); % median filterting to remove noise
     
-    % median filterting to remove noise
-    Data.img_medfilter = medfilt2(Data.img_contrast); %, [mf mf]); 
-    
-    % erasing background by multiplying binary image with grayscale image
+    % erase background by multiplying binary image with grayscale image
     Data.img_analyze = uint8(img_binary) .* Data.img_medfilter ;
     
     img_canny0 = edge(Data.img_analyze,'Canny'); % Canny edge detection
-
-
+    
     % Imposing white background onto image. 
     % This prevents the program from detecting any background particles. 
     img_canny = double(~img_binary) + double(img_canny0);
@@ -106,7 +95,8 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     %== Find and draw circles within aggregates ==========================%
     %   Find circles within soot aggregates 
     [centers, radii] = imfindcircles(img_canny,[rmin rmax],...
-        'ObjectPolarity', 'bright', 'Sensitivity', sens_val, 'Method', 'TwoStage'); 
+        'ObjectPolarity', 'bright', ...
+        'Sensitivity', sens_val, 'Method', 'TwoStage'); 
     Data.centers = centers;
     Data.radii = radii;
     
@@ -119,10 +109,10 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     
     %-- Check the circle finder by overlaying the CHT boundaries on the original image 
     %-- Remove circles out of the aggregate (?)
-    if and(f_plot>=1,~isempty(centers))
+    if and(f_plot>=1, ~isempty(centers))
         figure(1);
         hold on;
-        viscircles(centers+repmat(Aggs(ll).rect([1,2]),[size(centers,1),1]), ...
+        viscircles(centers + repmat(Aggs(ll).rect([1,2]), [size(centers,1),1]), ...
             radii', 'EdgeColor','r');
         hold off;
     end
@@ -130,7 +120,7 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     %== Save results =====================================================%
     %   Format output and autobackup data --------------------------------%
     Aggs(ll).kook_mod = Data; % copy data structure into img_data
-    Aggs(ll).dp = Data.dp;
+    Aggs(ll).dp = mean(Data.dp);
     if mod(ll,10)==0 % save data every 10 aggregates
         disp('Saving data...');
         save(['temp',filesep,'kook_mod_data.mat'],'Aggs'); % backup img_data
