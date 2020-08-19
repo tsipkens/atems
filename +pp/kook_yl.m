@@ -86,13 +86,13 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     
     
     %== Begin image processing ===========================================%
-    [img_Canny,Data] = preprocess(img_cropped,img_binary);
+    [img_canny, Data] = preprocess(img_cropped,img_binary);
     Data.method = 'kook_mod';
     
     
     %== Find and draw circles within aggregates ==========================%
     % Find circles within soot aggregates 
-    [centers, radii] = imfindcircles(img_Canny,[rmin rmax],...
+    [centers, radii] = imfindcircles(img_canny,[rmin rmax],...
         'ObjectPolarity', 'bright', 'Sensitivity', sens_val, 'Method', 'TwoStage'); 
     Data.centers = centers;
     Data.radii = radii;
