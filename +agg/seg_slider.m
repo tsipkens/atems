@@ -77,8 +77,8 @@ while moreaggs==1
     disp('Waiting for the user to apply the threshold to the image');
     uiwait(gcf);
     disp('Thresholding is applied.');
-
-
+    
+    
     %== STEP 4: Select particles and format output =======================%
     uiwait(msgbox(['Please selects (left click) particles satisfactorily ', ...
         'detected; and press enter']));
@@ -199,13 +199,13 @@ end
 %     data
 %   - QOL - User will not have to restart program if they mess up the lasso
 
-function binaryImage = lasso_fnc(Cropped_im)
+function img_mask = lasso_fnc(img_in)
 
 fontsize = 10;
 
 %-- Displaying cropped image ---------------------------------------------%
 clf;
-imagesc(Cropped_im);
+imagesc(img_in);
 colormap gray; axis image off;
 title('Original CROPPED Image', 'FontSize', fontsize);
 
@@ -228,7 +228,7 @@ end
 
 
 %-- Create a binary masked image from the ROI object ---------------------%
-binaryImage = hFH.createMask();
+img_mask = hFH.createMask();
 
 
 end
@@ -244,19 +244,19 @@ end
 %             Developed at the University of British Columbia
 %   Modified: Timothy Sipkens
 
-function thresh_slider(hObj,~,hax,img_cropped,img_binary0)
+function thresh_slider(hObj,~,hax,img_in,img_binary0)
 
 %-- Average filter -------------------------------------------------------%
 hav = fspecial('average');
-img_cropped = imfilter(img_cropped, hav);
+img_mod = imfilter(img_in, hav);
 
 
 %-- Median ---------------------------------------------------------------%
 % Examines a neighborhood of WxW matrix, takes and makes the centre of that
 % matrix the median of the original neighborhood
 W = 5;
-for ii=1:8 % repeatedly apply median filter
-    img_cropped = medfilt2(img_cropped,[W W]);
+for ii=1:8 % repeatedly apply median filter, which will result in artifacts on edges
+    img_mod = medfilt2(img_mod, [W W], 'symmetric');
 end
 % NOTE: The loop is intended to imitate the increasing amounts of 
 % median filter that is applied each time the slider button is clicked
@@ -264,14 +264,14 @@ end
 
 
 %-- Binary image via threshold value -------------------------------------%
-adj = get(hObj,'Value');
-level = graythresh(img_cropped);
+adj = get(hObj, 'Value');
+level = graythresh(img_mod); % default threshold is Otsu
 level = level + adj;
-img_binary1 = imbinarize(img_cropped,level);
+img_binary1 = imbinarize(img_mod, level);
 
 
-%-- Binary image via dilation --------------------------------------------%
-%   Reduces initial noise and fill initial gaps
+% Binary image via dilation, which
+% reduces initial noise and fills initial gaps.
 img_binary2 = imdilate(~img_binary1, strel('square',1));
 
 
@@ -283,14 +283,14 @@ img_binary3 = 0 .* img_binary2;
 img_binary3(img_binary0) = img_binary2(img_binary0);
 img_binary = logical(img_binary3);
 
-img_temp2 = imimposemin(img_cropped,img_binary);
+% Impose the binary on the cropped image for display to user.
+% This will adjust as the threshold is updated.
+img_toshow = double(img_mod) .* (double(~img_binary)+1) ./ 2;
 
 axes(hax);
-imagesc(img_temp2);
+imagesc(img_toshow);
 axis image off;
 
 end
-
-img_binary = ~img_binary;
 
 end
