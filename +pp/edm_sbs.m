@@ -60,27 +60,6 @@ for aa=1:length(imgs_binary)  % loop over aggregates
         end
     end
     
-    %{
-    % deprecated method, inaccurate and slow
-    for ii=1:length(se_vec) % loop with increasing disk size
-        se = strel('disk',se_vec(ii),8);
-        img_opened = imopen(img_binary./255,se);
-            % open the image using a disk of size se_vec(ii)
-
-        counts(ii) = nnz(img_opened);
-            % count the number of non-zero pixels remaining
-
-        tools.textbar(ii/length(se_vec));
-
-        if counts(ii)==0 % if all of the pixels are gone, exit loop
-            counts(ii:end) = 0;
-            tools.textbar(1);
-            break;
-        end
-
-    end
-    %}
-    
     counts = counts./counts(1);
 
     dp_count = (se_vec.*pixsize)';
@@ -107,8 +86,9 @@ for aa=1:length(imgs_binary)  % loop over aggregates
     x1 = lsqnonlin(@(x) (sigmoid(x) - Sa) ./ 100, x0, [], [], opts);
     Sa_fit = sigmoid(x1);
     
-    Aggs(aa).dpg_edm = x1(1);
-    Aggs(aa).sg_edm = x1(2);
+    Aggs(aa).dp_edm = x1(1); % geometric mean diameter for output
+    Aggs(aa).sg_edm = x1(2); % geometric standard deviation for output
+    Aggs(aa).dp = x1(1); % assign primary particle diameter based on dp_edm
     
     
     S = S+Sa; % add to assumulated S curve
@@ -135,7 +115,9 @@ S_fit = sigmoid(x1);
 disp('Complete.');
 disp(' ');
 
-Aggs(1).dpg_tot_edm = x1(1);
-Aggs(1).sg_tot_edm = x1(2);
+% report average dp and sg over the entire set of samples
+% stored in the first entry of Aggs
+Aggs(1).dp_edm_tot = x1(1);
+Aggs(1).sg_edm_tot = x1(2);
 
 end

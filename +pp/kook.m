@@ -18,9 +18,11 @@
 % 5. Added option as to whether of not to generate plots
 %
 %-------------------------------------------------------------------------%
+%
 % Inputs:
 %   Imgs       Image struct to be analyzed
 %   bool_plot  A boolean determining whether or not to generate plots
+% 
 %=========================================================================%
 
 function [Aggs,dp,dpdist] = kook(Imgs,bool_plot)
@@ -107,7 +109,8 @@ Aggs(1).kook.centers = centers; % output in px
 Aggs(1).kook.radii = radii; % output in px
 Aggs(1).kook.diameters = radii*pixsize*2; % output in nm
 
-dp = Aggs(1).kook.diameters;
+Aggs(1).dp = Aggs(1).kook.diameters;
+dp = Aggs(1).dp;
 dpdist = radii*pixsize*2;
 
 disp('Complete.');

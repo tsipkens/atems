@@ -52,15 +52,14 @@ figure; % generate figure for visualizing current aggregate
 n_aggs = length(Aggs);
 tools.textbar(0);
 
-for ll = 1:n_aggs % loop over each aggregate in the provided structure
+for aa = 1:n_aggs % loop over each aggregate in the provided structure
     
     %== Step 1: Image preparation ========================================%
-    pixsize = Aggs(ll).pixsize; % size of pixels in the image
-    img_binary = Aggs(ll).img_cropped_binary; % get the binarized image for this aggregate
+    pixsize = Aggs(aa).pixsize; % size of pixels in the image
+    img_binary = Aggs(aa).img_cropped_binary; % get the binarized image for this aggregate
     
-    %-- Loop through aggregates ------------------------------------------%
-    data = Aggs(ll); % initialize data structure for current aggregate
-    data.method = 'pcm';
+    % Get data for this aggregate
+    data = Aggs(aa); % initialize data structure for current aggregate
     
     
     
@@ -130,10 +129,11 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
     %== 3-5: Primary particle sizing =====================================%
     %-- 3-5-1: Simple PCM ------------------------------------------------%
     pcf_simple = 0.913;
-    Aggs(ll).dp_pcm_simple = ...
+    Aggs(aa).dp_pcm1 = ...
         2 * interp1(pcf_smooth, r1, pcf_simple);
-        % dp from simple PCM
+        % dp from simple PCM (labelled PCM1)
         % given by diameter corresponding to 91.3% of PCF
+    Aggs(aa).dp = Aggs(aa).dp_pcm1; % assign main primary particle diameter and dp_pcm1
     
         
     %-- 3-5-2: Generalized PCM -------------------------------------------%
@@ -147,9 +147,9 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
 
     pcf_general = (0.913 / 0.84) * ...
         (0.7 + 0.003*Rg_slope^-0.24 + 0.2*data.aspect_ratio^-1.13);
-    Aggs(ll).dp_pcm_gen = ...
+    Aggs(aa).dp_pcm2 = ...
         2 * interp1(pcf_smooth, r1, pcf_general);
-        % dp from generalized PCM
+        % dp from generalized PCM (labelled PCM2)
        
         
     %-- Plot pair correlation function in line graph format --------------%
@@ -158,7 +158,7 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
         figure, loglog(r, smooth(pcf), '-r'),...
             title (str), xlabel ('Radius'), ylabel('PCF(r)')
         hold on;
-        loglog(Aggs(ll).pcm_dp_simple, pcf_simple,'*')
+        loglog(Aggs(aa).dp, pcf_simple,'*')
         close all;
     end
     
@@ -167,7 +167,7 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
     %== Step 4: Save results =============================================%
     %   Autobackup data (every ten particles)
     if f_backup==1
-        if mod(ll,10)==0
+        if mod(aa,10)==0
             disp('Saving data...');
             save(['temp',filesep,'pcm_data.mat'],'Aggs'); % backup img_data
             disp('Complete.');
@@ -175,7 +175,7 @@ for ll = 1:n_aggs % loop over each aggregate in the provided structure
         end
     end
     
-    tools.textbar(ll / n_aggs);
+    tools.textbar(aa / n_aggs);
 end
 
 close; % close current figure

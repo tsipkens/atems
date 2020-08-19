@@ -7,8 +7,9 @@
 %
 % This code is modified by Yiling Kang
 % 
-% Compatability updates by Timothy Sipkens, and
+% Compatability updates by Timothy Sipkens and
 % Yeshun (Samuel) Ma at the University of British Columbia
+% 
 %-------------------------------------------------------------------------%
 %
 % This code was modified to provide more accurate primary particle size data with
@@ -44,11 +45,11 @@
 % can be adjusted to filter out outliers in line 31-32 with rmax and rmin
 %=========================================================================%
 
-function Aggs = kook_yl(Aggs,bool_plot)
+function Aggs = kook_yl(Aggs,dp,f_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
-if ~exist('bool_plot','var'); bool_plot = []; end
-if isempty(bool_plot); bool_plot = 0; end
+if ~exist('bool_plot','var'); f_plot = []; end
+if isempty(f_plot); f_plot = 0; end
 
 disp('Performing modified Kook analysis...');
 
@@ -68,7 +69,7 @@ rmin = 4; % Minimum radius in pixel (Keep high enough to eliminate dummies)
 sens_val = 0.75; % the sensitivity (0?1) for the circular Hough transform 
 edge_threshold = [0.125 0.190]; % the threshold for finding edges with edge detection
 
-if bool_plot>=1; figure(1); imshow(Aggs(1).image); end
+if f_plot>=1; figure(1); imshow(Aggs(1).image); end
 
 %== Main image processing loop ===========================================%
 for ll = 1:length(Aggs) % run loop as many times as images selected
@@ -105,7 +106,7 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     
     %-- Check the circle finder by overlaying the CHT boundaries on the original image 
     %-- Remove circles out of the aggregate (?)
-    if and(bool_plot>=1,~isempty(centers))
+    if and(f_plot>=1,~isempty(centers))
         figure(1);
         hold on;
         viscircles(centers+repmat(Aggs(ll).rect([1,2]),[size(centers,1),1]), ...
@@ -116,6 +117,7 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     %== Save results =====================================================%
     %   Format output and autobackup data --------------------------------%
     Aggs(ll).kook_mod = Data; % copy data structure into img_data
+    Aggs(ll).dp = Data.dp;
     if mod(ll,10)==0 % save data every 10 aggregates
         disp('Saving data...');
         save(['data',filesep,'kook_mod_data.mat'],'Aggs'); % backup img_data
@@ -125,6 +127,7 @@ for ll = 1:length(Aggs) % run loop as many times as images selected
     
 end % end of aggregate loop
 
+dp = [Aggs.dp]; % compile dp output
 
 disp('Complete.');
 disp(' ');
