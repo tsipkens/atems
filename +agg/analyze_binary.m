@@ -26,6 +26,7 @@ if isempty(fname); fname = cell(size(imgs)); end
 
 
 Aggs = struct([]); % initialize Aggs structure
+id = 0;
 
 disp('Calculating aggregate areas...');
 for ii=1:length(imgs_binary) % loop through provided images
@@ -45,10 +46,13 @@ for ii=1:length(imgs_binary) % loop through provided images
     figure(gcf);
     tools.plot_binary_overlay(img,img_binary);
     for jj = 1:naggs % loop through number of found aggregates
-
+        
+        id = id + 1; % increment global index counter
+        Aggs0(jj).id = id;
+        
         Aggs0(jj).fname = fname{ii};
         Aggs0(jj).pixsize = pixsize(ii);
-        Aggs0(jj).id = jj;
+        Aggs0(jj).id_image = jj;
 
         Aggs0(jj).image = img;
             % store image that the aggregate occurs in

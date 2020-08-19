@@ -47,7 +47,7 @@ for aa=ind_agg
         Aggs(aa).center_mass(1),...
         'xk', 'LineWidth', 0.75);
     text(Aggs(aa).center_mass(2) + 20, Aggs(aa).center_mass(1), ...
-        num2str(aa), 'Color', [0,0,0]);
+        num2str(Aggs(aa).id), 'Color', [0,0,0]);
         % label this point with aggregate no.
         % currently uses the global index in the Aggs structure
     
