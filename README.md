@@ -40,22 +40,11 @@ imgs_binary = agg.seg_kmeans6(imgs, pixsize, opts);
     % segment aggregates
 ```
 
-The result, `imgs_binary`, is a cell of image binaries, with `1` if a pixel is considered part of the aggregate and `0` if it is not. This can result in segmentations that look as follows :
+The result, `imgs_binary`, is either a single binary image (if one image is given as an input) or a cellular array of image binaries (if multiple images are given as an input), with `1` if a pixel is considered part of the aggregate and `0` if it is not. This can result in segmentations that look as follows :
 
 ![otsu_rb_orig](docs/kmeans.png)
 
-Other approaches are also available. For example, manual adjustment of the threshold on select parts of the image using a basic user interface can be performed using:
-
-```Matlab
-imgs_binary0 = agg.seg_slider(imgs, pixsize, opts);
-    % segment aggregates
-```
-
-This can result in segmentations like:
-
-![kmeans](docs/manual.png)
-
-It is worth noting that this latter approach is largely manual, resulting in variability and subjectiveness between users. However, the human input often greatly improves the quality of the segmentations and, while more time-intensive, can act as a reference in considering the appropriateness of the other segmentation methods. 
+Other approaches are also available and are discussed in Section 1 below. 
 
 Having segmented the image, aggregate characteristics can be determined by passing this binary image to an analysis function:
 
@@ -109,7 +98,7 @@ This package contains an expanding library of functions aimed at performing sema
 
 ### 1.1 agg.seg* functions
 
-Functions implementing different methods of aggregate-level semantic segmentation have filenames starting with `agg.seg*`. In each case, the output primarily consists of binary images of the same size as the original image but where pixels taken on logical values: `1` for pixels identified as part of the aggregate `0` for pixels identified as part of the background. The functions take `imgs` as a common input, which is either a single image or cellular array of images  of the aggregates (after any footer or additional information have been removed). Several methods also take `pixsize`, which denotes the size of each pixel in the image. Other arguments depend on the function and are available in the header information. 
+Functions implementing different methods of aggregate-level semantic segmentation have filenames starting with `agg.seg*`. In each case, the output primarily consists of binary images of the same size as the original image but where pixels taken on logical values: `1` for pixels identified as part of the aggregate `0` for pixels identified as part of the background. The functions take `imgs` as a common input, which is either a single image or cellular array of images of the aggregates (after any footer or additional information have been removed). Several methods also take `pixsize`, which denotes the size of each pixel in the image. Other arguments depend on the function and are available in the header information. 
 
 The available methods are summarized below. Multiple of these methods make use of the *rolling ball transformation*, applied using the `agg.rolling_ball` function included with this package. This transform fills in gaps inside aggregates, acting as a kind of noise filter. This is accomplished by way iterative morphological opening and closing. 
 
@@ -132,9 +121,13 @@ The latter function generally performs better.
 
 #### seg_slider
 
-This is a GUI-based method with a slider for adaptive, manual thresholding of the image (*adaptive* in that small sections of the image can be cropped and with an independently-selected threshold). Gaussian denoising is first performed on the image to reduce the noise in the output binary image. Then, a slider is used to manually adjust the level of the threshold in the cropped region of the image. This is a variant of the method included with the distribution of the PCM code by [Dastanpour et al. (2016)][dastanpour2016]. 
+This is a GUI-based method with a slider for adaptive, manual thresholding of the image (*adaptive* in that small sections of the image can be cropped and with an independently-selected threshold). Gaussian denoising is first performed on the image to reduce the noise in the output binary image. Then, a slider is used to manually adjust the level of the threshold in the cropped region of the image. This can result in segmentations like:
 
-Several sub-functions are included within the main file. 
+![kmeans](docs/manual.png)
+
+It is worth noting that the manual nature of this approach will resulting in variability and subjectiveness between users. However, the human input often greatly improves the quality of the segmentations and, while more time-intensive, can act as a reference in considering the appropriateness of the other segmentation methods. 
+
+Several sub-functions are included within the main file. This is a variant of the method included with the distribution of the PCM code by [Dastanpour et al. (2016)][dastanpour2016]. 
 
 > We note that this code saw important bug updates since the original code by [Dastanpour et al. (2016)][dastanpour2016]. This includes fixing how the original code would repeatedly apply a Gaussian filter every time the user interacted with the slider in the GUI (which may cause some backward compatibility issues), a reduction in the use of global variables, memory savings, and other performance improvements. 
 
