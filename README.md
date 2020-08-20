@@ -109,40 +109,34 @@ This package contains an expanding library of functions aimed at performing sema
 
 #### 1.1 agg.seg* functions
 
-Functions implementing different methods of aggregate-level semantic segmentation have filenames starting with `agg.seg*`. The functions generally share two common inputs:
+Functions implementing different methods of aggregate-level semantic segmentation have filenames starting with `agg.seg*`. In each case, the output primarily consists of binary images of the same size as the original image but where pixels taken on logical values: `1` for pixels identified as part of the aggregate `0` for pixels identified as part of the background. The functions take `imgs` as a common input, which is either a single image or cellular array of images  of the aggregates (after any footer or additional information have been removed). Several methods also take `pixsize`, which denotes the size of each pixel in the image. Other arguments depend on the function and are available in the header information. 
 
-1. imgs - An unmodified (save for removing the footer) single image or cellular array of images  of the aggregates. 
+The available methods are summarized below. Multiple of these methods make use of the *rolling ball transformation*, applied using the `agg.rolling_ball` function included with this package. This transform fills in gaps inside aggregates, acting as a kind of noise filter. This is accomplished by way iterative morphological opening and closing. 
 
-2. pixsize - The size of each pixel in the image (often used in the rolling ball transformation). 
+##### seg
 
-Other arguments depend on the function. 
+This is a general, multipurpose wrapper function that tries several of the other methods listed here in sequence, prompting the user after each attempt. This allow for refinement of the output from the *k*-means and Otsu-based methods discussed below.
 
-The available methods are summarized below. In each case, efforts are ongoing to standardize the outputs, which primarily consist of binary images in which pixels identified as part of the aggregate are assigned a value of `1` and pixels in the background are assigned a value of `0`.
+##### seg_kmeans6
 
-Other methods, beyond those below, are currently under development.
+This function applies a *k*-means segmentation approach using three feature layers, which include (*i*) a denoised version of the image, (*ii*) a measure of texture in the image, and (*iii*) an Otsu-like threshold, adjusted upwards. 
 
-###### 1.1.1 seg_otsu_rb*
+##### seg_otsu_rb*
 
-This method applies Otsu thresholding followed by a rolling ball transformation that fills gaps in the particles using the `agg.rolling_ball` function included with this package, which performs a rolling ball transformation that i composed of iterative morphological iterations. Two versions of this function are included: 
+This method applies Otsu thresholding followed by a rolling ball transformation. Two versions of this function are included: 
 
-1. seg_otsu_rb_orig - Remains true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. 
-
+1. seg_otsu_rb_orig - Remains more true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. 
 2. seg_otsu_rb - Updates the above implementation by (*i*) not immediately removing boundary aggregates, (*ii*) adding a background subtraction step using the `agg.bg_subtract` function, and (*iii*) adding a denoising step. 
 
-###### 1.1.2 seg_slider
+The latter function generally performs better. 
 
-This is a GUI-based method with a slider for *adaptive* manual thresholding of the image (adaptive in that small sections of the image can be cropped and thresholded independently). Gaussian denoising is first performed on the image to reduce the noise in the thresholded image. Then, a slider is used to manually adjust the level of the threshold. This is a variant of the method included with the distribution of the PCM code by [Dastanpour et al. (2016)][dastanpour2016], though it has seen considerable updates
-since that implementation. 
+##### seg_slider
 
-Several sub-functions are included within the main file.
+This is a GUI-based method with a slider for adaptive, manual thresholding of the image (*adaptive* in that small sections of the image can be cropped and with an independently-selected threshold). Gaussian denoising is first performed on the image to reduce the noise in the output binary image. Then, a slider is used to manually adjust the level of the threshold in the cropped region of the image. This is a variant of the method included with the distribution of the PCM code by [Dastanpour et al. (2016)][dastanpour2016]. 
 
-> We note that this code saw several important bug updates since the original code by [Dastanpour et al. (2016)][dastanpour2016]. This includes fixing how the original code would repeatedly apply a Gaussian filter every time the user interacted with the slider in the GUI (which may cause some backward compatibility issues), a reduction in the use of global variables, and significant memory savings.
+Several sub-functions are included within the main file. 
 
-###### 1.1.3 seg
-
-This is included as a wrapper function (agg_det.m) that runs a
-series of these other methods in series, prompting the user
-if adequate thresholding was achieved by a given method.
+> We note that this code saw important bug updates since the original code by [Dastanpour et al. (2016)][dastanpour2016]. This includes fixing how the original code would repeatedly apply a Gaussian filter every time the user interacted with the slider in the GUI (which may cause some backward compatibility issues), a reduction in the use of global variables, memory savings, and other performance improvements. 
 
 #### 1.2 analyze_binary
 
@@ -161,19 +155,19 @@ The `fname` argument is optional and adds this tag to the information in the out
 
 The +pp package contains multiple methods for determining the primary particle size of the aggregates of interest. Often this requires a binary mask of the image that can be generated using the +agg package methods.
 
-#### 2.1 pcm
+##### pcm
 
 The University of British Columbia's pair correlation method (PCM) MATLAB code for processing TEM images of soot to determine morphological properties. This package contains a significant update to the previous code provided with [Dastanpour et al. (2016)][dastanpour2016].
 
-#### 2.2 kook
+##### kook
 
 This method contains a copy of the code provided by [Kook et al. (2015)][kook], with minor modifications to match in the input/output of some of the other packages. The method is based on using the Hough transform on a pre-processed image.
 
-#### 2.3 kook_yl
+##### kook_yl
 
 This method contains a University of British Columbia-modified version of the method proposed by [Kook et al. (2015)][kook].
 
-#### 2.4 manual
+##### manual
 
 Code to be used in the manual sizing of soot primary particles developed at the University of British Columbia. The current method uses crosshairs to select the length and width of the particle. This is converted to various quantities, such as the mean primary particle diameter. The manual code is a heavily modified version of the code associated with [Dastanpour and Rogak (2014)][dastanpour2014].
 
@@ -184,7 +178,27 @@ This package contains a series of functions that help in visualizing or analyzin
 
 #### 3.1 Plotting functions (plot*)
 
-These functions aid in visualizing the results. For example, `plot_binary_overlay(...)` will plot the image and overlay labels for the aggregates in a corresponding binary image.
+These functions aid in visualizing the results. For example, 
+
+```Matlab
+plot_binary_overlay(img, img_binary)
+```
+
+will plot the image, given in `img`, and overlay labels for the aggregates in a corresponding binary image, given in `img_binary`.  Appending an `opts` structure to the function allows for the control of the appearance of the overlay, including the label alpha and colour. For example, 
+
+```Matlab
+opts.cmap = [0.92,0.16,0.49];
+plot_binary_overlay(img, img_binary, opts);
+```
+
+will plot the overlays in a red, while 
+
+```Matlab
+opts.cmap = [0.99,0.86,0.37];
+plot_binary_overlay(img, img_binary, opts);
+```
+
+will plot the overlays in a yellow.
 
 --------------------------------------------------------------------------
 
