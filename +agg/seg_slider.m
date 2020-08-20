@@ -161,7 +161,14 @@ if length(imgs)==1
 end
 
 
-%== Sub-functions ==%
+
+
+
+
+%===================%
+%== SUB-FUNCTIONS ==%
+%===================%
+
 %=========================================================================%
 %== BACKGROUND_FNC =======================================================%
 % Smooths out background using curve fitting
@@ -172,7 +179,6 @@ end
 %   This function smoothens background brightness, specially on the edges of
 %   the image where intensity (brightness) has a curved planar distribution.
 %   This improves thresholding in the following steps of image processing
-
 function img_refined = background_fnc(img_binary,img_cropped)
 
 nagg = nnz(img_binary); % pixels within the aggregate
@@ -233,7 +239,6 @@ end
 %   - Asks user if their lasso selection is correct before applying the
 %     data
 %   - QOL - User will not have to restart program if they mess up the lasso
-
 function img_mask = lasso_fnc(img_in)
 
 fontsize = 10;
@@ -278,7 +283,6 @@ end
 %   Author:   Ramin Dastanpour & Steven N. Rogak, 2016-02
 %             Developed at the University of British Columbia
 %   Modified: Timothy Sipkens
-
 function thresh_slider(hObj,~,hax,img_in,img_binary0)
 
 %-- Average filter -------------------------------------------------------%
