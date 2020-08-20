@@ -22,6 +22,8 @@ elseif ~iscell(imgs)
     imgs = {imgs};
 end
 
+n = length(imgs);
+
 if ~exist('pixsize','var'); pixsize = []; end
 if isempty(pixsize); pixsize = ones(size(imgs)); end
 
@@ -31,7 +33,7 @@ if ~exist('opts','var'); opts = []; end
 
 
 imgs_binary = cell(length(imgs),1); % pre-allocate
-for ii=1:length(imgs) % loop through provided images
+for ii=1:n % loop through provided images
     
     disp(['[== IMAGE ',num2str(ii),' =================================]']);
     
@@ -56,8 +58,14 @@ for ii=1:length(imgs) % loop through provided images
 end
 
 close(gcf); % close image with overlaid da
-disp('Complete.');
+disp('[== Complete =================================]');
 disp(' ');
+
+
+if n==1
+    imgs_binary = imgs_binary{1}; % if one image, extract from cell
+end
+
 
 end
 
@@ -80,19 +88,19 @@ if ~exist('pixsize','var'); pixsize = []; end
 if ~exist('minparticlesize','var'); minparticlesize = []; end
 if ~exist('coeffs','var'); coeffs = []; end
 
-bool_kmeans = 1;
-bool_otsu = 1;
+f_kmeans = 1;
+f_otsu = 1;
 if ~exist('opts','var'); opts = []; end
-if isfield(opts,'bool_kmeans'); bool_kmeans = opts.bool_kmeans; end
-if isfield(opts,'bool_otsu'); bool_otsu = opts.bool_otsu; end
+if isfield(opts,'f_kmeans'); f_kmeans = opts.bool_kmeans; end
+if isfield(opts,'f_otsu'); f_otsu = opts.bool_otsu; end
 %-------------------------------------------------------------------------%
 
 
 %== Attempt 1: k-means segmentation + rolling ball transformation ========%
-if bool_kmeans
+if f_kmeans
     img_binary = agg.seg_kmeans6(...
         img,pixsize);
-    [moreaggs,choice] = ...
+    [moreaggs,choice,img_binary] = ...
         user_input(img,img_binary); % prompt user
     img_binary = imclearborder(img_binary); % clear aggregates on border
 else
@@ -102,11 +110,11 @@ end
 
 
 %== Attempt 2: Ostu + rolling ball transformation ========================%
-if or(strcmp(choice,'No'),~bool_kmeans)
-    if bool_otsu
+if or(strcmp(choice,'No'), ~f_kmeans)
+    if f_otsu
         img_binary = agg.seg_otsu_rb(...
             img,pixsize,minparticlesize,coeffs);
-        [moreaggs,choice] = user_input(...
+        [moreaggs,choice,img_binary] = user_input(...
             img,img_binary); % prompt user
     else
         choice = 'No'; moreaggs = 1;
@@ -118,58 +126,15 @@ img_cropped = [];
 
 
 
-%== Attempt 3: Manual thresholding =======================================%
-while moreaggs==1
-    [img_temp,rect,~,img_cropped] = agg.seg_slider(img,1);
-        % used previously cropped image
-        % img_temp temporarily stores binary image
-    
-    [~,f] = tools.plot_binary_overlay(...
-        img_cropped,img_temp);
-    
-    choice2 = questdlg('Satisfied with aggregate detection? If not, try drawing an edge around the aggregate manually...',...
-        'Agg detection','Yes','No','Yes');
-    
-    close(f);
-    
-    
-    %== Attempt 4: Manual thresholding, again ============================%
-    if strcmp(choice2,'No')
-        [img_temp,rect,~,img_cropped] = agg.seg_slider(img,1);
-            % image is stored in a temporary image
-    end
-    
-    agg_binary_bin  = [agg_binary_bin, img_temp];
-    agg_cropped_bin = [agg_cropped_bin, img_cropped];
-    
-    %-- Subsitute rectangle back into orignal image ----------------------%
-    if isempty(img_binary)
-        img_binary = ones(size(img));
-    end
-    rect = round(rect);
-    size_temp = size(img_temp);
-    
-    inds1 = rect(2):(rect(2)+size_temp(1)-1);
-    inds2 = rect(1):(rect(1)+size_temp(2)-1);
-    img_binary(inds1,inds2) = ...
-        or(img_binary(inds1,inds2),img_temp);
-    
-    %-- Query user -------------------------------------------------------%
-    h = figure(gcf);
-    tools.plot_binary_overlay(img,img_binary);
-    f = gcf;
-    f.WindowState = 'maximized'; % maximize figure
-    
-    choice = questdlg('Are there any particles not detected?',...
-        'Missing particles','Yes','No','No');
-    if strcmp(choice,'Yes')
-        moreaggs=1;
-    else
-        moreaggs=0;
-    end
-    
-    close(h);
+%== Attempt 3: Manual thresholding with slider UI ========================%
+if moreaggs==1
+    img_binary = agg.seg_slider(img, img_binary, 1);
+        % access slider UI, using either:
+        % if 'Yes, but refine' on previous output from user_input fnc.
+        % OR zeros as a start
 end
+
+
 
 end
 
@@ -183,36 +148,34 @@ end
 %   Author:  Timothy Sipkens, 10-10-2019
 function [moreaggs,choice,img_binary] = user_input(img,img_binary)
 
-h = figure(gcf);
-tools.plot_binary_overlay(img,img_binary);
-f = gcf;
+f = figure(gcf);
 f.WindowState = 'maximized'; % maximize figure
+tools.plot_binary_overlay(img,img_binary);
 
 
 %== User interaction =====================================================%
 choice = questdlg(['Satisfied with automatic aggregate detection? ',...
-    'You will be able to delete non-aggregate noises and add missing particles later. ',...
-    'If not, other methods will be used'],...
-    'agg detection','Yes','Yes, but more particles or refine','No','Yes');
+    'NOTE: ''Yes, but refine'' will supplement the results with a manual threshold ',...
+    'or will allow the user to remove particles.'],...
+    'agg detection','Yes','Yes, but refine','No','Yes');
 
 moreaggs = 0; % default, returned is 'Yes' is chosen
-if strcmp(choice,'Yes, but more particles or refine')
+if strcmp(choice,'Yes, but refine')
     choice2 = questdlg('How do you want to refine aggregate detection?',...
-        'agg detection','More particles','Reduce noise','More particles');
-    if strcmp(choice2,'More particles')
+        'agg detection','More particles or add to existing particles', ...
+        'Remove particles','More particles or add to existing particles');
+    if strcmp(choice2, 'More particles or add to existing particles')
         moreaggs = 1;
     else
-        uiwait(msgbox('Please selects (left click) particles satisfactorily detected and press enter'));
-        img_binary_int = bwselect(~img_binary,8);
-        img_binary = ~img_binary_int;
+        uiwait(msgbox(['Please select (left click) particles to remove', ...
+            ' and press enter.']));
+        img_remove = bwselect(img_binary, 8);
+        img_binary = img_binary - img_remove;
     end
     
 elseif strcmp(choice,'No') % semi-automatic or manual methods will be used
-    img_binary = [];
     moreaggs = 1;
 end
-
-close(h);
 
 end
 

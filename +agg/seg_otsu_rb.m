@@ -63,7 +63,7 @@ end
 
 % If a single image, cell arrays are unnecessary.
 % Extract and just output images. 
-if length(imgs)==1
+if n==1
     img_binary = img_binary{1};
     img_kmeans = img_kmeans{1};
     feature_set = feature_set{1};

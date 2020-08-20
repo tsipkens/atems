@@ -5,7 +5,7 @@
 % Modified:     Tmothy Sipkens, 2019-10-11
 %=========================================================================%
 
-function [imgs_binary] = seg_slider(imgs, f_crop) 
+function [imgs_binary] = seg_slider(imgs, imgs_binary, f_crop) 
 
 
 %== Parse input ==========================================================%
@@ -21,11 +21,14 @@ elseif ~iscell(imgs)
 end
 
 n = length(imgs); % number of images to consider
+
+% initial cellular array of image binaries, if particle binary is not provided
+if ~exist('imgs_binary','var'); imgs_binary{n} = []; end
+if ~iscell(imgs_binary); imgs_binary = {imgs_binary}; end
 %=========================================================================%
 
 
 img_binary0 = []; % binary stored over multiple thresholds
-imgs_binary{n} = []; % initial cellular array of binaries
 
 f0 = figure; % initialize a figure
 f0.WindowState = 'maximized'; % maximize the figure window
@@ -39,7 +42,10 @@ for kk=1:n
     end
     
     img = imgs{kk}; % image for this iteration
-    img_binary0 = zeros(size(img)); % intialize binary for this iteration
+    
+    % intialize binary for this iteration
+    if isempty(imgs_binary{kk}); img_binary0 = zeros(size(img));
+    else img_binary0 = imgs_binary{kk}; end % use partially binarized image
     
     
 %== CORE FUNCTION ========================================================%
@@ -54,7 +60,7 @@ for kk=1:n
             colormap gray;
             axis image off;
 
-            uiwait(msgbox('Please crop the image around missing particle'));
+            uiwait(msgbox('Please crop the image around missing region.'));
             [img_cropped,rect] = imcrop; % user crops image
         else
             img_cropped = img; % originally bypassed in Kook code
@@ -95,16 +101,16 @@ for kk=1:n
         h = uicontrol('Position',[20 320 200 30],'String','Finished',...
             'Callback','uiresume(gcbf)');
         message = sprintf(['Move the slider to the right or left to change ', ...
-            'threshold level\nWhen finished, click on continute']);
+            'threshold level\nWhen finished, click on ''Finished'' continute.']);
         uiwait(msgbox(message));
-        disp('Waiting for the user to apply the threshold to the image');
+        disp('Waiting for the user to apply the threshold to the image.');
         uiwait(gcf);
         disp('Thresholding is applied.');
 
 
         %== STEP 4: Select particles and format output ===================%
         uiwait(msgbox(['Please selects (left click) particles satisfactorily ', ...
-            'detected; and press enter']));
+            'detected; and press enter.']));
         img_binary = bwselect(img_binary,8);
 
 
@@ -132,7 +138,7 @@ for kk=1:n
         figure(f0); clf;
         tools.plot_binary_overlay(img, img_binary0);
 
-        choice = questdlg('Are there any particles not detected?',...
+        choice = questdlg('Are there any particles poorly or not detected?',...
             'Missing particles','Yes','No','No');
         if strcmp(choice,'Yes')
             moreaggs=1;
