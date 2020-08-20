@@ -159,13 +159,17 @@ choice = questdlg(['Satisfied with automatic aggregate detection? ',...
     'or will allow the user to remove particles.'],...
     'agg detection','Yes','Yes, but refine','No','Yes');
 
-moreaggs = 0; % default, returned is 'Yes' is chosen
+moreaggs = 0; % default, returned if 'Yes' is chosen
 if strcmp(choice,'Yes, but refine')
     choice2 = questdlg('How do you want to refine aggregate detection?',...
         'agg detection','More particles or add to existing particles', ...
         'Remove particles','More particles or add to existing particles');
+    
+    % If more particles, set moreaggs = 1, which will skip ahead to Line 131
     if strcmp(choice2, 'More particles or add to existing particles')
         moreaggs = 1;
+        
+    % If particles to remove, use the bwselect utility.
     else
         uiwait(msgbox(['Please select (left click) particles to remove', ...
             ' and press enter.']));
@@ -173,7 +177,7 @@ if strcmp(choice,'Yes, but refine')
         img_binary = img_binary - img_remove;
     end
     
-elseif strcmp(choice,'No') % semi-automatic or manual methods will be used
+elseif strcmp(choice,'No') % skips to the next method
     moreaggs = 1;
 end
 
