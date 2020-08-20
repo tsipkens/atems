@@ -5,125 +5,160 @@
 % Modified:     Tmothy Sipkens, 2019-10-11
 %=========================================================================%
 
-function [img_binary0, rect, img_refined, img_cropped] = ...
-    seg_slider(img, f_crop) 
+function [imgs_binary] = seg_slider(imgs, f_crop) 
 
 
 %== Parse input ==========================================================%
 if ~exist('f_crop','var'); f_crop = []; end
 if isempty(f_crop); f_crop = 1; end
+
+if isstruct(imgs) % convert input images to a cell array
+    Imgs_str = imgs;
+    imgs = {Imgs_str.cropped};
+    pixsizes = [Imgs_str.pixsize];
+elseif ~iscell(imgs)
+    imgs = {imgs};
+end
+
+n = length(imgs); % number of images to consider
 %=========================================================================%
 
 
 img_binary0 = []; % binary stored over multiple thresholds
+imgs_binary{n} = []; % initial cellular array of binaries
+
 f0 = figure; % initialize a figure
 f0.WindowState = 'maximized'; % maximize the figure window
 
 
-moreaggs = 1;
-while moreaggs==1
-    img_binary = []; % declare nested variable (allows GUI feedback)
+for kk=1:n
+    
+    if n>1 % if more than one image, output text indicating image number
+        disp(['[== IMAGE ',num2str(kk), ' OF ', ...
+            num2str(length(imgs)), ' ============================]']);
+    end
+    
+    img = imgs{kk}; % image for this iteration
+    img_binary0 = zeros(size(img)); % intialize binary for this iteration
+    
+    
+%== CORE FUNCTION ========================================================%
+    moreaggs = 1;
+    while moreaggs==1
+        img_binary = []; % declare nested variable (allows GUI feedback)
 
-    %== STEP 1: Crop image ===============================================%
-    if f_crop
+        %== STEP 1: Crop image ===========================================%
+        if f_crop
+            figure(f0); clf;
+            imagesc(img);
+            colormap gray;
+            axis image off;
+
+            uiwait(msgbox('Please crop the image around missing particle'));
+            [img_cropped,rect] = imcrop; % user crops image
+        else
+            img_cropped = img; % originally bypassed in Kook code
+            rect = [];
+        end
+
+
+        %== STEP 2: Image refinment ======================================%
+        %-- Step 1-1: Apply Lasso tool -----------------------------------%
+        img_binary = lasso_fnc(img_cropped);
+
+        %-- Step 1-2: Refining background brightness ---------------------%
+        img_refined = background_fnc(img_binary,img_cropped);
+
+
+
+        %== STEP 3: Thresholding =========================================%
         figure(f0); clf;
-        imagesc(img);
+
+        hax = axes('Units','Pixels');
+        imagesc(img_refined);
         colormap gray;
         axis image off;
 
-        uiwait(msgbox('Please crop the image around missing particle'));
-        [img_cropped,rect] = imcrop; % user crops image
-    else
-        img_cropped = img; % originally bypassed in Kook code
-        rect = [];
+        level = graythresh(img_refined); % Otsu thresholding
+        hst = uicontrol('Style', 'slider',...
+            'Min',0-level,'Max',1-level,'Value',.5-level,...
+            'Position', [20 390 150 15],...
+            'Callback', {@thresh_slider,hax,img_refined,img_binary});
+        get(hst,'value'); % add a slider uicontrol
+
+        uicontrol('Style','text',...
+            'Position', [20 370 150 15],...
+            'String','Threshold level');
+                % add a text uicontrol to label the slider
+
+        %-- Pause program while user changes the threshold level ---------%
+        h = uicontrol('Position',[20 320 200 30],'String','Finished',...
+            'Callback','uiresume(gcbf)');
+        message = sprintf(['Move the slider to the right or left to change ', ...
+            'threshold level\nWhen finished, click on continute']);
+        uiwait(msgbox(message));
+        disp('Waiting for the user to apply the threshold to the image');
+        uiwait(gcf);
+        disp('Thresholding is applied.');
+
+
+        %== STEP 4: Select particles and format output ===================%
+        uiwait(msgbox(['Please selects (left click) particles satisfactorily ', ...
+            'detected; and press enter']));
+        img_binary = bwselect(img_binary,8);
+
+
+        %-- Check if result is satisfactory ------------------------------%
+        figure(f0); clf;
+        tools.plot_binary_overlay(img_cropped, img_binary);
+        choice2 = questdlg(['Satisfied with aggregate detection? ', ...
+            'If not, try drawing an edge around the aggregate manually...'], ...
+            'Agg detection','Yes','No','Yes');
+        if strcmp(choice2,'No'); continue; end
+            % if 'No', then go back to crop without incorporating binarys
+
+
+        %-- Subsitute rectangle back into orignal image ------------------%
+        rect = round(rect);
+        size_temp = size(img_binary);
+
+        inds1 = rect(2):(rect(2)+size_temp(1)-1);
+        inds2 = rect(1):(rect(1)+size_temp(2)-1);
+        img_binary0(inds1,inds2) = ...
+            or(img_binary0(inds1,inds2), img_binary);
+
+
+        %-- Query user ---------------------------------------------------%
+        figure(f0); clf;
+        tools.plot_binary_overlay(img, img_binary0);
+
+        choice = questdlg('Are there any particles not detected?',...
+            'Missing particles','Yes','No','No');
+        if strcmp(choice,'Yes')
+            moreaggs=1;
+        else
+            moreaggs=0;
+        end
+
     end
-
-
-    %== STEP 2: Image refinment ==========================================%
-    %-- Step 1-1: Apply Lasso tool ---------------------------------------%
-    img_binary = lasso_fnc(img_cropped);
-
-    %-- Step 1-2: Refining background brightness -------------------------%
-    img_refined = background_fnc(img_binary,img_cropped);
-
-
-
-    %== STEP 3: Thresholding =============================================%
-    figure(f0); clf;
-
-    hax = axes('Units','Pixels');
-    imagesc(img_refined);
-    colormap gray;
-    axis image off;
-
-    level = graythresh(img_refined); % Otsu thresholding
-    hst = uicontrol('Style', 'slider',...
-        'Min',0-level,'Max',1-level,'Value',.5-level,...
-        'Position', [20 390 150 15],...
-        'Callback', {@thresh_slider,hax,img_refined,img_binary});
-    get(hst,'value'); % add a slider uicontrol
-
-    uicontrol('Style','text',...
-        'Position', [20 370 150 15],...
-        'String','Threshold level');
-            % add a text uicontrol to label the slider
-
-    %-- Pause program while user changes the threshold level -------------%
-    h = uicontrol('Position',[20 320 200 30],'String','Finished',...
-        'Callback','uiresume(gcbf)');
-    message = sprintf(['Move the slider to the right or left to change ', ...
-        'threshold level\nWhen finished, click on continute']);
-    uiwait(msgbox(message));
-    disp('Waiting for the user to apply the threshold to the image');
-    uiwait(gcf);
-    disp('Thresholding is applied.');
+%=========================================================================%
     
+    imgs_binary{kk} = img_binary0; % copy binary to cellular array
     
-    %== STEP 4: Select particles and format output =======================%
-    uiwait(msgbox(['Please selects (left click) particles satisfactorily ', ...
-        'detected; and press enter']));
-    img_binary = bwselect(img_binary,8);
-    
-    
-    %-- Check if result is satisfactory ----------------------------------%
-    figure(f0); clf;
-    tools.plot_binary_overlay(img_cropped, img_binary);
-    choice2 = questdlg(['Satisfied with aggregate detection? ', ...
-        'If not, try drawing an edge around the aggregate manually...'], ...
-        'Agg detection','Yes','No','Yes');
-    if strcmp(choice2,'No'); continue; end
-        % if 'No', then go back to crop without incorporating binarys
-    
-
-    %-- Subsitute rectangle back into orignal image ----------------------%
-    if isempty(img_binary0)
-        img_binary0 = zeros(size(img));
+    if n>1 % if more than one image, output text
+        disp('[== Complete. ==============================]');
+        disp(' ');
+        disp(' ');
     end
-    rect = round(rect);
-    size_temp = size(img_binary);
-
-    inds1 = rect(2):(rect(2)+size_temp(1)-1);
-    inds2 = rect(1):(rect(1)+size_temp(2)-1);
-    img_binary0(inds1,inds2) = ...
-        or(img_binary0(inds1,inds2), img_binary);
-
-
-    %-- Query user -------------------------------------------------------%
-    figure(f0); clf;
-    tools.plot_binary_overlay(img, img_binary0);
-
-    choice = questdlg('Are there any particles not detected?',...
-        'Missing particles','Yes','No','No');
-    if strcmp(choice,'Yes')
-        moreaggs=1;
-    else
-        moreaggs=0;
-    end
-
 end
 
-close(f0);
+close(f0); % close figure used during segmentation
 
+% If a single image, cell arrays are unnecessary.
+% Extract and just output images. 
+if length(imgs)==1
+    imgs_binary = imgs_binary{1};
+end
 
 
 %== Sub-functions ==%
