@@ -3,7 +3,6 @@
 
 **(*A*nalysis tools for *TEM* images of *S*oot)**
 
-[![DOI](https://zenodo.org/badge/190795680.svg)](https://zenodo.org/badge/latestdoi/190795680)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 [![Version](https://img.shields.io/badge/Version-0.4+-blue.svg)]()
 
