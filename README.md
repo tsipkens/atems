@@ -108,7 +108,7 @@ This function applies a *k*-means segmentation approach using three feature laye
 
 ![fcolour](docs/fcolour.png)
 
-Applying Matlab's `imsegkmeans` function will then result in segmentations that look as follows: 
+Applying Matlab's `imsegkmeans` function will then result in segmentations as follows: 
 
 ![kmeans](docs/kmeans.png)
 
