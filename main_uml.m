@@ -4,9 +4,9 @@ clear;
 close all;
 clc;
 
-Imgs = tools.load_imgs; % load a single image
+% Imgs = tools.load_imgs; % load a single image
 
-% load('temp/b/Imgs.mat'); % load preset Imgs
+load('temp/b/Imgs.mat'); % load preset Imgs
 
 imgs = {Imgs.cropped}; % copy variables locally
 pixsize = [Imgs.pixsize];
@@ -14,9 +14,8 @@ fname = {Imgs.fname};
 
 
 %-- Run thresholding for all of the images -------------------------------%
-[imgs_binary, img_kmeans, feature_set] = agg.seg_kmeans6(imgs, pixsize);
-% imgs_binary = agg.seg_kmeans2(imgs, pixsize);
-% imgs_binary = agg.seg_otsu_rb(imgs, pixsize);
+% [imgs_binary, img_kmeans, feature_set] = agg.seg_kmeans6(imgs, pixsize);
+imgs_binary = agg.seg_otsu_rb(imgs, pixsize);
 
 
 
@@ -41,7 +40,7 @@ end
 
 
 
-%{
+%-{
 %== Read and visualization manual binaries ===============================%
 % read in adaptive manual binaries
 imgs_binary0{length(imgs)} = [];
@@ -65,6 +64,11 @@ end
 
 % plot and write manual binary images
 tools.write_images(imgs_agg0, fname, 'temp\b\man');
+
+% compute IoU
+i1 = [imgs_binary{:}]; i1 = i1(:);
+i2 = [imgs_binary0{:}]; i2 = i2(:);
+IoU = sum(and(i1,i2)) ./ sum(or(i1,i2))
 %=========================================================================%
 %}
 
