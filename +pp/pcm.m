@@ -36,7 +36,7 @@ if isempty(f_backup); f_backup = 0; end
 %-------------------------------------------------------------------------%
 
 
-disp('Performing PCM analysis...');
+disp('Performing PCM:');
 
 
 %-- Check whether the data folder is available ---------------------------%
