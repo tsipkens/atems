@@ -60,8 +60,9 @@ CC = bwconncomp(abs(img_bewBW-1));
 [~,nparts] = size(CC.PixelIdxList);
 if nparts>50 % if a lot of particles, remove more particles
     mod = 10;
-    disp(['Found too many particles, removing particles below: ',...
-        num2str(e*mod),' nm.']);
+    % Display test removed so as to not interfere with progress bar in Otsu.
+    % disp(['Found too many particles, removing particles below: ',...
+    %     num2str(e*mod),' nm.']);
 else
     mod = 1;
 end

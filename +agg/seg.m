@@ -35,7 +35,8 @@ if ~exist('opts','var'); opts = []; end
 imgs_binary = cell(length(imgs),1); % pre-allocate
 for ii=1:n % loop through provided images
     
-    disp(['[== IMAGE ',num2str(ii),' =================================]']);
+    disp(['[== IMAGE ',num2str(ii), ' OF ', ...
+            num2str(length(imgs)), ' ============================]']);
     
     %-- Initialize parameters --------------------------------------------%
     %   use defaults defined in seg instead
@@ -51,15 +52,13 @@ for ii=1:n % loop through provided images
     end
     imwrite(imgs_binary{ii}, ['temp/segg_',num2str(ii),'.TIF']);
     
-    disp('Completed thresholding.');
+    disp('[== Complete =================================]');
     disp(' ');
     
 end
 
 delete('temp/segg_*.TIF');
 close(gcf); % close image with overlaid da
-disp('[== Complete =================================]');
-disp(' ');
 
 
 if n==1

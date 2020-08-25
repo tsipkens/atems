@@ -1,9 +1,9 @@
 
-% PLOT  A modified version of iamgesc that formats images for this program.
+% IMSHOW  A modified version of iamgesc that formats images for this program.
 % Timothy Sipkens, 2020-08-25
 %=========================================================================%
 
-function h = plot(img, cmap)
+function h = imshow(img, cmap)
 
 if ~exist('cmap','var'); cmap = []; end
 if isempty(cmap); cmap = gray; end

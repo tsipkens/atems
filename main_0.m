@@ -5,7 +5,7 @@ clc;
 
 
 %-- Load images ----------------------------------------------------------%
-[Imgs, imgs, pixsize] = tools.load_imgs; % load a single image
+[Imgs, imgs, pixsizes] = tools.load_imgs; % load a single image
 fname = {Imgs.fname};
 %-------------------------------------------------------------------------%
 
@@ -13,10 +13,10 @@ fname = {Imgs.fname};
 %-- Run thresholding for all of the images -------------------------------%
 opts.bool_kmeans = 1;
 opts.bool_otsu = 0;
-imgs_binary = agg.seg(imgs, pixsize, opts);
+imgs_binary = agg.seg(imgs, pixsizes, opts);
 
 Aggs = agg.analyze_binary(imgs_binary, ...
-    imgs, pixsize, fname); % determine aggregate properties
+    imgs, pixsizes, fname); % determine aggregate properties
 %-------------------------------------------------------------------------%
 
 

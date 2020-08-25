@@ -55,10 +55,6 @@ img_original = II1;
 
 %== Pre-processing =======================================================% 
 %-- STEP 1: Invert image greyscale ---------------------------------------%
-if size(img_original,1) > 900
-	II1(950:size(II1,1), 1:250) = 0;% ignore scale bar in the TEM image x 1-250 pixel and y 950-max pixel
-end
-
 II1_bg = SelfSubt*II1; % Self-subtration from the original image
 II1 = maxImgCount-II1;
 II1 = II1-II1_bg; % subtract background

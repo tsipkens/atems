@@ -20,16 +20,12 @@ if ~isfield(opts,'cmap'); opts.cmap = [0.12,0.59,0.96]; end
 
 
 %-- Prepare figure for plotting ------------------------------------------%
-f0 = figure(gcf); % get handle for current figure
-
 % Clear current figure if: plotting more than one image 
 % OR plotting original image.
 if or(f_img==1, Nimg>1); clf; end
 
 % If more than one image, prepare to tile and maximize figure.
 if Nimg>1
-    f0.WindowState = 'maximized'; % maximize the figure window
-    
     N1 = floor(sqrt(Nimg));
     N2 = ceil(Nimg/N1);
     subplot(N1, N2, 1);
@@ -95,7 +91,7 @@ for ii=1:Nimg % loop through images
     if nargout>1; f1 = getframe; fr{ii} = f1.cdata; end % get formatted image
 end
 
-
+if and(nargout>1, Nimg==1); fr = fr{1}; end % output image instead of cell if only one image
 if nargout>0; h = gca; end % output axis handle
 if ~exist('i0','var'); i0 = []; end
 

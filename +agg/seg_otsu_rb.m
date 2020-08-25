@@ -60,6 +60,8 @@ for ii=1:n
     
     if n>1; tools.textbar(ii / n); end
 end
+disp('Complete.');
+disp(' ');
 
 % If a single image, cell arrays are unnecessary.
 % Extract and just output images. 

@@ -33,9 +33,7 @@ if ~exist('coeffs','var'); coeffs = []; end
 %-------------------------------------------------------------------------%
 
 % Loop over images, calling seg function below on each iteration.
-img_binary{n} = []; % pre-allocate cells
-img_kmeans{n} = [];
-feature_set{n} = [];
+img_binary{n} = []; % pre-allocate cell
 
 disp('Performing Otsu thresholding (as per Dastanpour):');
 if n>1; tools.textbar(0); end
@@ -58,6 +56,8 @@ for ii=1:n
     
     if n>1; tools.textbar(ii / n); end
 end
+disp('Complete.');
+disp(' ');
 
 % If a single image, cell arrays are unnecessary.
 % Extract and just output images. 
