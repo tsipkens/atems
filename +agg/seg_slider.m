@@ -94,7 +94,7 @@ for kk=1:n
         %-- Add a slider uicontrol ---------------------------------------%
         level = graythresh(img_refined); % Otsu thresholding
         hst = uicontrol('Style', 'slider',...
-            'Min', 0-level, 'Max', 1-level, 'Value', .5-level,...
+            'Min', 0.2-level, 'Max', 1-level, 'Value', 0.5-level,...
             'Position', [20 390 150 15],...
             'Callback', {@thresh_slider,hax,img_refined,img_binary});
         get(hst,'value');
@@ -113,14 +113,14 @@ for kk=1:n
         disp('Waiting for the user to apply the threshold to the image.');
         uiwait(gcf);
         disp('Thresholding is applied.');
-
-
+        
+        
         %== STEP 4: Select particles and format output ===================%
         uiwait(msgbox(['Please selects (left click) particles satisfactorily ', ...
             'detected; and press enter.']));
         img_binary = bwselect(img_binary,8);
-
-
+        
+        
         %-- Check if result is satisfactory ------------------------------%
         figure(f0); clf;
         tools.plot_binary_overlay(img_cropped, img_binary);
