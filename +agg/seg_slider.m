@@ -49,15 +49,15 @@ for kk=1:n
     
     
 %== CORE FUNCTION ========================================================%
+    figure(f0); clf; % intialize plot of image with initial binary overlaid
+    tools.plot_binary_overlay(img, img_binary0);
+    
     moreaggs = 1;
     while moreaggs==1
         img_binary = []; % declare nested variable (allows GUI feedback)
 
         %== STEP 1: Crop image ===========================================%
         if f_crop
-            figure(f0); clf;
-            tools.plot_binary_overlay(img, img_binary0);
-
             uiwait(msgbox('Please crop the image around missing region.'));
             [~, rect] = imcrop; % user crops image
             
@@ -87,6 +87,7 @@ for kk=1:n
 
         hax = axes('Units','Pixels');
         tools.imagesc(img_refined);
+        title('Applying threshold...');
         
         %-- Add a slider uicontrol ---------------------------------------%
         level = graythresh(img_refined); % Otsu thresholding
@@ -105,7 +106,7 @@ for kk=1:n
         h = uicontrol('Position',[20 335 150 25],'String','Finished',...
             'Callback','uiresume(gcbf)');
         message = sprintf(['Move the slider to the right or left to change ', ...
-            'threshold level\nWhen finished, click on ''Finished'' continute.']);
+            'threshold level\nWhen finished, click on ''Finished'' continue.']);
         uiwait(msgbox(message));
         disp('Waiting for the user to apply the threshold to the image.');
         uiwait(gcf);
@@ -118,7 +119,7 @@ for kk=1:n
         
         %== STEP 4: Select particles and format output ===================%
         uiwait(msgbox(['Please selects (left click) particles satisfactorily ', ...
-            'detected; and press enter.']));
+            'detected; and press enter or double click.']));
         img_binary = bwselect(img_binary,8);
         
         
@@ -272,7 +273,7 @@ drawing_correct = 0; % this variable is used to check if the user drew the lasso
 while drawing_correct==0 
     message = sprintf('Please draw an approximate boundary around the aggregate.\nLeft click and hold to begin drawing.\nLift mouse button to finish');
     uiwait(msgbox(message));
-    hFH = imfreehand(); % alternate for MATLAB 2019b+: drawfreehand();
+    fh = drawfreehand(); % alternate for MATLAB 2019b+: drawfreehand();
     finished_check = questdlg('Are you satisfied with your drawing?','Lasso Complete?','Yes','No','No');
     
     % if user is happy with their selection...
@@ -280,13 +281,13 @@ while drawing_correct==0
         drawing_correct = 1;
     % if user would like to redo their selection...
     else
-        delete(hFH);
+        delete(fh);
     end     
 end
 
 
 %-- Create a binary masked image from the ROI object ---------------------%
-img_mask = hFH.createMask();
+img_mask = fh.createMask();
 
 
 end
@@ -346,6 +347,7 @@ img_toshow = double(img_mod) .* (double(~img_binary)+1) ./ 2;
 
 axes(hax);
 tools.imagesc(img_toshow);
+title('Applying threshold...');
 
 end
 
