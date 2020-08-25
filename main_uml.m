@@ -6,7 +6,7 @@ clc;
 % [Imgs,imgs,pixsize] = tools.load_imgs; % OPTION 1: load a single image
 % load('temp/b/Imgs.mat'); % OPTION 2: load preset Imgs
 [Imgs,imgs,pixsize] = tools.load_imgs('images'); % OPTION 3: load all images in 'images' folder
-
+fname = {Imgs.fname};
 
 %-- Run thresholding for all of the images -------------------------------%
 [imgs_binary, img_kmeans, feature_set] = agg.seg_kmeans6(Imgs);

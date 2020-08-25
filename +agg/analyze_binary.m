@@ -7,11 +7,10 @@ function [Aggs] = analyze_binary(imgs_binary, imgs, pixsize, fname)
 
 %-- Parse inputs ---------------------------------------------------------%
 if isstruct(imgs_binary) % consider case that structure is given as input
-    Imgs_str = imgs;
-    imgs_binary = {Imgs_str.binary};
-    imgs = {Imgs_str.cropped};
-    pixsize = [Imgs_str.pixsize];
-    fname = {Imgs_str.fname};
+    Imgs = imgs;
+    imgs = {Imgs.cropped};
+    pixsize = [Imgs.pixsize];
+    fname = {Imgs.fname};
 else
     % consider case that a single image is given
     if ~iscell(imgs_binary); imgs_binary = {imgs_binary}; end

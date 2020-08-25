@@ -3,10 +3,8 @@ clear;
 close all;
 clc;
 
-Imgs = tools.load_imgs; % load a single image
+[Imgs, imgs, pixsize] = tools.load_imgs; % load a single image
 
-imgs = {Imgs.cropped}; % copy variables locally
-pixsize = [Imgs.pixsize];
 fname = {Imgs.fname};
 
 
@@ -15,22 +13,17 @@ opts.bool_kmeans = 1;
 opts.bool_otsu = 0;
 imgs_binary = agg.seg(imgs, pixsize, opts);
 
-% for ii=1:length(Imgs)
-%     imgs_binary{ii} = ...
-%         imread(['..\images\test\binary_manual\',fname{ii}]);
-% end
-
 
 Aggs = agg.analyze_binary(...
     imgs_binary,imgs,pixsize,fname);
         % determine aggregate properties
 
 
-Aggs_pcm = pp.pcm(Aggs);
+Aggs_pcm = pp.pcm(Aggs); % apply PCM
 
 
-Aggs_edm = pp.edm_sbs(Aggs_pcm);
-tools.write_excel(Aggs_edm,'temp\Aggs.xlsx');
+Aggs_edm = pp.edm_sbs(Aggs_pcm); % apply EDM-SBS
+tools.write_excel(Aggs_edm, 'temp\Aggs.xlsx');
 
 
 % Aggs_kook = pp.kook(Imgs,1);
