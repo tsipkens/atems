@@ -9,9 +9,9 @@ function [img_binary,img_kmeans,feature_set] = ...
 
 %-- Parse inputs ---------------------------------------------------------%
 if isstruct(imgs) % convert input images to a cell array
-    Imgs_str = imgs;
-    imgs = {Imgs_str.cropped};
-    pixsizes = [Imgs_str.pixsize];
+    Imgs = imgs;
+    imgs = {Imgs.cropped};
+    pixsizes = [Imgs.pixsize];
 elseif ~iscell(imgs)
     imgs = {imgs};
 end

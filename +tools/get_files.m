@@ -13,7 +13,6 @@ flag = 0; % 0: no image loaded; 1: at least one image loaded
 % loop continues until at least image is selected or the program is stopped
 
 Imgs.fname = ''; % initialize image reference structure
-Imgs.dir = '';
 
 
 %-- Get file information -------------------------------------------------%

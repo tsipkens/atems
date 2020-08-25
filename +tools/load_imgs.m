@@ -5,7 +5,7 @@
 % Author:   Timothy Sipkens, 2019-07-04
 %=========================================================================%
 
-function [Imgs, imgs] = load_imgs(Imgs, n)
+function [Imgs, imgs, pixsize] = load_imgs(Imgs, n)
 
 %-- Parse inputs ---------------------------------------------------------%
 % if not image information provided, use a UI to select files
@@ -26,8 +26,9 @@ end
 % crop out footer and get scale from text
 Imgs = tools.get_footer_scale(Imgs);
 
-% output cropped image
+% format other outputs
 imgs = {Imgs.cropped};
+pixsize = [Imgs.pixsize];
 
 end
 
