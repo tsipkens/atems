@@ -41,7 +41,7 @@ for ii=1:n % loop through provided images
     %   use defaults defined in seg instead
     
     %-- Run slider to obtain binary image --------------------------------%
-    [img_binary,~,~,~] = seg1(imgs{ii}, pixsize(ii), ...
+    [img_binary,~,~,~] = seg_sub(imgs{ii}, pixsize(ii), ...
         [], [], opts); % includes removing aggregates from border
     imgs_binary{ii} = img_binary;
     
@@ -73,11 +73,11 @@ end
 
 
 
-%== SEG1 =================================================================%
-%   Segments a single image by attempting multiple methods. 
+%== SEG_SUB ==============================================================%
+%   Sub-function that segments a single image by attempting multiple methods. 
 %   Author:  Timothy Sipkens, 10-10-2019
 function [img_binary,img_cropped,agg_binary_bin,agg_cropped_bin] = ...
-    seg1(img,pixsize,minparticlesize,coeffs,opts) 
+    seg_sub(img,pixsize,minparticlesize,coeffs,opts) 
 
 agg_binary_bin = {};    % Bin of binary aggregate images
 agg_cropped_bin = {};   % Bin of cropped aggregated images
@@ -134,6 +134,7 @@ if moreaggs==1
         % OR zeros as a start
 end
 
+commandwindow; % return focus to Matlab window
 
 
 end
