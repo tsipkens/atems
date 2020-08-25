@@ -318,7 +318,7 @@ img_mod = imfilter(img_in, hav);
 % Examines a neighborhood of WxW matrix, takes and makes the centre of that
 % matrix the median of the original neighborhood
 W = 5;
-for ii=1:8 % repeatedly apply median filter, which will result in artifacts on edges
+for ii=1:6 % repeatedly apply median filter, which will result in artifacts on edges
     img_mod = medfilt2(img_mod, [W W], 'symmetric');
 end
 % NOTE: The loop is intended to imitate the increasing amounts of 
