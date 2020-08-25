@@ -60,9 +60,14 @@ for kk=1:n
         if f_crop
             uiwait(msgbox('Please crop the image around missing region.'));
             [~, rect] = imcrop; % user crops image
+            rect = round(rect);
+            
+            if or(rect(3)==0, rect(4)==0)
+                uiwait(msgbox('Rectangle undefined, try again.'));
+                continue;
+            end
             
             % Get pixel values from original image instead of binary overlay.
-            rect = round(rect);
             inds1 = rect(2):(rect(2) + rect(4) - 1);
             inds2 = rect(1):(rect(1) + rect(3) - 1);
             img_cropped = img(inds1, inds2);
