@@ -90,18 +90,19 @@ for kk=1:n
         imagesc(img_refined);
         colormap gray;
         axis image off;
-
+        
+        %-- Add a slider uicontrol ---------------------------------------%
         level = graythresh(img_refined); % Otsu thresholding
         hst = uicontrol('Style', 'slider',...
-            'Min',0-level,'Max',1-level,'Value',.5-level,...
+            'Min', 0-level, 'Max', 1-level, 'Value', .5-level,...
             'Position', [20 390 150 15],...
             'Callback', {@thresh_slider,hax,img_refined,img_binary});
-        get(hst,'value'); % add a slider uicontrol
-
+        get(hst,'value');
+        
+        % add a text uicontrol to label the slider
         uicontrol('Style','text',...
             'Position', [20 370 150 15],...
             'String','Threshold level');
-                % add a text uicontrol to label the slider
 
         %-- Pause program while user changes the threshold level ---------%
         h = uicontrol('Position',[20 320 200 30],'String','Finished',...
