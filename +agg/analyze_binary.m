@@ -49,7 +49,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         
         id = id + 1; % increment global index counter
         Aggs0(jj).id = id;
-        Aggs0(jj).id_image = jj;
+        Aggs0(jj).img_id = ii;
         
         Aggs0(jj).fname = fname{ii};
         Aggs0(jj).pixsize = pixsize(ii);
@@ -103,7 +103,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         [x,y] = find(img_binary ~= 0);
         Aggs0(jj).center_mass = [mean(x); mean(y)];
 
-        tools.plot_aggregates(Aggs0,jj,0);
+        tools.plot_aggregates(Aggs0, ii, 0);
     end
 
     % saveas(gcf,['..\images-processed\',Aggs(aa).fname(1:end-4),'.jpg']);

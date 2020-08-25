@@ -40,7 +40,7 @@ for ii=1:n
     morph_param = 0.8/pixsize
 
     %== STEP 1: Attempt to the remove background gradient ================%
-    disp('Performing background subtraction...');
+    disp('Subtracting background...');
     img = agg.bg_subtract(img); % background subtraction
     disp('Complete.');
     disp(' ');
@@ -49,7 +49,7 @@ for ii=1:n
 
     %== STEP 2: Pre-process image ========================================%
     %-- A: Perform denoising ---------------------------------------------%
-    disp('Performing denoising...');
+    disp('Denoising...');
     img_denoise = imbilatfilt(img);
     % img_denoise = tools.imtotvar_sb_atv(img,15); % alternate total variation denoise
     disp('Complete.');
@@ -57,6 +57,7 @@ for ii=1:n
     
     
     %-- B: Use texture in bottom hat images ------------------------------%
+    disp('Computing texture layer...');
     se = strel('disk',20);
     img_both = imbothat(img_denoise,se);
 
@@ -65,9 +66,12 @@ for ii=1:n
     se12 = strel('disk', max(round(5*morph_param),1));
     i12 = imclose(i11, se12);
     i12 = im2uint8(i12 ./ max(max(i12)));
+    disp('Complete.');
+    disp(' ');
 
 
-    %-- C: Perform multi-thresholding ------------------------------------%
+    %-- C: Perform multi-threshold ---------------------------------------%
+    disp('Computing mutli-threshold layer...');
     i1 = im2uint8(img_denoise);
     i1 = imgaussfilt(i1,max(round(5*morph_param),1));
 
@@ -101,6 +105,8 @@ for ii=1:n
         end
     end
     i5 = imgaussfilt(im2uint8(i5.*255), 15);
+    disp('Complete.');
+    disp(' ');
 
 
     %-- Combine feature set ----------------------------------------------%
@@ -113,7 +119,7 @@ for ii=1:n
     
     
     %== STEP 3: Perform kmeans segmentation ==============================%
-    disp('Performing k-means clustering...');
+    disp('Performing k-means...');
     bw = imsegkmeans(feature_set{ii}, 2);
     disp('Complete.');
     disp(' ');
