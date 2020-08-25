@@ -82,7 +82,7 @@ The output is an updated `Aggs` structure that also contains an estimate of the 
 
 ```Matlab
 figure(1);
-tools.plot_aggregates(Aggs_pcm);
+tools.imshow_agg(Aggs_pcm);
 ```
 
 The inner circle now indicates the primary particle size from PCM, and the number indicating the index used by the program to identify each aggregate. 

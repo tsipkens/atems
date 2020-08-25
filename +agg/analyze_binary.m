@@ -3,7 +3,7 @@
 % Author:  Timothy Sipkens
 %=========================================================================%
 
-function [Aggs] = analyze_binary(imgs_binary, imgs, pixsize, fname)
+function [Aggs] = analyze_binary(imgs_binary, imgs, pixsize, fname, f_plot)
 
 %-- Parse inputs ---------------------------------------------------------%
 if isstruct(imgs_binary) % consider case that structure is given as input
@@ -22,9 +22,14 @@ if isempty(pixsize); pixsize = ones(size(imgs)); end
 
 if ~exist('fname','var'); fname = []; end
 if isempty(fname); fname = cell(size(imgs)); end
+
+% Flag for whether to show progress in a figure.
+if ~exist('f_plot','var'); f_plot = []; end
+if isempty(f_plot); f_plot = 1; end
 %-------------------------------------------------------------------------%
 
 
+if f_plot==1; f0 = figure; end % intialize a new figure to show progress
 Aggs = struct([]); % initialize Aggs structure
 id = 0;
 
@@ -43,8 +48,7 @@ for ii=1:length(imgs_binary) % loop through provided images
 
 
     %== Main loop to analyze each aggregate ==============================%
-    figure(gcf);
-    tools.imshow_binary(img, img_binary);
+    if f_plot==1; tools.imshow_binary(img, img_binary); end
     for jj = 1:naggs % loop through number of found aggregates
         
         id = id + 1; % increment global index counter
@@ -103,16 +107,15 @@ for ii=1:length(imgs_binary) % loop through provided images
         [x,y] = find(img_binary ~= 0);
         Aggs0(jj).center_mass = [mean(x); mean(y)];
 
-        tools.imshow_agg(Aggs0, ii, 0);
+        if f_plot==1; tools.imshow_agg(Aggs0, ii, 0); end
     end
+    
+    if f_plot==1; pause(0.1); end % pause very briefly to show overall aggregates
 
-    % saveas(gcf,['..\images-processed\',Aggs(aa).fname(1:end-4),'.jpg']);
-
-    pause(1);
-
-    Aggs = [Aggs,Aggs0]; % append current aggregate data
-
+    Aggs = [Aggs, Aggs0]; % append current aggregate data
 end
+
+close(f0); % close figure showing progress
 
 disp('Completed aggregate analysis.');
 disp(' ');
