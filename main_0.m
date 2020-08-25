@@ -42,7 +42,7 @@ tools.plot_aggregates(Aggs_edm);
 
 
 figure(4);
-loglog([Aggs_edm.dp_pcm_simple],real([Aggs_edm.dpg_edm]),'.');
+loglog([Aggs_pcm.dp], [Aggs_edm.dp], '.');
 hold on;
 loglog(xlim,xlim);
 hold off;
