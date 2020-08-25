@@ -1,8 +1,8 @@
 
 % SEG_SLIDER Performs background correction and manual thresholding on a user-defined portion of the image.
-% Author:       Ramin Dastanpour, Steven N. Rogak, 2016-02 (originally)
-%               Developed at the University of British Columbia
-% Modified:     Tmothy Sipkens, 2019-10-11
+% Author:   Timothy Sipkens, 2019-10-11 (modified)
+%           Ramin Dastanpour, 2016-02 (based on)
+%           Developed at the University of British Columbia
 %=========================================================================%
 
 function [imgs_binary] = seg_slider(imgs, imgs_binary, f_crop) 
@@ -56,12 +56,18 @@ for kk=1:n
         %== STEP 1: Crop image ===========================================%
         if f_crop
             figure(f0); clf;
-            imagesc(img);
+            % imagesc(img);
+            tools.plot_binary_overlay(img, img_binary0);
             colormap gray;
             axis image off;
 
             uiwait(msgbox('Please crop the image around missing region.'));
             [img_cropped,rect] = imcrop; % user crops image
+            
+            % Account for the fact that the binary overlay 
+            % is RGB not simple greyscale.
+            img_cropped = img_cropped(:,:,1);
+            
         else
             img_cropped = img; % originally bypassed in Kook code
             rect = [];
@@ -73,7 +79,7 @@ for kk=1:n
         img_binary = lasso_fnc(img_cropped);
 
         %-- Step 1-2: Refining background brightness ---------------------%
-        img_refined = background_fnc(img_binary,img_cropped);
+        img_refined = background_fnc(img_binary, img_cropped);
 
 
 
@@ -132,7 +138,13 @@ for kk=1:n
         inds2 = rect(1):(rect(1)+size_temp(2)-1);
         img_binary0(inds1,inds2) = ...
             or(img_binary0(inds1,inds2), img_binary);
-
+        
+        
+        %-- Save a temporary copy of image on each iteration -------------%
+        %   This is done in case of an error during segmentation.
+        if ~isfolder('temp'); mkdir('temp'); end
+        imwrite(img_binary0, ['temp/slider_',num2str(kk),'.tif']);
+        
 
         %-- Query user ---------------------------------------------------%
         figure(f0); clf;
@@ -145,7 +157,9 @@ for kk=1:n
         else
             moreaggs=0;
         end
-
+        
+        
+        
     end
 %=========================================================================%
     
@@ -159,6 +173,7 @@ for kk=1:n
 end
 
 close(f0); % close figure used during segmentation
+delete('temp/slider_*.tif'); % delete temporary files upon success
 
 % If a single image, cell arrays are unnecessary.
 % Extract and just output images. 
