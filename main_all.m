@@ -8,4 +8,5 @@ clc;
 Imgs = tools.load_imgs('images'); Imgs(end) = []; % OPTION 3: load all images in 'images' folder
 
 imgs = {Imgs.cropped}; % copy variables locally
-
+pixsize = [Imgs.pixsize];
+fname = {Imgs.fname};

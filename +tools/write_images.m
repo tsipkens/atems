@@ -12,7 +12,7 @@ if isempty(folder); folder = 'temp'; end
 %-------------------------------------------------------------------------%
 
 
-if isfolder(folder) % check if folder exists
+if ~isfolder(folder) % check if folder exists
    mkdir(folder); % create the folder if it does not exist
 end
 
