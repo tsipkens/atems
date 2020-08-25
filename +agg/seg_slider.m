@@ -56,24 +56,25 @@ for kk=1:n
         %== STEP 1: Crop image ===========================================%
         if f_crop
             figure(f0); clf;
-            % imagesc(img);
             tools.plot_binary_overlay(img, img_binary0);
             colormap gray;
             axis image off;
 
             uiwait(msgbox('Please crop the image around missing region.'));
-            [img_cropped,rect] = imcrop; % user crops image
+            [~, rect] = imcrop; % user crops image
             
-            % Account for the fact that the binary overlay 
-            % is RGB not simple greyscale.
-            img_cropped = img_cropped(:,:,1);
+            % Get pixel values from original image instead of binary overlay.
+            rect = round(rect);
+            inds1 = rect(2):(rect(2) + rect(4) - 1);
+            inds2 = rect(1):(rect(1) + rect(3) - 1);
+            img_cropped = img(inds1, inds2);
             
         else
             img_cropped = img; % originally bypassed in Kook code
             rect = [];
         end
-
-
+        
+        
         %== STEP 2: Image refinment ======================================%
         %-- Step 1-1: Apply Lasso tool -----------------------------------%
         img_binary = lasso_fnc(img_cropped);
@@ -105,7 +106,7 @@ for kk=1:n
             'String','Threshold level');
 
         %-- Pause program while user changes the threshold level ---------%
-        h = uicontrol('Position',[20 320 200 30],'String','Finished',...
+        h = uicontrol('Position',[20 335 150 25],'String','Finished',...
             'Callback','uiresume(gcbf)');
         message = sprintf(['Move the slider to the right or left to change ', ...
             'threshold level\nWhen finished, click on ''Finished'' continute.']);
@@ -137,10 +138,8 @@ for kk=1:n
 
         %-- Subsitute rectangle back into orignal image ------------------%
         rect = round(rect);
-        size_temp = size(img_binary);
-
-        inds1 = rect(2):(rect(2)+size_temp(1)-1);
-        inds2 = rect(1):(rect(1)+size_temp(2)-1);
+        inds1 = rect(2):(rect(2) + rect(4) - 1);
+        inds2 = rect(1):(rect(1) + rect(3) - 1);
         img_binary0(inds1,inds2) = ...
             or(img_binary0(inds1,inds2), img_binary);
         
