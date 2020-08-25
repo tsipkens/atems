@@ -5,7 +5,7 @@
 % Author:   Timothy Sipkens, 2019-07-04
 %=========================================================================%
 
-function [Imgs,img_raw] = load_imgs(Imgs, n)
+function [Imgs, imgs] = load_imgs(Imgs, n)
 
 %-- Parse inputs ---------------------------------------------------------%
 % if not image information provided, use a UI to select files
@@ -23,11 +23,11 @@ for ii=length(n):-1:1
     Imgs(ii).raw = imread([Imgs(ii).folder, filesep, Imgs(ii).fname]);
 end
 
-% output raw image
-img_raw = Imgs(1).raw;
-
 % crop out footer and get scale from text
 Imgs = tools.get_footer_scale(Imgs);
+
+% output cropped image
+imgs = {Imgs.cropped};
 
 end
 
