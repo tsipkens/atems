@@ -4,7 +4,6 @@ close all;
 clc;
 
 Imgs = tools.load_imgs; % load a single image
-Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 
 imgs = {Imgs.cropped}; % copy variables locally
 pixsize = [Imgs.pixsize];
@@ -32,7 +31,7 @@ Aggs_pcm = pp.pcm(Aggs);
 
 
 Aggs_edm = pp.edm_sbs(Aggs_pcm);
-tools.write_excel(Aggs_edm,'data\Aggs.xlsx');
+tools.write_excel(Aggs_edm,'temp\Aggs.xlsx');
 
 
 % Aggs_kook = pp.kook(Imgs,1);

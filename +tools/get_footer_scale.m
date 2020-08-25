@@ -27,6 +27,9 @@ for jj=1:length(Imgs)
     
     if footer_found == 0
         Imgs(jj).cropped = Imgs(jj).raw;
+        warning(['No footer found, cropped image is raw image. ' ...
+            'Assign pixsize manually']);
+        return;
     end
     
     

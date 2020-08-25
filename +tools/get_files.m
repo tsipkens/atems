@@ -27,7 +27,7 @@ while flag == 0
     else % if folder is given, get all tif files in the folder
         t0 = dir(fullfile(fd,'*.tif')); % pattern to match filenames
         fname = {t0.name};
-        folder = [t0(1).folder, filesep];
+        folder = t0(1).folder;
     end
     
     % Format file information for output
@@ -35,13 +35,13 @@ while flag == 0
         flag = 1;
         for ii=length(fname):-1:1
             Imgs(ii).fname = fname{ii};
-            Imgs(ii).dir = folder;
+            Imgs(ii).folder = folder;
         end
     elseif Imgs.fname==0 % handle when no image was selected
         error('No image selected.');
     else % handle when only one image is selected
         Imgs.fname = fname;
-        Imgs.dir = dir;
+        Imgs.folder = folder;
         flag = 1;
     end
 end

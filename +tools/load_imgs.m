@@ -20,7 +20,7 @@ if isempty(n); n = 1:length(Imgs); end
 
 %-- Read in image --------------------------------------------------------%
 for ii=length(n):-1:1
-    Imgs(ii).raw = imread([Imgs(ii).dir, Imgs(ii).fname]);
+    Imgs(ii).raw = imread([Imgs(ii).folder, filesep, Imgs(ii).fname]);
 end
 
 % output raw image
