@@ -24,7 +24,7 @@ Imgs = tools.get_footer_scale(Imgs); % get footer for selected image
 imgs = {Imgs.cropped};
 
 %{
-fold_name = replace(Imgs_ref.dir, '\images\', '\cropped[ts]\');
+fold_name = replace(Imgs_ref.folder, '\images\', '\cropped[ts]\');
 status = mkdir(fold_name);
 
 
