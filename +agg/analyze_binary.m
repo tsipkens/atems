@@ -50,10 +50,10 @@ for ii=1:length(imgs_binary) % loop through provided images
         
         id = id + 1; % increment global index counter
         Aggs0(jj).id = id;
+        Aggs0(jj).id_image = jj;
         
         Aggs0(jj).fname = fname{ii};
         Aggs0(jj).pixsize = pixsize(ii);
-        Aggs0(jj).id_image = jj;
 
         Aggs0(jj).image = img;
             % store image that the aggregate occurs in

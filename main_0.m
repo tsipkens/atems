@@ -14,7 +14,6 @@ fname = {Imgs.fname};
 opts.bool_kmeans = 1;
 opts.bool_otsu = 0;
 imgs_binary = agg.seg(imgs, pixsize, opts);
-[Imgs.binary] = imgs_binary{:};
 
 % for ii=1:length(Imgs)
 %     imgs_binary{ii} = ...

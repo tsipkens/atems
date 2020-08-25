@@ -1,6 +1,6 @@
 
 
-function [t2,t0] = write_json(var,fname)
+function [t2,t0] = write_json(var, fname)
 
 fid = fopen(fname,'wt'); % open file, overwriting previous text
 
