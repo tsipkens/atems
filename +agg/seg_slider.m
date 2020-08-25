@@ -94,13 +94,13 @@ for kk=1:n
         %-- Add a slider uicontrol ---------------------------------------%
         level = graythresh(img_refined); % Otsu thresholding
         hst = uicontrol('Style', 'slider',...
-            'Min', 0.2-level, 'Max', 1-level, 'Value', 0.5-level,...
+            'Min', 0.4-level, 'Max', 1-level, 'Value', 0.65-level,...
             'Position', [20 390 150 15],...
             'Callback', {@thresh_slider,hax,img_refined,img_binary});
         get(hst,'value');
         
         % add a text uicontrol to label the slider
-        uicontrol('Style','text',...
+        htxt = uicontrol('Style','text',...
             'Position', [20 370 150 15],...
             'String','Threshold level');
 
@@ -112,6 +112,10 @@ for kk=1:n
         uiwait(msgbox(message));
         disp('Waiting for the user to apply the threshold to the image.');
         uiwait(gcf);
+        
+        delete(h); % delete ui components used for thresholding
+        delete(hst);
+        delete(htxt);
         disp('Thresholding is applied.');
         
         
