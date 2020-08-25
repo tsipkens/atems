@@ -34,9 +34,7 @@ else % if adding an outline
 end
 
 
-imagesc(i0); % show labelled image
-colormap(gray);
-axis image off;
+tools.imagesc(i0); % show labelled image
 
 
 if nargout>0; h = gca; end % organize outputs

@@ -57,8 +57,6 @@ for kk=1:n
         if f_crop
             figure(f0); clf;
             tools.plot_binary_overlay(img, img_binary0);
-            colormap gray;
-            axis image off;
 
             uiwait(msgbox('Please crop the image around missing region.'));
             [~, rect] = imcrop; % user crops image
@@ -88,9 +86,7 @@ for kk=1:n
         figure(f0); clf;
 
         hax = axes('Units','Pixels');
-        imagesc(img_refined);
-        colormap gray;
-        axis image off;
+        tools.imagesc(img_refined);
         
         %-- Add a slider uicontrol ---------------------------------------%
         level = graythresh(img_refined); % Otsu thresholding
@@ -266,17 +262,14 @@ end
 %   - QOL - User will not have to restart program if they mess up the lasso
 function img_mask = lasso_fnc(img_in)
 
-fontsize = 10;
-
 %-- Displaying cropped image ---------------------------------------------%
 clf;
-imagesc(img_in);
-colormap gray; axis image off;
-title('Original CROPPED Image', 'FontSize', fontsize);
+tools.imagesc(img_in);
+title('Applying lasso tool...');
 
 %-- Freehand drawing. Selecting region of interest (ROI) -----------------%
 drawing_correct = 0; % this variable is used to check if the user drew the lasso correctly
-while drawing_correct == 0 
+while drawing_correct==0 
     message = sprintf('Please draw an approximate boundary around the aggregate.\nLeft click and hold to begin drawing.\nLift mouse button to finish');
     uiwait(msgbox(message));
     hFH = imfreehand(); % alternate for MATLAB 2019b+: drawfreehand();
@@ -352,8 +345,7 @@ img_binary = logical(img_binary3);
 img_toshow = double(img_mod) .* (double(~img_binary)+1) ./ 2;
 
 axes(hax);
-imagesc(img_toshow);
-axis image off;
+tools.imagesc(img_toshow);
 
 end
 
