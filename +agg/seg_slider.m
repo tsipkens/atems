@@ -63,7 +63,7 @@ for kk=1:n
     
 %== CORE FUNCTION ========================================================%
     figure(f0); clf; % intialize plot of image with initial binary overlaid
-    tools.plot_binary_overlay(img, img_binary0);
+    tools.imshow_binary(img, img_binary0);
     
     moreaggs = 1;
     while moreaggs==1
@@ -104,7 +104,7 @@ for kk=1:n
         figure(f0); clf;
 
         hax = axes('Units','Pixels');
-        tools.imagesc(img_refined);
+        tools.imshow(img_refined);
         title('Applying threshold...');
         
         %-- Add a slider uicontrol ---------------------------------------%
@@ -143,7 +143,7 @@ for kk=1:n
         
         %-- Check if result is satisfactory ------------------------------%
         figure(f0); clf;
-        tools.plot_binary_overlay(img_cropped, img_binary);
+        tools.imshow_binary(img_cropped, img_binary);
         choice2 = questdlg(['Satisfied with aggregate detection? ', ...
             'If not, try drawing an edge around the aggregate manually...'], ...
             'Agg detection','Yes','No','Yes');
@@ -167,7 +167,7 @@ for kk=1:n
 
         %-- Query user ---------------------------------------------------%
         figure(f0); clf;
-        tools.plot_binary_overlay(img, img_binary0);
+        tools.imshow_binary(img, img_binary0);
 
         choice = questdlg('Are there any particles poorly or not detected?',...
             'Missing particles','Yes','No','No');
@@ -283,7 +283,7 @@ function img_mask = lasso_fnc(img_in)
 
 %-- Displaying cropped image ---------------------------------------------%
 clf;
-tools.imagesc(img_in);
+tools.imshow(img_in);
 title('Applying lasso tool...');
 
 %-- Freehand drawing. Selecting region of interest (ROI) -----------------%
@@ -364,7 +364,7 @@ img_binary = logical(img_binary3);
 img_toshow = double(img_mod) .* (double(~img_binary)+1) ./ 2;
 
 axes(hax);
-tools.imagesc(img_toshow);
+tools.imshow(img_toshow);
 title('Applying threshold...');
 
 end

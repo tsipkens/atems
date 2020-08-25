@@ -65,7 +65,7 @@ to be analyzed in other software and languages, where `fname` is the filename of
 
 ```Matlab
 figure(1);
-tools.plot_aggregates(Aggs);
+tools.imshow_agg(Aggs);
 ```
 
 The resultant image highlights pixels that are part of the aggregate, and plots a circle that corresponds to the radius of gyration. This output is similar to that shown in images above for the *k*-means and the manual slider methods above. 
@@ -172,26 +172,26 @@ Code to be used in the manual sizing of soot primary particles developed at the 
 
 This package contains a series of functions that help in visualizing or analyzing the aggregates.
 
-### 3.1 Plotting functions (plot*)
+### 3.1 Functions to show images (tools.imshow*)
 
 These functions aid in visualizing the results. For example, 
 
 ```Matlab
-plot_binary_overlay(img, img_binary)
+tools.imshow_binary(img, img_binary)
 ```
 
 will plot the image, given in `img`, and overlay labels for the aggregates in a corresponding binary image, given in `img_binary`.  Appending an `opts` structure to the function allows for the control of the appearance of the overlay, including the label alpha and colour. For example, 
 
 ```Matlab
 opts.cmap = [0.92,0.16,0.49];
-plot_binary_overlay(img, img_binary, opts);
+tools.imshow_binary(img, img_binary, opts);
 ```
 
 will plot the overlays in a red, while 
 
 ```Matlab
 opts.cmap = [0.99,0.86,0.37];
-plot_binary_overlay(img, img_binary, opts);
+tools.imshow_binary(img, img_binary, opts);
 ```
 
 will plot the overlays in a yellow.

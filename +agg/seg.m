@@ -41,22 +41,22 @@ for ii=1:n % loop through provided images
     %   use defaults defined in seg instead
     
     %-- Run slider to obtain binary image --------------------------------%
-    [img_binary,~,~,~] = seg1(...
-        imgs{ii},pixsize(ii),[],[],...
-        opts); % includes removing aggregates from border
+    [img_binary,~,~,~] = seg1(imgs{ii}, pixsize(ii), ...
+        [], [], opts); % includes removing aggregates from border
     imgs_binary{ii} = img_binary;
     
+    % Write binaries to temporary file (in case an error occurs).
     if ~exist('temp', 'dir')
        mkdir('temp')
     end
-    imwrite(imgs_binary{ii},['temp/',num2str(ii),'.tiff']);
-        % write binaries to temporary file
+    imwrite(imgs_binary{ii}, ['temp/segg_',num2str(ii),'.TIF']);
     
     disp('Completed thresholding.');
     disp(' ');
     
 end
 
+delete('temp/segg_*.TIF');
 close(gcf); % close image with overlaid da
 disp('[== Complete =================================]');
 disp(' ');
@@ -150,7 +150,7 @@ function [moreaggs,choice,img_binary] = user_input(img,img_binary)
 
 f = figure(gcf);
 f.WindowState = 'maximized'; % maximize figure
-tools.plot_binary_overlay(img,img_binary);
+tools.imshow_binary(img, img_binary);
 
 
 %== User interaction =====================================================%

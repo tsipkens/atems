@@ -1,10 +1,9 @@
 
-% PLOT_AGGREGATES  Plot original image with binary mask overlayed
-% Author:          Timothy Sipkens, 2019-07-24
+% IMSHOW_AGG  Plot original image with binary mask overlayed
+% Author: Timothy Sipkens, 2019-07-24
 %=========================================================================%
 
-function [h, fr, i0] = plot_aggregates( ...
-    Aggs, idx, f_img, opts)
+function [h, fr, i0] = imshow_agg(Aggs, idx, f_img, opts)
 
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('idx','var'); idx = []; end % image index for plotting
@@ -60,7 +59,7 @@ for ii=1:Nimg % loop through images
             img_binary = or(img_binary,Aggs(aa).binary);
         end
 
-        [~,~,i0] = tools.plot_binary_overlay( ...
+        [~,~,i0] = tools.imshow_binary( ...
             Aggs(ind1(1)).image, img_binary, opts);
     end % else: plot circles on existing image
 

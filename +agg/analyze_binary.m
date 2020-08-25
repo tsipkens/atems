@@ -44,7 +44,7 @@ for ii=1:length(imgs_binary) % loop through provided images
 
     %== Main loop to analyze each aggregate ==============================%
     figure(gcf);
-    tools.plot_binary_overlay(img, img_binary);
+    tools.imshow_binary(img, img_binary);
     for jj = 1:naggs % loop through number of found aggregates
         
         id = id + 1; % increment global index counter
@@ -103,7 +103,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         [x,y] = find(img_binary ~= 0);
         Aggs0(jj).center_mass = [mean(x); mean(y)];
 
-        tools.plot_aggregates(Aggs0, ii, 0);
+        tools.imshow_agg(Aggs0, ii, 0);
     end
 
     % saveas(gcf,['..\images-processed\',Aggs(aa).fname(1:end-4),'.jpg']);

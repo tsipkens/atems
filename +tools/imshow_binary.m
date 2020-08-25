@@ -1,9 +1,9 @@
 
-% PLOT_BINARY_OVERLAY  Plot original image with binary mask overlayed
-% Author:              Timothy Sipkens, 2019-07-24
+% INSHOW_BINARY  Plot original image with binary mask overlayed
+% Author: Timothy Sipkens, 2019-07-24
 %=========================================================================%
 
-function [h,f,i0] = plot_binary_overlay(img, img_binary, opts)
+function [h,f,i0] = imshow_binary(img, img_binary, opts)
 
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('opts','var'); opts = struct(); end
@@ -34,7 +34,7 @@ else % if adding an outline
 end
 
 
-tools.imagesc(i0); % show labelled image
+tools.imshow(i0); % show labelled image
 
 
 if nargout>0; h = gca; end % organize outputs
