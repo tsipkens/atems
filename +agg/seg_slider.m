@@ -3,6 +3,19 @@
 % Author:   Timothy Sipkens, 2019-10-11 (modified)
 %           Ramin Dastanpour, 2016-02 (based on)
 %           Developed at the University of British Columbia
+% 
+%-------------------------------------------------------------------------%
+% Inputs: 
+%   imgs          Either (1) an Imgs structure, (2) a cellular array of 
+%                 images, or (3) a single image.
+% 
+%   imgs_binary   Partially pre-classified binary image (allows for
+%                 modification to existing binary using this method).
+%                 (OPTIONAL)
+%   
+%   f_crop        Whether or not to run the image crop tool (to zoom in on
+%                 small parts of the image).
+%                 (OPTIONAL, default = 1)
 %=========================================================================%
 
 function [imgs_binary] = seg_slider(imgs, imgs_binary, f_crop) 
