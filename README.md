@@ -116,9 +116,9 @@ Several methods also take `pixsize`, which denotes the size of each pixel in the
 
 The set of available methods is summarized below. 
 
-#### seg
+#### A general segmenter: seg
 
-This is a general, multipurpose wrapper function that tries several of the other methods listed here in sequence, prompting the user after each attempt. This allow for refinement of the output from the *k*-means and Otsu-based methods discussed below.
+The `agg.seg` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. This includes an allowance to refine output from the fully automated *k*-means and Otsu-based methods discussed below, using a manual thresholding of small regions of the image. 
 
 #### seg_kmeans
 
