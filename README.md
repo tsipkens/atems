@@ -201,9 +201,6 @@ The first function, `pp.kook`, contains a copy of the code provided by [Kook et 
 
 The `pp.kook2` function contains a modified version of the method proposed by [Kook et al. (2015)][kook] that removes circles in the background and assigns primary particles to aggregates. This is done rather simply:  by checking if the center of the circle for a given primary particle lies within the binary for a given aggregate. A sample output is as follows. 
 
-
-
-
 #### Manual sizing
 
 Code to be used in the manual sizing of soot primary particles developed at the University of British Columbia. The current method uses crosshairs to select the length and width of the particle. This is converted to various quantities, such as the mean primary particle diameter. The manual code is a heavily modified version of the code associated with [Dastanpour and Rogak (2014)][dastanpour2014].
@@ -258,13 +255,17 @@ This code also contain an adaptation of EDM-SBS method of [Bescond et al. (2014)
 #### References
 
 [Bescond et al., Aerosol Sci. Technol. (2014)][bescond]
+
 [Dastanpour et al., J. Powder Tech. (2016).][dastanpour2016]
+
 [Dastanpour and Rogak, Aerosol Sci. Technol. (2014).][dastanpour2014]
+
 [Kook et al., SAE Int. J. Engines (2015).][kook]
+
 [Trivanovic et al., Fuel (2020)][triv20]
 
 [kook]: https://doi.org/10.4271/2015-01-1991
 [dastanpour2016]: https://doi.org/10.1016/j.powtec.2016.03.027
 [dastanpour2014]: https://doi.org/10.1080/02786826.2014.955565
-[bsecond]: https://doi.org/10.1080/02786826.2014.932896
+[bescond]: https://doi.org/10.1080/02786826.2014.932896
 [triv20]: https://doi.org/10.1016/j.fuel.2020.118478
