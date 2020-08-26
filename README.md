@@ -102,7 +102,7 @@ The inner circle now indicates the primary particle size from PCM, and the numbe
 
 ## 1. Aggregate segmentation package (+agg)
 
-This package contains an expanding library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background areas. To demonstrate, we will consider a set of size sample images. 
+This package contains an expandable library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background areas. To demonstrate, we will consider a set of size sample images. 
 
 <img src="docs/base_imgs.png" width="1000px">
 
@@ -126,15 +126,21 @@ The `agg.seg` function is a general, multipurpose wrapper function that attempts
 
 #### seg_kmeans
 
-This function applies a *k*-means segmentation approach using three feature layers, which include (*i*) a denoised version of the image, (*ii*) a measure of texture in the image, and (*iii*) an Otsu-like threshold, adjusted upwards. Compiling these different feature layers results in segmentation that effectively consider colour images, if each of the layers are assigned a colour. For example, compilation of these feature layers could be visualized as: 
+This function applies a *k*-means segmentation approach using three feature layers, which include: 
 
-<img src="docs/fcolour.png" width="950px">
+1. a denoised version of the image, 
+2. a measure of texture in the image, and 
+3. an Otsu-like threshold, adjusted upwards. 
 
-Applying Matlab's `imsegkmeans` function will then result in segmentations as follows: 
+Compiling these different feature layers results in segmentation, which is roughly equivalent to segmenting colour images, if each of the layers are assigned a colour. For example, compilation of these feature layers for the sample images: 
+
+<img src="docs/fcolour.png" width="1000px">
+
+Finally, applying Matlab's `imsegkmeans` function, we achieve segmentations as follows: 
 
 <img src="docs/kmeans.png" width="1000px">
 
-While this may be adequate for many users, this technique occasionally fails, particularly if the function does not adequately remove the background. 
+This is the most robust of the fully automated methods available with this distribution. However, while this will likely be adequate for many users, the technique still occasionally fails, particularly if the function does not adequately remove the background. 
 
 #### seg_otsu_rb*
 
@@ -147,7 +153,7 @@ Sample images from the original and updated procedure, respectively, are shown b
 
 ![rb_orig](docs/otsu_rb_orig.png)
 
-![rb](docs/otsu_rb.png)
+<img src="docs/otsu_rb.png" min-width="700px">
 
 The latter function generally performs better, though both often break up aggregates and should likely be compliment with some manual adjustments following initial thresholding. 
 
@@ -254,15 +260,15 @@ This code also contain an adaptation of EDM-SBS method of [Bescond et al. (2014)
 
 #### References
 
-[Bescond et al., Aerosol Sci. Technol. (2014)][bescond]
+[Bescond, A., Yon, J., Ouf, F. X., Ferry, D., Delhaye, D., Gaffié, D., Coppalle, A. & Rozé, C. (2014). Automated determination of aggregate primary particle size distribution by TEM image analysis: application to soot. Aerosol Science and Technology, 48(8), 831-841.][bescond]
 
-[Dastanpour et al., J. Powder Tech. (2016).][dastanpour2016]
+[Dastanpour, R., Boone, J. M., & Rogak, S. N. (2016). Automated primary particle sizing of nanoparticle aggregates by TEM image analysis. Powder Technology, 295, 218-224.][dastanpour2016]
 
-[Dastanpour and Rogak, Aerosol Sci. Technol. (2014).][dastanpour2014]
+[Dastanpour, R., & Rogak, S. N. (2014). Observations of a correlation between primary particle and aggregate size for soot particles. Aerosol Science and Technology, 48(10), 1043-1049.][dastanpour2014]
 
-[Kook et al., SAE Int. J. Engines (2015).][kook]
+[Kook, S., Zhang, R., Chan, Q. N., Aizawa, T., Kondo, K., Pickett, L. M., Cenker, E., Bruneaux, G., Andersson, O., Pagels, J., & Nordin, E. Z. (2016). Automated detection of primary particles from transmission electron microscope (TEM) images of soot aggregates in diesel engine environments. *SAE International Journal of Engines*, *9*(1), 279-296.][kook]
 
-[Trivanovic et al., Fuel (2020)][triv20]
+[Trivanovic, U., Sipkens, T. A., Kazemimanesh, M., Baldelli, A., Jefferson, A. M., Conrad, B. M., Johnson, M. R., Corbin, J. C., Olfert, J. S., & Rogak, S. N. (2020). Morphology and size of soot from gas flares as a function of fuel and water addition. *Fuel*, *279*, 118478.][triv20]
 
 [kook]: https://doi.org/10.4271/2015-01-1991
 [dastanpour2016]: https://doi.org/10.1016/j.powtec.2016.03.027
