@@ -17,21 +17,22 @@ fname = {Imgs.fname};
 % k-means
 [imgs_km] = agg.seg_kmeans(Imgs);
 Aggs_km = agg.analyze_binary(imgs_km, imgs, pixsizes, fname);
-figure(1);
-tools.imshow_agg(Aggs_km);
+f1 = figure(1); f1.WindowState = 'maximized';
+opts.cmap = [0.92,0.16,0.49]; % red overlay
+tools.imshow_agg(Aggs_km, [], [], opts);
 commandwindow;
 
 % New Otsu
 imgs_otsu = agg.seg_otsu_rb(imgs, pixsizes);
 Aggs_otsu = agg.analyze_binary(imgs_otsu, imgs, pixsizes, fname);
-figure(2);
+f2 = figure(2); f2.WindowState = 'maximized';
 tools.imshow_agg(Aggs_otsu);
 commandwindow;
 
 % Original Otsu
 imgs_otsu_o = agg.seg_otsu_rb_orig(imgs, pixsizes);
 Aggs_otsu_o = agg.analyze_binary(imgs_otsu_o, imgs, pixsizes, fname);
-figure(3);
+f3 = figure(3); f3.WindowState = 'maximized';
 tools.imshow_agg(Aggs_otsu_o);
 commandwindow;
 %=========================================================================%
