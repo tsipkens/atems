@@ -38,9 +38,6 @@ for ii=1:n % loop through provided images
     disp(['[== IMAGE ',num2str(ii), ' OF ', ...
             num2str(length(imgs)), ' ============================]']);
     
-    %-- Initialize parameters --------------------------------------------%
-    %   use defaults defined in seg instead
-    
     %-- Run slider to obtain binary image --------------------------------%
     [img_binary,~,~,~] = seg_sub(imgs{ii}, pixsize(ii), ...
         [], [], opts); % includes removing aggregates from border
