@@ -145,7 +145,7 @@ Sample images from the original and updated procedure, respectively, are shown b
 
 ![rb](docs/otsu_rb.png)
 
-The latter function generally performs better, though both often break up aggregates and should likely be compliment with some manual adjustments following initial thresholding. . 
+The latter function generally performs better, though both often break up aggregates and should likely be compliment with some manual adjustments following initial thresholding. 
 
 #### seg_slider
 
