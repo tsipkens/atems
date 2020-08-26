@@ -104,7 +104,7 @@ The inner circle now indicates the primary particle size from PCM, and the numbe
 
 This package contains an expanding library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background areas. To demonstrate, we will consider a set of size sample images. 
 
-<img src="docs/base_imgs.png" style="max-width:700px;"></img>
+<img src="docs/base_imgs.png" style="max-width:500px;"></img>
 
 These images are included with this distribution in the `images/` folder. These images represent soot collected from a lab-scale flare (cf. see [Trivanovic et al. (2020)][triv20]) and a diesel engine. 
 
