@@ -294,11 +294,11 @@ while drawing_correct==0
     uiwait(msgbox(message));
     
     %-- Draw around the aggregate (tool depends on Matlab version) -------%
-    [~,vdate] = version; year(vdate); % get Matlab version year
+    [~,vdate] = version; vdate = year(vdate); % get Matlab version year
     if vdate>2018
         fh = drawfreehand(); % alternate for MATLAB 2019+
     else
-        fh = imfreehad(); % for older versions of Matlab
+        fh = imfreehand(); % for older versions of Matlab
     end
     finished_check = questdlg('Are you satisfied with your drawing?','Lasso Complete?','Yes','No','No');
     
