@@ -40,14 +40,15 @@ commandwindow;
 
 
 %== Primary particle sizing ==============================================%
-Aggs_pp = pp.pcm(Aggs_km);
-Aggs_pp = pp.edm_sbs(Aggs_pp);
+Aggs_pp = pp.edm_sbs(Aggs_km);
+Aggs_pp = pp.kook2(Aggs_pp);
+Aggs_pp = pp.pcm(Aggs_pp);
 
 figure(10);
 loglog([Aggs_pp.dp_pcm1], [Aggs_pp.dp_edm], '.');
 hold on;
-ylims = ylim;
-plot(ylims, ylims); % 1:1 line
+loglog([Aggs_pp.dp_pcm1], [Aggs_pp.dp_kook], '.');
+ylims = ylim;  plot(ylims, ylims); % 1:1 line
 hold off;
 %=========================================================================%
 

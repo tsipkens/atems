@@ -1,14 +1,11 @@
 
-% KOOK_YL  Performs modified Kook algorithm
+% KOOK2  Performs modified Kook algorithm that considers aggregate binaries.
 %
-% Code written by Ben Gigone and Emre Karatas, PhD
+% Original code written by Ben Gigone and Emre Karatas, PhD
 % Adapted from Kook et al. 2016, SAE
 % Works on Matlab 2012a or higher + Image RawImage Toolbox
 %
-% This code is modified by Yiling Kang
-% 
-% Compatability updates by Timothy Sipkens and
-% Yeshun (Samuel) Ma at the University of British Columbia
+% This code was modified by Yiling Kang and Timothy Sipkens
 % 
 %-------------------------------------------------------------------------%
 %
@@ -45,92 +42,122 @@
 % can be adjusted to filter out outliers in line 31-32 with rmax and rmin
 %=========================================================================%
 
-function Aggs = kook_yl(Aggs, f_plot)
+function Aggs = kook2(Aggs, f_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
 if ~exist('f_plot','var'); f_plot = []; end
-if isempty(f_plot); f_plot = 0; end
+if isempty(f_plot); f_plot = 1; end
 
-disp('Performing modified Kook analysis...');
+disp('Performing modified Kook:');
 
 
 %-- Sensitivity and Scaling Parameters -----------------------------------%
-maximgCount = 255; % Maximum image count for 8-bit image 
-SelfSubt = 0.8; % Self-subtraction level 
+max_img_count = 255; % Maximum image count for 8-bit image 
+self_subt = 0.8; % Self-subtraction level 
 mf = 1; % Median filter [x x] if needed 
-alpha = 0.1; % Shape of the negative Laplacian â€œunsharpâ€? filter 0->1 0.1
+alpha = 0.1; % Shape of the negative Laplacian "unsharp" filter 0->1 0.1
 rmax = 30; % Maximum radius in pixel
-rmin = 4; % Minimum radius in pixel (Keep high enough to eliminate dummies)
+rmin = 6; % Minimum radius in pixel (Keep high enough to eliminate dummies)
 sens_val = 0.75; % the sensitivity (0?1) for the circular Hough transform 
-edge_threshold = [0.125 0.190]; % the threshold for finding edges with edge detection
 
-if f_plot>=1; figure(1); imshow(Aggs(1).image); end
+
+if f_plot==1; f0 = figure; end
 
 %== Main image processing loop ===========================================%
-for ll = 1:length(Aggs) % run loop as many times as images selected
+% Prepare for loop over image indexes.
+idx = unique([Aggs.img_id]); % unique image indexes
+n_imgs = length(idx);
 
+n_aggs = length(Aggs); % total number of aggregates
+tools.textbar(0);
+
+for ii = 1:n_imgs % run loop as many times as images selected
+    
+    idx0 = [Aggs.img_id]==idx(ii);
+    idx_agg = 1:length(Aggs);
+    idx_agg = idx_agg(idx0);
+    a1 = idx_agg(1);
+    
+    if f_plot==1; tools.imshow(Aggs(a1).image); drawnow; end
+    
     %-- Crop footer and get scale ----------------------------------------%
-    pixsize = Aggs(ll).pixsize; 
-    img_cropped = Aggs(ll).img_cropped;
-    img_binary = Aggs(ll).img_cropped_binary;
+    pixsize = Aggs(a1).pixsize; 
+    img = Aggs(a1).image;
     
     
     %== Image preprocessing ==============================================%
-    Pp.img_bothat = imbothat(img_cropped,strel('disk',85)); % fix background illumination
-    Pp.img_contrast = imadjust(Pp.img_bothat); % enhance contrast
-    Pp.img_medfilter = medfilt2(Pp.img_contrast); % median filterting to remove noise
+    bg = self_subt .* img; % self-subtration from the original image
+    img_bgs = max_img_count - img;
+    img_bgs = img_bgs - bg; % subtract background
     
-    % erase background by multiplying binary image with grayscale image
-    Pp.img_analyze = uint8(img_binary) .* Pp.img_medfilter ;
+    img_medfilter = medfilt2(img_bgs, [mf, mf]); % median filterting to remove noise
     
-    img_canny0 = edge(Pp.img_analyze,'Canny'); % Canny edge detection
+    img_unsharp = imfilter(img_medfilter, fspecial('unsharp', alpha));
+    
+    img_canny = edge(img_unsharp, 'Canny'); % Canny edge detection
     
     % Imposing white background onto image. 
     % This prevents the program from detecting any background particles. 
-    img_canny = double(~img_binary) + double(img_canny0);
-    Pp.img_Canny = img_canny;
+    % img_canny = double(~img_binary) + double(img_canny0);
     %=====================================================================%
     
     
     %== Find and draw circles within aggregates ==========================%
     %   Find circles within soot aggregates 
-    [centers, radii] = imfindcircles(img_canny,[rmin rmax],...
+    [centers, radii] = imfindcircles(img_canny, [rmin rmax],...
         'ObjectPolarity', 'bright', ...
         'Sensitivity', sens_val, 'Method', 'TwoStage'); 
-    Pp.centers = centers;
-    Pp.radii = radii;
     
-    %-- Calculate Parameters (Add Histogram) -----------------------------%
-    Pp.dp = radii*pixsize*2;
-    Pp.dpg = nthroot(prod(Pp.dp),1/length(Pp.dp)); % geometric mean
-    Pp.sg = log(std(Pp.dp)); % geometric standard deviation
-    
-    Pp.Np = length(Pp.dp); % number of particles
-    
-    %-- Check the circle finder by overlaying the CHT boundaries on the original image 
-    %-- Remove circles out of the aggregate (?)
-    if and(f_plot>=1, ~isempty(centers))
-        figure(1);
+    %-- Check the circle finder by overlaying boundaries on the original image
+    if and(f_plot==1, ~isempty(centers))
         hold on;
-        viscircles(centers + repmat(Aggs(ll).rect([1,2]), [size(centers,1),1]), ...
-            radii', 'EdgeColor','r');
+        viscircles(centers, radii', 'EdgeColor','r');
         hold off;
+        drawnow;
     end
     
-    %== Save results =====================================================%
-    %   Format output and autobackup data --------------------------------%
-    Aggs(ll).kook_mod = Pp; % copy data structure into img_data
-    Aggs(ll).dp = mean(Pp.dp);
-    if mod(ll,10)==0 % save data every 10 aggregates
-        disp('Saving data...');
-        save(['temp',filesep,'kook_mod_data.mat'],'Aggs'); % backup img_data
-        disp('Save complete');
-        disp(' ');
+    
+    for aa=idx_agg % loop over aggregate for this image
+        img_binary = Aggs(aa).binary;
+        
+        idx_s = sub2ind(size(img), round(centers(:,2)), round(centers(:,1)));
+        in_aggregate = logical(img_binary(idx_s));
+        
+        idx_in = 1:length(idx_s);
+        idx_in = idx_in(in_aggregate);
+        
+        Pp.centers = centers(idx_in,:);
+        Pp.radii = radii(idx_in);
+
+        %-- Calculate Parameters (Add Histogram) -----------------------------%
+        Pp.dp = Pp.radii .* pixsize .* 2;
+        Pp.dpg = nthroot(prod(Pp.dp), 1/length(Pp.dp)); % geometric mean
+        Pp.sg = log(std(Pp.dp)); % geometric standard deviation
+
+        Pp.Np = length(Pp.dp); % number of particles
+
+
+        Aggs(aa).dp_kook = mean(Pp.dp);
+        Aggs(aa).dp = mean(Pp.dp);
+        Aggs(aa).kook = Pp; % copy primary particle information into Aggs
+        
+        %-- Check the circle finder by overlaying on the original image 
+        %   Circles in blue if part of considered aggregates
+        if and(f_plot==1, ~isempty(Pp.centers))
+            hold on;
+            viscircles(Pp.centers, Pp.radii', 'EdgeColor','b');
+            hold off;
+            drawnow;
+            pause(0.1);
+        end
     end
     
-end % end of aggregate loop
+    tools.textbar(ii / n_imgs);
+    
+end % end of image loop
 
 dp = [Aggs.dp]; % compile dp output
+close(f0);
 
 disp('Complete.');
 disp(' ');

@@ -46,7 +46,7 @@ SelfSubt = 0.8; % self-subtraction level
 mf = 1; % median filter [x x] if needed
 alpha = 0.1; % shape of the negative Laplacian “unsharp” filter 0?1
 rmax = 30; % maximum radius in pixel
-rmin = 4; % minimum radius in pixel
+rmin = 6; % minimum radius in pixel
 sens_val = 0.75; % the sensitivity (0->1) for the circular Hough transform
 
 img_original = II1;
@@ -63,16 +63,16 @@ if f_plot==2; figure(); imshow(II1, []); title('Step 1: Inversion and self-subtr
 
 %-- STEP 2: median filter to remove noise --------------------------------%
 II1_mf=medfilt2(II1, [mf mf]);
-if f_plot==2; figure();imshow(II1_mf, []);title('Step 2: Median filter'); end
+if f_plot==2; figure(); imshow(II1_mf, []);title('Step 2: Median filter'); end
 
 %-- STEP 3: Unsharp filter------------------------------------------------%
 f = fspecial('unsharp', alpha);
 II1_lt = imfilter(II1_mf, f);
-if f_plot==2; figure();imshow(II1_lt, []);title('Step 3: Unsharp filter'); end
+if f_plot==2; figure(); imshow(II1_lt, []);title('Step 3: Unsharp filter'); end
 
 %-- STEP 4: Canny edge detection -----------------------------------------%
 BWCED = edge(II1_lt,'canny'); % perfrom Canny edge detection
-if f_plot==2; figure();imshow(BWCED);title('Step 4: Canny edge detection'); end
+if f_plot==2; figure(); imshow(BWCED);title('Step 4: Canny edge detection'); end
 
 
 

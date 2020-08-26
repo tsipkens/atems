@@ -8,7 +8,7 @@ function [h, fr, i0] = imshow_agg(Aggs, idx, f_img, opts)
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('idx','var'); idx = []; end % image index for plotting
 if isempty(idx); idx = unique([Aggs.img_id]); end % plot all of the images
-Nimg = length(idx); % number of images to plot
+n_img = length(idx); % number of images to plot
 
 if ~exist('f_img','var'); f_img = []; end
 if isempty(f_img); f_img = 1; end
@@ -22,21 +22,21 @@ if ~isfield(opts,'cmap'); opts.cmap = [0.12,0.59,0.96]; end
 %-- Prepare figure for plotting ------------------------------------------%
 % Clear current figure if: plotting more than one image 
 % OR plotting original image.
-if or(f_img==1, Nimg>1); clf; end
+if or(f_img==1, n_img>1); clf; end
 
 % If more than one image, prepare to tile and maximize figure.
-if Nimg>1
-    N1 = floor(sqrt(Nimg));
-    N2 = ceil(Nimg/N1);
+if n_img>1
+    N1 = floor(sqrt(n_img));
+    N2 = ceil(n_img/N1);
     subplot(N1, N2, 1);
 end
 %-------------------------------------------------------------------------%
 
 
-if nargout>1; fr{Nimg} = []; end % inialize frame for output
-for ii=1:Nimg % loop through images
+if nargout>1; fr{n_img} = []; end % inialize frame for output
+for ii=1:n_img % loop through images
     
-    if Nimg>1 % if more than one image, prepare to tile
+    if n_img>1 % if more than one image, prepare to tile
         subplot(N1, N2, ii);
     end
     
@@ -91,7 +91,7 @@ for ii=1:Nimg % loop through images
     if nargout>1; f1 = getframe; fr{ii} = f1.cdata; end % get formatted image
 end
 
-if and(nargout>1, Nimg==1); fr = fr{1}; end % output image instead of cell if only one image
+if and(nargout>1, n_img==1); fr = fr{1}; end % output image instead of cell if only one image
 if nargout>0; h = gca; end % output axis handle
 if ~exist('i0','var'); i0 = []; end
 
