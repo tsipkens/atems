@@ -248,6 +248,7 @@ options = optimset('MaxFunEvals',1000);
 options = optimset(options,'MaxIter',1000); 
 [c] = lsqcurvefit(fun,c_start,xdata,double(img_bg),[],[],options);
 
+
 %-- Build the fitted surface ---------------------------------------------%
 img_bg_fit = zeros(size(img_bg));
 for ii = 1:size(img_bg,1)
@@ -291,7 +292,14 @@ drawing_correct = 0; % this variable is used to check if the user drew the lasso
 while drawing_correct==0 
     message = sprintf('Please draw an approximate boundary around the aggregate.\nLeft click and hold to begin drawing.\nLift mouse button to finish');
     uiwait(msgbox(message));
-    fh = drawfreehand(); % alternate for MATLAB 2019b+: drawfreehand();
+    
+    %-- Draw around the aggregate (tool depends on Matlab version) -------%
+    [~,vdate] = version; year(vdate); % get Matlab version year
+    if vdate>2018
+        fh = drawfreehand(); % alternate for MATLAB 2019+
+    else
+        fh = imfreehad(); % for older versions of Matlab
+    end
     finished_check = questdlg('Are you satisfied with your drawing?','Lasso Complete?','Yes','No','No');
     
     % if user is happy with their selection...
