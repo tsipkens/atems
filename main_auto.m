@@ -48,7 +48,7 @@ figure(10);
 loglog([Aggs_pp.dp_pcm1], [Aggs_pp.dp_edm], '.');
 hold on;
 loglog([Aggs_pp.dp_pcm1], [Aggs_pp.dp_kook], '.');
-ylims = ylim;  plot(ylims, ylims); % 1:1 line
+ylims = ylim;  plot(ylims, ylims, 'k-'); % 1:1 line
 hold off;
 %=========================================================================%
 
