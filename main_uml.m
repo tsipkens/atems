@@ -14,7 +14,7 @@ fname = {Imgs.fname};
 
 %== Run thresholding for all of the images ===============================%
 [imgs_binary, img_kmeans, feature_set] = agg.seg_kmeans(Imgs);
-% imgs_binary = agg.seg_otsu_rb(imgs, pixsize);
+% imgs_binary = agg.seg_otsu_rb(imgs, pixsizes);
 
 Aggs = agg.analyze_binary(...
     imgs_binary, imgs, pixsizes, fname); % determine aggregate properties

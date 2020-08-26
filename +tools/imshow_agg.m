@@ -88,7 +88,7 @@ for ii=1:n_img % loop through images
         hold off;
     end
     
-    if nargout>1; f1 = getframe; fr{ii} = f1.cdata; end % get formatted image
+    if nargout>1; axis off; f1 = getframe; fr{ii} = f1.cdata; axis on; end % get formatted image
 end
 
 if and(nargout>1, n_img==1); fr = fr{1}; end % output image instead of cell if only one image

@@ -104,7 +104,7 @@ The inner circle now indicates the primary particle size from PCM, and the numbe
 
 This package contains an expandable library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background areas. To demonstrate, we will consider a set of size sample images. 
 
-<img src="docs/base_imgs.png" width="1000px">
+![original](docs/original.png)
 
 These images are included with this distribution in the `images/` folder. These images represent soot collected from a lab-scale flare [(Trivanovic et al., 2020)][triv20] and a diesel engine. 
 
@@ -134,11 +134,11 @@ This function applies a *k*-means segmentation approach using three feature laye
 
 Compiling these different feature layers results in segmentation, which is roughly equivalent to segmenting colour images, if each of the layers are assigned a colour. For example, compilation of these feature layers for the sample images: 
 
-<img src="docs/fcolour.png" width="1000px">
+![fcolour](docs/fcolour.png)
 
 Finally, applying Matlab's `imsegkmeans` function, we achieve segmentations as follows: 
 
-<img src="docs/kmeans.png" width="1000px">
+![kmeans](docs/kmeans.png)
 
 This is the most robust of the fully automated methods available with this distribution. However, while this will likely be adequate for many users, the technique still occasionally fails, particularly if the function does not adequately remove the background. 
 
@@ -146,16 +146,17 @@ This is the most robust of the fully automated methods available with this distr
 
 These automated methods apply Otsu thresholding followed by a rolling ball transformation. Two versions of this function are included: 
 
-1. **seg_otsu_rb_orig** - Remains more true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. 
-2. **seg_otsu_rb** - Updates the above implementation by (*i*) not immediately removing boundary aggregates, (*ii*) adding a background subtraction step using the `agg.bg_subtract` function, and (*iii*) adding a bilateral denoising step. 
-
-Sample images from the original and updated procedure, respectively, are shown below. 
+The `agg.seg_otsu_rb_orig` function remains more true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. For the sample images, the following segmentations.
 
 ![rb_orig](docs/otsu_rb_orig.png)
 
-<img src="docs/otsu_rb.png" min-width="700px">
+Aggregates are often broken apart, which may be insufficient in itself. This implementation can be complimeted with `agg.seg_slider`, described below, to fill in the gaps between the aggregates and add missing aggregates. 
 
-The latter function generally performs better, though both often break up aggregates and should likely be compliment with some manual adjustments following initial thresholding. 
+Stemming from the deficiencies of the above function, the `agg.seg_otsu_rb` function updates the above implementation by (*i*) not immediately removing boundary aggregates, (*ii*) adding a background subtraction step using the `agg.bg_subtract` function, and (*iii*) adding a bilateral denoising step. This results in the following segmentations.
+
+![otsu_rb](docs/otsu_rb.png)
+
+This latter function generally performs better, though the results still often breaks up aggregates and should likely be compliment with some manual adjustments following initial thresholding. The technique generally underperformed relative to the previously mentioned *k*-means method. 
 
 #### Manually adjusting the threshold: seg_slider
 
