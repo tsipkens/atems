@@ -147,9 +147,9 @@ Sample images from the original and updated procedure, respectively, are shown b
 
 The latter function generally performs better, though both often break up aggregates and should likely be compliment with some manual adjustments following initial thresholding. 
 
-#### seg_slider
+#### Manually adjusting the threshold: seg_slider
 
-This is a GUI-based method with a slider for adaptive, manual thresholding of the image (*adaptive* in that small sections of the image can be cropped and with an independently-selected threshold). Gaussian denoising is first performed on the image to reduce the noise in the output binary image. Then, a slider is used to manually adjust the level of the threshold in the cropped region of the image. This can result in segmentations like:
+The function `agg.seg_slider` enacts a GUI-based method with a slider for adaptive, manual thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps. Gaussian blurring is first performed on the image to reduce the noise in the output binary image. Then, a slider is used to manually adjust the level of the threshold in the cropped region of the image. This can result in segmentations like:
 
 ![kmeans](docs/manual.png)
 
@@ -161,7 +161,7 @@ Several sub-functions are included within the main file. This is a variant of th
 
 ### 1.2 analyze_binary
 
-Having produced a binary image by any of the `agg.seg*` functions, the `agg.analyze_binary` function is used to convert these binaries to aggregate characteristics, such as area in pixels, radius of gyration, area-equivalent diameter, aspect ratio, etc.. The function itself takes a binary image, the original image, and the pixel size as inputs, e.g., 
+Having produced a binary image by any of the above functions, the `agg.analyze_binary` function is used to convert these binaries to aggregate characteristics, such as area in pixels, radius of gyration, area-equivalent diameter, aspect ratio, etc.. The function itself takes a binary image, the original image, and the pixel size as inputs, e.g., 
 
 ```Matlab
 Aggs = agg.analyze_binary(imgs_binary,imgs,pixsize,fname);
@@ -179,15 +179,17 @@ Multiple of these methods make use of the *rolling ball transformation*, applied
 
 The +pp package contains multiple methods for determining the primary particle size of the aggregates of interest. Often this requires a binary mask of the image that can be generated using the +agg package methods.
 
-#### pcm
+#### PCM
 
 The University of British Columbia's pair correlation method (PCM) MATLAB code for processing TEM images of soot to determine morphological properties. This package contains a significant update to the previous code provided with [Dastanpour et al. (2016)][dastanpour2016].
 
-#### kook
+#### EDM-SBS
 
-This method contains a copy of the code provided by [Kook et al. (2015)][kook], with minor modifications to match in the input/output of some of the other packages. The method is based on using the Hough transform on a pre-processed image.
+#### Hough transform (via Kook et al.)
 
-#### kook_yl
+Two `agg.seg_kook*` functions are included with this program, which fit circles to the image using the Hough transform and the method described by [Kook et al. (2015)][kook]. 
+
+The first function, `seg.kook`, contains a copy of the code provided by [Kook et al. (2015)][kook], with minor modifications to match the input/output of some of the other packages, namely to take an `Imgs` structure as an input (it will only consider the first image in the structure) and to output an `Aggs` structure. 
 
 This method contains a University of British Columbia-modified version of the method proposed by [Kook et al. (2015)][kook].
 
