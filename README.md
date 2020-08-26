@@ -150,7 +150,7 @@ The `agg.seg_otsu_rb_orig` function remains more true to the original code of [D
 
 ![rb_orig](docs/otsu_rb_orig.png)
 
-Aggregates are often broken apart, which may be insufficient in itself. This implementation can be complimeted with `agg.seg_slider`, described below, to fill in the gaps between the aggregates and add missing aggregates. 
+Aggregates are often broken apart, which may be insufficient in itself. This implementation can be complimented with `agg.seg_slider`, described below, to fill in the gaps between the aggregates and add missing aggregates. 
 
 Stemming from the deficiencies of the above function, the `agg.seg_otsu_rb` function updates the above implementation by (*i*) not immediately removing boundary aggregates, (*ii*) adding a background subtraction step using the `agg.bg_subtract` function, and (*iii*) adding a bilateral denoising step. This results in the following segmentations.
 
@@ -160,7 +160,9 @@ This latter function generally performs better, though the results still often b
 
 #### Manually adjusting the threshold: seg_slider
 
-The function `agg.seg_slider` enacts a GUI-based method with a slider for adaptive, manual thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps. Gaussian blurring is first performed on the image to reduce the noise in the output binary image. Then, a slider is used to manually adjust the level of the threshold in the cropped region of the image. This can result in segmentations like:
+The function `agg.seg_slider` is very close to a fully manual technique. The function enacts a GUI-based method with a slider for adaptive, manual thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps. First, the user is prompted to crop out a single aggregate. 
+
+Gaussian blurring is first performed on the image to reduce the noise in the output binary image. Then, a slider is used to manually adjust the level of the threshold in the cropped region of the image. This can result in segmentations like:
 
 ![manual](docs/manual.png)
 
