@@ -104,9 +104,9 @@ The inner circle now indicates the primary particle size from PCM, and the numbe
 
 This package contains an expanding library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background areas. To demonstrate, we will consider a set of size sample images. 
 
-<img src="docs/base_imgs.png" style="max-width:500px;"></img>
+<img src="docs/base_imgs.png" style="width:600px;"></img>
 
-These images are included with this distribution in the `images/` folder. These images represent soot collected from a lab-scale flare (cf. see [Trivanovic et al. (2020)][triv20]) and a diesel engine. 
+These images are included with this distribution in the `images/` folder. These images represent soot collected from a lab-scale flare [(Trivanovic et al., 2020)][triv20] and a diesel engine. 
 
 ### 1.1 agg.seg* functions
 
@@ -128,11 +128,11 @@ The `agg.seg` function is a general, multipurpose wrapper function that attempts
 
 This function applies a *k*-means segmentation approach using three feature layers, which include (*i*) a denoised version of the image, (*ii*) a measure of texture in the image, and (*iii*) an Otsu-like threshold, adjusted upwards. Compiling these different feature layers results in segmentation that effectively consider colour images, if each of the layers are assigned a colour. For example, compilation of these feature layers could be visualized as: 
 
-![fcolour](docs/fcolour.png)
+<img src="docs/fcolour.png" style="width:600px;"></img>
 
 Applying Matlab's `imsegkmeans` function will then result in segmentations as follows: 
 
-![kmeans](docs/kmeans.png)
+<img src="docs/kmeans.png" style="width:600px;"></img>
 
 While this may be adequate for many users, this technique occasionally fails, particularly if the function does not adequately remove the background. 
 
