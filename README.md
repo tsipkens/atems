@@ -104,7 +104,7 @@ The inner circle now indicates the primary particle size from PCM, and the numbe
 
 This package contains an expanding library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background areas. To demonstrate, we will consider a set of size sample images. 
 
-<img src="docs/base_imgs.png" style="width:600px;"></img>
+<img src="docs/base_imgs.png" style="width:600px">
 
 These images are included with this distribution in the `images/` folder. These images represent soot collected from a lab-scale flare [(Trivanovic et al., 2020)][triv20] and a diesel engine. 
 
@@ -128,11 +128,11 @@ The `agg.seg` function is a general, multipurpose wrapper function that attempts
 
 This function applies a *k*-means segmentation approach using three feature layers, which include (*i*) a denoised version of the image, (*ii*) a measure of texture in the image, and (*iii*) an Otsu-like threshold, adjusted upwards. Compiling these different feature layers results in segmentation that effectively consider colour images, if each of the layers are assigned a colour. For example, compilation of these feature layers could be visualized as: 
 
-<img src="docs/fcolour.png" style="width:600px;"></img>
+<img src="docs/fcolour.png" style="width:600px">
 
 Applying Matlab's `imsegkmeans` function will then result in segmentations as follows: 
 
-<img src="docs/kmeans.png" style="width:600px;"></img>
+<img src="docs/kmeans.png" style="width:600px">
 
 While this may be adequate for many users, this technique occasionally fails, particularly if the function does not adequately remove the background. 
 
@@ -155,7 +155,7 @@ The latter function generally performs better, though both often break up aggreg
 
 The function `agg.seg_slider` enacts a GUI-based method with a slider for adaptive, manual thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps. Gaussian blurring is first performed on the image to reduce the noise in the output binary image. Then, a slider is used to manually adjust the level of the threshold in the cropped region of the image. This can result in segmentations like:
 
-![kmeans](docs/manual.png)
+![manual](docs/manual.png)
 
 It is worth noting that the manual nature of this approach will resulting in variability and subjectiveness between users. However, the human input often greatly improves the quality of the segmentations and, while more time-intensive, can act as a reference in considering the appropriateness of the other segmentation methods. 
 
