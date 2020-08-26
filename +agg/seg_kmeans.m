@@ -1,10 +1,11 @@
 
-% SEG_KMEANS6 Performs kmeans clustering on a modified feature set.
-% Author:   Timothy Sipkens, 2020-08-13
+% SEG_KMEANS  Performs kmeans clustering on a modified feature set.
+% Author: Timothy Sipkens, 2020-08-13
+% Version: 6
 %=========================================================================%
 
 function [img_binary,img_kmeans,feature_set] = ...
-    seg_kmeans6(imgs,pixsizes)
+    seg_kmeans(imgs,pixsizes)
 
 
 %-- Parse inputs ---------------------------------------------------------%

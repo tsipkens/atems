@@ -15,7 +15,7 @@ fname = {Imgs.fname};
 
 %== Run thresholding for all of the images ===============================%
 % k-means
-[imgs_km] = agg.seg_kmeans6(Imgs);
+[imgs_km] = agg.seg_kmeans(Imgs);
 Aggs_km = agg.analyze_binary(imgs_km, imgs, pixsizes, fname);
 figure(1);
 tools.imshow_agg(Aggs_km);

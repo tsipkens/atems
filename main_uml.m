@@ -13,7 +13,7 @@ fname = {Imgs.fname};
 
 
 %== Run thresholding for all of the images ===============================%
-[imgs_binary, img_kmeans, feature_set] = agg.seg_kmeans6(Imgs);
+[imgs_binary, img_kmeans, feature_set] = agg.seg_kmeans(Imgs);
 % imgs_binary = agg.seg_otsu_rb(imgs, pixsize);
 
 Aggs = agg.analyze_binary(...
