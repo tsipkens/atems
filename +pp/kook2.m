@@ -111,7 +111,8 @@ for ii = 1:n_imgs % run loop as many times as images selected
     %-- Check the circle finder by overlaying boundaries on the original image
     if and(f_plot==1, ~isempty(centers))
         hold on;
-        viscircles(centers, radii', 'EdgeColor','r');
+        viscircles(centers, radii', 'EdgeColor', [0.1,0.1,0.1], ...
+        	'LineWidth', 0.75, 'EnhanceVisibility', false);
         hold off;
         drawnow;
     end
@@ -145,7 +146,8 @@ for ii = 1:n_imgs % run loop as many times as images selected
         %   Circles in blue if part of considered aggregates
         if and(f_plot==1, ~isempty(Pp.centers))
             hold on;
-            viscircles(Pp.centers, Pp.radii', 'EdgeColor','b');
+            viscircles(Pp.centers, Pp.radii', 'EdgeColor', [0.92,0.16,0.49], ...
+                'LineWidth', 0.75, 'EnhanceVisibility', false);
             hold off;
             drawnow;
             pause(0.1);
