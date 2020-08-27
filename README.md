@@ -162,9 +162,9 @@ This latter function generally performs better, though the results still often b
 
 The function `agg.seg_slider` is very close to a fully manual technique. The function enacts a GUI-based method with a slider for adaptive, manual thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps: 
 
-1. The user is prompted to **crop** around a single aggregate. This allows the user to zoom in on the image for the remaining steps. 
-2. The user uses a lasso tool to draw around the aggregate. The excluded regions are used for **background subtraction** in individual regions of the image. 
-3. Gaussian blurring is first performed on the image to reduce the noise in the output binary image. Then, the user is prompted with a **slider** that is used to manually adjust the level of the threshold in the cropped region of the image. The optimal threshold normally occurs when parts of the surrounding region are also considered above the threshold (i.e., show up as black) but do not connect to the main aggregate (see Step 4 in the figure below depicting the window progression). 
+1. The user is first prompted to **crop** around a single aggregate. This allows the user to zoom in on the image for the remaining steps. 
+2. The user uses a lasso tool to draw around the aggregate. The excluded regions are used for **background subtraction** in cropped region of the image. 
+3. Gaussian blurring is then performed on the image to reduce the noise in the output binary image. Then, the user is prompted with a **slider** that is used to manually adjust the level of the threshold in the cropped region of the image. Black regions denotes sections above the selected threshold. The optimal threshold normally occurs when parts of the surrounding region are also considered above the threshold (i.e., show up as black) but do not connect to the main aggregate (see Step 4 in the figure below depicting the window progression). 
 4. The user is prompted to **select** which regions are aggregate, ignoring any white regions that may be above the threshold but are not part of the aggregate. 
 5. Finally, the user will be prompted to **check** whether the segmentation was successful by referring to an image with the resultant binary overlaid on the original image.
 
