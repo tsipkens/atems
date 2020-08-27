@@ -6,16 +6,16 @@
 %   Vanouver, BC, Canada. 
 %=========================================================================%
 
-function [Aggs, dp] = manual(Aggs, ind)
+function [Aggs, dp] = manual(Aggs, idx)
 
 %-- Parse inputs ---------------------------------------------------------%
-if ~exist('ind','var'); ind = []; end
-if isempty(ind); ind = 1:length(Aggs); end
+if ~exist('ind','var'); idx = []; end
+if isempty(idx); idx = 1:length(Aggs); end
     % if ind was not specified, analyze all of the aggregates
 %-------------------------------------------------------------------------%
 
 
-disp('Performing manual analysis...');
+disp('Performing manual analysis:');
 
 %-- Check whether the data folder is available ---------------------------%
 if exist('data','dir') ~= 7 % 7 if exist parameter is a directory
@@ -26,7 +26,8 @@ f0 = figure; % figure handle used during manual sizing
 f0.WindowState = 'maximized';
 
 %== Process image ========================================================%
-for ll = 1:length(ind) % run loop as many times as images selected
+tools.textbar(0);
+for ll = 1:length(idx) % run loop as many times as images selected
     
     Pp = struct(); % re-initialize data structure
     
@@ -82,16 +83,26 @@ for ll = 1:length(ind) % run loop as many times as images selected
     Pp = tools.refine_circles(img_cropped, Pp);
         % allow for refinement of circles
         % uses handles and prompts the user
+        
+    commandwindow; % return focus to Matlab window
     
     %== Save results =====================================================%
     %   Format output and autobackup data ------------------------%
+    disp('Saving temporary data...');
     Aggs(ll).dp_manual = Pp; % copy Dp data structure into img_data
     Aggs(ll).dp = mean(Pp.dp);
     save(['temp',filesep,'manual_data.mat'],'Aggs'); % backup img_data
-
+    disp('Complete.');
+    disp(' ');
+    
+    disp('Progress:');
+    tools.textbar(0);
+    tools.textbar(ii/length(idx));
+    disp(' ');
 end
 
-close(f0);
+close(f0); % close existing figure
+delete(['temp',filesep,'manual_data.mat']); % delete temporary datas
 dp = [Aggs.dp_manual];
 
 disp('Complete.');
