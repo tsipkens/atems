@@ -54,9 +54,8 @@ for ii=1:n % loop through provided images
     
 end
 
-delete('temp/segg_*.TIF');
 close(gcf); % close image with overlaid da
-
+delete('temp/segg_*.TIF');
 
 if n==1
     imgs_binary = imgs_binary{1}; % if one image, extract from cell
