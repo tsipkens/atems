@@ -6,7 +6,7 @@
 %   Vanouver, BC, Canada. 
 %=========================================================================%
 
-function [Aggs, dp] = manual(Aggs, idx)
+function [Aggs, Pp, dp] = manual(Aggs, idx)
 
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('ind','var'); idx = []; end
@@ -25,11 +25,11 @@ end
 f0 = figure; % figure handle used during manual sizing
 f0.WindowState = 'maximized';
 
+
 %== Process image ========================================================%
 tools.textbar(0);
-for ll = 1:length(idx) % run loop as many times as images selected
-    
-    Pp = struct(); % re-initialize data structure
+Pp(length(idx)) = struct(); % re-initialize data structure
+for ll = 1:length(idx) % run loop as many times as aggregates selected
     
     pixsize = Aggs(ll).pixsize; % copy pixel size locally
     img_cropped = Aggs(ll).img_cropped;
@@ -54,20 +54,20 @@ for ll = 1:length(idx) % run loop as many times as images selected
         
         % prompt user to draw first line
         [x,y] = ginput(2);
-        Pp.length(jj,1) = pixsize*sqrt((x(2)-x(1))^2+(y(2) - y(1))^2);
+        Pp(ll).length(jj,1) = pixsize*sqrt((x(2)-x(1))^2+(y(2) - y(1))^2);
         line([x(1),x(2)],[y(1),y(2)], 'linewidth', 3);
         
         % prompt user to draw second line
         [a,b] = ginput(2);
-        Pp.width(jj,1) = pixsize*sqrt((a(2)-a(1))^2+(b(2) - b(1))^2);
+        Pp(ll).width(jj,1) = pixsize*sqrt((a(2)-a(1))^2+(b(2) - b(1))^2);
         line([a(1),a(2)],[b(1),b(2)],'Color', 'r', 'linewidth', 3);
         
         %-- Save center of the primary particle --------------------------%
-        Pp.centers(jj,:) = find_centers(x,y,a,b);
-        Pp.radii(jj,:) = (sqrt((a(2)-a(1))^2 + (b(2)-b(1))^2)+...
+        Pp(ll).centers(jj,:) = find_centers(x,y,a,b);
+        Pp(ll).radii(jj,:) = (sqrt((a(2)-a(1))^2 + (b(2)-b(1))^2)+...
         	sqrt((x(2)-x(1))^2 + (y(2)-y(1))^2)) / 4;
             % takes an average over drawn lines (given in pixels)
-        Pp.dp = 2 .* pixsize .* Pp.radii; % particle diameter (given in nm)
+        Pp(ll).dp = 2 .* pixsize .* Pp(ll).radii; % particle diameter (given in nm)
         
         %-- Check if there are more primary particles --------------------%
         choice = questdlg('Do you want to analyze another primary particle ?',...
@@ -80,7 +80,7 @@ for ll = 1:length(idx) % run loop as many times as images selected
         
     end
     
-    Pp = tools.refine_circles(img_cropped, Pp);
+    Pp(ll) = tools.refine_circles(img_cropped, Pp(ll));
         % allow for refinement of circles
         % uses handles and prompts the user
         
@@ -89,21 +89,20 @@ for ll = 1:length(idx) % run loop as many times as images selected
     %== Save results =====================================================%
     %   Format output and autobackup data ------------------------%
     disp('Saving temporary data...');
-    Aggs(ll).dp_manual = Pp; % copy Dp data structure into img_data
-    Aggs(ll).dp = mean(Pp.dp);
-    save(['temp',filesep,'manual_data.mat'],'Aggs'); % backup img_data
+    Aggs(ll).Pp_manual = Pp(ll); % copy Dp data structure into img_data
+    Aggs(ll).dp = mean(Pp(ll).dp);
+    save(['temp',filesep,'Pp_manual.mat'],'Pp'); % backup img_data
     disp('Complete.');
     disp(' ');
     
-    disp('Progress:');
+    disp('Overall progress:');
     tools.textbar(0);
-    tools.textbar(ll/length(idx));
     disp(' ');
 end
 
 close(f0); % close existing figure
-delete(['temp',filesep,'manual_data.mat']); % delete temporary datas
-dp = [Aggs.dp_manual];
+delete(['temp',filesep,'Pp_manual.mat']); % delete temporary datas
+dp = [Aggs.Pp_manual];
 
 disp('Complete.');
 disp(' ');

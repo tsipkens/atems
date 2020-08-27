@@ -141,7 +141,7 @@ for ii = 1:n_imgs % run loop as many times as images selected
 
         Aggs(aa).dp_kook = mean(Pp.dp);
         Aggs(aa).dp = mean(Pp.dp);
-        Aggs(aa).kook = Pp; % copy primary particle information into Aggs
+        Aggs(aa).Pp_kook = Pp; % copy primary particle information into Aggs
         
         %-- Check the circle finder by overlaying on the original image 
         %   Circles in blue if part of considered aggregates
