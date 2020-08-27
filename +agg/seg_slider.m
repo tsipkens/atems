@@ -62,8 +62,6 @@ for kk=1:n
     
     
 %== CORE FUNCTION ========================================================%
-    figure(f0); clf; % intialize plot of image with initial binary overlaid
-    tools.imshow_binary(img, img_binary0);
     
     moreaggs = 1;
     while moreaggs==1
@@ -71,6 +69,9 @@ for kk=1:n
 
         %== STEP 1: Crop image ===========================================%
         if f_crop
+            figure(f0); clf; % intialize plot of image with initial binary overlaid
+            tools.imshow_binary(img, img_binary0);
+            
             uiwait(msgbox('Please crop the image around missing region.'));
             [~, rect] = imcrop; % user crops image
             rect = round(rect);
@@ -302,11 +303,10 @@ while drawing_correct==0
     end
     finished_check = questdlg('Are you satisfied with your drawing?','Lasso Complete?','Yes','No','No');
     
-    % if user is happy with their selection...
-    if strcmp(finished_check, 'Yes')
+    if strcmp(finished_check, 'Yes') % if user is happy with their selection...
         drawing_correct = 1;
-    % if user would like to redo their selection...
-    else
+        
+    else % if user would like to redo their selection...
         delete(fh);
     end     
 end
