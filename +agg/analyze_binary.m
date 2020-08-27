@@ -66,8 +66,8 @@ for ii=1:length(imgs_binary) % loop through provided images
         img_binary(CC.PixelIdxList{1,jj}) = 1;
         Aggs0(jj).binary = img_binary;
 
-        [Aggs0(jj).img_cropped,Aggs0(jj).img_cropped_binary,Aggs0(jj).rect] = ...
-            autocrop(img,img_binary);
+        [~, ~, Aggs0(jj).rect] = ...
+            autocrop(img, img_binary);
             % get a cropped version of the aggregate
             % 'autocrop' method included below
 
@@ -75,7 +75,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         %== Compute aggregate dimensions/parameters ======================%
         SE = strel('disk',1);
         img_dilated = imdilate(img_binary,SE);
-        img_edge = img_dilated-img_binary;
+        img_edge = img_dilated - img_binary;
         % img_edge = edge(img_binary,'sobel'); % currently causes an error
 
         [row, col] = find(Aggs0(jj).img_cropped_binary);
@@ -160,7 +160,7 @@ end
 %== AUTOCROP =============================================================%
 %   Automatically crops an image based on binary information
 %   Author:  Yeshun (Samuel) Ma, Timothy Sipkens, 2019-07-23
-function [img_cropped,img_binary,rect] = autocrop(img_orig,img_binary)
+function [img_cropped,img_binary,rect] = autocrop(img_orig, img_binary)
 
 [x,y] = find(img_binary);
 

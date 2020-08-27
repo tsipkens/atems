@@ -32,7 +32,7 @@ Pp(length(idx)) = struct(); % re-initialize data structure
 for ll = 1:length(idx) % run loop as many times as aggregates selected
     
     pixsize = Aggs(ll).pixsize; % copy pixel size locally
-    img_cropped = Aggs(ll).img_cropped;
+    img_cropped = imcrop(Aggs(ll).image, Aggs(ll).rect);
     
     %== Step 3: Analyzing each aggregate =================================%
     f_finished = 0;
@@ -80,18 +80,18 @@ for ll = 1:length(idx) % run loop as many times as aggregates selected
         
     end
     
+    % Allow for refinement of circles by
+    % using handles and prompting the user.
     Pp(ll) = tools.refine_circles(img_cropped, Pp(ll));
-        % allow for refinement of circles
-        % uses handles and prompts the user
         
     commandwindow; % return focus to Matlab window
     
     %== Save results =====================================================%
     %   Format output and autobackup data ------------------------%
     disp('Saving temporary data...');
-    Aggs(ll).Pp_manual = Pp(ll); % copy Dp data structure into img_data
+    Aggs(ll).Pp_manual = Pp(ll); % copy Pp data structure into Aggs
     Aggs(ll).dp = mean(Pp(ll).dp);
-    save(['temp',filesep,'Pp_manual.mat'],'Pp'); % backup img_data
+    save(['temp',filesep,'Pp_manual.mat'],'Pp'); % backup Pp
     disp('Complete.');
     disp(' ');
     
