@@ -1,11 +1,11 @@
 
-% ROLLING_BALL Perform a rolling ball transformation.
-% Author: Ramin Dastanpour
-% Modified: Ramin DastanpourTimothy Sipkens, 2019-11-06
+% ROLLING_BALL Perform a rolling ball transformation, as per Dastanpour et al.
+% Author:      Ramin Dastanpour
+% Modified:    Timothy Sipkens, 2019-11-06
 %=========================================================================%
 
 function [img_binary] = ...
-    rolling_ball(img_binary,pixsize,minparticlesize,coeffs)
+    rolling_ball(img_binary, pixsize, minparticlesize, coeffs)
 
 
 %== Parse inputs =========================================================%
@@ -60,8 +60,9 @@ CC = bwconncomp(abs(img_bewBW-1));
 [~,nparts] = size(CC.PixelIdxList);
 if nparts>50 % if a lot of particles, remove more particles
     mod = 10;
-    disp(['Found too many particles, removing particles below: ',...
-        num2str(e*mod),' nm.']);
+    % Display test removed so as to not interfere with progress bar in Otsu.
+    % disp(['Found too many particles, removing particles below: ',...
+    %     num2str(e*mod),' nm.']);
 else
     mod = 1;
 end

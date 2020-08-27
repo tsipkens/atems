@@ -18,97 +18,80 @@
 % 5. Added option as to whether of not to generate plots
 %
 %-------------------------------------------------------------------------%
+%
 % Inputs:
-%   Imgs       Image struct to be analyzed
-%   bool_plot  A boolean determining whether or not to generate plots
+%   img        A single image to be analyzed
+%   pixsize    Size of the pixels
+%   f_plot     A boolean determining whether or not to generate plots
+% 
 %=========================================================================%
 
-function [Aggs,dp,dpdist] = kook(Imgs,bool_plot)
+function [Pp, dp] = kook(img, pixsize, f_plot)
 
 %-- Parse inputs and load image ------------------------------------------%
-if ~exist('bool_plot','var'); bool_plot = []; end
-if isempty(bool_plot); bool_plot = 1; end
+if ~exist('f_plot','var'); f_plot = []; end
+if isempty(f_plot); f_plot = 1; end
 %-------------------------------------------------------------------------%
 
 
 disp('Performing original Kook analysis...');
 
-Aggs = struct; % initialize aggregate data structure
-pixsize = Imgs(1).pixsize;
-II1 = Imgs(1).cropped;
+Pp = struct; % initialize aggregate data structure
 
 
 %-- Set relevant parameter values ----------------------------------------%
-maxImgCount = 255; % maximum image count for 8-bit image
-SelfSubt = 0.8; % self-subtraction level
+max_img_count = 255; % maximum image count for 8-bit image
+self_subt = 0.8; % self-subtraction level
 mf = 1; % median filter [x x] if needed
 alpha = 0.1; % shape of the negative Laplacian “unsharp” filter 0?1
 rmax = 30; % maximum radius in pixel
-rmin = 4; % minimum radius in pixel
+rmin = 6; % minimum radius in pixel
 sens_val = 0.75; % the sensitivity (0->1) for the circular Hough transform
-
-img_original = II1;
 %-------------------------------------------------------------------------%
 
 
 %== Pre-processing =======================================================% 
 %-- STEP 1: Invert image greyscale ---------------------------------------%
-if size(img_original,1) > 900
-	II1(950:size(II1,1), 1:250) = 0;% ignore scale bar in the TEM image x 1-250 pixel and y 950-max pixel
-end
-
-II1_bg = SelfSubt*II1; % Self-subtration from the original image
-II1 = maxImgCount-II1;
-II1 = II1-II1_bg; % subtract background
-II1(II1<0)=0;
-if bool_plot==2; figure(); imshow(II1, []); title('Step 1: Inversion and self-subtraction'); end
+i1_bg = self_subt .* img; % self-subtration from the original image
+img = max_img_count - img;
+img = img - i1_bg; % subtract background
+img(img<0) = 0;
 
 %-- STEP 2: median filter to remove noise --------------------------------%
-II1_mf=medfilt2(II1, [mf mf]);
-if bool_plot==2; figure();imshow(II1_mf, []);title('Step 2: Median filter'); end
+i1_mf = medfilt2(img, [mf mf]);
 
 %-- STEP 3: Unsharp filter------------------------------------------------%
 f = fspecial('unsharp', alpha);
-II1_lt = imfilter(II1_mf, f);
-if bool_plot==2; figure();imshow(II1_lt, []);title('Step 3: Unsharp filter'); end
+i1_lt = imfilter(i1_mf, f);
 
 %-- STEP 4: Canny edge detection -----------------------------------------%
-BWCED = edge(II1_lt,'canny'); % perfrom Canny edge detection
-if bool_plot==2; figure();imshow(BWCED);title('Step 4: Canny edge detection'); end
+bw_canny = edge(i1_lt,'canny'); % perfrom Canny edge detection
 
 
 
 %== Main processing steps ================================================%
 %-- Find circles within soot aggregates ----------------------------------%
-[centers, radii] = imfindcircles(BWCED,[rmin rmax],...
-    'objectpolarity', 'bright', 'sensitivity', sens_val, 'method', 'TwoStage');
-% - draw circles
-if bool_plot==2
-    figure(gcf);imshow(img_original,[]);hold;
-    h = viscircles(centers, radii, 'EdgeColor','r');
-    title('Step 5: Parimary particles overlaid on the original TEM image');
-end
-
+[centers, radii] = imfindcircles(bw_canny, [rmin rmax],...
+    'objectpolarity', 'bright', 'sensitivity', sens_val, ...
+    'method', 'TwoStage');
 
 %-- Check the circle finder ----------------------------------------------%
 %-- Overlaying the CHT boundaries on the original image. 
-if bool_plot>=1
+if f_plot==1
     figure;
-    imshow(img_original);
+    imshow(img);
     hold on;
     viscircles(centers, radii, 'EdgeColor','r');
     hold off;
-    title('Step 6: Primary particles overlaid on the Canny edges and the original TEM image');
 end
 
 
 %== Generate outputs =====================================================%
-Aggs(1).kook.centers = centers; % output in px
-Aggs(1).kook.radii = radii; % output in px
-Aggs(1).kook.diameters = radii*pixsize*2; % output in nm
+Pp.centers = centers; % output in px
+Pp.radii = radii; % output in px
+Pp.dp = radii * pixsize * 2; % output in nm
 
-dp = Aggs(1).kook.diameters;
-dpdist = radii*pixsize*2;
+dp = mean(Pp.dp);
 
 disp('Complete.');
 disp(' ');

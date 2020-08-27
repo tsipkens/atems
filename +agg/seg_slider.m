@@ -1,82 +1,215 @@
 
 % SEG_SLIDER Performs background correction and manual thresholding on a user-defined portion of the image.
-% Author:       Ramin Dastanpour, Steven N. Rogak, 2016-02 (originally)
-%               Developed at the University of British Columbia
-% Modified:     Tmothy Sipkens, 2019-10-11
+% Author:   Timothy Sipkens, 2019-10-11 (modified)
+%           Ramin Dastanpour, 2016-02 (based on)
+%           Developed at the University of British Columbia
+% 
+%-------------------------------------------------------------------------%
+% Inputs: 
+%   imgs          Either (1) an Imgs structure, (2) a cellular array of 
+%                 images, or (3) a single image.
+% 
+%   imgs_binary   Partially pre-classified binary image (allows for
+%                 modification to existing binary using this method).
+%                 (OPTIONAL)
+%   
+%   f_crop        Whether or not to run the image crop tool (to zoom in on
+%                 small parts of the image).
+%                 (OPTIONAL, default = 1)
 %=========================================================================%
 
-function [img_binary,rect,img_refined,img_cropped] = seg_slider(img,bool_crop) 
+function [imgs_binary] = seg_slider(imgs, imgs_binary, f_crop) 
+
 
 %== Parse input ==========================================================%
-if ~exist('bool_crop','var'); bool_crop = []; end
-if isempty(bool_crop); bool_crop = 1; end
+if ~exist('f_crop','var'); f_crop = []; end
+if isempty(f_crop); f_crop = 1; end
+
+if isstruct(imgs) % convert input images to a cell array
+    Imgs_str = imgs;
+    imgs = {Imgs_str.cropped};
+    pixsizes = [Imgs_str.pixsize];
+elseif ~iscell(imgs)
+    imgs = {imgs};
+end
+
+n = length(imgs); % number of images to consider
+
+% initial cellular array of image binaries, if particle binary is not provided
+if ~exist('imgs_binary','var'); imgs_binary{n} = []; end
+if ~iscell(imgs_binary); imgs_binary = {imgs_binary}; end
 %=========================================================================%
 
 
-img_binary = []; % declare nested variable (allows GUI feedback)
+img_binary0 = []; % binary stored over multiple thresholds
+
+f0 = figure; % initialize a figure
+f0.WindowState = 'maximized'; % maximize the figure window
 
 
-%== STEP 1: Crop image ===================================================%
-if bool_crop
-    uiwait(msgbox('Please crop the image around missing particle'));
-    [img_cropped,rect] = imcrop(img); % user crops image
-else
-	img_cropped = img; % originally bypassed in Kook code
-    rect = [];
+for kk=1:n
+    
+    if n>1 % if more than one image, output text indicating image number
+        disp(['[== IMAGE ',num2str(kk), ' OF ', ...
+            num2str(length(imgs)), ' ============================]']);
+    end
+    
+    img = imgs{kk}; % image for this iteration
+    
+    % intialize binary for this iteration
+    if isempty(imgs_binary{kk}); img_binary0 = zeros(size(img));
+    else img_binary0 = imgs_binary{kk}; end % use partially binarized image
+    
+    
+%== CORE FUNCTION ========================================================%
+    
+    moreaggs = 1;
+    while moreaggs==1
+        img_binary = []; % declare nested variable (allows GUI feedback)
+
+        %== STEP 1: Crop image ===========================================%
+        if f_crop
+            figure(f0); clf; % intialize plot of image with initial binary overlaid
+            tools.imshow_binary(img, img_binary0);
+            
+            uiwait(msgbox('Please crop the image around missing region.'));
+            [~, rect] = imcrop; % user crops image
+            rect = round(rect);
+            
+            if or(rect(3)==0, rect(4)==0)
+                uiwait(msgbox('Rectangle undefined, try again.'));
+                continue;
+            end
+            
+            % Get pixel values from original image instead of binary overlay.
+            inds1 = rect(2):(rect(2) + rect(4) - 1);
+            inds2 = rect(1):(rect(1) + rect(3) - 1);
+            img_cropped = img(inds1, inds2);
+            
+        else
+            img_cropped = img; % originally bypassed in Kook code
+            rect = [];
+        end
+        
+        
+        %== STEP 2: Image refinment ======================================%
+        %-- Step 1-1: Apply Lasso tool -----------------------------------%
+        img_binary = lasso_fnc(img_cropped);
+
+        %-- Step 1-2: Refining background brightness ---------------------%
+        img_refined = background_fnc(img_binary, img_cropped);
+
+
+
+        %== STEP 3: Thresholding =========================================%
+        figure(f0); clf;
+
+        hax = axes('Units','Pixels');
+        tools.imshow(img_refined);
+        title('Applying threshold...');
+        
+        %-- Add a slider uicontrol ---------------------------------------%
+        level = graythresh(img_refined); % Otsu thresholding
+        hst = uicontrol('Style', 'slider',...
+            'Min', 0.4-level, 'Max', 1-level, 'Value', 0.6-level,...
+            'Position', [20 390 150 15],...
+            'Callback', {@thresh_slider,hax,img_refined,img_binary});
+        get(hst,'value');
+        
+        % add a text uicontrol to label the slider
+        htxt = uicontrol('Style','text',...
+            'Position', [20 370 150 15],...
+            'String','Threshold level');
+
+        %-- Pause program while user changes the threshold level ---------%
+        h = uicontrol('Position',[20 335 150 25],'String','Finished',...
+            'Callback','uiresume(gcbf)');
+        message = sprintf(['Move the slider to the right or left to change ', ...
+            'threshold level\nWhen finished, click on ''Finished'' continue.']);
+        uiwait(msgbox(message));
+        disp('Waiting for the user to apply the threshold to the image.');
+        uiwait(gcf);
+        
+        delete(h); % delete ui components used for thresholding
+        delete(hst);
+        delete(htxt);
+        disp('Thresholding is applied.');
+        
+        
+        %== STEP 4: Select particles and format output ===================%
+        uiwait(msgbox(['Please selects (left click) particles satisfactorily ', ...
+            'detected; and press enter or double click.']));
+        img_binary = bwselect(img_binary,8);
+        
+        
+        %-- Check if result is satisfactory ------------------------------%
+        figure(f0); clf;
+        tools.imshow_binary(img_cropped, img_binary);
+        choice2 = questdlg(['Satisfied with aggregate detection? ', ...
+            'If not, try drawing an edge around the aggregate manually...'], ...
+            'Agg detection','Yes','No','Yes');
+        if strcmp(choice2,'No'); continue; end
+            % if 'No', then go back to crop without incorporating binarys
+
+
+        %-- Subsitute rectangle back into orignal image ------------------%
+        rect = round(rect);
+        inds1 = rect(2):(rect(2) + rect(4) - 1);
+        inds2 = rect(1):(rect(1) + rect(3) - 1);
+        img_binary0(inds1,inds2) = ...
+            or(img_binary0(inds1,inds2), img_binary);
+        
+        
+        %-- Save a temporary copy of image on each iteration -------------%
+        %   This is done in case of an error during segmentation.
+        if ~isfolder('temp'); mkdir('temp'); end
+        imwrite(img_binary0, ['temp/slider_',num2str(kk),'.tif']);
+        
+
+        %-- Query user ---------------------------------------------------%
+        figure(f0); clf;
+        tools.imshow_binary(img, img_binary0);
+
+        choice = questdlg('Are there any particles poorly or not detected?',...
+            'Missing particles','Yes','No','No');
+        if strcmp(choice,'Yes')
+            moreaggs=1;
+        else
+            moreaggs=0;
+        end
+        
+        
+        
+    end
+%=========================================================================%
+    
+    imgs_binary{kk} = img_binary0; % copy binary to cellular array
+    
+    if n>1 % if more than one image, output text
+        disp('[== Complete. ==============================]');
+        disp(' ');
+        disp(' ');
+    end
+end
+
+close(f0); % close figure used during segmentation
+delete('temp/slider_*.tif'); % delete temporary files upon success
+
+% If a single image, cell arrays are unnecessary.
+% Extract and just output images. 
+if length(imgs)==1
+    imgs_binary = imgs_binary{1};
 end
 
 
-%== STEP 2: Image refinment ==============================================%
-%-- Step 1-1: Apply Lasso tool -------------------------------------------%
-img_binary = lasso_fnc(img_cropped);
-
-%-- Step 1-2: Refining background brightness -----------------------------%
-img_refined = background_fnc(img_binary,img_cropped);
-
-
-
-%== STEP 3: Thresholding =================================================%
-f = figure;
-screen_size = get(0,'Screensize');
-set(f,'Position',screen_size); % maximize figure
-% f.WindowState = 'maximized'; % maximize figure
-
-hax = axes('Units','Pixels');
-imshow(img_refined);
-
-level = graythresh(img_refined); % Otsu thresholding
-hst = uicontrol('Style', 'slider',...
-    'Min',0-level,'Max',1-level,'Value',.5-level,...
-    'Position', [20 390 150 15],...
-    'Callback', {@thresh_slider,hax,img_refined,img_binary});
-get(hst,'value'); % add a slider uicontrol
-
-uicontrol('Style','text',...
-    'Position', [20 370 150 15],...
-    'String','Threshold level');
-        % add a text uicontrol to label the slider
-
-%-- Pause program while user changes the threshold level -----------------%
-h = uicontrol('Position',[20 320 200 30],'String','Finished',...
-    'Callback','uiresume(gcbf)');
-message = sprintf('Move the slider to the right or left to change threshold level\nWhen finished, click on continute');
-uiwait(msgbox(message));
-disp('Waiting for the user to apply the threshold to the image');
-uiwait(gcf);
-close(gcf);
-disp('Thresholding is applied.');
-
-
-%== STEP 4: Select particles and format output ===========================%
-uiwait(msgbox('Please selects (left click) particles satisfactorily detected; and press enter'));
-img_binary = bwselect(img_binary,8);
-close(gcf);
-img_binary = ~img_binary; % formatted for PCA, other codes should reverse this
 
 
 
 
-%== Sub-functions ==% 
+%===================%
+%== SUB-FUNCTIONS ==%
+%===================%
+
 %=========================================================================%
 %== BACKGROUND_FNC =======================================================%
 % Smooths out background using curve fitting
@@ -87,7 +220,6 @@ img_binary = ~img_binary; % formatted for PCA, other codes should reverse this
 %   This function smoothens background brightness, specially on the edges of
 %   the image where intensity (brightness) has a curved planar distribution.
 %   This improves thresholding in the following steps of image processing
-
 function img_refined = background_fnc(img_binary,img_cropped)
 
 nagg = nnz(img_binary); % pixels within the aggregate
@@ -116,6 +248,7 @@ c_start = [0 0 0 0 0 mean_bg];
 options = optimset('MaxFunEvals',1000);
 options = optimset(options,'MaxIter',1000); 
 [c] = lsqcurvefit(fun,c_start,xdata,double(img_bg),[],[],options);
+
 
 %-- Build the fitted surface ---------------------------------------------%
 img_bg_fit = zeros(size(img_bg));
@@ -148,36 +281,39 @@ end
 %   - Asks user if their lasso selection is correct before applying the
 %     data
 %   - QOL - User will not have to restart program if they mess up the lasso
-
-function binaryImage = lasso_fnc(Cropped_im)
-
-fontsize = 10;
+function img_mask = lasso_fnc(img_in)
 
 %-- Displaying cropped image ---------------------------------------------%
-figure; imshow(Cropped_im);
-title('Original CROPPED Image', 'FontSize', fontsize);
-set(gcf, 'Position', get(0,'Screensize')); % Maximize figure.
+clf;
+tools.imshow(img_in);
+title('Applying lasso tool...');
 
 %-- Freehand drawing. Selecting region of interest (ROI) -----------------%
 drawing_correct = 0; % this variable is used to check if the user drew the lasso correctly
-while drawing_correct == 0 
+while drawing_correct==0 
     message = sprintf('Please draw an approximate boundary around the aggregate.\nLeft click and hold to begin drawing.\nLift mouse button to finish');
     uiwait(msgbox(message));
-    hFH = imfreehand(); % alternate for MATLAB 2019b+: drawfreehand();
+    
+    %-- Draw around the aggregate (tool depends on Matlab version) -------%
+    [~,vdate] = version; vdate = year(vdate); % get Matlab version year
+    if vdate>2018
+        fh = drawfreehand(); % alternate for MATLAB 2019+
+    else
+        fh = imfreehand(); % for older versions of Matlab
+    end
     finished_check = questdlg('Are you satisfied with your drawing?','Lasso Complete?','Yes','No','No');
     
-    % if user is happy with their selection...
-    if strcmp(finished_check, 'Yes')
+    if strcmp(finished_check, 'Yes') % if user is happy with their selection...
         drawing_correct = 1;
-    % if user would like to redo their selection...
-    else
-        delete(hFH);
+        
+    else % if user would like to redo their selection...
+        delete(fh);
     end     
 end
 
 
 %-- Create a binary masked image from the ROI object ---------------------%
-binaryImage = hFH.createMask();
+img_mask = fh.createMask();
 
 
 end
@@ -192,21 +328,19 @@ end
 %   Author:   Ramin Dastanpour & Steven N. Rogak, 2016-02
 %             Developed at the University of British Columbia
 %   Modified: Timothy Sipkens
-
-function thresh_slider(hObj,event,hax,thresh_slider_in,binaryImage)
+function thresh_slider(hObj,~,hax,img_in,img_binary0)
 
 %-- Average filter -------------------------------------------------------%
 hav = fspecial('average');
-img_filtered = imfilter(thresh_slider_in, hav);
+img_mod = imfilter(img_in, hav);
 
 
 %-- Median ---------------------------------------------------------------%
 % Examines a neighborhood of WxW matrix, takes and makes the centre of that
 % matrix the median of the original neighborhood
 W = 5;
-thresh_slider_in = img_filtered;
-for ii=1:8 % repeatedly apply median filter
-    thresh_slider_in = medfilt2(thresh_slider_in,[W W]);
+for ii=1:6 % repeatedly apply median filter, which will result in artifacts on edges
+    img_mod = medfilt2(img_mod, [W W], 'symmetric');
 end
 % NOTE: The loop is intended to imitate the increasing amounts of 
 % median filter that is applied each time the slider button is clicked
@@ -214,33 +348,33 @@ end
 
 
 %-- Binary image via threshold value -------------------------------------%
-adj = get(hObj,'Value');
-level = graythresh(thresh_slider_in);
-level = level+adj;
-img_binary1 = imbinarize(thresh_slider_in,level);
+adj = get(hObj, 'Value');
+level = graythresh(img_mod); % default threshold is Otsu
+level = level + adj;
+img_binary1 = imbinarize(img_mod, level);
 
 
-%-- Binary image via dilation --------------------------------------------%
-%   Reduces initial noise and fill initial gaps
-SE1 = strel('square',1);
-img_binary2 = imdilate(~img_binary1,SE1);
+% Binary image via dilation, which
+% reduces initial noise and fills initial gaps.
+img_binary2 = imdilate(~img_binary1, strel('square',1));
 
 
 %-- Refining binary image. Before refinig, thresholding causes some ------%
 %   Errors, initiating from edges, grows towards the aggregate. In
 %   this section, external boundary, or background region, is utilized to
 %   eliminate detection errors in the background region.
-img_binary3 = 0.*img_binary2;
-img_binary3(binaryImage) = img_binary2(binaryImage);
+img_binary3 = 0 .* img_binary2;
+img_binary3(img_binary0) = img_binary2(img_binary0);
 img_binary = logical(img_binary3);
 
-img_temp2 = imimposemin(thresh_slider_in,img_binary);
+% Impose the binary on the cropped image for display to user.
+% This will adjust as the threshold is updated.
+img_toshow = double(img_mod) .* (double(~img_binary)+1) ./ 2;
 
 axes(hax);
-imshow(img_temp2);
+tools.imshow(img_toshow);
+title('Applying threshold...');
 
 end
-
-img_binary = ~img_binary;
 
 end

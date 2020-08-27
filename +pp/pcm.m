@@ -11,16 +11,16 @@
 % of British Columbia
 %=========================================================================%
 
-function [Aggs] = pcm(Aggs,bool_plot,bool_backup)
+function [Aggs] = pcm(Aggs, f_plot, f_backup)
 
 %-- Parse inputs and load image ------------------------------------------%
-if ~exist('bool_plot','var'); bool_plot = []; end
-if isempty(bool_plot); bool_plot = 0; end
+% Choose whether to plot pair correlation functions (PCFs).
+if ~exist('f_plot','var'); f_plot = []; end 
+if isempty(f_plot); f_plot = 0; end
 
-if ~exist('bool_backup','var'); bool_backup = []; end
-if isempty(bool_backup); bool_backup = 0; end
-
-disp('Performing PCM analysis...');
+% Choose whether to save backup copies during evaluation to temp/ folder.
+if ~exist('f_backup','var'); f_backup = []; end
+if isempty(f_backup); f_backup = 0; end
 
 % if isstruct(aggs)
 %     Aggs_str = aggs;
@@ -36,6 +36,9 @@ disp('Performing PCM analysis...');
 %-------------------------------------------------------------------------%
 
 
+disp('Performing PCM:');
+
+
 %-- Check whether the data folder is available ---------------------------%
 if exist('data','dir') ~= 7 % 7 if exist parameter is a directory
     mkdir('data') % make output folder
@@ -46,140 +49,133 @@ figure; % generate figure for visualizing current aggregate
 
 
 %== Main image processing loop ===========================================%
-nAggs = length(Aggs);
+n_aggs = length(Aggs);
 tools.textbar(0);
 
-for ll = 1:nAggs % run loop as many times as images selected
+for aa = 1:n_aggs % loop over each aggregate in the provided structure
     
     %== Step 1: Image preparation ========================================%
-    pixsize = Aggs(ll).pixsize;
-    img_binary = Aggs(ll).img_cropped_binary;
-    img_cropped = Aggs(ll).img_cropped;
+    pixsize = Aggs(aa).pixsize; % size of pixels in the image
+    img_binary = imcrop(Aggs(aa).binary, Aggs(aa).rect); % get the binarized image for this aggregate
     
-    %-- Loop through aggregates ------------------------------------------%
-    Data = Aggs(ll); % initialize data structure for current aggregate
-    Data.method = 'pcm';
+    % Get data for this aggregate
+    data = Aggs(aa); % initialize data structure for current aggregate
+    
     
     
     %== Step 3-3: Development of the pair correlation function (PCF) -%
     %-- 3-3-1: Find the skeleton of the aggregate --------------------%
-    Skel = bwmorph(img_binary,'thin',Inf);
-    [skeletonY, skeletonX] = find(Skel);
+    skel = bwmorph(img_binary, 'thin', Inf); % get aggregate skeleton
+    [skel_y, skel_x] = find(skel); % find skeleton pixels
     
-    %-- 3-3-2: Calculate the distances between skeleton pixels and other pixels
+    
+    %-- 3-3-2: Calculate the distances between binary pixels
     [row, col] = find(img_binary);
     
-    % to consolidate the pixels of consideration to much smaller arrays
-    p       = 0;
-    X       = 0;
-    Y       = 0;
-    density = 20; % larger densities make the program less computationally expensive
-
-    for kk = 1:density:Data.num_pixels
-        p    = p + 1;
-        X(p) = col(kk);
-        Y(p) = row(kk);
-    end
-
-    % to calculate all the distances with reference to one pixel at a time,
-    % using vector algebra, and then adding the results
-    Distance_mat = []; % reinitialize Distance_mat
-    for kk = 1:1:length(skeletonX)
-        Distance_int = ((X-skeletonX(kk)).^2+(Y-skeletonY(kk)).^2).^.5;
-        Distance_mat(((kk-1)*length(X)+1):(kk*length(X))) = Distance_int;
-    end
-
-    %-- 3-3-3: Construct the pair correlation ------------------------%
+    % To consolidate the pixels of consideration to much smaller arrays, we
+    % apply thinning, which makes the program less computationally
+    % expensive. Thinning aims for a vector of max length of 3,000. 
+    thin = max(round(data.num_pixels/6e3), 1);
+    X = col(1:thin:data.num_pixels);
+    Y = row(1:thin:data.num_pixels);
+    
+    % To calculate all the distances with reference to one pixel at a time,
+    % using vector algebra, and then adding the results.
+    d_vec = sqrt((X - skel_x') .^2 + (Y - skel_y') .^2);
+    d_vec = nonzeros(d_vec(:)'); % vectorize the output and remove zeros
+    
+    
+    %-- 3-3-3: Construct the pair correlation ----------------------------%
     %   Sort radii into bins and calculate PCF
-    Distance_max = double(uint16(max(Distance_mat)));
-    Distance_mat = nonzeros(Distance_mat).*pixsize;
-    nbins        = Distance_max * pixsize;
-    dr           = 1;
-    Radius       = 1:dr:nbins;
+    d_max = double(uint16(max(d_vec))); % maximum distance in px
+    d_vec = d_vec .* pixsize; % vector of distances in nm
+    r     = 1:1:(d_max * pixsize); % radius vector in nm
     
     % Pair correlation function (PCF)
-    % PCF = histcounts(Distance_mat,[Radius-dr/2,Radius(end)+dr/2]);
-    PCF = hist(Distance_mat,Radius); % UPDATE REMOVED
-
-    % Smoothing the pair correlation function (PCF)
-    %   Updated to remove number of variables
-    d                                  = 5 + 2*Distance_max;
-    BW                                = zeros(d,d);
-    BW(Distance_max+3,Distance_max+3) = 1;
-    BW                                = bwdist(BW,'euclidean');
-    BW                                = BW./Distance_max;
-    BW                                = im2bw(BW,1);
+    pcf = histcounts(d_vec, [r-1/2,r(end)+1/2]); % updated call (last entry is different)
+    idx_p = find(pcf~=0); pcf = pcf(idx_p); % remove zero PCFs
+    r1 = r(idx_p); % radius, adjusted for zero PCFs
     
+    % Smoothing the pair correlation function (PCF
+    % Updated to remove number of variables
+    d   = 5 + 2 * d_max;
+    bw  = zeros(d, d);
+    bw(d_max + 3, d_max + 3) = 1;
+    bw  = bwdist(bw, 'euclidean');
+    bw  = bw ./ d_max;
+    bw  = im2bw(bw, 1);
     
     %-- Prep for PCM -----------------------------------------------------%
-    [row,col] = find(~BW);
-    Distance_Denaminator = ((row-Distance_max+3).^2+(col-Distance_max+3).^2).^.5;
-    Distance_Denaminator = nonzeros(Distance_Denaminator).*pixsize;
-    % Denamonator = histcounts(Distance_Denaminator,[Radius-dr/2,Radius(end)+dr/2]);
-    Denamonator = hist(Distance_Denaminator,Radius); % UPDATE REMOVED
-    Denamonator = Denamonator.*length(skeletonX)./density;
-    Denamonator(Denamonator==0) = 1; % bug fix, overcomes division by zero
-    PCF = PCF./Denamonator;
-    PCF_smoothed = smooth(PCF);
-
-    for kk=1:size(PCF_smoothed)-1
-        if PCF_smoothed(kk) == PCF_smoothed(kk+1)
-            PCF_smoothed(kk+1) = PCF_smoothed(kk)-1e-4;
+    [row, col] = find(~bw); % find non-zero pixels in binary
+    d_denominator = sqrt((row - d_max + 3) .^2 + (col - d_max + 3) .^2);
+    d_denominator = nonzeros(d_denominator) .* pixsize;
+    
+    denominator = histcounts(d_denominator, [r-1/2, r(end)+1/2]);
+    denominator = denominator(idx_p) .* length(skel_x) ./ thin;
+    denominator(denominator==0) = 1; % bug fix, overcomes division by zero
+    pcf = pcf ./ denominator; % update pair correlation function
+    pcf_smooth = smooth(pcf); % smooth the pair correlation function
+    
+    % adjust PCF to be monotonically decreasing
+    for kk=1:(size(pcf_smooth)-1)
+        if pcf_smooth(kk) <= pcf_smooth(kk+1)
+            pcf_smooth(kk+1) = pcf_smooth(kk) - 1e-12;
         end
     end
-    %{
-    % UPDATE REMOVED
-    [~,ia] = unique(PCF_smoothed); % bug fix, remove non-unique entries
-    ia = sort(ia);
-    PCF_smoothed = PCF_smoothed(ia);
-    Radius = Radius(ia);
-    %}
+    pcf_smooth = pcf_smooth ./ max(pcf_smooth); % normalize by initial value
+    
+    
     
     %== 3-5: Primary particle sizing =====================================%
     %-- 3-5-1: Simple PCM ------------------------------------------------%
-    PCF_simple   = .913;
-    Aggs(ll).dp_pcm_simple = ...
-        2*interp1(PCF_smoothed, Radius, PCF_simple);
-        % dp from simple PCM
-    
-    %-- 3-5-2: Generalized PCM ---------------------------------------%
-    URg      = 1.1*Data.Rg; % 10% higher than Rg
-    LRg      = 0.9*Data.Rg; % 10% lower than Rg
-    PCFRg    = interp1(Radius, PCF_smoothed, Data.Rg); % P at Rg
-    PCFURg   = interp1(Radius, PCF_smoothed, URg); % P at URg
-    PCFLRg   = interp1(Radius, PCF_smoothed, LRg); % P at LRg
-    PRgslope = (PCFURg+PCFLRg-PCFRg)/(URg-LRg); % dp/dr(Rg)
-
-    PCF_generalized   = (.913/.84)*...
-        (0.7+0.003*PRgslope^(-0.24)+0.2*Data.aspect_ratio^-1.13);
-    Aggs(ll).dp_pcm_general = ...
-        2*interp1(PCF_smoothed, Radius, PCF_generalized);
-        % dp from generalized PCM
+    pcf_simple = 0.913;
+    Aggs(aa).dp_pcm1 = ...
+        2 * interp1(pcf_smooth, r1, pcf_simple);
+        % dp from simple PCM (labelled PCM1)
+        % given by diameter corresponding to 91.3% of PCF
+    Aggs(aa).dp = Aggs(aa).dp_pcm1; % assign main primary particle diameter and dp_pcm1
     
         
-    %-- Plot pair correlation function in line graph format ----------%
-    if bool_plot
-        str = sprintf('Pair Correlation Line Plot %f ',PCF_simple);
-        figure, loglog(Radius, smooth(PCF), '-r'),...
+    %-- 3-5-2: Generalized PCM -------------------------------------------%
+    Rg_u     = 1.1 * data.Rg; % perturb Rg, 10% higher
+    Rg_l     = 0.9 * data.Rg; % perturb Rg, 10% lower
+    pcf_Rg   = interp1(r1, pcf_smooth, data.Rg); % PCF at Rg
+    pcf_Rg_u = interp1(r1, pcf_smooth, Rg_u); % PCF at upper Rg
+    pcf_Rg_l = interp1(r1, pcf_smooth, Rg_l); % PCF at lower Rg
+    Rg_slope = (pcf_Rg_u + pcf_Rg_l - pcf_Rg) / (Rg_u - Rg_l);
+        % dp/dr(Rg), slope by finite difference
+
+    pcf_general = (0.913 / 0.84) * ...
+        (0.7 + 0.003*Rg_slope^-0.24 + 0.2*data.aspect_ratio^-1.13);
+    Aggs(aa).dp_pcm2 = ...
+        2 * interp1(pcf_smooth, r1, pcf_general);
+        % dp from generalized PCM (labelled PCM2)
+       
+        
+    %-- Plot pair correlation function in line graph format --------------%
+    if f_plot
+        str = sprintf('Pair Correlation Line Plot %f ', pcf_simple);
+        figure, loglog(r, smooth(pcf), '-r'),...
             title (str), xlabel ('Radius'), ylabel('PCF(r)')
         hold on;
-        loglog(Aggs(ll).pcm_dp_simple,PCF_simple,'*')
+        loglog(Aggs(aa).dp, pcf_simple,'*')
         close all;
     end
     
+    
 
-    %== Step 4: Save results =========================================%
+    %== Step 4: Save results =============================================%
     %   Autobackup data (every ten particles)
-    if bool_backup==1
-        if mod(ll,10)==0
+    if f_backup==1
+        if mod(aa,10)==0
             disp('Saving data...');
-            save(['data',filesep,'pcm_data.mat'],'Aggs'); % backup img_data
+            save(['temp',filesep,'pcm_data.mat'],'Aggs'); % backup img_data
             disp('Complete.');
             tools.textbar(0); % reinitilize space for textbar
         end
     end
     
-    tools.textbar(ll/nAggs);
+    tools.textbar(aa / n_aggs);
 end
 
 close; % close current figure

@@ -6,91 +6,104 @@
 %   Vanouver, BC, Canada. 
 %=========================================================================%
 
-function [Aggs,Data] = manual(Aggs,ind)
+function [Aggs, Pp, dp] = manual(Aggs, idx)
 
 %-- Parse inputs ---------------------------------------------------------%
-if ~exist('ind','var'); ind = []; end
-if isempty(ind); ind = 1:length(Aggs); end
+if ~exist('ind','var'); idx = []; end
+if isempty(idx); idx = 1:length(Aggs); end
     % if ind was not specified, analyze all of the aggregates
 %-------------------------------------------------------------------------%
 
 
-disp('Performing manual analysis...');
+disp('Performing manual analysis:');
 
 %-- Check whether the data folder is available ---------------------------%
 if exist('data','dir') ~= 7 % 7 if exist parameter is a directory
     mkdir('data') % make output folder
 end
 
-figure; % figure handle used during manual sizing
+f0 = figure; % figure handle used during manual sizing
+f0.WindowState = 'maximized';
 
 
 %== Process image ========================================================%
-for ll = 1:length(ind) % run loop as many times as images selected
-    
-    Data = struct(); % re-initialize data structure
+tools.textbar(0);
+Pp(length(idx)) = struct(); % re-initialize data structure
+for ll = 1:length(idx) % run loop as many times as aggregates selected
     
     pixsize = Aggs(ll).pixsize; % copy pixel size locally
-    img_cropped = Aggs(ll).img_cropped;
+    img_cropped = imcrop(Aggs(ll).image, Aggs(ll).rect);
     
     %== Step 3: Analyzing each aggregate =================================%
-    bool_finished = 0;
+    f_finished = 0;
     jj = 0; % intialize particle counter
     
-    f = figure; % plot aggregate
-    imshow(img_cropped);
-    f.WindowState = 'maximized';
+    figure(f0); % plot aggregate
+    clf;
+    imagesc(img_cropped);
+    colormap gray; axis image off;
     hold on;
     
     uiwait(msgbox('Please select two points on the image that correspond to the length of the primary particle',...
         ['Process Stage: Length of primary particle ' num2str(jj)...
         '/' num2str(jj)],'help'));
     
-    while bool_finished == 0
+    while f_finished == 0
 
         jj = jj+1;
+        
+        % prompt user to draw first line
         [x,y] = ginput(2);
+        Pp(ll).length(jj,1) = pixsize*sqrt((x(2)-x(1))^2+(y(2) - y(1))^2);
+        line([x(1),x(2)],[y(1),y(2)], 'linewidth', 3);
         
-        Data.length(jj,1) = pixsize*sqrt((x(2)-x(1))^2+(y(2) - y(1))^2);
-        line ([x(1),x(2)],[y(1),y(2)], 'linewidth', 3);
-        
+        % prompt user to draw second line
         [a,b] = ginput(2);
-        
-        Data.width(jj,1) = pixsize*sqrt((a(2)-a(1))^2+(b(2) - b(1))^2);
-        line ([a(1),a(2)],[b(1),b(2)],'Color', 'r', 'linewidth', 3);
+        Pp(ll).width(jj,1) = pixsize*sqrt((a(2)-a(1))^2+(b(2) - b(1))^2);
+        line([a(1),a(2)],[b(1),b(2)],'Color', 'r', 'linewidth', 3);
         
         %-- Save center of the primary particle --------------------------%
-        Data.centers(jj,:) = find_centers(x,y,a,b);
-        Data.radii(jj,:) = (sqrt((a(2)-a(1))^2+(b(2)-b(1))^2)+...
-        	sqrt((x(2)-x(1))^2+(y(2)-y(1))^2))/4;
+        Pp(ll).centers(jj,:) = find_centers(x,y,a,b);
+        Pp(ll).radii(jj,:) = (sqrt((a(2)-a(1))^2 + (b(2)-b(1))^2)+...
+        	sqrt((x(2)-x(1))^2 + (y(2)-y(1))^2)) / 4;
             % takes an average over drawn lines (given in pixels)
-        Data.dp = 2.*pixsize.*Data.radii; % particle diameter (given in nm)
+        Pp(ll).dp = 2 .* pixsize .* Pp(ll).radii; % particle diameter (given in nm)
         
         %-- Check if there are more primary particles --------------------%
         choice = questdlg('Do you want to analyze another primary particle ?',...
-        'Continue?','Yes','No','Yes');
+        'Continue?', 'Yes', 'No', 'Yes');
         if strcmp(choice,'Yes')
-        	bool_finished = 0;
+        	f_finished = 0;
         else
-        	bool_finished = 1;
+        	f_finished = 1;
         end
         
     end
     
-    Data = tools.refine_circles(img_cropped,Data);
-        % allow for refinement of circles
+    % Allow for refinement of circles by
+    % using handles and prompting the user.
+    Pp(ll) = tools.refine_circles(img_cropped, Pp(ll));
+        
+    commandwindow; % return focus to Matlab window
     
     %== Save results =====================================================%
     %   Format output and autobackup data ------------------------%
-    Aggs(ll).dp_manual_data = Data; % copy Dp data structure into img_data
-    Aggs(ll).dp_manual = mean(Data.dp);
-    save(['data',filesep,'manual_data.mat'],'Aggs'); % backup img_data
+    disp('Saving temporary data...');
+    Aggs(ll).Pp_manual = Pp(ll); % copy Pp data structure into Aggs
+    Aggs(ll).dp = mean(Pp(ll).dp);
+    save(['temp',filesep,'Pp_manual.mat'],'Pp'); % backup Pp
+    disp('Complete.');
+    disp(' ');
     
-    close all;
-
+    disp('Overall progress:');
+    tools.textbar(0);
+    tools.textbar(ll / length(idx));
+    disp(' ');
 end
 
-Data = [Aggs.dp_manual_data];
+close(f0); % close existing figure
+delete(['temp',filesep,'Pp_manual.mat']); % delete temporary datas
+dp = [Aggs.dp];
 
 disp('Complete.');
 disp(' ');

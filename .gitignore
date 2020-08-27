@@ -1,10 +1,14 @@
 
 data/
 data\
-images/
-images\
 +archive/
 +archive\
 archive/
 archive\
+results/
+results\
+
+temp/
+temp\
+
 *.asv

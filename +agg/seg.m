@@ -8,8 +8,72 @@
 % Modified: Timothy Sipkens, 2019
 %=========================================================================%
 
+
+%== WRAPPER FUNCTION ====================================================%
+%   Used to loop over multiple images. 
+function [imgs_binary] = seg(imgs,pixsize,opts)
+
+%-- Parse inputs ---------------------------------------------------------%
+if isstruct(imgs)
+    Imgs_str = imgs;
+    imgs = {Imgs_str.cropped};
+    pixsize = [Imgs_str.pixsize];
+elseif ~iscell(imgs)
+    imgs = {imgs};
+end
+
+n = length(imgs);
+
+if ~exist('pixsize','var'); pixsize = []; end
+if isempty(pixsize); pixsize = ones(size(imgs)); end
+
+%-- Partially parse name-value pairs --%
+if ~exist('opts','var'); opts = []; end
+%-------------------------------------------------------------------------%
+
+
+imgs_binary = cell(length(imgs),1); % pre-allocate
+for ii=1:n % loop through provided images
+    
+    disp(['[== IMAGE ',num2str(ii), ' OF ', ...
+            num2str(length(imgs)), ' ============================]']);
+    
+    %-- Run slider to obtain binary image --------------------------------%
+    [img_binary,~,~,~] = seg_sub(imgs{ii}, pixsize(ii), ...
+        [], [], opts); % includes removing aggregates from border
+    imgs_binary{ii} = img_binary;
+    
+    % Write binaries to temporary file (in case an error occurs).
+    if ~exist('temp', 'dir')
+       mkdir('temp')
+    end
+    imwrite(imgs_binary{ii}, ['temp/segg_',num2str(ii),'.TIF']);
+    
+    disp('[== Complete =================================]');
+    disp(' ');
+    
+end
+
+delete('temp/segg_*.TIF');
+close(gcf); % close image with overlaid da
+
+
+if n==1
+    imgs_binary = imgs_binary{1}; % if one image, extract from cell
+end
+
+
+end
+
+
+
+
+
+%== SEG_SUB ==============================================================%
+%   Sub-function that segments a single image by attempting multiple methods. 
+%   Author:  Timothy Sipkens, 10-10-2019
 function [img_binary,img_cropped,agg_binary_bin,agg_cropped_bin] = ...
-    seg(img,pixsize,minparticlesize,coeffs,opts) 
+    seg_sub(img,pixsize,minparticlesize,coeffs,opts) 
 
 agg_binary_bin = {};    % Bin of binary aggregate images
 agg_cropped_bin = {};   % Bin of cropped aggregated images
@@ -20,19 +84,19 @@ if ~exist('pixsize','var'); pixsize = []; end
 if ~exist('minparticlesize','var'); minparticlesize = []; end
 if ~exist('coeffs','var'); coeffs = []; end
 
-bool_kmeans = 1;
-bool_otsu = 1;
+f_kmeans = 1;
+f_otsu = 1;
 if ~exist('opts','var'); opts = []; end
-if isfield(opts,'bool_kmeans'); bool_kmeans = opts.bool_kmeans; end
-if isfield(opts,'bool_otsu'); bool_otsu = opts.bool_otsu; end
+if isfield(opts,'f_kmeans'); f_kmeans = opts.bool_kmeans; end
+if isfield(opts,'f_otsu'); f_otsu = opts.bool_otsu; end
 %-------------------------------------------------------------------------%
 
 
 %== Attempt 1: k-means segmentation + rolling ball transformation ========%
-if bool_kmeans
-    img_binary = agg.seg_kmeans2(...
+if f_kmeans
+    img_binary = agg.seg_kmeans(...
         img,pixsize);
-    [moreaggs,choice] = ...
+    [moreaggs,choice,img_binary] = ...
         user_input(img,img_binary); % prompt user
     img_binary = imclearborder(img_binary); % clear aggregates on border
 else
@@ -42,11 +106,11 @@ end
 
 
 %== Attempt 2: Ostu + rolling ball transformation ========================%
-if or(strcmp(choice,'No'),~bool_kmeans)
-    if bool_otsu
+if or(strcmp(choice,'No'), ~f_kmeans)
+    if f_otsu
         img_binary = agg.seg_otsu_rb(...
             img,pixsize,minparticlesize,coeffs);
-        [moreaggs,choice] = user_input(...
+        [moreaggs,choice,img_binary] = user_input(...
             img,img_binary); % prompt user
     else
         choice = 'No'; moreaggs = 1;
@@ -58,58 +122,16 @@ img_cropped = [];
 
 
 
-%== Attempt 3: Manual thresholding =======================================%
-while moreaggs==1
-    [img_temp,rect,~,img_cropped] = agg.seg_slider(img,1);
-        % used previously cropped image
-        % img_temp temporarily stores binary image
-    
-    [~,f] = tools.plot_binary_overlay(...
-        img_cropped,img_temp);
-    
-    choice2 = questdlg('Satisfied with aggregate detection? If not, try drawing an edge around the aggregate manually...',...
-        'Agg detection','Yes','No','Yes');
-    
-    close(f);
-    
-    
-    %== Attempt 4: Manual thresholding, again ============================%
-    if strcmp(choice2,'No')
-        [img_temp,rect,~,img_cropped] = agg.seg_slider(img,1);
-            % image is stored in a temporary image
-    end
-    
-    agg_binary_bin  = [agg_binary_bin, img_temp];
-    agg_cropped_bin = [agg_cropped_bin, img_cropped];
-    
-    %-- Subsitute rectangle back into orignal image ----------------------%
-    if isempty(img_binary)
-        img_binary = ones(size(img));
-    end
-    rect = round(rect);
-    size_temp = size(img_temp);
-    
-    inds1 = rect(2):(rect(2)+size_temp(1)-1);
-    inds2 = rect(1):(rect(1)+size_temp(2)-1);
-    img_binary(inds1,inds2) = ...
-        or(img_binary(inds1,inds2),img_temp);
-    
-    %-- Query user -------------------------------------------------------%
-    h = figure(gcf);
-    tools.plot_binary_overlay(img,img_binary);
-    f = gcf;
-    f.WindowState = 'maximized'; % maximize figure
-    
-    choice = questdlg('Are there any particles not detected?',...
-        'Missing particles','Yes','No','No');
-    if strcmp(choice,'Yes')
-        moreaggs=1;
-    else
-        moreaggs=0;
-    end
-    
-    close(h);
+%== Attempt 3: Manual thresholding with slider UI ========================%
+if moreaggs==1
+    img_binary = agg.seg_slider(img, img_binary, 1);
+        % access slider UI, using either:
+        % if 'Yes, but refine' on previous output from user_input fnc.
+        % OR zeros as a start
 end
+
+commandwindow; % return focus to Matlab window
+
 
 end
 
@@ -123,36 +145,38 @@ end
 %   Author:  Timothy Sipkens, 10-10-2019
 function [moreaggs,choice,img_binary] = user_input(img,img_binary)
 
-h = figure(gcf);
-tools.plot_binary_overlay(img,img_binary);
-f = gcf;
+f = figure(gcf);
 f.WindowState = 'maximized'; % maximize figure
+tools.imshow_binary(img, img_binary);
 
 
 %== User interaction =====================================================%
 choice = questdlg(['Satisfied with automatic aggregate detection? ',...
-    'You will be able to delete non-aggregate noises and add missing particles later. ',...
-    'If not, other methods will be used'],...
-    'agg detection','Yes','Yes, but more particles or refine','No','Yes');
+    'NOTE: ''Yes, but refine'' will supplement the results with a manual threshold ',...
+    'or will allow the user to remove particles.'],...
+    'agg detection','Yes','Yes, but refine','No','Yes');
 
-moreaggs = 0; % default, returned is 'Yes' is chosen
-if strcmp(choice,'Yes, but more particles or refine')
+moreaggs = 0; % default, returned if 'Yes' is chosen
+if strcmp(choice,'Yes, but refine')
     choice2 = questdlg('How do you want to refine aggregate detection?',...
-        'agg detection','More particles','Reduce noise','More particles');
-    if strcmp(choice2,'More particles')
+        'agg detection','More particles or add to existing particles', ...
+        'Remove particles','More particles or add to existing particles');
+    
+    % If more particles, set moreaggs = 1, which will skip ahead to Line 131
+    if strcmp(choice2, 'More particles or add to existing particles')
         moreaggs = 1;
+        
+    % If particles to remove, use the bwselect utility.
     else
-        uiwait(msgbox('Please selects (left click) particles satisfactorily detected and press enter'));
-        img_binary_int = bwselect(~img_binary,8);
-        img_binary = ~img_binary_int;
+        uiwait(msgbox(['Please select (left click) particles to remove', ...
+            ' and press enter.']));
+        img_remove = bwselect(img_binary, 8);
+        img_binary = img_binary - img_remove;
     end
     
-elseif strcmp(choice,'No') % semi-automatic or manual methods will be used
-    img_binary = [];
+elseif strcmp(choice,'No') % skips to the next method
     moreaggs = 1;
 end
-
-close(h);
 
 end
 
