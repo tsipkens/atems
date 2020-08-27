@@ -88,17 +88,17 @@ The resultant image highlights pixels that are part of the aggregate, and plots 
 Primary particle size information can finally be determined using functions in the **pp** package. The original pair correlation method (PCM), for example, can be applied by using the `Aggs` output from the `agg.analyze_binary` function as
 
 ```Matlab
-Aggs_pcm = pp.pcm(Aggs); % apply PCM
+Aggs = pp.pcm(Aggs); % apply PCM
 ```
 
-The output is an updated `Aggs` structure that also contains an estimate of the primary particle size for each aggregate. Having done this, the primary particle size can be visualized along with the radius of gyration noted above by passing the updates `Aggs` structure to the `tools.plot_aggregates` function:
+The output is an updated `Aggs` structure that also contains an estimate of the primary particle size for each aggregate. Having done this, the primary particle size can be visualized along with the radius of gyration noted above by passing the updated `Aggs` structure to the `tools.plot_aggregates` function:
 
 ```Matlab
 figure(1);
-tools.imshow_agg(Aggs_pcm);
+tools.imshow_agg(Aggs);
 ```
 
-The inner circle now indicates the primary particle size from PCM, and the number indicating the index used by the program to identify each aggregate. 
+The inner circle in this plot now indicates the primary particle size from PCM, the larger circle the radius of gyration from *k*-means, and the number indicating the index used by the program to identify each aggregate. Images produced using this type of procedure will feature heavily in the remainder of this README. 
 
 ## 1. Aggregate segmentation package (+agg)
 
@@ -160,13 +160,21 @@ This latter function generally performs better, though the results still often b
 
 #### Manually adjusting the threshold: seg_slider
 
-The function `agg.seg_slider` is very close to a fully manual technique. The function enacts a GUI-based method with a slider for adaptive, manual thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps. First, the user is prompted to crop out a single aggregate. 
+The function `agg.seg_slider` is very close to a fully manual technique. The function enacts a GUI-based method with a slider for adaptive, manual thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps: 
 
-Gaussian blurring is first performed on the image to reduce the noise in the output binary image. Then, a slider is used to manually adjust the level of the threshold in the cropped region of the image. This can result in segmentations like:
+1. The user is prompted to **crop** around a single aggregate. This allows the user to zoom in on the image for the remaining steps. 
+2. The user uses a lasso tool to draw around the aggregate. The excluded regions are used for **background subtraction** in individual regions of the image. 
+3. Gaussian blurring is first performed on the image to reduce the noise in the output binary image. Then, the user is prompted with a **slider** that is used to manually adjust the level of the threshold in the cropped region of the image. The optimal threshold normally occurs when parts of the surrounding region are also considered above the threshold (i.e., show up as black) but do not connect to the main aggregate (see Step 4 in the figure below depicting the window progression). 
+4. The user is prompted to **select** which regions are aggregate, ignoring any white regions that may be above the threshold but are not part of the aggregate. 
+5. Finally, the user will be prompted to **check** whether the segmentation was successful by referring to an image with the resultant binary overlaid on the original image.
+
+The progression of windows generally appears as follows. 
+
+![manual_progress](docs/manual_progress.png)
+
+It is worth noting that the manual nature of this approach will resulting in variability and subjectiveness between users. However, the human input often greatly improves the quality of the segmentations and, while more time-intensive, can act as a reference in considering the appropriateness of the other segmentation methods. A sample segmentation follows. 
 
 ![manual](docs/manual.png)
-
-It is worth noting that the manual nature of this approach will resulting in variability and subjectiveness between users. However, the human input often greatly improves the quality of the segmentations and, while more time-intensive, can act as a reference in considering the appropriateness of the other segmentation methods. 
 
 Several sub-functions are included within the main file. This is a variant of the method included with the distribution of the PCM code by [Dastanpour et al. (2016)][dastanpour2016]. 
 
@@ -174,15 +182,13 @@ Several sub-functions are included within the main file. This is a variant of th
 
 ### 1.2 analyze_binary
 
-Having produced a binary image by any of the above functions, the `agg.analyze_binary` function is used to convert these binaries to aggregate characteristics, such as area in pixels, radius of gyration, area-equivalent diameter, aspect ratio, etc.. The function itself takes a binary image, the original image, and the pixel size as inputs, e.g., 
+All of the above methods produce a common output: a binary image. The `agg.analyze_binary` function is now used to convert these binaries to aggregate characteristics, such as area in pixels, radius of gyration, area-equivalent diameter, aspect ratio, among other quantities. The function itself takes a binary image, the original image, and the pixel size as inputs, as follows. 
 
 ```Matlab
 Aggs = agg.analyze_binary(imgs_binary,imgs,pixsize,fname);
 ```
 
-The output is a MATLAB structured array, `Aggs`, containing information about the aggregate. The array has one entry for each aggregate found in the image, which is itself defined as any independent groupings of pixels. 
-
-The `fname` argument is optional and adds this tag to the information in the output `Aggs` structure. 
+The output is a MATLAB structured array, `Aggs`, containing information about the aggregate. The array has one entry for each aggregate found in the image, which is itself defined as any independent groupings of pixels. The `fname` argument is optional and adds this tag to the information in the output `Aggs` structure. 
 
 ### 1.3 rolling_ball
 
@@ -194,9 +200,9 @@ The +pp package contains multiple methods for determining the primary particle s
 
 #### PCM
 
-The `pp.pcm` function contains code for the University of British Columbia's pair correlation method (PCM) method. This package contains a significant update to the previous code provided with [Dastanpour et al. (2016)][dastanpour2016]. 
+The `pp.pcm` function contains code for the University of British Columbia's pair correlation method (PCM) method. This package contains a significant improvements to code readability, memory use, and length relative to the previous code provided with [Dastanpour et al. (2016)][dastanpour2016]. The underlying method is largely unchanged, correlating the relationship between pixels to the primary particle size for a given aggregate. A single average primary particle diameter is given for each aggregate. [Dastanpour et al.][dastanpour2016] provided two different types of pair correlation function (PCF), corresponding to `Aggs.dp_pcm1`, previously denoted as *simple* and `Aggs.dp_pcm2`, previously denoted as *general*. Testing has generally suggested that the simple method perform better, and this value is assigned to `Aggs.dp` in the output from the PCM method. 
 
-#### EDM-SBS: edm_sbs
+#### EDM-SBS
 
 The Euclidean distance mapping, scale-based analysis (EDM-SBS) of [Bescond et al. (2014)][bescond] is implement in the `pp.edm_sbs` function. This is an adaptation of the original code for use with Matlab and using the binaries above in the place of output from imageJ. As such, some minor differences in output should be expected (which are challenging to compare, as the ImageJ output does not have a direct analog here). The method remains true to how it is described in [Bescond et al.][bescond] and ports some components from the original Scilab code (version 3, available [here](http://www.coria.fr/spip.php?article910)). 
 
@@ -204,15 +210,19 @@ Among the changes to the original EDM-SBS code, this implementation also applies
 
 #### Hough transform: kook*
 
-Two `pp.kook*` functions are included with this program, which fit circles to the image using the Hough transform and the method described by [Kook et al. (2015)][kook]. 
+Two `pp.kook*` functions are included with this program, which fit circles to features in the image using the Hough transform and the pre-processing steps described by [Kook et al. (2015)][kook]. 
 
-The first function, `pp.kook`, contains a copy of the code provided by [Kook et al. (2015)][kook], with minor modifications to match the input/output of some of the other packages — namely to take a single image, `img`, and a pixel size, `pixsize` — and to output a `Pp` structure, which contains information for each circle. Note that the original function acts on images without trying to assign primary particles to an aggregate, a feature resolved in the second function below. This causes some compatibility issues in terms of comparing the output from this function to the other methods contained in thsi codebase. 
+The first function, `pp.kook`, contains a copy of the code provided by [Kook et al. (2015)][kook], with minor modifications to match the input/output of some of the other packages — namely to take a single image, `img`, and a pixel size, `pixsize` — and to output a `Pp` structure, which contains information for each circle. Note that the original function acts on images without trying to assign primary particles to an aggregate, something resolved in the second function below. This causes some compatibility issues in terms of comparing the output from this function to the other methods contained in this program. 
 
-The `pp.kook2` function contains a modified version of the method proposed by [Kook et al. (2015)][kook] that removes circles in the background and assigns primary particles to aggregates. This is done rather simply:  by checking if the center of the circle for a given primary particle lies within the binary for a given aggregate. A sample output is as follows. 
+The `pp.kook2` function contains a modified version of the method proposed by [Kook et al. (2015)][kook] that excludes circles in the background and assigns primary particles to aggregates. This is done rather simply:  by checking if the center of the circles from the preceding procedure lie within the binary for a given aggregate. A sample output is as follows. 
+
+![kook2](docs/kook2.png)
+
+Here, red circles are identified as part of an aggregate, while black circles are excluded in the output. Note that it is apparent from some of the images that gradients in the background influenced the results. Though, it can also be noted that the circles within the aggregates remain reasonable (to the extent that the overall method is reasonable). 
 
 #### Manual sizing
 
-Code to be used in the manual sizing of soot primary particles developed at the University of British Columbia. The current method uses crosshairs to select the length and width of the particle. This is converted to various quantities, such as the mean primary particle diameter. The manual code is a heavily modified version of the code associated with [Dastanpour and Rogak (2014)][dastanpour2014].
+The `pp.manual` function can be used to manual draw circles around the soot primary particles. The code was developed at the University of British Columbia and represents a heavily modified version of the code associated with [Dastanpour and Rogak (2014)][dastanpour2014]. The current method uses two lines overlaid on each primary particle to select the length and width of the particle. This is converted to various quantities, such as the center of each primary particle and the overall mean primary particle diameter. 
 
 
 ## 3. Additional tools package (+tools)
@@ -221,7 +231,7 @@ This package contains a series of functions that help in visualizing or analyzin
 
 ### 3.1 Functions to show images (tools.imshow*)
 
-These functions aid in visualizing the results. For example, 
+These functions aid in visualizing the resultant images. For example, 
 
 ```Matlab
 tools.imshow_binary(img, img_binary)

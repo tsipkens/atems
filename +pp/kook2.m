@@ -39,7 +39,8 @@
 % 
 % Circular hough transform sensitivity can be adjusted with sens_val in line 33
 % of the code. In addition, the boundaries for the size of the circles detected
-% can be adjusted to filter out outliers in line 31-32 with rmax and rmin
+% can be adjusted to filter out outliers in line 31-32 with rmax and rmin.
+% 
 %=========================================================================%
 
 function Aggs = kook2(Aggs, f_plot)
