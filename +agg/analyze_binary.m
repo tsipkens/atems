@@ -3,7 +3,8 @@
 % Author:  Timothy Sipkens
 %=========================================================================%
 
-function [Aggs] = analyze_binary(imgs_binary, imgs, pixsize, fname, f_plot)
+function [Aggs] = analyze_binary(imgs_binary, imgs, pixsize, ...
+    fname, f_edges, f_plot)
 
 %-- Parse inputs ---------------------------------------------------------%
 if isstruct(imgs_binary) % consider case that structure is given as input
@@ -23,6 +24,12 @@ if isempty(pixsize); pixsize = ones(size(imgs)); end
 if ~exist('fname','var'); fname = []; end
 if isempty(fname); fname = cell(size(imgs)); end
 
+% Flag for whether to remove aggregates at the edges of the images.
+% 1 removes border aggregates, other values keep border aggregates.
+% Default is to remove border aggregates. 
+if ~exist('f_edges','var'); f_edges = []; end
+if isempty(f_edges); f_edges = 1; end
+
 % Flag for whether to show progress in a figure.
 if ~exist('f_plot','var'); f_plot = []; end
 if isempty(f_plot); f_plot = 1; end
@@ -38,8 +45,12 @@ for ii=1:length(imgs_binary) % loop through provided images
 
     img_binary = imgs_binary{ii};
     img = imgs{ii};
+    
+    if f_edges % if clearing aggregate borders
+        img_binary = imclearborder(img_binary);
+    end
 
-    CC = bwconncomp(imgs_binary{ii}); % find seperate aggregates
+    CC = bwconncomp(img_binary); % find seperate aggregates
     naggs = CC.NumObjects; % count number of aggregates
 
     Aggs0 = struct([]); % re-initialize Aggs0 structure
