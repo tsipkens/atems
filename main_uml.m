@@ -17,18 +17,20 @@ fname = {Imgs.fname};
 % imgs_binary = agg.seg_otsu_rb(imgs, pixsizes);
 
 Aggs = agg.analyze_binary(...
-    imgs_binary, imgs, pixsizes, fname); % determine aggregate properties
+    imgs_binary, imgs, pixsizes, fname, 0); % determine aggregate properties
 
 %-- Generate plots of images ---------------------------------------------%
 f1 = figure(1); f1.WindowState = 'maximized';
 opts.cmap = [0.92,0.16,0.49]; % red overlay
 
 % Get higher res. aggregate plots for saving.
+%{
 imgs_agg{length(imgs)} = []; % initialize cell
 for ii=1:length(imgs)
     [~, imgs_agg{ii}] = tools.imshow_agg(Aggs, ii, 1, opts);
 end
 tools.write_images(imgs_agg, fname, 'temp\b\kmeans');
+%}
 
 % Plot for output to veiwer.
 [~, imgs_agg] = tools.imshow_agg(Aggs, [], 1, opts); % tiled plot aggregates
@@ -39,8 +41,8 @@ commandwindow; % return focus to Matlab window
 
 
 
-%-{
-%== Read and visualization manual binaries ===============================%
+%{
+%== Read and visualization MANUAL binaries ===============================%
 % read in adaptive manual binaries
 imgs_binary0{length(imgs)} = [];
 
@@ -57,11 +59,13 @@ f2 = figure(2); f2.WindowState = 'maximized';
 opts.cmap = [0.99,0.86,0.37]; % yellow overlay
 
 % Get higher res. aggregate plots for saving.
+%{
 imgs_agg0{length(imgs)} = []; % initialize cell
 for ii=1:length(imgs)
     [~, imgs_agg0{ii}] = tools.imshow_agg(Aggs0, ii, 1, opts);
 end
 tools.write_images(imgs_agg0, fname, 'temp\b\manual'); % write manual binary images
+%}
 
 % Plot for output to veiwer.
 [~, imgs_agg0] = tools.imshow_agg(Aggs0, [], 1, opts); % tiled plot aggregates
