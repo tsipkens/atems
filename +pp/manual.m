@@ -97,6 +97,7 @@ for ll = 1:length(idx) % run loop as many times as aggregates selected
     
     disp('Overall progress:');
     tools.textbar(0);
+    tools.textbar(ll / length(idx));
     disp(' ');
 end
 
