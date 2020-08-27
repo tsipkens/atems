@@ -56,7 +56,7 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
     
     %== Step 1: Image preparation ========================================%
     pixsize = Aggs(aa).pixsize; % size of pixels in the image
-    img_binary = Aggs(aa).img_cropped_binary; % get the binarized image for this aggregate
+    img_binary = imcrop(Aggs(aa).binary, Aggs(aa).rect); % get the binarized image for this aggregate
     
     % Get data for this aggregate
     data = Aggs(aa); % initialize data structure for current aggregate

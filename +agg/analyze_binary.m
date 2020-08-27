@@ -78,7 +78,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         img_edge = img_dilated - img_binary;
         % img_edge = edge(img_binary,'sobel'); % currently causes an error
 
-        [row, col] = find(Aggs0(jj).img_cropped_binary);
+        [row, col] = find(imcrop(Aggs0(jj).binary, Aggs0(jj).rect));
         Aggs0(jj).length = max((max(row)-min(row)),(max(col)-min(col)))*pixsize(ii);
         Aggs0(jj).width = min((max(row)-min(row)),(max(col)-min(col)))*pixsize(ii);
         Aggs0(jj).aspect_ratio = Aggs0(jj).length/Aggs0(jj).width;
