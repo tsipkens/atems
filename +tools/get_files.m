@@ -17,7 +17,7 @@ Imgs.fname = ''; % initialize image reference structure
 
 %-- Get file information -------------------------------------------------%
 while flag == 0
-    dir_start = '..\data'; % initial directory to look for images
+    dir_start = 'images'; % initial directory to look for images
     
     % Browse or get file information.
     if isempty(fd) % if no folder, user browses for images (tif,jpg)
