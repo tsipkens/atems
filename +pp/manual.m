@@ -103,6 +103,7 @@ end
 
 close(f0); % close existing figure
 delete(['temp',filesep,'Pp_manual.mat']); % delete temporary datas
+dp = [Aggs.dp];
 
 disp('Complete.');
 disp(' ');
