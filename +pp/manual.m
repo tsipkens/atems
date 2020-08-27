@@ -97,7 +97,7 @@ for ll = 1:length(idx) % run loop as many times as images selected
     
     disp('Progress:');
     tools.textbar(0);
-    tools.textbar(ii/length(idx));
+    tools.textbar(ll/length(idx));
     disp(' ');
 end
 
