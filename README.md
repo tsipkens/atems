@@ -227,9 +227,9 @@ The `pp.manual` function can be used to manual draw circles around the soot prim
 
 ## 3. Additional tools package (+tools)
 
-This package contains a series of functions that help in visualizing or analyzing the aggregates.
+This package contains a series of functions that help in visualizing or analyzing the aggregates that transcend multiple methods or functions. We discuss a few examples here and refer the reader to individual functions for more information. 
 
-### 3.1 Functions to show images (tools.imshow*)
+#### Functions to show images (tools.imshow*)
 
 These functions aid in visualizing the resultant images. For example, 
 
@@ -251,7 +251,45 @@ opts.cmap = [0.99,0.86,0.37];
 tools.imshow_binary(img, img_binary, opts);
 ```
 
-will plot the overlays in a yellow.
+will plot the overlays in a yellow. 
+
+The related `tools.imshow_agg` function will plot the binaries, as above, but add aggregate level information to the plot, including: (*i*) the aggregate number; (*ii*) the radius of gyration about the center of the aggregate; and (*iii*) the average primary particle diameter, if this information is available (the function will use the `Aggs.dp` field, which will contain primary particle information from the most recently applied method). 
+
+#### Functions to write data to files (tools.write*)
+
+This set of functions writes data to files, with the precise format depending on the function. 
+
+The `write_excel` and `write_json` functions write aggregate-level information to Excel and JSON formats respectively. The precise output will depend on what information is contained in the `Aggs` structure given to the method. For example, `Aggs` structures with primary particle information will have that information output to the Excel or JSON files. 
+
+The `write_images` function, in contrast, take a cell of images (or a single image) and writes them to a series of files, specified by the `fnames` argument, in the folder specified by the `folder` argument. For example, this can be used to write the binary images presented at the beginning of this README to a temporary folder using
+
+```Matlab
+tools.imwrite(imgs_binary, fname, 'temp');
+```
+
+This function is also useful when paired with the `tools.imshow_agg` function to write images with binary overlays and radius of gyration information (such as those presented throughout this README). For a series of images that have been processed to produce an `Aggs` structure, this can be accomplished using: 
+
+```Matlab
+imgs_agg{length(imgs)} = []; % initialize cell
+
+% Loop through images and get overlay for each image. 
+% The second argument of tools.imshow_agg gets the 
+% colordata from the frame in the overlay image. 
+for ii=1:length(imgs)
+    [~, imgs_agg{ii}] = tools.imshow_agg(Aggs, ii, 1, opts);
+end
+
+% Write the overlay images to a temporary folder
+tools.write_images(imgs_agg, fname, 'temp');
+```
+
+As the image size will depend on the physical size of the figure on the screen, it may be useful to first run
+
+```Matlab
+f1 = figure(1); f1.WindowState = 'maximized';
+```
+
+to maximize the figure window, to generate higher quality output. 
 
 --------------------------------------------------------------------------
 
@@ -270,6 +308,8 @@ This program contains very significantly modified versions of the code distribut
 Also included with this program is the Matlab code of [Kook et al. (2015)][kook], modified to accommodate the expected inputs and outputs common to the other functions.
 
 This code also contain an adaptation of EDM-SBS method of [Bescond et al. (2014)][bescond]. We thank the authors, in particular Jerome Yon, for their help in understanding their original Scilab code and ImageJ plugin. Modifications to allow the method to work directly on binary images (rather than a custom output from ImageJ) and to integrate the method into the Matlab environment may present some minor compatibility issues, but allows use of the aggregate segmentation methods given in the **agg** package. 
+
+Finally, the progress bar in the function `tools.textbar`, which is used to indicate progress on some of the primary particle sizing techniques, is a modified version of that written by [Samuel Grauer](https://github.com/sgrauer). 
 
 #### References
 
