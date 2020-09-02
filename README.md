@@ -196,7 +196,7 @@ Multiple of these methods make use of the *rolling ball transformation*, applied
 
 ## 2. Primary particle analysis package (+pp)
 
-The +pp package contains multiple methods for determining the primary particle size of the aggregates of interest. Often this requires a binary mask of the image that can be generated using the +agg package methods.
+The +pp package contains multiple methods for determining the primary particle size of the aggregates of interest. Often this requires a binary mask of the image that can be generated using the +agg package methods. After applying most of the methods, the primary particle size will be stored in (*i*) the `Aggs.dp` field and (*ii*) another `Aggs` field with additional information specifying the method used (e.g., `Aggs.dp_pcm1`  contains a PCM-derived primary particle diameter). For the former, whichever method was last used will overwrite the `Aggs.dp` field, which then acts as a default value that is used by other functions (by the `tools.imshow_agg` function). 
 
 #### PCM
 
