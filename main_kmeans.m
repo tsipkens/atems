@@ -92,8 +92,8 @@ IoU = sum(and(i1,i2)) ./ sum(or(i1,i2))
 
 %-{
 %== Primary particle sizing ==============================================%
-Aggs = pp.pcm(Aggs);
 Aggs = pp.edm_sbs(Aggs);
+Aggs = pp.pcm(Aggs);
 
 figure(20);
 loglog([Aggs.da], [Aggs.dp_pcm1], '.');
