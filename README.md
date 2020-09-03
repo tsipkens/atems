@@ -301,6 +301,10 @@ f1 = figure(1); f1.WindowState = 'maximized';
 
 to maximize the figure window, to generate higher quality output. 
 
+#### Functions to visualize post-processed results (tools.viz*)
+
+This set of functions is intended to generate formatted plots of post-processed results. For example, `tools.viz_darho` generates a scatter plot of the area-equivalent diameter versus effective density estimated for each aggregate. 
+
 --------------------------------------------------------------------------
 
 #### License
