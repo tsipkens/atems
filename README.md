@@ -104,9 +104,11 @@ The inner circle in this plot now indicates the primary particle size from PCM, 
 
 The main scripts demonstrate further use of the code for specific scenerios. We consider three such scripts: 
 
-The `main_0` script present use of the `agg.seg` general segmenter function, described below, and how to read in one's own images. 
+The `main_0` script present use of the `agg.seg` general segmenter function, described below, and how to read in one's own images. Data is written to an Excel file for examination external to Matlab. 
 
-The `main_kmeans` is designed to specifically investigate the *k*-means approach to aggregate-level segmentation. By default, this is done on the sample images provided in the `images/` folder included with this distribution. This script will also read in some binaries produced by the `agg.slider` method for comparison. This script supports a European Aerosol Conference submission by the authors ([Sipkens et al., 2020][eac20]).
+The `main_kmeans` script is designed to specifically investigate the *k*-means approach to aggregate-level segmentation. By default, this is done on the sample images provided in the `images/` folder included with this distribution. This script will also read in some binaries produced by the `agg.slider` (manual) method for comparison. Finally, the primary particle size is computed for the *k*-means binaries and is plotted for the user. This script supports a European Aerosol Conference submission ([Sipkens et al., 2020][eac20]).
+
+The `main_auto` script runs through most of the fully automated technqiues provided with this program (e.g., *k*-means, Otsu, PCM, etc.), applying them to the images provided in the `images/` folder. Binary overlay images are shown for each method for comparison. 
 
 ## 2. Aggregate segmentation package (+agg)
 

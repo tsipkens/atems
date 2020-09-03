@@ -49,7 +49,7 @@ function Aggs = kook2(Aggs, f_plot)
 if ~exist('f_plot','var'); f_plot = []; end
 if isempty(f_plot); f_plot = 1; end
 
-disp('Performing modified Kook:');
+disp('Performing Kook(2):');
 
 
 %-- Sensitivity and Scaling Parameters -----------------------------------%

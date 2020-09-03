@@ -97,6 +97,8 @@ Aggs_edm = pp.edm_sbs(Aggs_pcm);
 
 figure(20);
 loglog([Aggs_pcm.da], [Aggs_pcm.dp_pcm1], '.');
+xlabel('d_a');
+ylabel('d_{p,PCM}');
 
 figure(21);
 loglog([Aggs_edm.dp_pcm1], [Aggs_edm.dp_edm], '.');
@@ -104,6 +106,8 @@ hold on;
 ylims = ylim;
 plot(ylims, ylims); % 1:1 line
 hold off;
+xlabel('d_{p,PCM}');
+ylabel('d_{p,EDM}');
 %=========================================================================%
 %}
 
