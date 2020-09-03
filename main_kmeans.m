@@ -1,4 +1,11 @@
 
+% MAIN_KMEANS  A script to explicitly test the k-means method. 
+% Test is performed on the sample images, by default. 
+% Optionally reads in manually binarized images. 
+% Author: Timothy Sipkens
+%=========================================================================%
+
+
 clear;
 close all;
 clc;
@@ -41,18 +48,18 @@ commandwindow; % return focus to Matlab window
 
 
 
-%{
+%-{
 %== Read and visualization MANUAL binaries ===============================%
 % read in adaptive manual binaries
 imgs_binary0{length(imgs)} = [];
 
 % Read in manual binary images
 for ii=1:length(imgs)
-    imgs_binary0{ii} = imread(['..\data\test\binary[ts]\',fname{ii}]);
+    imgs_binary0{ii} = imread(['images/binary/',fname{ii}]);
 end
 
 Aggs0 = agg.analyze_binary(imgs_binary0, ...
-    imgs, pixsizes, fname); % analyze manual binaries
+    imgs, pixsizes, fname, 0); % analyze manual binaries
 
 %-- Generate plots of images ---------------------------------------------%
 f2 = figure(2); f2.WindowState = 'maximized';
@@ -85,18 +92,22 @@ IoU = sum(and(i1,i2)) ./ sum(or(i1,i2))
 
 %-{
 %== Primary particle sizing ==============================================%
-Aggs_pcm = pp.pcm(Aggs);
-Aggs_edm = pp.edm_sbs(Aggs_pcm);
+Aggs = pp.edm_sbs(Aggs);
+Aggs = pp.pcm(Aggs);
 
 figure(20);
-loglog([Aggs_pcm.da], [Aggs_pcm.dp_pcm1], '.');
+loglog([Aggs.da], [Aggs.dp_pcm1], '.');
+xlabel('d_a');
+ylabel('d_{p,PCM}');
 
 figure(21);
-loglog([Aggs_edm.dp_pcm1], [Aggs_edm.dp_edm], '.');
+loglog([Aggs.dp_pcm1], [Aggs.dp_edm], '.');
 hold on;
 ylims = ylim;
 plot(ylims, ylims); % 1:1 line
 hold off;
+xlabel('d_{p,PCM}');
+ylabel('d_{p,EDM}');
 %=========================================================================%
 %}
 
