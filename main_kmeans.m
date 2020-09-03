@@ -1,4 +1,11 @@
 
+% MAIN_KMEANS  A script to explicitly test the k-means method. 
+% Test is performed on the sample images, by default. 
+% Optionally reads in manually binarized images. 
+% Author: Timothy Sipkens
+%=========================================================================%
+
+
 clear;
 close all;
 clc;
@@ -41,18 +48,18 @@ commandwindow; % return focus to Matlab window
 
 
 
-%{
+%-{
 %== Read and visualization MANUAL binaries ===============================%
 % read in adaptive manual binaries
 imgs_binary0{length(imgs)} = [];
 
 % Read in manual binary images
 for ii=1:length(imgs)
-    imgs_binary0{ii} = imread(['..\data\test\binary[ts]\',fname{ii}]);
+    imgs_binary0{ii} = imread(['images/binary/',fname{ii}]);
 end
 
 Aggs0 = agg.analyze_binary(imgs_binary0, ...
-    imgs, pixsizes, fname); % analyze manual binaries
+    imgs, pixsizes, fname, 0); % analyze manual binaries
 
 %-- Generate plots of images ---------------------------------------------%
 f2 = figure(2); f2.WindowState = 'maximized';

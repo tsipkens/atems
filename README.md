@@ -100,7 +100,15 @@ tools.imshow_agg(Aggs);
 
 The inner circle in this plot now indicates the primary particle size from PCM, the larger circle the radius of gyration from *k*-means, and the number indicating the index used by the program to identify each aggregate. Images produced using this type of procedure will feature heavily in the remainder of this README. 
 
-## 1. Aggregate segmentation package (+agg)
+## 1. Main scripts (main_\*)
+
+The main scripts demonstrate further use of the code for specific scenerios. We consider three such scripts: 
+
+The `main_0` script present use of the `agg.seg` general segmenter function, described below, and how to read in one's own images. 
+
+The `main_kmeans` is designed to specifically investigate the *k*-means approach to aggregate-level segmentation. By default, this is done on the sample images provided in the `images/` folder included with this distribution. This script will also read in some binaries produced by the `agg.slider` method for comparison. This script supports a European Aerosol Conference submission by the authors ([Sipkens et al., 2020][eac20]).
+
+## 2. Aggregate segmentation package (+agg)
 
 This package contains an expandable library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background areas. To demonstrate, we will consider a set of size sample images. 
 
@@ -108,7 +116,7 @@ This package contains an expandable library of functions aimed at performing sem
 
 These images are included with this distribution in the `images/` folder. These images represent soot collected from a lab-scale flare [(Trivanovic et al., 2020)][triv20] and a diesel engine. 
 
-### 1.1 agg.seg* functions
+### 2.1 agg.seg* functions
 
 The main functions implementing aggregate-level semantic segmentation have filenames following `agg.seg*`. In each case, the output primarily consists of binary images of the same size as the original image but where pixels taken on logical values: `1` for pixels identified as part of the aggregate `0` for pixels identified as part of the background. The functions often take similar inputs, with main argument being `imgs`, which is one of:
 
@@ -180,7 +188,7 @@ Several sub-functions are included within the main file. This is a variant of th
 
 > We note that this code saw important bug updates since the original code by [Dastanpour et al. (2016)][dastanpour2016]. This includes fixing how the original code would repeatedly apply a Gaussian filter every time the user interacted with the slider in the GUI (which may cause some backward compatibility issues), a reduction in the use of global variables, memory savings, and other performance improvements. 
 
-### 1.2 analyze_binary
+### 2.2 analyze_binary
 
 All of the above methods produce a common output: a binary image. The `agg.analyze_binary` function is now used to convert these binaries to aggregate characteristics, such as area in pixels, radius of gyration, area-equivalent diameter, aspect ratio, among other quantities. The function itself takes a binary image, the original image, and the pixel size as inputs, as follows. 
 
@@ -190,11 +198,11 @@ Aggs = agg.analyze_binary(imgs_binary,imgs,pixsize,fname);
 
 The output is a MATLAB structured array, `Aggs`, containing information about the aggregate. The array has one entry for each aggregate found in the image, which is itself defined as any independent groupings of pixels. The `fname` argument is optional and adds this tag to the information in the output `Aggs` structure. 
 
-### 1.3 rolling_ball
+### 2.3 rolling_ball
 
 Multiple of these methods make use of the *rolling ball transformation*, applied using the `agg.rolling_ball` function included with this package. This transform fills in gaps inside aggregates, acting as a kind of noise filter. This is accomplished by way iterative morphological opening and closing. 
 
-## 2. Primary particle analysis package (+pp)
+## 3. Primary particle analysis package (+pp)
 
 The +pp package contains multiple methods for determining the primary particle size of the aggregates of interest. Often this requires a binary mask of the image that can be generated using the +agg package methods. After applying most of the methods, the primary particle size will be stored in (*i*) the `Aggs.dp` field and (*ii*) another `Aggs` field with additional information specifying the method used (e.g., `Aggs.dp_pcm1`  contains a PCM-derived primary particle diameter). For the former, whichever method was last used will overwrite the `Aggs.dp` field, which then acts as a default value that is used by other functions (by the `tools.imshow_agg` function). 
 
@@ -225,7 +233,7 @@ Here, red circles are identified as part of an aggregate, while black circles ar
 The `pp.manual` function can be used to manual draw circles around the soot primary particles. The code was developed at the University of British Columbia and represents a heavily modified version of the code associated with [Dastanpour and Rogak (2014)][dastanpour2014]. The current method uses two lines overlaid on each primary particle to select the length and width of the particle. This is converted to various quantities, such as the center of each primary particle and the overall mean primary particle diameter. 
 
 
-## 3. Additional tools package (+tools)
+## 4. Additional tools package (+tools)
 
 This package contains a series of functions that help in visualizing or analyzing the aggregates that transcend multiple methods or functions. We discuss a few examples here and refer the reader to individual functions for more information. 
 
@@ -234,7 +242,7 @@ This package contains a series of functions that help in visualizing or analyzin
 These functions aid in visualizing the resultant images. For example, 
 
 ```Matlab
-tools.imshow_binary(img, img_binary)
+tools.imshow_binary(img, img_binary);
 ```
 
 will plot the image, given in `img`, and overlay labels for the aggregates in a corresponding binary image, given in `img_binary`.  Appending an `opts` structure to the function allows for the control of the appearance of the overlay, including the label alpha and colour. For example, 
@@ -253,7 +261,7 @@ tools.imshow_binary(img, img_binary, opts);
 
 will plot the overlays in a yellow. 
 
-The related `tools.imshow_agg` function will plot the binaries, as above, but add aggregate level information to the plot, including: (*i*) the aggregate number; (*ii*) the radius of gyration about the center of the aggregate; and (*iii*) the average primary particle diameter, if this information is available (the function will use the `Aggs.dp` field, which will contain primary particle information from the most recently applied method). 
+The related `tools.imshow_agg` function will plot the binaries, as above, and add aggregate-level information to the plot, including: (*i*) the aggregate number; (*ii*) the radius of gyration about the center of the aggregate; and (*iii*) the average primary particle diameter, if this information is available (the function will use the `Aggs.dp` field, which will contain primary particle information from the most recently applied method). 
 
 #### Functions to write data to files (tools.write*)
 
@@ -321,6 +329,8 @@ Finally, the progress bar in the function `tools.textbar`, which is used to indi
 
 [Kook, S., Zhang, R., Chan, Q. N., Aizawa, T., Kondo, K., Pickett, L. M., Cenker, E., Bruneaux, G., Andersson, O., Pagels, J., & Nordin, E. Z. (2016). Automated detection of primary particles from transmission electron microscope (TEM) images of soot aggregates in diesel engine environments. *SAE International Journal of Engines*, *9*(1), 279-296.][kook]
 
+[Sipkens, T. A., Zhou., L., Rogak, S. N. (2020). Aggregate-level segmentation of soot TEM images by unsupervised machine learning. *European Aerosol Conference*, Aachen, Germany.][eac20]
+
 [Trivanovic, U., Sipkens, T. A., Kazemimanesh, M., Baldelli, A., Jefferson, A. M., Conrad, B. M., Johnson, M. R., Corbin, J. C., Olfert, J. S., & Rogak, S. N. (2020). Morphology and size of soot from gas flares as a function of fuel and water addition. *Fuel*, *279*, 118478.][triv20]
 
 [kook]: https://doi.org/10.4271/2015-01-1991
@@ -328,3 +338,4 @@ Finally, the progress bar in the function `tools.textbar`, which is used to indi
 [dastanpour2014]: https://doi.org/10.1080/02786826.2014.955565
 [bescond]: https://doi.org/10.1080/02786826.2014.932896
 [triv20]: https://doi.org/10.1016/j.fuel.2020.118478
+[eac20]: https://doi.org/10.13140/RG.2.2.14433.12648
