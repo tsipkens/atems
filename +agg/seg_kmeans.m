@@ -92,12 +92,15 @@ for ii=1:n
     lvl4 = find(((n_in - n_in_pred) ./ n_in_pred) > 0.10); % cases that devaite 10% from initial trend
     lvl4 = lvl3(lvl4(1)); % use the first case found in preceding line
     i2b = ~im2bw(i1, lvl2 * lvl4); % binary at a fraction above Otsu threshold
-
+    
+    % Close the higher threshold image 
+    % to remove noisy points now included in binary
     se3 = strel('disk',max(round(5*morph_param),1));
     i3 = imclose(i2b,se3);
-        % close the higher threshold image 
-        % to remove noisy points now included in binary
-
+        
+    % Check if regions originally included in the Otsu threshold
+    % (i) belong to an aggregate that remains in the newly thresholded
+    % image and (ii) are not included in the new threshold image. 
     i5 = zeros(size(i2b));
     bw1 = bwlabel(i3);
     for jj=1:max(max(bw1))
