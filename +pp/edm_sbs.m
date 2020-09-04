@@ -10,7 +10,13 @@
 %                (2) A single binary image, where 1s indicate aggregate.
 %                (3) A cellular arrays of the above images.
 %   pixsizes     A scalar or vector contain the pixel size for each image.
-%                (Not used if an Aggs structure is provided)
+%                (Not used if an Aggs structure is provided.)
+% 
+% Outputs: 
+%   Aggs         A structure containing information for each aggregate.
+%   dp_bin       The vector of particle sizes used in S curve.
+%   S            The S curve as defined by Bescond et al.
+%   S_fit        The fit S curve used to quantify the particle size.
 %=========================================================================%
 
 function [Aggs, dp_bin, S, S_fit] = edm_sbs(imgs_binary, pixsizes)
