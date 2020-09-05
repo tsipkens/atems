@@ -136,12 +136,12 @@ for ii=1:n
 
 
     %== STEP 4: Rolling Ball Transformation ==============================%
-    ds = round(6 * morph_param);
-    se6 = strel('disk', max(ds,2));
+    ds = round(4 * morph_param);
+    se6 = strel('disk', max(ds, 1));
         % disk size limited by size of holes in particle
     i7 = imclose(img_kmeans{ii}, se6);
 
-    se7 = strel('disk', max(ds-1,1));
+    se7 = strel('disk', max(ds-1, 0));
         % disk size must be less than se6 to maintain connectivity
     img_rb = imopen(i7, se7);
     
