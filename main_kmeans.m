@@ -84,6 +84,9 @@ commandwindow; % return focus to Matlab window
 i1 = [imgs_binary{:}]; i1 = i1(:);
 i2 = [imgs_binary0{:}]; i2 = i2(:);
 IoU = sum(and(i1,i2)) ./ sum(or(i1,i2))
+
+%-- Compute % difference in da -------------------------------------------%
+da_pd = (mean([Aggs.da]) ./ mean([Aggs0.da]) - 1) .* 100
 %=========================================================================%
 %}
 
