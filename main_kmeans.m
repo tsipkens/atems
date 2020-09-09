@@ -55,7 +55,7 @@ imgs_binary0{length(imgs)} = [];
 
 % Read in manual binary images
 for ii=1:length(imgs)
-    imgs_binary0{ii} = imread(['images/binary/',fname{ii}]);
+    imgs_binary0{ii} = imread(['images/slider/',fname{ii}]);
 end
 
 Aggs0 = agg.analyze_binary(imgs_binary0, ...
