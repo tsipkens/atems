@@ -71,8 +71,8 @@ for ii=1:n
     disp(' ');
 
 
-    %-- C: Perform multi-threshold ---------------------------------------%
-    disp('Computing mutli-threshold layer...');
+    %-- C: Perform adjusted threshold ------------------------------------%
+    disp('Computing adjusted threshold layer...');
     i1 = im2uint8(img_denoise);
     i1 = imgaussfilt(i1,max(round(5*morph_param),1));
 
