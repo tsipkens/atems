@@ -3,7 +3,7 @@
 % Author: Timothy Sipkens, 2019-07-24
 %=========================================================================%
 
-function [h, fr, i0] = imshow_agg(Aggs, idx, f_img, opts)
+function [h, fr, i0] = imshow_agg(Aggs, idx, f_img, opts, f_text)
 
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('idx','var'); idx = []; end % image index for plotting
@@ -13,9 +13,13 @@ n_img = length(idx); % number of images to plot
 if ~exist('f_img','var'); f_img = []; end
 if isempty(f_img); f_img = 1; end
 
+% Determine which images will be plotted
 if ~exist('opts','var'); opts = struct(); end
 if ~isfield(opts,'cmap'); opts.cmap = [0.12,0.59,0.96]; end
-% determine which images will be plotted
+
+% Whether or not to label aggregates with numbers
+if ~exist('f_text','var'); f_text = []; end
+if isempty(f_text); f_text = 1; end
 %-------------------------------------------------------------------------%
 
 
@@ -68,10 +72,13 @@ for ii=1:n_img % loop through images
         plot(Aggs(aa).center_mass(2), ...
             Aggs(aa).center_mass(1),...
             'xk', 'LineWidth', 0.75);
-        text(Aggs(aa).center_mass(2) + 20, Aggs(aa).center_mass(1), ...
-            num2str(Aggs(aa).id), 'Color', [0,0,0]);
-            % label this point with aggregate no.
-            % currently uses the global index in the Aggs structure
+        
+        % Label this point with aggregate no., 
+        % currently uses the global index in the Aggs structure.
+        if f_text
+            text(Aggs(aa).center_mass(2) + 20, Aggs(aa).center_mass(1), ...
+                num2str(Aggs(aa).id), 'Color', [0,0,0]);
+        end
 
         % Plot radius of gyration on plot
         viscircles(fliplr(Aggs(aa).center_mass'),...
