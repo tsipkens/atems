@@ -69,8 +69,9 @@ for ii=1:length(imgs_binary) % loop through provided images
         Aggs0(jj).fname = fname{ii};
         Aggs0(jj).pixsize = pixsize(ii);
         
-        Aggs0(jj).image = img;
-            % store image that the aggregate occurs in
+        if jj==1
+            Aggs0(1).image = img; % store the overall image for the first aggregate
+        end
         
         %-- Step 3-2: Prepare an image of the isolated aggregate ---------%
         img_binary = zeros(size(img_binary));
@@ -84,7 +85,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         
         
         %== Compute aggregate dimensions/parameters ======================%
-        SE = strel('disk',1);
+        SE = strel('disk', 1);
         img_dilated = imdilate(img_binary,SE);
         img_edge = img_dilated - img_binary;
         
@@ -100,8 +101,8 @@ for ii=1:length(imgs_binary) % loop through provided images
             pixsize(ii) ^ 2; % aggregate area [nm^2]
         Aggs0(jj).Rg = gyration(img_binary, pixsize(ii)); % calculate radius of gyration [nm]
         
-        % Calculate aggregate perimeter
-        Aggs0(jj).perimeter = sum(sum(img_edge~=0))*pixsize(ii);
+        Aggs0(jj).perimeter = sum(sum(img_edge~=0)) * ...
+            pixsize(ii); % calculate aggregate perimeter
         
         [x,y] = find(img_binary ~= 0);
         Aggs0(jj).center_mass = [mean(x); mean(y)];
