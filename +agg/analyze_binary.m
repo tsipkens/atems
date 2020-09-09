@@ -68,56 +68,44 @@ for ii=1:length(imgs_binary) % loop through provided images
         
         Aggs0(jj).fname = fname{ii};
         Aggs0(jj).pixsize = pixsize(ii);
-
+        
         Aggs0(jj).image = img;
             % store image that the aggregate occurs in
-
+        
         %-- Step 3-2: Prepare an image of the isolated aggregate ---------%
         img_binary = zeros(size(img_binary));
         img_binary(CC.PixelIdxList{1,jj}) = 1;
-        Aggs0(jj).binary = img_binary;
-
-        [~, ~, Aggs0(jj).rect] = ...
-            autocrop(img, img_binary);
-            % get a cropped version of the aggregate
-            % 'autocrop' method included below
-
-
+        Aggs0(jj).binary = logical(img_binary); % store binary image
+        
+        % Get a cropped version of the aggregate
+        % 'autocrop' method included below.
+        [~, ~, Aggs0(jj).rect] = autocrop(img, img_binary);
+            
+        
+        
         %== Compute aggregate dimensions/parameters ======================%
         SE = strel('disk',1);
         img_dilated = imdilate(img_binary,SE);
         img_edge = img_dilated - img_binary;
-        % img_edge = edge(img_binary,'sobel'); % currently causes an error
-
+        
         [row, col] = find(imcrop(Aggs0(jj).binary, Aggs0(jj).rect));
-        Aggs0(jj).length = max((max(row)-min(row)),(max(col)-min(col)))*pixsize(ii);
-        Aggs0(jj).width = min((max(row)-min(row)),(max(col)-min(col)))*pixsize(ii);
-        Aggs0(jj).aspect_ratio = Aggs0(jj).length/Aggs0(jj).width;
-
-        %{
-        [Aggs(aa).length, Aggs(aa).width] = ...
-            agg.agg_dimension(img_edge,pixsize(ii));
-            % calculate aggregate length and width
-        Aggs(aa).aspect_ratio = Aggs(aa).length/Aggs(aa).width;
-        %}
-
+        Aggs0(jj).length = max((max(row)-min(row)), (max(col)-min(col))) * pixsize(ii);
+        Aggs0(jj).width = min((max(row)-min(row)), (max(col)-min(col))) * pixsize(ii);
+        Aggs0(jj).aspect_ratio = Aggs0(jj).length / Aggs0(jj).width;
+        
         Aggs0(jj).num_pixels = nnz(img_binary); % number of non-zero pixels
-        Aggs0(jj).da = ((Aggs0(jj).num_pixels/pi)^.5)*2*pixsize(ii);
-            % area-equialent diameter [nm]
-        Aggs0(jj).area = nnz(img_binary).*pixsize(ii)^2;
-            % aggregate area [nm^2]
-        Aggs0(jj).Rg = gyration(img_binary,pixsize(ii));
-            % calculate radius of gyration [nm]
-
+        Aggs0(jj).da = ((Aggs0(jj).num_pixels/pi)^.5) * ...
+            2 * pixsize(ii); % area-equialent diameter [nm]
+        Aggs0(jj).area = nnz(img_binary) .* ... 
+            pixsize(ii) ^ 2; % aggregate area [nm^2]
+        Aggs0(jj).Rg = gyration(img_binary, pixsize(ii)); % calculate radius of gyration [nm]
+        
+        % Calculate aggregate perimeter
         Aggs0(jj).perimeter = sum(sum(img_edge~=0))*pixsize(ii);
-            % calculate aggregate perimeter
-        % Aggs(ll).perimeter = ...
-        %     agg.perimeter_length(img_binary,...
-        %     pixsize(ii),Aggs(ll).num_pixels); % alternate perimeter
-
+        
         [x,y] = find(img_binary ~= 0);
         Aggs0(jj).center_mass = [mean(x); mean(y)];
-
+        
         if f_plot==1; tools.imshow_agg(Aggs0, ii, 0); drawnow; end
     end
     
