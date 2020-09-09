@@ -54,7 +54,7 @@ for ll = idx % run loop as many times as aggregates selected
         '/' num2str(jj)],'help'));
     
     while f_finished == 0
-
+        
         jj = jj+1;
         
         % prompt user to draw first line
@@ -88,7 +88,7 @@ for ll = idx % run loop as many times as aggregates selected
     % Allow for refinement of circles by
     % using handles and prompting the user.
     Pp(ll) = tools.refine_circles(img_cropped, Pp(ll));
-        
+    
     commandwindow; % return focus to Matlab window
     
     %== Save results =====================================================%
@@ -102,7 +102,7 @@ for ll = idx % run loop as many times as aggregates selected
     
     disp('Overall progress:');
     tools.textbar(0);
-    tools.textbar(ll / length(idx));
+    tools.textbar(find(ll==idx) / length(idx));
     disp(' ');
 end
 
