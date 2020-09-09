@@ -49,7 +49,7 @@ commandwindow; % return focus to Matlab window
 
 
 %-{
-%== Read and visualization MANUAL binaries ===============================%
+%== Read and visualization SLIDER binaries ===============================%
 % read in adaptive manual binaries
 imgs_binary0{length(imgs)} = [];
 
