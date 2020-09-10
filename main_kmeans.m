@@ -11,7 +11,7 @@ close all;
 clc;
 
 % [Imgs,imgs,pixsizes] = tools.load_imgs; % OPTION 1: load a single image
-% load('temp/b/Imgs.mat'); % OPTION 2: load preset Imgs
+% load('temp/Imgs_carleton.mat'); % OPTION 2: load preset Imgs
 [Imgs,imgs,pixsizes] = tools.load_imgs('images'); % OPTION 3: load all images in 'images' folder
 
 fname = {Imgs.fname};

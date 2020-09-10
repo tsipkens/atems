@@ -150,7 +150,7 @@ for ii=1:n
     
     
     if n>1 % if more than one image, output text
-        disp('[== Complete. ==============================]');
+        disp('[== Complete. ==================================]');
         disp(' ');
         disp(' ');
     end
