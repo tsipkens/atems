@@ -52,6 +52,10 @@ for ii=1:length(imgs_binary) % loop through provided images
 
     CC = bwconncomp(img_binary); % find seperate aggregates
     naggs = CC.NumObjects; % count number of aggregates
+    
+    % If more than 50 aggregates were found, the method likely failed. 
+    % Skip this image and continue on. 
+    if naggs>50; continue; end
 
     Aggs0 = struct([]); % re-initialize Aggs0 structure
     Aggs0(naggs).fname = '';
@@ -60,6 +64,7 @@ for ii=1:length(imgs_binary) % loop through provided images
 
     %== Main loop to analyze each aggregate ==============================%
     if f_plot==1; tools.imshow_binary(img, img_binary); end
+    
     for jj = 1:naggs % loop through number of found aggregates
         
         id = id + 1; % increment global index counter
