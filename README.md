@@ -51,7 +51,7 @@ The images and pixel sizes can also be extracted from the `Imgs` structure using
 
 ```Matlab
 imgs = {Imgs.cropped}; % copy variables locally
-pixsize = [Imgs.pixsize]; % pixel size for each image
+pixsizes = [Imgs.pixsize]; % pixel size for each image
 fname = {Imgs.fname};
 ```
 
@@ -60,7 +60,7 @@ fname = {Imgs.fname};
 The next step is to evaluate binaries that separate the image into pixels that are part of the background and pixels that are part of aggregates. This is done using the functions in the **agg** package. For example, a *k*-means segmentation specific to this problem can be performed using:
 
 ```Matlab
-imgs_binary = agg.seg_kmeans(imgs, pixsize, opts);
+imgs_binary = agg.seg_kmeans(imgs, pixsizes, opts);
     % segment aggregates
 ```
 
@@ -70,7 +70,7 @@ Having segmented the image, aggregate characteristics can be determined by passi
 
 ```Matlab
 Aggs = agg.analyze_binary(...
-    imgs_binary,imgs,pixsize,fname);
+    imgs_binary, imgs, pixsizes, fname);
         % determine aggregate properties
 ```
 
