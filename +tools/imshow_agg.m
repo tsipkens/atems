@@ -8,6 +8,7 @@ function [h, fr, i0] = imshow_agg(Aggs, idx, f_img, opts, f_text)
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('idx','var'); idx = []; end % image index for plotting
 if isempty(idx); idx = unique([Aggs.img_id]); end % plot all of the images
+if length(idx) > 24; idx = idx(1:24); end % consider a max. of 24 images
 n_img = length(idx); % number of images to plot
 
 if ~exist('f_img','var'); f_img = []; end

@@ -56,6 +56,10 @@ for ii=1:length(imgs_binary) % loop through provided images
     % If more than 50 aggregates were found, the method likely failed. 
     % Skip this image and continue on. 
     if naggs>50; continue; end
+    
+    % If more than 55% of the image is aggregate, the method likely failed.
+    % Skip this image and continue on.
+    if (nnz(imgs_binary) / numel(img_binary)) > 0.5; continue; end
 
     Aggs0 = struct([]); % re-initialize Aggs0 structure
     Aggs0(naggs).fname = '';
