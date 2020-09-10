@@ -150,11 +150,11 @@ The `agg.seg` function is a general, multipurpose wrapper function that attempts
 
 This function applies a *k*-means segmentation approach using three feature layers, which include: 
 
-  **FEATURE 1**. a *denoised* version of the image, 
-    
-  **FEATURE 2**. a measure of *texture* in the image, and 
-    
-  **FEATURE 3**. an Otsu-like classified image, with the *threshold adjusted* upwards. 
+FEATURE 1. a *denoised* version of the image, 
+
+FEATURE 2. a measure of *texture* in the image, and 
+
+FEATURE 3. an Otsu-like classified image, with the *threshold adjusted* upwards. 
 
 Compiling these different feature layers results in a three layer image that will be used for segmentation. This is roughly equivalent to segmenting colour images, if each of the layers was assigned a colour. For example, compilation of these feature layers for the sample images results in the following feature layers and compiled RGB image: 
 
