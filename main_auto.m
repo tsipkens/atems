@@ -23,14 +23,14 @@ tools.imshow_agg(Aggs_km, [], [], opts);
 commandwindow;
 
 % New Otsu
-imgs_otsu = agg.seg_otsu_rb(imgs, pixsizes);
+imgs_otsu = agg.seg_otsu(imgs, pixsizes);
 Aggs_otsu = agg.analyze_binary(imgs_otsu, imgs, pixsizes, fname);
 f2 = figure(2); f2.WindowState = 'maximized'; title('Otsu');
 tools.imshow_agg(Aggs_otsu);
 commandwindow;
 
 % Original Otsu
-imgs_otsu_o = agg.seg_otsu_rb_orig(imgs, pixsizes);
+imgs_otsu_o = agg.seg_otsu_orig(imgs, pixsizes);
 Aggs_otsu_o = agg.analyze_binary(imgs_otsu_o, imgs, pixsizes, fname);
 f3 = figure(3); f3.WindowState = 'maximized'; title('Otsu (orig.)');
 tools.imshow_agg(Aggs_otsu_o);
