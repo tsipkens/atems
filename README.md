@@ -64,7 +64,7 @@ imgs_binary = agg.seg_kmeans(imgs, pixsizes, opts);
     % segment aggregates
 ```
 
-The result, `imgs_binary`, is either a single binary image (if one image is given as an input) or a cellular array of image binaries (if multiple images are given as an input), with `1` if a pixel is considered part of the aggregate and `0` if it is not. Other approaches are also available and are discussed in Section 1 below. 
+The result, `imgs_binary`, is either a single binary image (if one image is given as an input) or a cell array of image binaries (if multiple images are given as an input), with `1` if a pixel is considered part of the aggregate and `0` if it is not. Other approaches are also available and are discussed in Section 1 below. 
 
 Having segmented the image, aggregate characteristics can be determined by passing this binary image to an analysis function:
 
@@ -135,7 +135,7 @@ These images are included with this distribution in the `images/` folder. These 
 The main functions implementing aggregate-level semantic segmentation have filenames following `agg.seg*`. In each case, the output primarily consists of binary images of the same size as the original image but where pixels taken on logical values: `1` for pixels identified as part of the aggregate `0` for pixels identified as part of the background. The functions often take similar inputs, with main argument being `imgs`, which is one of:
 
 1. a single image (after any footer or additional information have been removed), 
-2. a cellular array of images (again with the footer removed); or
+2. a cell array of images (again with the footer removed); or
 3. an `Imgs` structure, containing the image information as fields. 
 
 Several methods also take `pixsize`, which denotes the size of each pixel in the image. If an `Imgs` structure if provided, this information is expected to be contained in this structure and any `pixsize` input is ignored. Other arguments depend on the function (e.g., optional parameters for the rolling ball transform). 

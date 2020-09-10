@@ -14,12 +14,12 @@ clc;
 % load('temp/Imgs.mat'); % OPTION 2: load preset Imgs
 [Imgs,imgs,pixsizes] = tools.load_imgs('images'); % OPTION 3: load all images in 'images' folder
 
-fname = {Imgs.fname};
+fname = {Imgs.fname}; % cell array of file names
 
 
 
 
-%== Run thresholding for all of the images ===============================%
+%== Run K-MEANS for all of the images ====================================%
 [imgs_binary, img_kmeans, feature_set] = agg.seg_kmeans(Imgs);
 % imgs_binary = agg.seg_otsu(imgs, pixsizes);
 
