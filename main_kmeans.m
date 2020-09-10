@@ -68,7 +68,14 @@ i2 = [imgs_binary0{:}]; i2 = i2(:);
 IoU = sum(and(i1,i2)) ./ sum(or(i1,i2))
 
 %-- Compute % difference in da -------------------------------------------%
-da_pd = (mean([Aggs.da]) ./ mean([Aggs0.da]) - 1) .* 100
+dag_diff = (mean([Aggs.da]) ./ mean([Aggs0.da]) - 1) .* 100
+
+%-- Match aggregates and compare da --------------------------------------%
+[idx_0, idx_k] = tools.match_aggs(Aggs0, Aggs);
+da_diff = (1 - [Aggs0(idx_0).da] ./ [Aggs(idx_k).da]) .* 100;
+da_m = median(da_diff)
+da_s1 = prctile(da_diff, 2.5)
+da_s2 = prctile(da_diff, 97.5)
 %=========================================================================%
 %}
 

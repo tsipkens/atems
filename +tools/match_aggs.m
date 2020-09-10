@@ -18,8 +18,10 @@ cc_b = zeros(size(B,1), 1);
 for ii=1:max([Aggs_a.img_id])
     
     idx_a = find([Aggs_a.img_id]==ii); % index in Aggs_a for this image
+    if isempty(idx_a); continue; end % if image isn't available
     
     idx_b0 = find(strcmp({Aggs_b.fname}, Aggs_a(idx_a(1)).fname));
+    if isempty(idx_b0); continue; end % if image isn't available
     idx_b0 = Aggs_b(idx_b0(1)).img_id; % initial image index in Aggs_b
     idx_b = find([Aggs_b.img_id]==idx_b0); % index in Aggs_b for this image
     
