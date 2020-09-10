@@ -11,7 +11,7 @@ close all;
 clc;
 
 % [Imgs,imgs,pixsizes] = tools.load_imgs; % OPTION 1: load a single image
-% load('temp/Imgs_carleton.mat'); % OPTION 2: load preset Imgs
+% load('temp/Imgs.mat'); % OPTION 2: load preset Imgs
 [Imgs,imgs,pixsizes] = tools.load_imgs('images'); % OPTION 3: load all images in 'images' folder
 
 fname = {Imgs.fname};
@@ -29,15 +29,6 @@ Aggs = agg.analyze_binary(...
 %-- Generate plots of images ---------------------------------------------%
 f1 = figure(1); f1.WindowState = 'maximized';
 opts.cmap = [0.92,0.16,0.49]; % red overlay
-
-% Get higher res. aggregate plots for saving.
-%{
-imgs_agg{length(imgs)} = []; % initialize cell
-for ii=1:length(imgs)
-    [~, imgs_agg{ii}] = tools.imshow_agg(Aggs, ii, 1, opts);
-end
-tools.write_images(imgs_agg, fname, 'temp\b\kmeans');
-%}
 
 % Plot for output to veiwer.
 [~, imgs_agg] = tools.imshow_agg(Aggs, [], 1, opts); % tiled plot aggregates
@@ -64,15 +55,6 @@ Aggs0 = agg.analyze_binary(imgs_binary0, ...
 %-- Generate plots of images ---------------------------------------------%
 f2 = figure(2); f2.WindowState = 'maximized';
 opts.cmap = [0.99,0.86,0.37]; % yellow overlay
-
-% Get higher res. aggregate plots for saving.
-%{
-imgs_agg0{length(imgs)} = []; % initialize cell
-for ii=1:length(imgs)
-    [~, imgs_agg0{ii}] = tools.imshow_agg(Aggs0, ii, 1, opts);
-end
-tools.write_images(imgs_agg0, fname, 'temp\b\manual'); % write manual binary images
-%}
 
 % Plot for output to veiwer.
 [~, imgs_agg0] = tools.imshow_agg(Aggs0, [], 1, opts); % tiled plot aggregates
