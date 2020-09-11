@@ -4,7 +4,7 @@
 % Author: Timothy Sipkens
 %=========================================================================%
 
-function [] = viz_dadp(Aggs_da, dp)
+function [h, a1] = viz_dadp(Aggs_da, dp)
 
 % Parse inputs
 if isstruct(Aggs_da); da = [Aggs_da.da]; dp = [Aggs_da.dp];
@@ -30,6 +30,7 @@ t1 = max([xlims(2),ylims(2)]);
 % Plot dp-da relation
 p1 = polyfit(log10(da), log10(dp),1);
 p1_val = 10 .^ polyval(p1, log10([t0,t1]));
+a1 = [10^p1(2), p1(1)];
 loglog([t0,t1], p1_val, 'Color', [0.12,0.59,0.96]);
 
 
@@ -64,7 +65,8 @@ set(gca, 'Children', [h(2:end); h(1)]);
 
 xlabel('d_a [nm]');
 ylabel('d_p [nm]');
-legend({'d_p > d_a', 'Data', 'Power law fit', ...
+legend({'d_p > d_a', 'Data', ...
+    ['Power law fit (',num2str(a1(1),3),'d_a^{',num2str(a1(2),2),'})'], ...
     'Universal relation', '2-sigma ellipse'}, ...
     'Location', 'southeast');
 
