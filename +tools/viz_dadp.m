@@ -4,11 +4,16 @@
 % Author: Timothy Sipkens
 %=========================================================================%
 
-function [h, a1] = viz_dadp(Aggs_da, dp)
+function [h, a1] = viz_dadp(Aggs_da, dp, cm)
 
 % Parse inputs
 if isstruct(Aggs_da); da = [Aggs_da.da]; dp = [Aggs_da.dp];
-else da = Aggs_da; end
+else; da = Aggs_da; end
+
+if ~exist('cm', 'var'); cm = []; end
+if isempty(cm); cm = [0.12,0.59,0.96]; end
+
+
 
 % In case some dp failed and are NaN, remove entries. 
 idx_remove = find(isnan(dp));
@@ -17,7 +22,7 @@ dp(idx_remove) = [];
 
 
 % Plot data
-loglog(da, dp, '.', 'Color', [0.12,0.59,0.96]);
+loglog(da, dp, '.', 'Color', cm);
 hold on;
 
 
@@ -31,7 +36,7 @@ t1 = max([xlims(2),ylims(2)]);
 p1 = polyfit(log10(da), log10(dp),1);
 p1_val = 10 .^ polyval(p1, log10(xlims));
 a1 = [10^p1(2), p1(1)];
-loglog(xlims, p1_val, 'Color', [0.12,0.59,0.96]);
+loglog(xlims, p1_val, 'Color', cm);
 
 
 % Plot universal relation from Olfert and Rogak
@@ -47,7 +52,7 @@ t = linspace(0, 2*pi); % points around the edge of the circle
 a = (V*sqrt(D)) * [cos(t(:))'; sin(t(:))']; % points on the ellipse
 
 loglog(10.^(a(1, :)+mu(1)), 10.^(a(2, :)+mu(2)), '--', ...
-    'Color', [0.12,0.59,0.96]);
+    'Color', cm);
 %-------------------------------------------------------------------------%
 
 
