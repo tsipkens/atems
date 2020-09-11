@@ -10,6 +10,11 @@ function [] = viz_dadp(Aggs_da, dp)
 if isstruct(Aggs_da); da = [Aggs_da.da]; dp = [Aggs_da.dp];
 else da = Aggs_da; end
 
+% In case some dp failed and are NaN, remove entries. 
+idx_remove = find(isnan(dp));
+da(idx_remove) = [];
+dp(idx_remove) = [];
+
 
 % Plot data
 loglog(da, dp, '.', 'Color', [0.12,0.59,0.96]);
