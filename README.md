@@ -55,6 +55,8 @@ pixsizes = [Imgs.pixsize]; % pixel size for each image
 fname = {Imgs.fname};
 ```
 
+We note that, at the moment, all of the images will be loaded into memory. For computers with less memory, this could restrict the number of images that can be analyzed at one time. Batches of 250 images have been run successfully on a computer with 16 GB of RAM (Matlab limits memory usage to below this value).
+
 #### Aggregate-level segmentation
 
 The next step is to evaluate binaries that separate the image into pixels that are part of the background and pixels that are part of aggregates. This is done using the functions in the **agg** package. For example, a *k*-means segmentation specific to this problem can be performed using:

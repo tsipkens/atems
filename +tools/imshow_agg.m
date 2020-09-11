@@ -6,17 +6,25 @@
 function [h, fr, i0] = imshow_agg(Aggs, idx, f_img, opts, f_text)
 
 %-- Parse inputs ---------------------------------------------------------%
+% Determine which images will be plotted
 if ~exist('idx','var'); idx = []; end % image index for plotting
 if isempty(idx); idx = unique([Aggs.img_id]); end % plot all of the images
-if length(idx) > 24; idx = idx(1:24); end % consider a max. of 24 images
+
+% Exceptions if idx indicates many images
+if and(length(idx)>24, nargout<2) % plot a max. of 24 images (exception below)
+    idx = idx(1:24);
+elseif length(idx)>24 % if second output and still many images, don't produce plot
+    f_img = 0;
+end
 n_img = length(idx); % number of images to plot
 
+% Whether of not to plot image
 if ~exist('f_img','var'); f_img = []; end
 if isempty(f_img); f_img = 1; end
 
-% Determine which images will be plotted
+% Determine color for overlay
 if ~exist('opts','var'); opts = struct(); end
-if ~isfield(opts,'cmap'); opts.cmap = [0.12,0.59,0.96]; end
+if ~isfield(opts,'cmap'); opts.cmap = [0.12,0.59,0.96]; end % default is a blue
 
 % Whether or not to label aggregates with numbers
 if ~exist('f_text','var'); f_text = []; end
