@@ -88,9 +88,8 @@ Aggs = pp.edm_sbs(Aggs);
 Aggs = pp.pcm(Aggs);
 
 figure(20);
-loglog([Aggs.da], [Aggs.dp_pcm1], '.');
-xlabel('d_a');
-ylabel('d_{p,PCM}');
+tools.viz_dadp([Aggs.da], [Aggs.dp_pcm1]);
+ylabel('d_{p,PCM} [nm]');
 
 figure(21);
 loglog([Aggs.dp_pcm1], [Aggs.dp_edm], '.');
