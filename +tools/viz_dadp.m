@@ -29,13 +29,13 @@ t1 = max([xlims(2),ylims(2)]);
 
 % Plot dp-da relation
 p1 = polyfit(log10(da), log10(dp),1);
-p1_val = 10 .^ polyval(p1, log10([t0,t1]));
+p1_val = 10 .^ polyval(p1, log10(xlims));
 a1 = [10^p1(2), p1(1)];
-loglog([t0,t1], p1_val, 'Color', [0.12,0.59,0.96]);
+loglog(xlims, p1_val, 'Color', [0.12,0.59,0.96]);
 
 
 % Plot universal relation from Olfert and Rogak
-loglog([t0,t1], 10.^(log10(17.8) + 0.35.*log10([t0,t1]./100)), 'k--');
+loglog(xlims, 10.^(log10(17.8) + 0.35.*log10(xlims./100)), 'k--');
 
 
 %-- Plot 2-sigma ellipse -------------------------------------------------%
@@ -53,7 +53,6 @@ loglog(10.^(a(1, :)+mu(1)), 10.^(a(2, :)+mu(2)), '--', ...
 
 % Plot polygon of off-limit particles (i.e., where da > dp)
 % Edge of this region corresponds to single primary particle aggregates.
-xlims = xlim; ylims = ylim;
 fill([xlims(1), xlims(1), ylims(2)], ...
     [xlims(1), ylims(2), ylims(2)], ...
     [0.95,0.95,0.95], 'EdgeColor', [0.5,0.5,0.5]);
