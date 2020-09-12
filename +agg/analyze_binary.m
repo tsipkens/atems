@@ -46,28 +46,38 @@ for ii=1:length(imgs_binary) % loop through provided images
     img_binary = imgs_binary{ii};
     img = imgs{ii};
     
-    if f_edges % if clearing aggregate borders
+    
+    % If more than 45% of the image is aggregate, the method likely failed.
+    % Skip this image and continue on. This is done before remove border
+    % aggregates, if relevant. 
+    if (nnz(img_binary) / numel(img_binary)) > 0.45
+        continue;
+    end
+    
+    
+    % If clearing aggregate borders...
+    if f_edges
         img_binary = imclearborder(img_binary);
     end
-
+    
+    
+    % Detect distinct aggregates
     CC = bwconncomp(img_binary); % find seperate aggregates
     naggs = CC.NumObjects; % count number of aggregates
+    
     
     % If more than 50 aggregates were found, the method likely failed. 
     % Skip this image and continue on. 
     if naggs>50; continue; end
     
-    % If more than 55% of the image is aggregate, the method likely failed.
-    % Skip this image and continue on.
-    if (nnz(img_binary) / numel(img_binary)) > 0.55; continue; end
     
-    % If no aggregates, skip image.
+    % If no aggregates, skip image
     if naggs==0; continue; end
-
+    
+    
     Aggs0 = struct([]); % re-initialize Aggs0 structure
     Aggs0(naggs).fname = '';
         % pre-allocate new space for aggregates and assign filename
-
 
     %== Main loop to analyze each aggregate ==============================%
     if f_plot==1; tools.imshow_binary(img, img_binary); end
