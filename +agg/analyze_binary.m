@@ -59,7 +59,7 @@ for ii=1:length(imgs_binary) % loop through provided images
     
     % If more than 55% of the image is aggregate, the method likely failed.
     % Skip this image and continue on.
-    if (nnz(img_binary) / numel(img_binary)) > 0.55; continue; end
+    if (nnz(img_binary) / numel(img_binary)) > 0.45; continue; end
     
     % If no aggregates, skip image.
     if naggs==0; continue; end
