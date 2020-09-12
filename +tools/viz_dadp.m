@@ -2,9 +2,16 @@
 % VIZ_DADP  Generate a formatted plot of da versus dp. 
 % This includes a fit relation and the universal relation of Olfert and Rogak.
 % Author: Timothy Sipkens
+% 
+% Outputs:
+%   h   Axis handle
+%   p2  Parameters of power law fit to the data
+%           p2(1) - Pre-factor
+%           p2(2) - Power, D_{TEM}
+%           p2(3) - d_{p,100}, primary particle size for 100 nm aggregate
 %=========================================================================%
 
-function [h, a1] = viz_dadp(Aggs_da, dp, cm)
+function [h, p2] = viz_dadp(Aggs_da, dp, cm)
 
 % Parse inputs
 if isstruct(Aggs_da); da = [Aggs_da.da]; dp = [Aggs_da.dp];
@@ -35,7 +42,9 @@ t1 = max([xlims(2),ylims(2)]);
 % Plot dp-da relation
 p1 = polyfit(log10(da), log10(dp),1);
 p1_val = 10 .^ polyval(p1, log10(xlims));
-a1 = [10^p1(2), p1(1)];
+p2 = [10^p1(2), ... % pre-factor for fit
+    p1(1), ... % power for fit
+    10^p1(2)*(100^p1(1))]; % d_{p,100} for fit
 loglog(xlims, p1_val, 'Color', cm);
 
 
@@ -70,7 +79,7 @@ set(gca, 'Children', [h(2:end); h(1)]);
 xlabel('d_a [nm]');
 ylabel('d_p [nm]');
 legend({'d_p > d_a', 'Data', ...
-    ['Power law fit (',num2str(a1(1),3),'d_a^{',num2str(a1(2),2),'})'], ...
+    ['Power law fit (',num2str(p2(1),3),'d_a^{',num2str(p2(2),2),'})'], ...
     'Universal relation', '2-sigma ellipse'}, ...
     'Location', 'southeast');
 
