@@ -23,9 +23,9 @@ Functions in these packages are called by prefacing the function name with the p
 
   [1. Main scripts (main_\*)](#main-scripts-main)
 
-  [2. Aggregate segmentation package (+agg)](aggregate-segmentation-package-agg)
+  [2. Aggregate segmentation package (+agg)](#aggregate-segmentation-package-agg)
   
-  [3. Primary particle analysis package (+pp)](primary-particle-analysis-package-pp)
+  [3. Primary particle analysis package (+pp)](#primary-particle-analysis-package-pp)
 
 
 ### Dependencies
