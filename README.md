@@ -395,4 +395,3 @@ More information will be made available here should this citation be updated.
 [triv20]: https://doi.org/10.1016/j.fuel.2020.118478
 [eac20]: https://doi.org/10.13140/RG.2.2.14433.12648
 [kheirkhah20]: https://doi.org/10.1080/02786826.2020.1758623
-[sipkens_kmeans]: 
