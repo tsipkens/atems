@@ -20,7 +20,7 @@ end
 n = length(imgs); % number of images to consider
 
 if ~exist('pixsizes','var'); pixsizes = []; end
-if isempty(pixsizes); pixsizes = ones(size(img)); end
+if isempty(pixsizes); pixsizes = ones(size(imgs)); end
 if length(pixsizes)==1; pixsizes = pixsizes .* ones(size(imgs)); end % extend if scalar
 
 if ~exist('minparticlesize','var'); minparticlesize = []; end

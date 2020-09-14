@@ -16,7 +16,7 @@ You can contribute to this project in two significant ways:
 
 In short, when you submit code changes, your submissions are understood to be under the same MIT License that covers the project. Feel free to contact the maintainers if that's a concern.
 
-### Using a consistent coding ctyle
+### Using a consistent coding style
 
 A couple of notes to keep things consistent: 
 

@@ -58,7 +58,9 @@ for kk=1:n
     
     % intialize binary for this iteration
     if isempty(imgs_binary{kk}); img_binary0 = zeros(size(img));
-    else img_binary0 = imgs_binary{kk}; end % use partially binarized image
+        
+    % use partially binarized image, covert to logical, if necessary
+    else img_binary0 = logical(imgs_binary{kk}); end
     
     
 %== CORE FUNCTION ========================================================%
@@ -153,7 +155,6 @@ for kk=1:n
 
 
         %-- Subsitute rectangle back into orignal image ------------------%
-        rect = round(rect);
         inds1 = rect(2):(rect(2) + rect(4) - 1);
         inds2 = rect(1):(rect(1) + rect(3) - 1);
         img_binary0(inds1,inds2) = ...

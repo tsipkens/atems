@@ -60,9 +60,9 @@ for ii=1:n
     %-- B: Use texture in bottom hat images ------------------------------%
     disp('Computing texture layer...');
     se = strel('disk',20);
-    img_both = imbothat(img_denoise,se);
+    i10 = imbothat(img_denoise,se);
 
-    i10 = imbilatfilt(img_both); % denoise
+    % i10 = imbilatfilt(img_denoise); % denoise, aids in correctly identifying edges below
     i11 = entropyfilt(i10, true(15)); % entropy filter, related to texture
     se12 = strel('disk', max(round(5*morph_param),1));
     i12 = imclose(i11, se12);
@@ -71,19 +71,19 @@ for ii=1:n
     disp(' ');
 
 
-    %-- C: Perform multi-threshold ---------------------------------------%
-    disp('Computing mutli-threshold layer...');
+    %-- C: Perform adjusted threshold ------------------------------------%
+    disp('Computing adjusted threshold layer...');
     i1 = im2uint8(img_denoise);
     i1 = imgaussfilt(i1,max(round(5*morph_param),1));
 
     lvl2 = graythresh(i1); % simple Otsu threshold
     i2a = ~im2bw(i1, lvl2); % Otsu binary
     
-    % now, loop through threshold values above Otsu 
-    % and find number of pixels that are part of the aggregates
+    % Now, loop through threshold values above Otsu 
+    % and find number of pixels that are part of the aggregates.
     lvl3 = 1:0.002:1.25;
     n_in = ones(size(lvl3));
-    for ll=1:length(lvl3)
+    for ll=1:length(lvl3) % loop, increasing the threshold level
         n_in(ll) = sum(sum(~im2bw(i1, lvl2 * lvl3(ll))));
     end
     n_in = movmean(n_in, 10); % apply moving average to smooth out curve, remove kinks
@@ -92,17 +92,21 @@ for ii=1:n
     lvl4 = find(((n_in - n_in_pred) ./ n_in_pred) > 0.10); % cases that devaite 10% from initial trend
     lvl4 = lvl3(lvl4(1)); % use the first case found in preceding line
     i2b = ~im2bw(i1, lvl2 * lvl4); % binary at a fraction above Otsu threshold
-
+    
+    % Close the higher threshold image 
+    % to remove noisy points now included in binary.
     se3 = strel('disk',max(round(5*morph_param),1));
     i3 = imclose(i2b,se3);
-        % close the higher threshold image 
-        % to remove noisy points now included in binary
-
+        
+    % Check if regions originally included in the Otsu threshold
+    % (i) belong to an aggregate that remains in the newly thresholded
+    % image and (ii) are not included in the new threshold image. 
+    % If this is the case, add the pixels back. 
     i5 = zeros(size(i2b));
     bw1 = bwlabel(i3);
     for jj=1:max(max(bw1))
         if any(i2a(bw1==jj)==1)
-            i5(bw1==jj) = 1;
+            i5(bw1==jj) = 1; % add Otsu pixels back
         end
     end
     i5 = imgaussfilt(im2uint8(i5.*255), 15);
@@ -132,24 +136,21 @@ for ii=1:n
 
 
     %== STEP 4: Rolling Ball Transformation ==============================%
-    % img_binary = ~agg.rolling_ball(...
-    %     ~img_kmeans,pixsize,minparticlesize,coeffs);
-
-    ds = round(6 * morph_param);
-    se6 = strel('disk', max(ds,2));
+    ds = round(4 * morph_param);
+    se6 = strel('disk', max(ds, 1));
         % disk size limited by size of holes in particle
     i7 = imclose(img_kmeans{ii}, se6);
 
-    se7 = strel('disk', max(ds-1,1));
+    se7 = strel('disk', max(ds-1, 0));
         % disk size must be less than se6 to maintain connectivity
     img_rb = imopen(i7, se7);
     
-    img_binary{ii} = bwareaopen(img_rb, 3); % remove particles below 3 pixels
+    img_binary{ii} = bwareaopen(img_rb, 50); % remove particles below 50 pixels
 %=========================================================================%
     
     
     if n>1 % if more than one image, output text
-        disp('[== Complete. ==============================]');
+        disp('[== Complete. ==================================]');
         disp(' ');
         disp(' ');
     end

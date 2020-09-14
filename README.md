@@ -1,7 +1,7 @@
 
 # ATEMS
 
-**(*A*nalysis tools for *TEM* images of *S*oot)**
+**(Matlab *A*nalysis tools for *TEM* images of *S*oot)**
 
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 [![Version](https://img.shields.io/badge/Version-0.4+-blue.svg)]()
@@ -51,26 +51,28 @@ The images and pixel sizes can also be extracted from the `Imgs` structure using
 
 ```Matlab
 imgs = {Imgs.cropped}; % copy variables locally
-pixsize = [Imgs.pixsize]; % pixel size for each image
+pixsizes = [Imgs.pixsize]; % pixel size for each image
 fname = {Imgs.fname};
 ```
+
+We note that, at the moment, all of the images will be loaded into memory. For computers with less memory, this could restrict the number of images that can be analyzed at one time. Batches of 250 images have been run successfully on a computer with 16 GB of RAM (Matlab limits memory usage to below this value).
 
 #### Aggregate-level segmentation
 
 The next step is to evaluate binaries that separate the image into pixels that are part of the background and pixels that are part of aggregates. This is done using the functions in the **agg** package. For example, a *k*-means segmentation specific to this problem can be performed using:
 
 ```Matlab
-imgs_binary = agg.seg_kmeans(imgs, pixsize, opts);
+imgs_binary = agg.seg_kmeans(imgs, pixsizes, opts);
     % segment aggregates
 ```
 
-The result, `imgs_binary`, is either a single binary image (if one image is given as an input) or a cellular array of image binaries (if multiple images are given as an input), with `1` if a pixel is considered part of the aggregate and `0` if it is not. Other approaches are also available and are discussed in Section 1 below. 
+The result, `imgs_binary`, is either a single binary image (if one image is given as an input) or a cell array of image binaries (if multiple images are given as an input), with `1` if a pixel is considered part of the aggregate and `0` if it is not. Other approaches are also available and are discussed in Section 1 below. 
 
 Having segmented the image, aggregate characteristics can be determined by passing this binary image to an analysis function:
 
 ```Matlab
 Aggs = agg.analyze_binary(...
-    imgs_binary,imgs,pixsize,fname);
+    imgs_binary, imgs, pixsizes, fname);
         % determine aggregate properties
 ```
 
@@ -114,13 +116,13 @@ The inner circle in this plot now indicates the primary particle size from PCM, 
 
 ## 1. Main scripts (main_\*)
 
-The main scripts demonstrate further use of the code for specific scenerios. We consider three such scripts: 
+The main scripts demonstrate further use of the code for specific scenerios. We consider three such scripts. 
 
-The `main_0` script present use of the `agg.seg` general segmenter function, described below, and how to read in one's own images. Data is written to an Excel file for examination external to Matlab. 
+**1.** The `main_0` script present use of the `agg.seg` general segmenter function, described below, and how to read in one's own images. Data is written to an Excel file for examination external to Matlab. 
 
-The `main_kmeans` script is designed to specifically investigate the *k*-means approach to aggregate-level segmentation. By default, this is done on the sample images provided in the `images/` folder included with this distribution. This script will also read in some binaries produced by the `agg.slider` (manual) method for comparison. Finally, the primary particle size is computed for the *k*-means binaries and is plotted for the user. This script supports a European Aerosol Conference submission ([Sipkens et al., 2020][eac20]).
+**2.** The `main_kmeans` script is designed to specifically investigate the *k*-means approach to aggregate-level segmentation. By default, this is done on the sample images provided in the `images/` folder included with this distribution. This script will also read in some binaries produced by the slider method for comparison. Finally, the primary particle size is computed for the *k*-means binaries and is plotted for the user. This script supports a European Aerosol Conference submission ([Sipkens et al., 2020][eac20]).
 
-The `main_auto` script runs through most of the fully automated technqiues provided with this program (e.g., *k*-means, Otsu, PCM, etc.), applying them to the images provided in the `images/` folder. Binary overlay images are shown for each method for comparison. 
+**3.** The `main_auto` script runs through most of the fully automated technqiues provided with this program (e.g., *k*-means, Otsu, PCM, etc.), applying them to the images provided in the `images/` folder. Binary overlay images are shown for each method for comparison. 
 
 ## 2. Aggregate segmentation package (+agg)
 
@@ -135,7 +137,7 @@ These images are included with this distribution in the `images/` folder. These 
 The main functions implementing aggregate-level semantic segmentation have filenames following `agg.seg*`. In each case, the output primarily consists of binary images of the same size as the original image but where pixels taken on logical values: `1` for pixels identified as part of the aggregate `0` for pixels identified as part of the background. The functions often take similar inputs, with main argument being `imgs`, which is one of:
 
 1. a single image (after any footer or additional information have been removed), 
-2. a cellular array of images (again with the footer removed); or
+2. a cell array of images (again with the footer removed); or
 3. an `Imgs` structure, containing the image information as fields. 
 
 Several methods also take `pixsize`, which denotes the size of each pixel in the image. If an `Imgs` structure if provided, this information is expected to be contained in this structure and any `pixsize` input is ignored. Other arguments depend on the function (e.g., optional parameters for the rolling ball transform). 
@@ -144,17 +146,19 @@ The set of available methods is summarized below.
 
 #### A general segmenter: seg
 
-The `agg.seg` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. This includes an allowance to refine output from the fully automated *k*-means and Otsu-based methods discussed below, using a manual thresholding of small regions of the image. 
+The `agg.seg` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. This includes an allowance to refine output from the fully automated *k*-means and Otsu-based methods discussed below, using a slider for a nearly manual thresholding of small regions of the image. 
 
-#### seg_kmeans
+#### *k*-means segmentation: seg_kmeans
 
 This function applies a *k*-means segmentation approach using three feature layers, which include: 
 
-1. a denoised version of the image, 
-2. a measure of texture in the image, and 
-3. an Otsu-like threshold, adjusted upwards. 
+FEATURE 1. a *denoised* version of the image, 
 
-Compiling these different feature layers results in segmentation, which is roughly equivalent to segmenting colour images, if each of the layers are assigned a colour. For example, compilation of these feature layers for the sample images: 
+FEATURE 2. a measure of *texture* in the image, and 
+
+FEATURE 3. an Otsu-like classified image, with the *threshold adjusted* upwards. 
+
+Compiling these different feature layers results in a three layer image that will be used for segmentation. This is roughly equivalent to segmenting colour images, if each of the layers was assigned a colour. For example, compilation of these feature layers for the sample images results in the following feature layers and compiled RGB image: 
 
 ![fcolour](docs/fcolour.png)
 
@@ -164,25 +168,25 @@ Finally, applying Matlab's `imsegkmeans` function, we achieve segmentations as f
 
 This is the most robust of the fully automated methods available with this distribution. However, while this will likely be adequate for many users, the technique still occasionally fails, particularly if the function does not adequately remove the background. 
 
-#### seg_otsu_rb*
+#### Otsu thresholding: seg_otsu_rb*
 
-These automated methods apply Otsu thresholding followed by a rolling ball transformation. Two versions of this function are included: 
+These automated methods apply Otsu thresholding followed by a rolling ball transformation. Two versions of this function are included. 
 
-The `agg.seg_otsu_rb_orig` function remains more true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. For the sample images, the following segmentations.
+**1.** The `agg.seg_otsu_rb_orig` function remains more true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. For the sample images, the following segmentations.
 
 ![rb_orig](docs/otsu_rb_orig.png)
 
 Aggregates are often broken apart, which may be insufficient in itself. This implementation can be complimented with `agg.seg_slider`, described below, to fill in the gaps between the aggregates and add missing aggregates. 
 
-Stemming from the deficiencies of the above function, the `agg.seg_otsu_rb` function updates the above implementation by (*i*) not immediately removing boundary aggregates, (*ii*) adding a background subtraction step using the `agg.bg_subtract` function, and (*iii*) adding a bilateral denoising step. This results in the following segmentations.
+**2.** Stemming from the deficiencies of the above function, the `agg.seg_otsu_rb` function updates the above implementation by (*i*) not immediately removing boundary aggregates, (*ii*) adding a background subtraction step using the `agg.bg_subtract` function, and (*iii*) adding a bilateral denoising step. This results in the following segmentations.
 
 ![otsu_rb](docs/otsu_rb.png)
 
 This latter function generally performs better, though the results still often breaks up aggregates and should likely be compliment with some manual adjustments following initial thresholding. The technique generally underperformed relative to the previously mentioned *k*-means method. 
 
-#### Manually adjusting the threshold: seg_slider
+#### GUI-based slider method: seg_slider
 
-The function `agg.seg_slider` is very close to a fully manual technique. The function enacts a GUI-based method with a slider for adaptive, manual thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps: 
+The function `agg.seg_slider` is a largely manual technique. The function enacts a GUI-based method with a slider for adaptive, semi-automatic thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps: 
 
 1. The user is first prompted to **crop** around a single aggregate. This allows the user to zoom in on the image for the remaining steps. 
 2. The user uses a lasso tool to draw around the aggregate. The excluded regions are used for **background subtraction** in cropped region of the image. 
@@ -194,9 +198,9 @@ The progression of windows generally appears as follows.
 
 ![manual_progress](docs/manual_progress.png)
 
-It is worth noting that the manual nature of this approach will resulting in variability and subjectiveness between users. However, the human input often greatly improves the quality of the segmentations and, while more time-intensive, can act as a reference in considering the appropriateness of the other segmentation methods. A sample segmentation follows. 
+It is worth noting that the mostly manual nature of this approach will resulting in variability and subjectiveness between users. However, the human input often greatly improves the quality of the segmentations and, while more time-intensive, can act as a reference in considering the appropriateness of the other segmentation methods. A sample segmentation follows. 
 
-![manual](docs/manual.png)
+![slider](docs/slider.png)
 
 Several sub-functions are included within the main file. This is a variant of the method included with the distribution of the PCM code by [Dastanpour et al. (2016)][dastanpour2016]. 
 

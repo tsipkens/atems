@@ -2,24 +2,46 @@
 % EDM_SBS Performs Euclidean distance mapping-scale based analysis. 
 %         Based on the work of Bescond et al., Aerosol Sci. Technol. (2014).
 % Author: Timothy Sipkens, 2019-11-23
+% 
+%-------------------------------------------------------------------------%
+% Inputs: 
+%   imgs_binary  Could be one of three options: 
+%                (1) An Aggs structure, produced by other parts of this program
+%                (2) A single binary image, where 1s indicate aggregate.
+%                (3) A cellular arrays of the above images.
+%   pixsizes     A scalar or vector contain the pixel size for each image.
+%                (Not used if an Aggs structure is provided.)
+% 
+% Outputs: 
+%   Aggs         A structure containing information for each aggregate.
+%   dp_bin       The vector of particle sizes used in S curve.
+%   S            The S curve as defined by Bescond et al.
+%   S_fit        The fit S curve used to quantify the particle size.
 %=========================================================================%
 
 function [Aggs, dp_bin, S, S_fit] = edm_sbs(imgs_binary, pixsizes)
 
 
 %-- Parse inputs ---------------------------------------------------------%
-if isstruct(imgs_binary) % consider case that Aggs is given as input
+% OPTION 1: Consider case that Aggs is given as input.
+if isstruct(imgs_binary)
     Aggs0 = imgs_binary;
     pixsizes = [Aggs0.pixsize];
     imgs_binary = {Aggs0.binary};
     Aggs = Aggs0;
+
+% OPTION 2: A single binary image is given.
 elseif ~iscell(imgs_binary)
     imgs_binary = {imgs_binary};
     Aggs = struct([]); % initialize Aggs structure
+    
+% OPTION 3: A cellular array of images is given.
 else
     Aggs = struct([]); % initialize Aggs structure
+    
 end
 
+% Extract or assign the pixel size for each aggregate
 if ~exist('pixsizes','var'); pixsizes = []; end
 if isempty(pixsizes); pixsizes = 1; end
 if length(pixsizes)==1; pixsizes = pixsizes.*ones(size(imgs_binary)); end

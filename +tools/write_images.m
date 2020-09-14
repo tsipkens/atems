@@ -7,6 +7,7 @@ function [] = write_images(imgs, fnames, folder)
 
 %-- Parse inputs ---------------------------------------------------------%
 if ~iscell(imgs); imgs = {imgs}; end
+if ~iscell(fnames); fnames = {fnames}; end
 if ~exist('folder','var'); folder = []; end
 if isempty(folder); folder = 'temp'; end
 %-------------------------------------------------------------------------%

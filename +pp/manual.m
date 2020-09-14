@@ -9,7 +9,7 @@
 function [Aggs, Pp, dp] = manual(Aggs, idx)
 
 %-- Parse inputs ---------------------------------------------------------%
-if ~exist('ind','var'); idx = []; end
+if ~exist('idx','var'); idx = []; end
 if isempty(idx); idx = 1:length(Aggs); end
     % if ind was not specified, analyze all of the aggregates
 %-------------------------------------------------------------------------%
@@ -29,10 +29,15 @@ f0.WindowState = 'maximized';
 %== Process image ========================================================%
 tools.textbar(0);
 Pp(length(idx)) = struct(); % re-initialize data structure
-for ll = 1:length(idx) % run loop as many times as aggregates selected
+for ll = idx % run loop as many times as aggregates selected
+    
+    idx0 = [Aggs.img_id]==Aggs(ll).img_id; %  index of first aggregate in image
+    idx_agg = 1:length(Aggs);
+    idx_agg = idx_agg(idx0);
+    a1 = idx_agg(1);
     
     pixsize = Aggs(ll).pixsize; % copy pixel size locally
-    img_cropped = imcrop(Aggs(ll).image, Aggs(ll).rect);
+    img_cropped = imcrop(Aggs(a1).image, Aggs(ll).rect);
     
     %== Step 3: Analyzing each aggregate =================================%
     f_finished = 0;
@@ -49,7 +54,7 @@ for ll = 1:length(idx) % run loop as many times as aggregates selected
         '/' num2str(jj)],'help'));
     
     while f_finished == 0
-
+        
         jj = jj+1;
         
         % prompt user to draw first line
@@ -83,7 +88,7 @@ for ll = 1:length(idx) % run loop as many times as aggregates selected
     % Allow for refinement of circles by
     % using handles and prompting the user.
     Pp(ll) = tools.refine_circles(img_cropped, Pp(ll));
-        
+    
     commandwindow; % return focus to Matlab window
     
     %== Save results =====================================================%
@@ -97,7 +102,7 @@ for ll = 1:length(idx) % run loop as many times as aggregates selected
     
     disp('Overall progress:');
     tools.textbar(0);
-    tools.textbar(ll / length(idx));
+    tools.textbar(find(ll==idx) / length(idx));
     disp(' ');
 end
 
