@@ -1,4 +1,3 @@
-
 # ATEMS
 
 **(Matlab *A*nalysis tools for *TEM* images of *S*oot)**
@@ -21,11 +20,15 @@ Functions in these packages are called by prefacing the function name with the p
 
 [Components](#1-main-scripts-main_)
 
-- [1. Main scripts (main_\*)](#1-main-scripts-main_)
+- [1. Main scripts (main_\*)](#1-main-scripts-main_): Testing the codebase
 
 - [2. Aggregate segmentation package (+agg)](#2-aggregate-segmentation-package-agg)
 
 - [3. Primary particle analysis package (+pp)](#3-primary-particle-analysis-package-pp)
+
+[Contributors and acknowledgements](#contributors-and-acknowledgements)
+
+[References](#references)
 
 ## Dependencies
 
@@ -130,13 +133,13 @@ The inner circle in this plot now indicates the primary particle size from PCM, 
 
 ## 1. Main scripts (main_\*)
 
-The main scripts demonstrate further use of the code for specific scenerios. We consider three such scripts. 
+The main scripts demonstrate further use of the code for specific scenarios and are provided to **test the codebase**. Three such scripts are included: 
 
-**1.** The `main_0` script present use of the `agg.seg` general segmenter function, described below, and how to read in one's own images. Data is written to an Excel file for examination external to Matlab. 
+**1.** The `main_kmeans` script is designed to specifically investigate the *k*-means approach to aggregate-level segmentation. By default, this is done on the sample images provided in the `images/` folder included with this distribution. This script will also read in some binaries (provided in the `images/slider/` folder) produced by the slider method beforehand for comparison. Finally, the primary particle size is computed for the *k*-means binaries and is plotted for the user. This script supports a European Aerosol Conference submission ([Sipkens et al., 2020][eac20]).
 
-**2.** The `main_kmeans` script is designed to specifically investigate the *k*-means approach to aggregate-level segmentation. By default, this is done on the sample images provided in the `images/` folder included with this distribution. This script will also read in some binaries produced by the slider method for comparison. Finally, the primary particle size is computed for the *k*-means binaries and is plotted for the user. This script supports a European Aerosol Conference submission ([Sipkens et al., 2020][eac20]).
+**2.** The `main_auto` script runs through most of the fully automated techniques provided with this program (e.g., *k*-means, Otsu, PCM, etc.), applying them to the images provided in the `images/` folder. The binary images produced by each method are overlaid on the original images for inspection by the user. Outputs are similar to those presented in [Section 2](#2-aggregate-segmentation-package-agg) below. 
 
-**3.** The `main_auto` script runs through most of the fully automated technqiues provided with this program (e.g., *k*-means, Otsu, PCM, etc.), applying them to the images provided in the `images/` folder. Binary overlay images are shown for each method for comparison. 
+**3.** The `main_0` script presents use of the `agg.seg` general segmentation function, described [below](#a-general-segmentation-function-seg), as well as how to read in one's own images. At the end of the script, data is written to an Excel file for examination external to Matlab. Note that this requires that the user's images be formatted appropriately, either with a horizontal footer below the TEM image that has a white background or a cropped TEM image, in which case the user will have to provide pixel size information. Sample images on which the method have been tested are again found in the  `images/` folder. 
 
 ## 2. Aggregate segmentation package (+agg)
 
@@ -158,7 +161,7 @@ Several methods also take `pixsize`, which denotes the size of each pixel in the
 
 The set of available methods is summarized below. 
 
-#### A general segmenter: seg
+#### A general segmentation function: seg
 
 The `agg.seg` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. This includes an allowance to refine output from the fully automated *k*-means and Otsu-based methods discussed below, using a slider for a nearly manual thresholding of small regions of the image. 
 
