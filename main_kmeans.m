@@ -76,6 +76,13 @@ da_diff = (1 - [Aggs0(idx_0).da] ./ [Aggs(idx_k).da]) .* 100;
 da_m = median(da_diff)
 da_s1 = prctile(da_diff, 2.5)
 da_s2 = prctile(da_diff, 97.5)
+
+%-- Size comparison ------------------------------------------------------%
+sz_k = size(Aggs,2) % number of k-means aggregates
+sz_s = size(Aggs0,2) % number of slider aggregates
+sz_match = size(da_diff,2) % percent change in da for matched aggregates
+sz_add = size(Aggs,2) - size(da_diff,2) % aggregates in k-means with no match
+sz_rmv = size(Aggs0,2) - size(da_diff,2) % aggregates in slider with no match
 %=========================================================================%
 %}
 
