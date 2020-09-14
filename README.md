@@ -13,6 +13,21 @@ This codebase contains Matlab code for several methods of characterizing soot ag
 
 Functions in these packages are called by prefacing the function name with the package name, e.g., PCM can be called used `pp.pcm`. 
 
+### Table of contents
+
+[Dependencies](#dependencies)
+
+[Getting started](#getting-started): Walking through a sample code
+
+[Components](#main-scripts-main)
+
+  [1. Main scripts (main_\*)](#main-scripts-main)
+
+  [2. Aggregate segmentation package (+agg)](aggregate-segmentation-package-agg)
+  
+  [3. Primary particle analysis package (+pp)](primary-particle-analysis-package-pp)
+
+
 ### Dependencies
 
 This software was tested using Matlab 2020a (though most functions have been validated against older versions) and depends on the following Matlab toolboxes: 
