@@ -13,7 +13,7 @@ This codebase contains Matlab code for several methods of characterizing soot ag
 
 Functions in these packages are called by prefacing the function name with the package name, e.g., PCM can be called used `pp.pcm`. 
 
-### Table of contents
+## Table of contents
 
 [Dependencies](#dependencies)
 
@@ -28,7 +28,7 @@ Functions in these packages are called by prefacing the function name with the p
 [  3. Primary particle analysis package (+pp)](#3-primary-particle-analysis-package-pp)
 
 
-### Dependencies
+## Dependencies
 
 This software was tested using Matlab 2020a (though most functions have been validated against older versions) and depends on the following Matlab toolboxes: 
 
@@ -40,7 +40,7 @@ This software was tested using Matlab 2020a (though most functions have been val
 
 If not already installed, these packages can be added to Matlab via the instructions available on Matlab's website. 
 
-### Getting started
+## Getting started
 
 #### Load images
 
