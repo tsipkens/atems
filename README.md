@@ -19,14 +19,13 @@ Functions in these packages are called by prefacing the function name with the p
 
 [Getting started](#getting-started): Walking through a sample code
 
-[Components](#main-scripts-main)
+[Components](#1-main-scripts-main_)
 
-[  1. Main scripts (main_\*)](#1-main-scripts-main_)
+- [1. Main scripts (main_\*)](#1-main-scripts-main_)
 
-[  2. Aggregate segmentation package (+agg)](#2-aggregate-segmentation-package-agg)
+- [2. Aggregate segmentation package (+agg)](#2-aggregate-segmentation-package-agg)
 
-[  3. Primary particle analysis package (+pp)](#3-primary-particle-analysis-package-pp)
-
+- [3. Primary particle analysis package (+pp)](#3-primary-particle-analysis-package-pp)
 
 ## Dependencies
 
