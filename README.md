@@ -7,7 +7,7 @@
 
 This codebase contains Matlab code for several methods of characterizing soot aggregates in TEM images. This includes methods for evaluating the aggregate projected area, perimeter, and primary particle diameter. Methods include Otsu thresholding, the pair correlation method (PCM), Hough circle transform (following [Kook](kook)), and tools to aid in manual analysis. 
 
-Testing of this codebase makes use of the `main_*` functions in the upper directory, which are described in *[1. Main scripts (main_\*)](#1-main-scripts-main_)* below. 
+**Testing** of this codebase makes use of the `main_*` functions in the upper directory, which are described in *[1. Main scripts (main_\*)](#1-main-scripts-main_)* below. Specifically, `main_kmeans` and `main_auto` test the fully automated methods, while `main_0` allows for testing of the more manual methods (which require substantial user input). 
 
 The program is primarily composed of two analysis packages, which will be discussed later in the README: 
 
@@ -169,7 +169,15 @@ The set of available methods is summarized below.
 
 #### A general segmentation function: seg
 
-The `agg.seg` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. This includes an allowance to refine output from the fully automated *k*-means and Otsu-based methods discussed below, using a slider for a nearly manual thresholding of small regions of the image. 
+The `agg.seg` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. Specifically, the method attempts: 
+
+1. The ***k*-means classifier**, prompting the user after segmentation is complete. The user can either (*i*) accept the result as is, (*ii*) reject the output altogether and move on to the next method, (*iii*) choose to remove particles, or (*iv*) add either entirely new particles or add pixels to existing particles (which involves skipping ahead to Step 3, using the current segmentation as a starting point). 
+
+2. The **Otsu** classifier, with the same prompts following segmentation. 
+
+3. Use the GUI-based slider method (the `seg_slider` function described below) to produce a largely-manual segmentation. 
+
+This is repeated until the user has classifid all of the images that were passed to the function. 
 
 #### *k*-means segmentation: seg_kmeans
 
