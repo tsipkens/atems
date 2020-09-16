@@ -171,7 +171,7 @@ The set of available methods is summarized below.
 
 The `agg.seg` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. Specifically, the method attempts: 
 
-1. The ***k*-means classifier**, prompting the user after segmentation is complete. The user can either (*i*) accept the result as is, (*ii*) reject the output altogether and move on to the next method, (*iii*) choose to remove particles, or (*iv*) add either entirely new particles or add pixels to existing particles (which involves skipping ahead to Step 3, using the current segmentation as a starting point). 
+1. The ***k*-means** classifier, prompting the user after segmentation is complete. The user can either (*i*) accept the result as is, (*ii*) reject the output altogether and move on to the next method, (*iii*) choose to remove particles, or (*iv*) add either entirely new particles or add pixels to existing particles (which involves skipping ahead to Step 3, using the current segmentation as a starting point). 
 
 2. The **Otsu** classifier, with the same prompts following segmentation. 
 
