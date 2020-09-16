@@ -59,8 +59,8 @@ for ii=1:n
     
     
 %== CORE FUNCTION ========================================================%
-    morph_param = 0.8/pixsize
-
+    morph_param = 0.8/pixsize % parameter used to adjust morphological operations
+    
     %== STEP 1: Attempt to the remove background gradient ================%
     disp('Subtracting background...');
     img = agg.bg_subtract(img); % background subtraction
