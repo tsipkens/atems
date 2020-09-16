@@ -1,7 +1,26 @@
 
 % SEG_KMEANS  Performs kmeans clustering on a modified feature set.
+%   Uses the technique described in Sipkens and Rogak (Submitted) 
+%   to segment soot aggregates in TEM images. This requires that image 
+%   annotations / footer information be removed.
 % Author: Timothy Sipkens, 2020-08-13
 % Version: 6
+% 
+%-------------------------------------------------------------------------%
+% Inputs: 
+%   imgs      A cell array of images OR a single image.
+%   pixsizes  The size of a pixel in nm/px, either as a scalar value for 
+%             all of the images OR a vector with one entry per image.
+%             If not given, assumed to be 1 nm/px, with implications for
+%             the rolling ball transform.
+% 
+% Outputs:
+%   img_binary  A cell array of binary / classified images, where 1
+%               indicates particles and 0 indicates background.
+%   img_kmeans  The k-means classified image, prior to apply the rolling
+%               ball transform. 
+%   feature_set Colour-equivalent images of the feature set used as
+%               input to the k-means classifier.
 %=========================================================================%
 
 function [img_binary,img_kmeans,feature_set] = ...
