@@ -7,7 +7,7 @@
 
 This codebase contains Matlab code for several methods of characterizing soot aggregates in TEM images. This includes methods for evaluating the aggregate projected area, perimeter, and primary particle diameter. Methods include Otsu thresholding, the pair correlation method (PCM), Hough circle transform (following [Kook](kook)), and tools to aid in manual analysis. 
 
-Testing of this codebase makes use of the `main_*` functions in the upper directory, which are described [below](#1-main-scripts-main_). 
+Testing of this codebase makes use of the `main_*` functions in the upper directory, which are described in *[1. Main scripts (main_\*)](#1-main-scripts-main_)* below. 
 
 The program is primarily composed of two analysis packages, which will be discussed later in the README: 
 
