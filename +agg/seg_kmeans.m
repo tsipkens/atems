@@ -21,6 +21,8 @@
 %               ball transform. 
 %   feature_set Colour-equivalent images of the feature set used as
 %               input to the k-means classifier.
+%-------------------------------------------------------------------------%
+%
 %=========================================================================%
 
 function [img_binary,img_kmeans,feature_set] = ...
