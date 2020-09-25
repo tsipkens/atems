@@ -135,7 +135,7 @@ tools.imshow_agg(Aggs);
 
 The inner circle in this plot now indicates the primary particle size from PCM, the larger circle the radius of gyration from *k*-means, and the number indicating the index used by the program to identify each aggregate. Images produced using this type of procedure will feature heavily in the remainder of this README. 
 
-## 1. Main scripts (main_\*)
+## 1. MAIN SCRIPTS (main_\*)
 
 The main scripts demonstrate further use of the code for specific scenarios and are provided to **test the codebase**. Three such scripts are included: 
 
@@ -145,7 +145,7 @@ The main scripts demonstrate further use of the code for specific scenarios and 
 
 **3.** The `main_0` script presents use of the `agg.seg` general segmentation function, described [below](#a-general-segmentation-function-seg), as well as how to read in one's own images. At the end of the script, data is written to an Excel file for examination external to Matlab. Note that this requires that the user's images be formatted appropriately, either with a horizontal footer below the TEM image that has a white background or a cropped TEM image, in which case the user will have to provide pixel size information. Sample images on which the method have been tested are again found in the  `images/` folder. 
 
-## 2. Aggregate segmentation package (+agg)
+## 2. AGGREGATE SEGMENTATION PACKAGE (+agg)
 
 This package contains an expandable library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background regions. Functions are accessed by appending `agg.` to the function name, e.g., `agg.seg_kmeans` to call the *k*-means segmentation procedure. 
 
@@ -251,7 +251,7 @@ The output is a MATLAB structured array, `Aggs`, containing information about th
 
 Multiple of these methods make use of the *rolling ball transformation*, applied using the `agg.rolling_ball` function included with this package. This transform fills in gaps inside aggregates, acting as a kind of noise filter. This is accomplished by way iterative morphological opening and closing. 
 
-## 3. Primary particle analysis package (+pp)
+## 3. PRIMARY PARTICLE ANALYSIS PACKAGE (+pp)
 
 The +pp package contains multiple methods for determining the primary particle size of the aggregates of interest. Often this requires a binary mask of the image that can be generated using the +agg package methods. After applying most of the methods, the primary particle size will be stored in (*i*) the `Aggs.dp` field and (*ii*) another `Aggs` field with additional information specifying the method used (e.g., `Aggs.dp_pcm1`  contains a PCM-derived primary particle diameter). For the former, whichever method was last used will overwrite the `Aggs.dp` field, which then acts as a default value that is used by other functions (by the `tools.imshow_agg` function). 
 
@@ -282,7 +282,7 @@ Here, red circles are identified as part of an aggregate, while black circles ar
 The `pp.manual` function can be used to manual draw circles around the soot primary particles. The code was developed at the University of British Columbia and represents a heavily modified version of the code associated with [Dastanpour and Rogak (2014)][dastanpour2014]. The current method uses two lines overlaid on each primary particle to select the length and width of the particle. This is converted to various quantities, such as the center of each primary particle and the overall mean primary particle diameter. 
 
 
-## 4. Additional tools package (+tools)
+## 4. ADDITIONAL TOOLS PACKAGE (+tools)
 
 This package contains a series of functions that help in visualizing or analyzing the aggregates that transcend multiple methods or functions. We discuss a few examples here and refer the reader to individual functions for more information. 
 
