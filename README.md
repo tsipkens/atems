@@ -28,6 +28,8 @@ The program is primarily composed of two analysis packages, which will be discus
 
 - [3. Primary particle analysis package (+pp)](#3-primary-particle-analysis-package-pp)
 
+- [4. Additional tools package (+tools)](#4-additional-tools-package-tools)
+
 [Contributors and acknowledgements](#contributors-and-acknowledgements)
 
 [How to cite](#how-to-cite)
