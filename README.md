@@ -173,7 +173,7 @@ The set of available methods is summarized below.
 
 The `agg.seg` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. Specifically, the method attempts: 
 
-1. The ***k*-means** classifier, prompting the user after segmentation is complete. The user can either (*i*) accept the result as is, (*ii*) reject the output altogether and move on to the next method, (*iii*) choose to remove particles, or (*iv*) add either entirely new particles or add pixels to existing particles (which involves skipping ahead to Step 3, using the current segmentation as a starting point). 
+1. The ***k*-means** classifier (following [Sipkens and Rogak][jaskmeans]), prompting the user after segmentation is complete. The user can either (*i*) accept the result as is, (*ii*) reject the output altogether and move on to the next method, (*iii*) choose to remove particles, or (*iv*) add either entirely new particles or add pixels to existing particles (which involves skipping ahead to Step 3, using the current segmentation as a starting point). 
 
 2. The **Otsu** classifier, with the same prompts following segmentation. 
 
@@ -183,7 +183,7 @@ This is repeated until the user has classifid all of the images that were passed
 
 #### *k*-means segmentation: seg_kmeans
 
-This function applies a *k*-means segmentation approach using three feature layers, which include: 
+This function applies a *k*-means segmentation approach following [Sipkens and Rogak][jaskmeans] and using three feature layers, which include: 
 
 FEATURE 1. a *denoised* version of the image, 
 
@@ -378,7 +378,7 @@ Finally, the progress bar in the function `tools.textbar`, which is used to indi
 
 On use of this code or the *k*-means segmentation procedure described [above](#k-means-segmentation-seg_kmeans), please tentatively cite: 
 
-[Sipkens, T. A., Zhou., L., Rogak, S. N. (2020). Aggregate-level segmentation of soot TEM images by unsupervised machine learning. *European Aerosol Conference*, Aachen, Germany.][eac20]
+[Sipkens, T. A., Rogak, S. N. (In press). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. Journal of Aerosol Science.][jaskmeans]
 
 More information will be made available here should this citation be updated. 
 
@@ -396,6 +396,8 @@ More information will be made available here should this citation be updated.
 
 [Sipkens, T. A., Zhou., L., Rogak, S. N. (2020). Aggregate-level segmentation of soot TEM images by unsupervised machine learning. *European Aerosol Conference*, Aachen, Germany.][eac20]
 
+[Sipkens, T. A., Rogak, S. N. (In press). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. Journal of Aerosol Science.][jaskmeans]
+
 [Trivanovic, U., Sipkens, T. A., Kazemimanesh, M., Baldelli, A., Jefferson, A. M., Conrad, B. M., Johnson, M. R., Corbin, J. C., Olfert, J. S., & Rogak, S. N. (2020). Morphology and size of soot from gas flares as a function of fuel and water addition. *Fuel*, *279*, 118478.][triv20]
 
 [kook]: https://doi.org/10.4271/2015-01-1991
@@ -404,4 +406,5 @@ More information will be made available here should this citation be updated.
 [bescond]: https://doi.org/10.1080/02786826.2014.932896
 [triv20]: https://doi.org/10.1016/j.fuel.2020.118478
 [eac20]: https://doi.org/10.13140/RG.2.2.14433.12648
+[jaskmeans]: ""
 [kheirkhah20]: https://doi.org/10.1080/02786826.2020.1758623
