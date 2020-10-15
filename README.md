@@ -378,7 +378,7 @@ Finally, the progress bar in the function `tools.textbar`, which is used to indi
 
 On use of this code or the *k*-means segmentation procedure described [above](#k-means-segmentation-seg_kmeans), please tentatively cite: 
 
-[Sipkens, T. A., Rogak, S. N. (In press). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. Journal of Aerosol Science.][jaskmeans]
+[Sipkens, T. A., Rogak, S. N. (Under review). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. Journal of Aerosol Science.][jaskmeans]
 
 More information will be made available here should this citation be updated. 
 
@@ -396,7 +396,7 @@ More information will be made available here should this citation be updated.
 
 [Sipkens, T. A., Zhou., L., Rogak, S. N. (2020). Aggregate-level segmentation of soot TEM images by unsupervised machine learning. *European Aerosol Conference*, Aachen, Germany.][eac20]
 
-[Sipkens, T. A., Rogak, S. N. (In press). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. Journal of Aerosol Science.][jaskmeans]
+[Sipkens, T. A., Rogak, S. N. (Under review). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. Journal of Aerosol Science.][jaskmeans]
 
 [Trivanovic, U., Sipkens, T. A., Kazemimanesh, M., Baldelli, A., Jefferson, A. M., Conrad, B. M., Johnson, M. R., Corbin, J. C., Olfert, J. S., & Rogak, S. N. (2020). Morphology and size of soot from gas flares as a function of fuel and water addition. *Fuel*, *279*, 118478.][triv20]
 
