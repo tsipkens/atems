@@ -370,7 +370,7 @@ This program contains very significantly modified versions of the code distribut
 
 Also included with this program is the Matlab code of [Kook et al. (2015)][kook], modified to accommodate the expected inputs and outputs common to the other functions.
 
-This code also contain an adaptation of EDM-SBS method of [Bescond et al. (2014)][bescond]. We thank the authors, in particular Jerome Yon, for their help in understanding their original Scilab code and ImageJ plugin. Modifications to allow the method to work directly on binary images (rather than a custom output from ImageJ) and to integrate the method into the Matlab environment may present some minor compatibility issues, but allows use of the aggregate segmentation methods given in the **agg** package. 
+This code also contain an adaptation of EDM-SBS method of [Bescond et al. (2014)][bescond]. We thank the authors, in particular Jerome Yon, for their help in understanding their original [Scilab code and ImageJ plugin](http://www.coria.fr/spip.php?article910). Modifications to allow the method to work directly on binary images (rather than a custom output from ImageJ) and to integrate the method into the Matlab environment may present some minor compatibility issues, but allows use of the aggregate segmentation methods given in the **agg** package. 
 
 Finally, the progress bar in the function `tools.textbar`, which is used to indicate progress on some of the primary particle sizing techniques, is a modified version of that written by [Samuel Grauer](https://github.com/sgrauer). 
 
