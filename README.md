@@ -46,7 +46,7 @@ This software was tested using Matlab 2020a (though most functions have been val
 4. the optimization toolbox, and 
 5. the video and image blockset. 
 
-If not already installed, these packages can be added to Matlab via the instructions available on Matlab's website. 
+If not already installed, these packages can be added to Matlab via the instructions available on [Matlab's website](https://www.mathworks.com/help/matlab/matlab_env/get-add-ons.html). 
 
 ## Getting started
 
