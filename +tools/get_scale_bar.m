@@ -18,6 +18,8 @@ if ~iscell(imgs); imgs = {imgs}; end
 %-------------------------------------------------------------------------%
 
 
+disp('Getting image scales...');
+
 f0 = figure;
 f0.WindowState = 'maximized'; % maximize the figure window
 
@@ -50,6 +52,9 @@ for ii=1:length(imgs) % loop through images
 end
 
 close(f0); % close figure
+
+disp('Complete.');
+disp(' ');
         
 end
 
