@@ -1,11 +1,11 @@
 
-% POST_ELLIPSE  Plots an ellipse give a center, major and minor radii, and slope.
+% VIZ_ELLIPSE  Plots an ellipse give a center, major and minor radii, and slope.
 % Author: Timothy Sipkens, 2019-10-27
 % Note:   For raidus, the first entry is the major axis, the second entry
 %         is the minor axis
 %=========================================================================%
 
-function h = post_ellipse(mu, Sigma, s, cspec)
+function h = viz_ellipse(mu, Sigma, s, cspec)
 
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('s','var'); s = []; end

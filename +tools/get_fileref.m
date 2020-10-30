@@ -1,11 +1,11 @@
 
-% GET_FILES  Loads references to image files, including their name and directory.
+% GET_FILEREF  Loads references to image files, including their name and directory.
 % Expects data to be located at '../data', that is in a folder named 'data'
 % up a single directory. 
 % Author: Timothy Sipkens
 %=========================================================================%
 
-function Imgs = get_files(fd)
+function Imgs = get_fileref(fd)
 
 if ~exist('fd','var'); fd = []; end
 

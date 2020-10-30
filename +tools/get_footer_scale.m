@@ -10,17 +10,18 @@ for jj=1:length(Imgs)
     % when the program reaches a row of only white pixels, removes
     % everything below it (specific to ubc photos). It will do nothing if
     % there is no footer or the footer is not pure white.
-    footer_found = 0;
     white = 255; % how white is the background of footer?
+    footer_found = 0; % flag whether footer was found
     
     for ii = 1:size(Imgs(jj).raw,1)
-        if sum(Imgs(jj).raw(ii,:)) == size(Imgs(jj).raw,2)*white && ...
-                footer_found == 0
+        if sum(Imgs(jj).raw(ii,:)) > ...
+                (0.85 * size(Imgs(jj).raw,2) * white) % 85% white row
             FooterEdge = ii;
             footer_found = 1;
             Imgs(jj).cropped = Imgs(jj).raw(1:FooterEdge-1, :);
             footer  = Imgs(jj).raw(FooterEdge:end, :);
             
+            footer_found = 1;
             break;
         end
     end
@@ -41,8 +42,10 @@ for jj=1:length(Imgs)
     pixsize_end = strfind(Imgs(jj).ocr.Text,' nm/pix')-1;
     if isempty(pixsize_end) % if not found, try nmlpix
         pixsize_end = strfind(Imgs(jj).ocr.Text,' nmlpix')-1;
+        
         if isempty(pixsize_end)
             pixsize_end = strfind(Imgs(jj).ocr.Text,' pm/pix')-1; % micrometer
+            
             if isempty(pixsize_end)
                 pixsize_end = strfind(Imgs(jj).ocr.Text,' pmlpix')-1;
             end

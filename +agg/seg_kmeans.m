@@ -105,12 +105,20 @@ for ii=1:n
     lvl3 = 1:0.002:1.25;
     n_in = ones(size(lvl3));
     for ll=1:length(lvl3) % loop, increasing the threshold level
-        n_in(ll) = sum(sum(~im2bw(i1, lvl2 * lvl3(ll))));
+        n_in(ll) = sum(sum(~im2bw(i1, min(lvl2 * lvl3(ll), 1))));
+            % min(*, 1) prevents loop from going above max. brightness
     end
     n_in = movmean(n_in, 10); % apply moving average to smooth out curve, remove kinks
     p = polyfit(lvl3(1:10), n_in(1:10), 1); % fit linear curve to inital points
     n_in_pred = p(1).*lvl3 + p(2); % predicted values of number of pixels in aggregates
     lvl4 = find(((n_in - n_in_pred) ./ n_in_pred) > 0.10); % cases that devaite 10% from initial trend
+    
+    % If nothing found, revert to Otsu.
+    if isempty(lvl4)
+        lvl4 = 1;
+        warning('Adjusted threshold failed. Using Otsu.');
+    end
+    
     lvl4 = lvl3(lvl4(1)); % use the first case found in preceding line
     i2b = ~im2bw(i1, lvl2 * lvl4); % binary at a fraction above Otsu threshold
     

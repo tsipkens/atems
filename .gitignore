@@ -13,7 +13,6 @@ results\
 temp/
 temp\
 
-main_cnn.m
 +agg/seg_cnn.m
 +agg\seg_cnn.m
 
