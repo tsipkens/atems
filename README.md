@@ -382,7 +382,7 @@ Finally, the progress bar in the function `tools.textbar`, which is used to indi
 
 On use of this code or the *k*-means segmentation procedure described [above](#k-means-segmentation-seg_kmeans), please cite: 
 
-[Sipkens, T. A., Rogak, S. N. (Accepted). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. *Journal of Aerosol Science*, 105699.][jaskmeans]
+> [Sipkens, T. A., Rogak, S. N. (Accepted). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. *Journal of Aerosol Science*, 105699.][jaskmeans]
 
 Users of the pair correlation method (PCM), the Euclidean distance mapping-surface based scale (EBD-SBS), and Hough transform (following Kook et al.) codes should acknowledge the corresponding studies under the acknowledgements above. Please also consider citing this repository directly. 
 
