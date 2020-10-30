@@ -380,11 +380,11 @@ Finally, the progress bar in the function `tools.textbar`, which is used to indi
 
 #### How to cite
 
-On use of this code or the *k*-means segmentation procedure described [above](#k-means-segmentation-seg_kmeans), please tentatively cite: 
+On use of this code or the *k*-means segmentation procedure described [above](#k-means-segmentation-seg_kmeans), please cite: 
 
-[Sipkens, T. A., Rogak, S. N. (Under review). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. Journal of Aerosol Science.][jaskmeans]
+[Sipkens, T. A., Rogak, S. N. (Accepted). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. *Journal of Aerosol Science*, 105699.][jaskmeans]
 
-More information will be made available here should this citation be updated. 
+Users of the pair correlation method (PCM), the Euclidean distance mapping-surface based scale (EBD-SBS), and Hough transform (following Kook et al.) codes should acknowledge the corresponding studies under the acknowledgements above. Please also consider citing this repository directly. 
 
 #### References
 
@@ -400,7 +400,7 @@ More information will be made available here should this citation be updated.
 
 [Sipkens, T. A., Zhou., L., Rogak, S. N. (2020). Aggregate-level segmentation of soot TEM images by unsupervised machine learning. *European Aerosol Conference*, Aachen, Germany.][eac20]
 
-[Sipkens, T. A., Rogak, S. N. (Under review). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. Journal of Aerosol Science.][jaskmeans]
+[Sipkens, T. A., Rogak, S. N. (Accepted). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. *Journal of Aerosol Science*, 105699.][jaskmeans]
 
 [Trivanovic, U., Sipkens, T. A., Kazemimanesh, M., Baldelli, A., Jefferson, A. M., Conrad, B. M., Johnson, M. R., Corbin, J. C., Olfert, J. S., & Rogak, S. N. (2020). Morphology and size of soot from gas flares as a function of fuel and water addition. *Fuel*, *279*, 118478.][triv20]
 
@@ -410,5 +410,5 @@ More information will be made available here should this citation be updated.
 [bescond]: https://doi.org/10.1080/02786826.2014.932896
 [triv20]: https://doi.org/10.1016/j.fuel.2020.118478
 [eac20]: https://doi.org/10.13140/RG.2.2.14433.12648
-[jaskmeans]: ""
+[jaskmeans]: https://doi.org/10.1016/j.jaerosci.2020.105699
 [kheirkhah20]: https://doi.org/10.1080/02786826.2020.1758623
