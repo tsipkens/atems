@@ -3,7 +3,7 @@
 % Author: Timothy Sipkens, 2019-07-24
 %=========================================================================%
 
-function [h, fr, i0] = imshow_agg(Aggs, idx, f_img, opts, f_text)
+function [h, fr, i0] = imshow_agg(Aggs, idx, f_img, opts)
 
 %-- Parse inputs ---------------------------------------------------------%
 % Determine which images will be plotted
@@ -13,8 +13,6 @@ if isempty(idx); idx = unique([Aggs.img_id]); end % plot all of the images
 % Exceptions if idx indicates many images
 if and(length(idx)>24, nargout<2) % plot a max. of 24 images (exception below)
     idx = idx(1:24);
-elseif length(idx)>24 % if second output and still many images, don't produce plot
-    f_img = 0;
 end
 n_img = length(idx); % number of images to plot
 
@@ -22,23 +20,30 @@ n_img = length(idx); % number of images to plot
 if ~exist('f_img','var'); f_img = []; end
 if isempty(f_img); f_img = 1; end
 
-% Determine color for overlay
+% Determine options for overlay
 if ~exist('opts','var'); opts = struct(); end
-if ~isfield(opts,'cmap'); opts.cmap = [0.12,0.59,0.96]; end % default is a blue
-
-% Whether or not to label aggregates with numbers
-if ~exist('f_text','var'); f_text = []; end
-if isempty(f_text); f_text = 1; end
+if ~isfield(opts,'cmap'); opts.cmap = [0.12,0.59,0.96]; end  % color to use, default is a blue
+if ~isfield(opts,'f_text'); opts.f_text = 1; end  % whether or not to label aggregates with numbers
+if ~isfield(opts,'f_show'); opts.f_show = 0; end  % whether to show images if just saving
 %-------------------------------------------------------------------------%
 
 
 %-- Prepare figure for plotting ------------------------------------------%
 % Clear current figure if: plotting more than one image 
 % OR plotting original image.
-if or(f_img==1, n_img>1); clf; end
+if nargout>1
+    fr{n_img} = [];  % inialize frame for output
+    
+    % New figure for saving plots, probably not shown to user.
+    if opts.f_show==1; f0 = figure;
+    else; f0 = figure('visible', 'off'); end
+else
+    f0 = gcf; % otherwise get current figure
+    if or(f_img==1, n_img>1); clf; end
+end
 
-% If more than one image, prepare to tile and maximize figure.
-if n_img>1
+% If more than one image and not writing to file, tile figure.
+if and(n_img>1, nargout<2)
     N1 = floor(sqrt(n_img));
     N2 = ceil(n_img/N1);
     subplot(N1, N2, 1);
@@ -46,10 +51,10 @@ end
 %-------------------------------------------------------------------------%
 
 
-if nargout>1; fr{n_img} = []; end % inialize frame for output
+if n_img>1; disp('Resolving images:'); tools.textbar([0, n_img]); end
 for ii=1:n_img % loop through images
     
-    if n_img>1 % if more than one image, prepare to tile
+    if and(n_img>1, nargout<2) % if more than one image, prepare to tile
         subplot(N1, N2, ii);
     end
     
@@ -84,7 +89,7 @@ for ii=1:n_img % loop through images
         
         % Label this point with aggregate no., 
         % currently uses the global index in the Aggs structure.
-        if f_text
+        if opts.f_text
             text(Aggs(aa).center_mass(2) + 20, Aggs(aa).center_mass(1), ...
                 num2str(Aggs(aa).id), 'Color', [0,0,0]);
         end
@@ -104,12 +109,29 @@ for ii=1:n_img % loop through images
         hold off;
     end
     
-    if nargout>1; axis off; f1 = getframe; fr{ii} = f1.cdata; axis on; end % get formatted image
+    if nargout>1  % get formatted image if output required
+        axis off;
+        f1 = getframe;
+        fr{ii} = f1.cdata;
+    end
+    
+    if n_img>1; tools.textbar([ii, n_img]); end
 end
+if n_img>1; disp('Complete.'); disp(' '); end
+ 
 
-if and(nargout>1, n_img==1); fr = fr{1}; end % output image instead of cell if only one image
-if nargout>0; h = gca; end % output axis handle
+%-- Parse outputs --------------------------------------------------------%
+if and(nargout>1, n_img==1); fr = fr{1}; end  % output image instead of cell if only one image
+
+if nargout==1; h = gca;  % output axis handle
+elseif nargout>1; h =[]; end  % axis handle not output if figure deleted
+
+if nargout>1; close(f0);  % if only saving images, delete figure
+elseif n_img>1; f0.WindowState = 'maximized';  % otherwise, maximize the figure window
+
 if ~exist('i0','var'); i0 = []; end
+%-------------------------------------------------------------------------%
+
 
 end
 
