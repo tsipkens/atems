@@ -24,7 +24,7 @@
 %       from the most recent loop and moving outward. Integer pairs can be
 %       added for as many iterables are present. For example, 
 %       textbar([1, 3, 2, 5]) yields:
-%           27% |██████              | 4/15 
+%           27% |█████▌              | 4/15
 %    
 %   textbar(..., f_back) displays a textbar with control over whether the 
 %       previous textbar is removed, where f_back=1 will remove the
@@ -32,7 +32,7 @@
 %       is, textbar(0.4, 1) is the same as textbar(0.4). By contrast, 
 %       the code `for ii=1:3; textbar([ii, 3], 0); end` will yield:
 %            33% |███████             | 1/3
-%            67% |██████████████      | 2/3
+%            67% |█████████████▌      | 2/3
 %           100% |████████████████████| 3/3
 %           
 % NOTE:
