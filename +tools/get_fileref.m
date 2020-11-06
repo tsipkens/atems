@@ -24,7 +24,9 @@ while flag == 0
         [fname, folder] = uigetfile({'*.tif;*.jpg', 'TEM image (*.tif;*.jpg)'}, ...
             'Select Images', dir_start, 'MultiSelect', 'on');
     else % if folder is given, get all tif files in the folder
-        t0 = dir(fullfile(fd,'*.tif')); % pattern to match filenames
+        t0 = [ ...  % pattern to match filenames
+            dir(fullfile(fd,'*.tif')), ...  % get TIF
+            dir(fullfile(fd,'*.jpg'))];  % get JPG
         fname = {t0.name};
         folder = t0(1).folder;
     end

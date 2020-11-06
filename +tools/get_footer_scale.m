@@ -2,7 +2,7 @@
 % GET_FOOTER_SCALE Crops the footer from the image and determines the scale.
 %=========================================================================%
 
-function [Imgs,pixsize] = get_footer_scale(Imgs)
+function [Imgs, pixsize] = get_footer_scale(Imgs)
 
 for jj=1:length(Imgs)
     
@@ -15,7 +15,7 @@ for jj=1:length(Imgs)
     
     for ii = 1:size(Imgs(jj).raw,1)
         if sum(Imgs(jj).raw(ii,:)) > ...
-                (0.85 * size(Imgs(jj).raw,2) * white) % 85% white row
+                (0.9 * size(Imgs(jj).raw,2) * white) % 85% white row
             FooterEdge = ii;
             footer_found = 1;
             Imgs(jj).cropped = Imgs(jj).raw(1:FooterEdge-1, :);
@@ -28,9 +28,11 @@ for jj=1:length(Imgs)
     
     if footer_found == 0
         Imgs(jj).cropped = Imgs(jj).raw;
+        Imgs(jj).pixsize = NaN;  % return NaN if nothing found
+        
         warning(['No footer found, cropped image is raw image. ' ...
             'Assign pixsize manually']);
-        return;
+        continue;
     end
     
     
@@ -61,7 +63,7 @@ for jj=1:length(Imgs)
 
 end
 
-pixsize = [Imgs(1).pixsize];
+pixsize = [Imgs.pixsize];
 
 end
 
