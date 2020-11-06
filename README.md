@@ -203,7 +203,7 @@ Finally, applying Matlab's `imsegkmeans` function, we achieve segmentations as f
 
 ![kmeans](docs/kmeans.png)
 
-This is the most robust of the fully automated methods available with this distribution. However, while this will likely be adequate for many users, the technique still occasionally fails, particularly if the function does not adequately remove the background. 
+This is the most robust of the fully automated methods available with this distribution. However, while this will likely be adequate for many users, the technique still occasionally fails, particularly if the function does not adequately remove the background. The method also has some notable limitations when images are (i) *zoomed in* on a single aggregate while (ii) also slightly overexposed. 
 
 #### Otsu thresholding: seg_otsu_rb*
 
