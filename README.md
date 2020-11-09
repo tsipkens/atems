@@ -62,7 +62,11 @@ The first step in the image analysis process is to import images. Images can be 
 Imgs = tools.load_imgs('images'); % load the images
 ```
 
-The output structure contains the image file name and directory; the image itself, with the footer cropped; and the pixel size, read from the image footer. The latter two operations make use of the get_footer_scale function, which requires a certain style footer that is consistent with TEM images taken at the University of British Columbia and applies optical character recognition to determine the pixel size (stored in the `pixsize` field). One can also generate by selecting files in a file explorer by omitting the string input: 
+The output structure contains the image file name and directory; the image itself, with the footer cropped; and the pixel size, read from the image footer. 
+
+> NOTE: The latter two operations make use of the `tools.detect_footer_scale` function, which attempts to interpret the image footer and/or scale using image analysis tools. The method is known to work with TEM images taken at the University of British Columbia, where it applies optical character recognition to determine the pixel size from the footer text (stored in the `Imgs.pixsize` field) and crops the footer away. Black text on the image may also be readable more generally. Alternatively, the user can also call the `tools.ui_scale_bar` function to use a UI to get the pixel size.
+
+One can also generate by selecting files in a file explorer by omitting the string input: 
 
 ```Matlab
 Imgs = tools.load_imgs; % load the images
@@ -74,7 +78,7 @@ The second way images can be handled is using a cell array of cropped images and
 [Imgs, imgs, pixsizes] = tools.load_imgs('images'); % load the images
 ```
 
-The images and pixel sizes can also be extracted from the `Imgs` structure using:
+The images and pixel sizes can equivalently be extracted from the `Imgs` structure using:
 
 ```Matlab
 imgs = {Imgs.cropped}; % copy variables locally

@@ -1,5 +1,5 @@
 
-% GET_SCALE_BAR  Detecting pixel size using a UI to get the scale 
+% UI_SCALE_BAR  Detecting pixel size using a UI to get the scale 
 % Adaptated from: PCM code by Dastanpour et al. (https://github.com/unatriva/UBC-PCM/blob/master/PCM_Main_Code_v5.m)
 % Modified: Timothy Sipkens
 % 
@@ -7,7 +7,7 @@
 % Otherwise, provide input as Imgs structure. 
 %=========================================================================%
 
-function [pixsizes] = get_scale_bar(imgs)
+function [pixsizes] = ui_scale_bar(imgs)
 
 %-- Parse inputs ---------------------------------------------------------%
 if isstruct(imgs)

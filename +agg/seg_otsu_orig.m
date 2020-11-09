@@ -1,5 +1,5 @@
 
-% SEG_OTSU_RB_ORIG  Performs Otsu thresholding + a rolling ball transformation (as per Dastanpur et al.).
+% SEG_OTSU_ORIG  Performs Otsu thresholding + a rolling ball transformation (as per Dastanpur et al.).
 % Authors:  Ramin Dastanpour, Steven N. Rogak, 2016-02
 %           Developed at the University of British Columbia
 % Modified: Timothy Sipkens
@@ -10,7 +10,7 @@
 %       background subtraction, and adds a denoising step. 
 %=========================================================================%
 
-function [img_binary] = seg_otsu_rb_orig(...
+function [img_binary] = seg_otsu_orig(...
     imgs, pixsizes, minparticlesize, coeffs) 
 
 %-- Parse inputs ---------------------------------------------------------%
@@ -63,8 +63,6 @@ disp(' ');
 % Extract and just output images. 
 if n==1
     img_binary = img_binary{1};
-    img_kmeans = img_kmeans{1};
-    feature_set = feature_set{1};
 end
 
 
