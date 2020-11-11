@@ -31,7 +31,10 @@ disp('Complete.');
 disp(' ');
 
 % crop out footer and get scale from text
+disp('Attempting to detect footer and scale...');
 Imgs = detect_footer_scale(Imgs);
+disp('Complete.');
+disp(' ');
 
 % format other outputs
 imgs = {Imgs.cropped};

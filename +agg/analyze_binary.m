@@ -47,10 +47,11 @@ for ii=1:length(imgs_binary) % loop through provided images
     img = imgs{ii};
     
     
-    % If more than 45% of the image is aggregate, the method likely failed.
+    % If more than 25% of the image is boundary aggregate, the method likely failed.
     % Skip this image and continue on. This is done before remove border
     % aggregates, if relevant. 
-    if (nnz(img_binary) / numel(img_binary)) > 0.45
+    bwborder = img_binary - imclearborder(img_binary);
+    if (nnz(bwborder) / numel(img_binary)) > 0.25
         continue;
     end
     
