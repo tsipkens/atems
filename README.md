@@ -11,7 +11,7 @@
 
 This codebase contains Matlab code for several methods of characterizing soot aggregates in TEM images. This includes methods for evaluating the aggregate projected area, perimeter, and primary particle diameter. Methods include Otsu thresholding, the pair correlation method (PCM), Hough circle transform (following [Kook](kook)), and tools to aid in manual analysis. This code is designed to replace a [previous, deprecated code](https://github.com/unatriva/UBC-PCM).
 
-**Testing** of this codebase makes use of the `main_*` functions in the upper directory, which are described in *[1. Main scripts (main_\*)](#1-main-scripts-main_)* below. Specifically, `main_kmeans` and `main_auto` test the fully automated methods, while `main_0` allows for testing of the more manual methods (which require substantial user input). 
+**Testing** of this codebase makes use of the `main_*` functions in the upper directory, which are described in [1. MAIN SCRIPTS (main_\*)](#1-main-scripts-main_) below. Specifically, `main_kmeans` and `main_auto` test the fully automated methods, while `main_0` allows for testing of the more manual methods (which require substantial user input). 
 
 The program is primarily composed of two analysis packages, which will be discussed later in the README: 
 
@@ -66,13 +66,13 @@ The output structure contains the image file name and directory; the image itsel
 
 > NOTE: The latter two operations make use of the `tools.detect_footer_scale` function, which attempts to interpret the image footer and/or scale using image analysis tools. The method is known to work with TEM images taken at the University of British Columbia, where it applies optical character recognition to determine the pixel size from the footer text (stored in the `Imgs.pixsize` field) and crops the footer away. Black text on the image may also be readable more generally. Alternatively, the user can also call the `tools.ui_scale_bar` function to use a UI to get the pixel size.
 
-One can also generate by selecting files in a file explorer by omitting the string input: 
+One can also get the image to analyzer by selecting files them in a file explorer by omitting the string input: 
 
 ```Matlab
 Imgs = tools.load_imgs; % load the images
 ```
 
-The second way images can be handled is using a cell array of cropped images and pixel sizes. These are secondary outputs to the load_imgs function: 
+Proceeding, the image can also be handled is using a cell array of cropped images and pixel sizes. These are secondary outputs to the `tools.load_imgs` function: 
 
 ```Matlab
 [Imgs, imgs, pixsizes] = tools.load_imgs('images'); % load the images
@@ -86,7 +86,7 @@ pixsizes = [Imgs.pixsize]; % pixel size for each image
 fname = {Imgs.fname};
 ```
 
-We note that, at the moment, all of the images will be loaded into memory. For computers with less memory, this could restrict the number of images that can be analyzed at one time. Batches of 250 images have been run successfully on a computer with 16 GB of RAM (Matlab limits memory usage to below this value).
+> NOTE: At the moment, this approach will load all of the images into memory. For computers with less memory, this could restrict the number of images that can be analyzed at one time. Batches of 250 images have been run successfully on a computer with 16 GB of RAM (Matlab limits memory usage to below this value). A simple work around is to load the images in groups, rather than all at once, and add an outer loop to proceed through the different groups.. The `tools.load_imgs(fd, n)` function is equipped to handle this, passing the second, optional argument `n` as the integer range of images to load into memory. For example, `n = 1:3` will load the first three images from the set specified by `fd`. 
 
 #### Aggregate-level segmentation
 

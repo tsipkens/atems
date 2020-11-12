@@ -13,7 +13,7 @@ if ~exist('fd','var'); fd = []; end
 if isempty(fd); Imgs = get_fileref; end % use UI to get files
 if isa(fd, 'char'); Imgs = get_fileref(fd); end % get all images in folder given in Imgs
 
-% if image number not specified, use the first one
+% if image number not specified, process all of the images.
 if ~exist('n','var'); n = []; end
 if isempty(n); n = 1:length(Imgs); end
 
