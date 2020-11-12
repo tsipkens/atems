@@ -19,26 +19,27 @@ if isempty(n); n = 1:length(Imgs); end
 
 
 %-- Read in image --------------------------------------------------------%
-disp('Reading images...');
+tools.textheader('Getting images');
 ln = length(n); % number of images
+
+disp('Loading images:');
 tools.textbar([0, ln]);
 for ii=ln:-1:1 % reverse order to pre-allocate
     Imgs(ii).raw = imread([Imgs(ii).folder, filesep, Imgs(ii).fname]);
     Imgs(ii).raw = Imgs(ii).raw(:,:,1);
     tools.textbar([ln - ii + 1, ln])
 end
-disp('Complete.');
 disp(' ');
 
 % crop out footer and get scale from text
-disp('Attempting to detect footer and scale...');
+disp('Detecting footer/scale...');
 Imgs = detect_footer_scale(Imgs);
-disp('Complete.');
-disp(' ');
 
 % format other outputs
 imgs = {Imgs.cropped};
 pixsize = [Imgs.pixsize];
+
+tools.textheader();  % output footer text
 
 end
 

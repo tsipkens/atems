@@ -51,8 +51,8 @@ img_kmeans{n} = [];
 feature_set{n} = [];
 for ii=1:n
     if n>1 % if more than one image, output text indicating image number
-        disp(['[== IMAGE ',num2str(ii), ' OF ', ...
-            num2str(length(imgs)), ' ============================]']);
+        tools.textheader([' Image ',num2str(ii), ' of ', ...
+            num2str(length(imgs))]);
     end
     
     img = imgs{ii}; pixsize = pixsizes(ii); % values for this iteration
@@ -178,11 +178,7 @@ for ii=1:n
 %=========================================================================%
     
     
-    if n>1 % if more than one image, output text
-        disp('[== Complete. ==================================]');
-        disp(' ');
-        disp(' ');
-    end
+    if n>1; tools.textheader(); end  % if more than one image, output text
 end
 
 % If a single image, cell arrays are unnecessary.
