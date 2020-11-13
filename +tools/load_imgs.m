@@ -106,7 +106,7 @@ end
 %   Crops the footer from the image and determines the scale.
 function [Imgs, pixsizes] = detect_footer_scale(Imgs)
 
-disp('Looking for footers and image scale:');
+disp('Looking for footers and image scales:');
 tools.textbar([0, length(Imgs)]);
 
 for jj=1:length(Imgs)

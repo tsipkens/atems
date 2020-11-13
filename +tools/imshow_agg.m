@@ -55,8 +55,7 @@ if n_img>1; tools.textheader('Plotting aggregates'); disp('Resolving images:'); 
 for ii=1:n_img % loop through images
     
     if and(n_img>1, nargout<2) % if more than one image, prepare to tile
-        subplot(N1, N2, ii);
-        title(num2str(idx(ii)));
+        h = subplot(N1, N2, ii);
     end
     
     %-- Determine which aggregates to plot for this image ----------------%
@@ -82,6 +81,15 @@ for ii=1:n_img % loop through images
 
         [~,~,i0] = tools.imshow_binary( ...
             Aggs(idx1(1)).image, img_binary, opts);
+        
+        % Make panels bigger.
+        if and(n_img>1, nargout<2)
+            title(num2str(idx(ii)));
+            sc_h = 1.175;
+            h.Position(3:4) = h.Position(3:4) .* sc_h;  % make panels 10% bigger
+            h.Position(1:2) = h.Position(1:2) - ...
+                h.Position(3:4) .* ((sc_h-1)/2);
+        end
     end % else: plot circles on existing image
 
 
