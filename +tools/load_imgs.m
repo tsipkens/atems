@@ -121,44 +121,43 @@ for jj=1:length(Imgs)
     
     f_nm = 1;  % flag indicating nanometers (detected below)
     
-    for ii = 1:size(Imgs(jj).raw,1)
-        if sum(Imgs(jj).raw(ii,:)) > ...
-                (0.9 * size(Imgs(jj).raw,2) * white) % 85% white row
-            FooterEdge = ii;
-            Imgs(jj).cropped = Imgs(jj).raw(1:FooterEdge-1, :);
-            footer  = Imgs(jj).raw(FooterEdge:end, :);
-            
-            footer_found = 1;  % flag that footer was found
-            
-            %-- Detecting magnification and/or pixel size ----------------%
-            o1 = ocr(footer);
-            Imgs(jj).ocr = o1;
+    % Search for row satisying 
+    f_footrow = sum(Imgs(jj).raw, 2) > ...
+    	(0.9 * size(Imgs(jj).raw,2) * white);
+    ii = find(f_footrow, 1);  % first 90% white row
+    
+    if ~isempty(ii)  % if found footer satisyfing above
+        Imgs(jj).cropped = Imgs(jj).raw(1:ii-1, :);
+        footer  = Imgs(jj).raw(ii:end, :);
 
-            % Look for pixel size.
-            pixsize_end = strfind(o1.Text,' nm/pix')-1;
-            if isempty(pixsize_end) % if not found, try nmlpix
-                pixsize_end = strfind(o1.Text,' nmlpix')-1;
+        footer_found = 1;  % flag that footer was found
+
+        %-- Detecting magnification and/or pixel size ----------------%
+        o1 = ocr(footer);
+        Imgs(jj).ocr = o1;
+
+        % Look for pixel size.
+        pixsize_end = strfind(o1.Text,' nm/pix')-1;
+        if isempty(pixsize_end) % if not found, try nmlpix
+            pixsize_end = strfind(o1.Text,' nmlpix')-1;
+
+            if isempty(pixsize_end)
+                pixsize_end = strfind(o1.Text,' pm/pix')-1; % micrometer
 
                 if isempty(pixsize_end)
-                    pixsize_end = strfind(o1.Text,' pm/pix')-1; % micrometer
-
-                    if isempty(pixsize_end)
-                        pixsize_end = strfind(o1.Text,' pmlpix')-1;
-                    end
-                    f_nm = 0;
+                    pixsize_end = strfind(o1.Text,' pmlpix')-1;
                 end
+                f_nm = 0;
             end
-            
-            % Interpret OCR text and compute pixel size.
-            pixsize_start = strfind(o1.Text,'Cal')+5;
-            Imgs(jj).pixsize = str2double(...
-                o1.Text(pixsize_start:pixsize_end));
-            
-            % If given in micrometers, convert.
-            if f_nm==0; Imgs(jj).pixsize = Imgs(jj).pixsize*1e3; end
-            
-            break;
         end
+
+        % Interpret OCR text and compute pixel size.
+        pixsize_start = strfind(o1.Text,'Cal')+5;
+        Imgs(jj).pixsize = str2double(...
+            o1.Text(pixsize_start:pixsize_end));
+
+        % If given in micrometers, convert.
+        if f_nm==0; Imgs(jj).pixsize = Imgs(jj).pixsize*1e3; end
     end
     
     
