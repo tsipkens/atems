@@ -68,6 +68,12 @@ for ii=1:n_img % loop through images
     if f_img
         % find all of the aggregates in the image of interest
         ind1 = find(idx0);
+        
+        if isempty(ind1)
+            warning(['No aggregates for image no. ', num2str(idx(ii)), '.']);
+            continue;
+        end
+        
         img_binary = zeros(size(Aggs(idx_agg(1)).image));
         for aa=idx_agg
             img_binary = or(img_binary,Aggs(aa).binary);
