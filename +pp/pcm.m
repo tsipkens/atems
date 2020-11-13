@@ -36,8 +36,7 @@ if isempty(f_backup); f_backup = 0; end
 %-------------------------------------------------------------------------%
 
 
-disp('Performing PCM:');
-
+tools.textheader('PCM');
 
 %-- Check whether the data folder is available ---------------------------%
 if exist('data','dir') ~= 7 % 7 if exist parameter is a directory
@@ -50,7 +49,9 @@ figure; % generate figure for visualizing current aggregate
 
 %== Main image processing loop ===========================================%
 n_aggs = length(Aggs);
-tools.textbar(0);
+
+disp('Characterizing aggregates:');
+tools.textbar([0, n_aggs]);
 
 for aa = 1:n_aggs % loop over each aggregate in the provided structure
     
@@ -175,12 +176,11 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
         end
     end
     
-    tools.textbar(aa / n_aggs);
+    tools.textbar([aa, n_aggs]);
 end
 
 close; % close current figure
 
-disp('Complete.');
-disp(' ');
+tools.textheader();
 
 end

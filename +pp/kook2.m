@@ -49,7 +49,7 @@ function Aggs = kook2(Aggs, f_plot)
 if ~exist('f_plot','var'); f_plot = []; end
 if isempty(f_plot); f_plot = 1; end
 
-disp('Performing Kook(2):');
+tools.textheader('Performing Kook(2)');
 
 
 %-- Sensitivity and Scaling Parameters -----------------------------------%
@@ -70,7 +70,7 @@ idx = unique([Aggs.img_id]); % unique image indexes
 n_imgs = length(idx);
 
 n_aggs = length(Aggs); % total number of aggregates
-tools.textbar(0);
+tools.textbar([0, n_imgs]);
 
 for ii = 1:n_imgs % run loop as many times as images selected
     
@@ -155,15 +155,14 @@ for ii = 1:n_imgs % run loop as many times as images selected
         end
     end
     
-    tools.textbar(ii / n_imgs);
+    tools.textbar([ii, n_imgs]);
     
 end % end of image loop
 
 dp = [Aggs.dp]; % compile dp output
 close(f0);
 
-disp('Complete.');
-disp(' ');
+tools.textheader();
 
 end
 

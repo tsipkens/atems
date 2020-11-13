@@ -51,7 +51,7 @@ end
 %-------------------------------------------------------------------------%
 
 
-if n_img>1; disp('Resolving images:'); tools.textbar([0, n_img]); end
+if n_img>1; tools.textheader('Plotting aggregates'); disp('Resolving images:'); tools.textbar([0, n_img]); end
 for ii=1:n_img % loop through images
     
     if and(n_img>1, nargout<2) % if more than one image, prepare to tile
@@ -117,7 +117,7 @@ for ii=1:n_img % loop through images
     
     if n_img>1; tools.textbar([ii, n_img]); end
 end
-if n_img>1; disp('Complete.'); disp(' '); end
+if n_img>1; tools.textheader(); end
  
 
 %-- Parse outputs --------------------------------------------------------%

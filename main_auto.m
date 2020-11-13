@@ -7,12 +7,7 @@ clear;
 close all;
 clc;
 
-[Imgs, imgs, pixsizes] = tools.load_imgs('images'); % load all images in 'images' folder
-
-% Only use the first image for testing.
-Imgs = Imgs(1);
-imgs = imgs{1};
-pixsizes = pixsizes(1);
+[Imgs, imgs, pixsizes] = tools.load_imgs('images', 1); % load first image in 'images' folder
 
 fname = {Imgs.fname};
 

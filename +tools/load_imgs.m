@@ -7,6 +7,8 @@
 
 function [Imgs, imgs, pixsize] = load_imgs(fd, n)
 
+tools.textheader('Loading images');
+
 %-- Parse inputs ---------------------------------------------------------%
 % if not image information provided, use a UI to select files
 if ~exist('fd','var'); fd = []; end
@@ -16,13 +18,13 @@ if isa(fd, 'char'); Imgs = get_fileref(fd); end % get all images in folder given
 % if image number not specified, process all of the images.
 if ~exist('n','var'); n = []; end
 if isempty(n); n = 1:length(Imgs); end
+Imgs = Imgs(n);  % option to select only some of the images before read
 
 
 %-- Read in image --------------------------------------------------------%
-tools.textheader('Getting images');
 ln = length(n); % number of images
 
-disp('Loading images:');
+disp('Reading files:');
 tools.textbar([0, ln]);
 for ii=ln:-1:1 % reverse order to pre-allocate
     Imgs(ii).raw = imread([Imgs(ii).folder, filesep, Imgs(ii).fname]);
@@ -32,7 +34,6 @@ end
 disp(' ');
 
 % crop out footer and get scale from text
-disp('Detecting footer/scale...');
 Imgs = detect_footer_scale(Imgs);
 
 % format other outputs
@@ -104,6 +105,9 @@ end
 %== DETECT_FOOTER_SCALE ==================================================%
 %   Crops the footer from the image and determines the scale.
 function [Imgs, pixsizes] = detect_footer_scale(Imgs)
+
+disp('Looking for footers and image scale:');
+tools.textbar([0, length(Imgs)]);
 
 for jj=1:length(Imgs)
     
@@ -188,7 +192,8 @@ for jj=1:length(Imgs)
             if f_nm==0; Imgs(jj).pixsize = Imgs(jj).pixsize * 1e3; end
 
             Imgs(jj).cropped = Imgs(jj).raw;  % scale bar in image, cannot crop
-            continue;
+            
+            footer_found = 1; % mark that text has been found
         end
     end
     
@@ -196,10 +201,9 @@ for jj=1:length(Imgs)
     if footer_found == 0
         Imgs(jj).cropped = Imgs(jj).raw;
         Imgs(jj).pixsize = NaN;  % return NaN if nothing found
-        continue;
     end
     
-
+    tools.textbar([jj, length(Imgs)]);
 end
 
 pixsizes = [Imgs.pixsize];

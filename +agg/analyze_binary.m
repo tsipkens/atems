@@ -40,7 +40,8 @@ if f_plot==1; f0 = figure; end % intialize a new figure to show progress
 Aggs = struct([]); % initialize Aggs structure
 id = 0;
 
-disp('Calculating aggregate areas...');
+tools.textheader('Analyzing binaries');
+disp('Progress:'); tools.textbar([0, length(imgs_binary)]);
 for ii=1:length(imgs_binary) % loop through provided images
 
     img_binary = imgs_binary{ii};
@@ -136,12 +137,13 @@ for ii=1:length(imgs_binary) % loop through provided images
     if f_plot==1; pause(0.05); end % pause very briefly to show overall aggregates
     
     Aggs = [Aggs, Aggs0]; % append current aggregate data
+    
+    tools.textbar([ii, length(imgs_binary)]);
 end
 
 close(f0); % close figure showing progress
 
-disp('Completed aggregate analysis.');
-disp(' ');
+tools.textheader();
 
 end
 

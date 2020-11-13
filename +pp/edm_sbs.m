@@ -48,6 +48,8 @@ if length(pixsizes)==1; pixsizes = pixsizes.*ones(size(imgs_binary)); end
 %-------------------------------------------------------------------------%
 
 
+tools.textheader('EDM-SBS');
+
 %-- Discretization for accumulated S curve -------------------------------%
 d_max = 100;
 nb_classes = 250;
@@ -56,8 +58,8 @@ S = zeros(size(dp_bin)); % initialize S curve
 
 
 %-- Main loop over binary images -----------------------------------------%
-disp('Performing EDM-SBS:');
-tools.textbar(0);
+disp('Characterizing aggregates:');
+tools.textbar([0, length(imgs_binary)]);
 
 for aa=1:length(imgs_binary)  % loop over aggregates
 
@@ -115,11 +117,10 @@ for aa=1:length(imgs_binary)  % loop over aggregates
     
     S = S+Sa; % add to assumulated S curve
     
-    tools.textbar(aa/length(imgs_binary));
+    tools.textbar([aa, length(imgs_binary)]);
 
 end % end loop over aggregates
 S = S./length(imgs_binary); % normalize S curve
-disp(' ');
 
 
 %== Fit a sigmoid function to all of the data ============================%
@@ -129,13 +130,12 @@ a = 0.9966;
 sigmoid = @(x) a./(1+exp(((log(x(1))-log(dp_bin))./log(x(2))-bet)./ome));
     % x(1) = dpg, x(2) = spg
 
-disp('Fitting curve to all of the data...');
 opts = optimset('Display','off');
 x0 = [25,1.5];
 x1 = lsqnonlin(@(x) (sigmoid(x) - S) ./ 100, x0, [], [], opts);
 S_fit = sigmoid(x1);
-disp('Complete.');
-disp(' ');
+
+tools.textheader();
 
 % report average dp and sg over the entire set of samples
 % stored in the first entry of Aggs
