@@ -123,7 +123,6 @@ for ii=1:n_img % loop through images
     
     if n_img>1; tools.textbar([ii, n_img]); end
 end
-if n_img>1; tools.textheader(); end
  
 
 %-- Parse outputs --------------------------------------------------------%
@@ -138,6 +137,8 @@ elseif n_img>1; f0.WindowState = 'maximized';  % otherwise, maximize the figure 
 if ~exist('i0','var'); i0 = []; end
 %-------------------------------------------------------------------------%
 
+drawnow;  % draw the plot
+if n_img>1; tools.textheader(); end
 
 end
 
