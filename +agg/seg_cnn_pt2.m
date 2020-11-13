@@ -56,8 +56,9 @@ for ii=length(fnames):-1:1
             % disk size must be less than se6 to maintain connectivity
         img_rb = imopen(i7, se7);
 
-        img_binary{ii} = bwareaopen(img_rb, 50); % remove particles below 50 pixels
-    end    
+        img_binary{ii} = bwareaopen(img_rb, 80); % remove particles below 50 pixels
+    end
+    
 end
 
 
