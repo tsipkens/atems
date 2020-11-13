@@ -2,6 +2,13 @@
 % SEG_CNN_PT2  A simple function that reads binary images from a data folder.
 % This is then used by the CarbonBlackSegmentation code before proceeding with 
 % seg_cnn_pt2.
+% 
+% NOTE:
+%   A rolling ball transform is applied only and always when the pixsize
+%   argument is given. 
+%   In other words, if one does NOT want to apply the rolling ball
+%   transform, do NOT give a pixsize. If one does want to apply the rolling
+%   ball transform, one MUST supply pixsize. 
 %=========================================================================%
 
 function [img_binary] = seg_cnn_pt2(fnames, fd, pixsize)
