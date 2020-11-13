@@ -51,10 +51,18 @@ if isempty(f_back); f_back = 1; end  % by default, remove
 %----------------------------------------------------------%
 
 
-if (isempty(i) || i(1) < 0); pct = 0; end  % if initializing textbar
-if length(i)==1; pct = i; i(2) = 0;  % if percent is given directly
-elseif length(i)==2; pct = i(1) / i(2); % if integer pair is given
-else % if a series of integer pairs is given, get global index and total elements
+% If initializing textbar.
+if (isempty(i) || i(1) < 0); pct = 0;
+    
+% If percent is given directly.
+elseif length(i)==1; pct = i; i(2) = 0;  
+
+% If integer pair is given.
+elseif length(i)==2; pct = i(1) / i(2); 
+
+% If a series of integer pairs is given, 
+% get global index and total elements.
+else
     j = prod(i(2:2:end));
     k = i(1); % initialize global index
     for ii=3:2:length(i)% loop over dimensions
@@ -64,11 +72,12 @@ else % if a series of integer pairs is given, get global index and total element
     pct = i(1) / i(2);
 end
 
-%-- Parse input ----%
-if pct == 0; f_back = 0; end  % initialize progress bar, do not backspace
+
+% If initializing progress bar, do not erase.
+if pct==0; f_back = 0; end
 
 
-%-- Parameters ----%
+%-- Other parameters ----%
 n_dot = 20;  % number of elements in progress bar
 n_xtra = 10;  % padded elements  for percent / general spacing
 n_frac = 2 * length(num2str(i(2))) + 1;  % number of extra elements due to fraction
@@ -80,9 +89,11 @@ n_str = n_dot + n_xtra + n_frac;
 if f_back; str_back = repmat(char(8), [1, n_str]); % if continuing textbar
 else; str_back = ''; end  % if initializing textbar
 
+
 % Format percentage leading bar.
 str_p00 = num2str(100 * pct, '%.0f');   % formatted percent
 str_p00 = [repmat(' ', [1, 3-length(str_p00)]), str_p00];  % pad with necessary spaces
+
 
 % Format text for middle of the bar.
 nc = ceil(pct * n_dot);  % number of completed elements
@@ -90,11 +101,14 @@ str_p01 = repmat(char(9608), [1, nc]);  % completed portion of bar
 if ((nc - pct * n_dot) > 0.5); str_p01(end) = char(9612); end  % allow for half blocks
 str_p02 = repmat(' ', [1, n_dot-nc]);  % uncompleted portion of bar
 
+
 % Format fraction trailing bar.
+% Note that this rounds the first number, i(1), down.
+% This accomodates non-integer i(1), which can be used for partial steps.
 if i(2)==0; str_p03 = '';  % if only percentage given, don't show fraction
-else  % otherwise, format fraction
-    str_p03 = [num2str(i(1), '%.0f'), ...
-        '/', num2str(i(2), '%.0f')]; % add fraction at the end
+else  % otherwise, format fraction of end of bar
+    str_p03 = [num2str(floor(i(1)), '%.0f'), ...  
+        '/', num2str(i(2), '%.0f')];
 end
 str_p03 = [str_p03, repmat(' ', [1, n_frac-length(str_p03)])];  % pad with necessary spaces
 
