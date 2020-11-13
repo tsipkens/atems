@@ -56,6 +56,7 @@ for ii=1:n_img % loop through images
     
     if and(n_img>1, nargout<2) % if more than one image, prepare to tile
         subplot(N1, N2, ii);
+        title(num2str(idx(ii)));
     end
     
     %-- Determine which aggregates to plot for this image ----------------%
@@ -67,9 +68,9 @@ for ii=1:n_img % loop through images
     %-- Plot labelled image by default -----------------------------------%
     if f_img
         % find all of the aggregates in the image of interest
-        ind1 = find(idx0);
+        idx1 = find(idx0);
         
-        if isempty(ind1)
+        if isempty(idx1)
             warning(['No aggregates for image no. ', num2str(idx(ii)), '.']);
             continue;
         end
@@ -80,7 +81,7 @@ for ii=1:n_img % loop through images
         end
 
         [~,~,i0] = tools.imshow_binary( ...
-            Aggs(ind1(1)).image, img_binary, opts);
+            Aggs(idx1(1)).image, img_binary, opts);
     end % else: plot circles on existing image
 
 
