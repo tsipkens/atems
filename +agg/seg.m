@@ -175,7 +175,8 @@ if strcmp(choice,'Yes, but refine')
     else
         uiwait(msgbox(['Please select (left click) particles ', ...
             'to remove and press enter.']));
-        img_remove = bwselect(img_binary, 8);
+        tools.imshow(img_binary);
+        img_remove = bwselect;
         img_binary = img_binary - img_remove;
     end
     
