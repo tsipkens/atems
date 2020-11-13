@@ -59,7 +59,6 @@ if n==1
     imgs_binary = imgs_binary{1}; % if one image, extract from cell
 end
 
-disp('{========================================}');
 
 end
 
