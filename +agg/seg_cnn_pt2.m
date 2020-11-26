@@ -42,22 +42,26 @@ img_binary = {};
 for ii=length(fnames):-1:1
     img_binary{ii} = imread([fd, '\results\', fnames{ii}]);
     img_binary{ii} = img_binary{ii}(:,:,1)~=0;
-
-        %== Rolling Ball Transformation ==============================%
+    
+    %-{
+    %== Rolling Ball Transformation ==============================%
     if ~isempty(pixsize)  % if pixel size given, apply rolling ball transform
         morph_param = 0.8/pixsize(ii); % parameter used to adjust morphological operations
 
+        % Disk size limited by size of holes in particle.
         ds = round(4 * morph_param);
         se6 = strel('disk', max(ds, 1));
-            % disk size limited by size of holes in particle
         i7 = imclose(img_binary{ii}, se6);
-
+        
+        % Disk size must be less than se6, 
+        % to maintain connectivity.
         se7 = strel('disk', max(ds-1, 0));
-            % disk size must be less than se6 to maintain connectivity
-        img_rb = imopen(i7, se7);
-
-        img_binary{ii} = bwareaopen(img_rb, 1e3); % remove particles below 50 pixels
+        img_binary{ii} = imopen(i7, se7);
+        
+        % Remove particles below 1000 pixels.
+        img_binary{ii} = bwareaopen(img_binary{ii}, 1e3);
     end
+    %}
     
 end
 
