@@ -6,22 +6,20 @@
 % Author: Timothy Sipkens, 2020-08-13
 % Version: 6
 % 
-%-------------------------------------------------------------------------%
-% Inputs: 
+% INPUTS: 
 %   imgs      A cell array of images OR a single image.
 %   pixsizes  The size of a pixel in nm/px, either as a scalar value for 
 %             all of the images OR a vector with one entry per image.
 %             If not given, assumed to be 1 nm/px, with implications for
 %             the rolling ball transform.
 % 
-% Outputs:
+% OUTPUTS:
 %   img_binary  A cell array of binary / classified images, where 1
 %               indicates particles and 0 indicates background.
 %   img_kmeans  The k-means classified image, prior to apply the rolling
 %               ball transform. 
 %   feature_set Colour-equivalent images of the feature set used as
 %               input to the k-means classifier.
-%-------------------------------------------------------------------------%
 %
 %=========================================================================%
 
@@ -44,6 +42,7 @@ if ~exist('pixsizes','var'); pixsizes = []; end
 if isempty(pixsizes); pixsizes = ones(size(imgs)); end
 if length(pixsizes)==1; pixsizes = pixsizes .* ones(size(imgs)); end % extend if scalar
 %-------------------------------------------------------------------------%
+
 
 tools.textheader('k-means');
 
