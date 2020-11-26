@@ -141,7 +141,7 @@ for ii=1:length(imgs_binary) % loop through provided images
     tools.textbar([ii, length(imgs_binary)]);
 end
 
-close(f0); % close figure showing progress
+if f_plot==1; close(f0); end % close figure showing progress
 
 tools.textheader();
 
