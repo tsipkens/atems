@@ -164,16 +164,18 @@ for ii=1:n
     
     
     %== STEP 4: Rolling Ball Transformation ==============================%
+    % Disk size limited by size of holes in particle.
     ds = round(4 * morph_param);
     se6 = strel('disk', max(ds, 1));
-        % disk size limited by size of holes in particle
     i7 = imclose(img_kmeans{ii}, se6);
-
+    
+    % Disk size must be less than se6 to 
+    % maintain connectivity. 
     se7 = strel('disk', max(ds-1, 0));
-        % disk size must be less than se6 to maintain connectivity
     img_rb = imopen(i7, se7);
     
-    img_binary{ii} = bwareaopen(img_rb, 50); % remove particles below 50 pixels
+    % Remove particles below 50 pixels.
+    img_binary{ii} = bwareaopen(img_rb, 50);
 %=========================================================================%
     
     
