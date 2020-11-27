@@ -23,8 +23,8 @@
 %
 %=========================================================================%
 
-function [img_binary,img_kmeans,feature_set] = ...
-    seg_kmeans(imgs,pixsizes)
+function [img_binary, img_kmeans, feature_set] = ...
+    seg_kmeans(imgs, pixsizes, opts)
 
 
 %-- Parse inputs ---------------------------------------------------------%
@@ -41,6 +41,9 @@ n = length(imgs); % number of images to consider
 if ~exist('pixsizes','var'); pixsizes = []; end
 if isempty(pixsizes); pixsizes = ones(size(imgs)); end
 if length(pixsizes)==1; pixsizes = pixsizes .* ones(size(imgs)); end % extend if scalar
+
+if ~exist('opts', 'var'); opts = struct(); end
+if ~isfield(opts, 'minsize'); opts.minsize = 50; end
 %-------------------------------------------------------------------------%
 
 
@@ -173,8 +176,9 @@ for ii=1:n
     se7 = strel('disk', max(ds-1, 0));
     img_rb = imopen(i7, se7);
     
-    % Remove particles below 50 pixels.
-    img_binary{ii} = bwareaopen(img_rb, 50);
+    % Remove particles below opts.minsize pixels.
+    % By default, removes aggregates smaller than 50 pixels.
+    img_binary{ii} = bwareaopen(img_rb, opts.minsize);
 %=========================================================================%
     
     
