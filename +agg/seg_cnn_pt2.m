@@ -1,7 +1,7 @@
 
-% SEG_CNN_PT2  A simple function that reads binary images from a data folder.
-% This is then used by the CarbonBlackSegmentation code before proceeding with 
-% seg_cnn_pt2.
+% SEG_CNN_PT2  A simple function that read binary images from a data folder.
+% Expects segmentations produced by the CarbonBlackSegmentation package:
+% See https://github.com/maxfrei750/CarbonBlackSegmentation. 
 % 
 % NOTE:
 %   A rolling ball transform is applied only and always when the pixsize
