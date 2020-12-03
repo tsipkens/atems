@@ -25,6 +25,7 @@ if ~exist('opts','var'); opts = struct(); end
 if ~isfield(opts,'cmap'); opts.cmap = [0.12,0.59,0.96]; end  % color to use, default is a blue
 if ~isfield(opts,'f_text'); opts.f_text = 1; end  % whether or not to label aggregates with numbers
 if ~isfield(opts,'f_show'); opts.f_show = 0; end  % whether to show images if just saving
+if ~isfield(opts,'f_dp'); opts.f_dp = 1; end  % whether to show images if just saving
 %-------------------------------------------------------------------------%
 
 
@@ -115,11 +116,13 @@ for ii=1:n_img % loop through images
             'EnhanceVisibility', false, 'Color', opts.cmap);
 
         % Plot primary particle diameter from PCM if available
-        if isfield(Aggs,'dp') % if available plot reference dp
-            viscircles(fliplr(Aggs(aa).center_mass'), ...
-                Aggs(aa).dp / 2 ./ Aggs(aa).pixsize, ... % use default value of dp
-                'Color', [0.92,0.16,0.49], 'LineWidth', ...
-                0.75, 'EnhanceVisibility', false);
+        if opts.f_dp
+            if isfield(Aggs,'dp') % if available plot reference dp
+                viscircles(fliplr(Aggs(aa).center_mass'), ...
+                    Aggs(aa).dp / 2 ./ Aggs(aa).pixsize, ... % use default value of dp
+                    'Color', [0.92,0.16,0.49], 'LineWidth', ...
+                    0.75, 'EnhanceVisibility', false);
+            end
         end
         hold off;
     end
@@ -137,7 +140,8 @@ end
 %-- Parse outputs --------------------------------------------------------%
 if and(nargout>1, n_img==1); fr = fr{1}; end  % output image instead of cell if only one image
 
-if nargout==1; h = gca;  % output axis handle
+if nargout==0; clear h;  % clear h if not required
+elseif nargout==1; h = gca;  % output axis handle
 elseif nargout>1; h =[]; end  % axis handle not output if figure deleted
 
 if nargout>1; close(f0);  % if only saving images, delete figure
