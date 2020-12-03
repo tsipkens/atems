@@ -63,6 +63,11 @@ for ii=1:length(imgs_binary) % loop through provided images
     end
     
     
+    % Remove aggregates below 10 pixels, which will
+    % cause problems with primary particle sizing.
+    % Segmentation technqiues may impose different minimums.
+    img_binary = bwareaopen(img_binary, 10);
+    
     % Detect distinct aggregates
     CC = bwconncomp(img_binary); % find seperate aggregates
     naggs = CC.NumObjects; % count number of aggregates
@@ -72,8 +77,7 @@ for ii=1:length(imgs_binary) % loop through provided images
     % Skip this image and continue on. 
     if naggs>50; continue; end
     
-    
-    % If no aggregates, skip image
+    % If no aggregates, skip image. 
     if naggs==0; continue; end
     
     
@@ -189,7 +193,7 @@ function [img_cropped,img_binary,rect] = autocrop(img_orig, img_binary)
 
 [x,y] = find(img_binary);
 
-space = 25;
+space = 3;
 size_img = size(img_orig);
 
 % Find coordinates of top and bottom of aggregate
