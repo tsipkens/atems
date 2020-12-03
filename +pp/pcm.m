@@ -125,6 +125,12 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
     end
     pcf_smooth = pcf_smooth ./ max(pcf_smooth); % normalize by initial value
     
+    % If too small to have enough points to interpolated between.
+    if length(pcf_smooth)==1
+        Aggs(aa).dp_pcm1 = Aggs(aa).da;
+        Aggs(aa).dp = Aggs(aa).dp_pcm1;
+        continue;
+    end
     
     
     %== 3-5: Primary particle sizing =====================================%
