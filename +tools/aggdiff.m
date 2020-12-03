@@ -3,13 +3,10 @@
 % Author: Timothy Sipkens, 2020-12-02
 %=========================================================================%
 
-function [out] = aggdiff(Aggs, Aggs0, imgs, imgs0, f_dp)
+function [out] = aggdiff(Aggs, Aggs0, imgs, imgs0)
 
 if ~exist('Aggs', 'var'); Aggs = []; end
 if ~exist('imgs', 'var'); imgs = {}; end
-
-if ~exist('f_dp', 'var'); f_dp = []; end
-if isempty(f_dp); f_dp = 1; end
 
 
 %-- Pre-format images ----------------------------------------------------%
@@ -66,26 +63,6 @@ out.sz_match = size(idx_0,1);  % number of aggregates with a match
 out.sz_add = size(Aggs,2) - size(idx_0,1);  % aggregates in Aggs with no match
 out.sz_rmv = size(Aggs0,2) - size(idx_0,1);  % aggregates in Aggs0 with no match
 
-
-if f_dp
-    agg_fields0 = fields(Aggs0);
-    agg_fields = fields(Aggs);
-    idx_dp0 = find(contains(agg_fields0, 'dp'));
-
-    for ii=(idx_dp0')
-        % Find corresponding field in other Aggs structure.
-        agg_field = agg_fields0{ii};
-        idx_dp = find(strcmp(agg_fields, agg_field), 1);
-
-        if ~isempty(idx_dp)
-            out.(agg_field) = median([Aggs.(agg_field)]);
-            out.([agg_field, '_std']) = exp(std(log([Aggs.(agg_field)])));
-            out.([agg_field, '_pd']) = (1 - ...
-                median([Aggs.(agg_field)]) ./ ...
-                median([Aggs0.(agg_field)])) .* 100;
-        end
-    end
-end
 
 end
 
