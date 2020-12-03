@@ -3,8 +3,8 @@
 %         Based on the work of Bescond et al., Aerosol Sci. Technol. (2014).
 % Author: Timothy Sipkens, 2019-11-23
 % 
-%-------------------------------------------------------------------------%
-% Inputs: 
+% 
+% INPUTS: 
 %   imgs_binary  Could be one of three options: 
 %                (1) An Aggs structure, produced by other parts of this program
 %                (2) A single binary image, where 1s indicate aggregate.
@@ -12,7 +12,7 @@
 %   pixsizes     A scalar or vector contain the pixel size for each image.
 %                (Not used if an Aggs structure is provided.)
 % 
-% Outputs: 
+% OUTPUTS: 
 %   Aggs         A structure containing information for each aggregate.
 %   dp_bin       The vector of particle sizes used in S curve.
 %   S            The S curve as defined by Bescond et al.
