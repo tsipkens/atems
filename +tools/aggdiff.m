@@ -3,7 +3,7 @@
 % Author: Timothy Sipkens, 2020-12-02
 %=========================================================================%
 
-function [out] = aggdiff(Aggs, Aggs0, imgs, imgs0)
+function [out, idx_0, idx_1] = aggdiff(Aggs, Aggs0, imgs, imgs0)
 
 if ~exist('Aggs', 'var'); Aggs = []; end
 if ~exist('imgs', 'var'); imgs = {}; end
