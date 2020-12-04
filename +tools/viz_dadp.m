@@ -11,7 +11,7 @@
 %           p2(3) - d_{p,100}, primary particle size for 100 nm aggregate
 %=========================================================================%
 
-function [h, p2] = viz_dadp(Aggs_da, dp, cm)
+function [h, p2] = viz_dadp(Aggs_da, dp, cm, f_legend)
 
 % Parse inputs
 if isstruct(Aggs_da); da = [Aggs_da.da]; dp = [Aggs_da.dp];
@@ -19,6 +19,9 @@ else; da = Aggs_da; end
 
 if ~exist('cm', 'var'); cm = []; end
 if isempty(cm); cm = [0.12,0.59,0.96]; end
+
+if ~exist('f_legend', 'var'); f_legend = []; end
+if isempty(f_legend); f_legend = [0.12,0.59,0.96]; end
 
 
 
@@ -78,10 +81,13 @@ set(gca, 'Children', [h(2:end); h(1)]);
 
 xlabel('d_a [nm]');
 ylabel('d_p [nm]');
-legend({'d_p > d_a', 'Data', ...
-    ['Power law fit (',num2str(p2(1),3),'d_a^{',num2str(p2(2),2),'})'], ...
-    'Universal relation', '2-sigma ellipse'}, ...
-    'Location', 'southeast');
+
+if f_legend
+    legend({'d_p > d_a', 'Data', ...
+        ['Power law fit (',num2str(p2(1),3),'d_a^{',num2str(p2(2),2),'})'], ...
+        'Universal relation', '2-sigma ellipse'}, ...
+        'Location', 'southeast');
+end
 
 
 hold off;
