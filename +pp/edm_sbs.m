@@ -5,7 +5,7 @@
 % 
 % 
 % INPUTS: 
-%   imgs_binary  Could be one of three options: 
+%   imgs_Aggs    Could be one of three options: 
 %                (1) An Aggs structure, produced by other parts of this program
 %                (2) A single binary image, where 1s indicate aggregate.
 %                (3) A cellular arrays of the above images.
@@ -19,20 +19,20 @@
 %   S_fit        The fit S curve used to quantify the particle size.
 %=========================================================================%
 
-function [Aggs, dp_bin, S, S_fit] = edm_sbs(imgs_binary, pixsizes)
+function [Aggs, dp_bin, S, S_fit] = edm_sbs(imgs_Aggs, pixsizes)
 
 
 %-- Parse inputs ---------------------------------------------------------%
 % OPTION 1: Consider case that Aggs is given as input.
-if isstruct(imgs_binary)
-    Aggs0 = imgs_binary;
+if isstruct(imgs_Aggs)
+    Aggs0 = imgs_Aggs;
     pixsizes = [Aggs0.pixsize];
     imgs_binary = {Aggs0.binary};
     Aggs = Aggs0;
 
 % OPTION 2: A single binary image is given.
-elseif ~iscell(imgs_binary)
-    imgs_binary = {imgs_binary};
+elseif ~iscell(imgs_Aggs)
+    imgs_binary = {imgs_Aggs};
     Aggs = struct([]); % initialize Aggs structure
     
 % OPTION 3: A cellular array of images is given.
