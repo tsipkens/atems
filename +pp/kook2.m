@@ -139,8 +139,8 @@ for ii = 1:n_imgs % run loop as many times as images selected
         Pp.Np = length(Pp.dp); % number of particles
 
 
-        Aggs(aa).dp_kook = mean(Pp.dp);
-        Aggs(aa).dp = mean(Pp.dp);
+        Aggs(aa).dp_kook = exp(mean(log(Pp.dp)));  % geometric mean
+        Aggs(aa).dp = Aggs(aa).dp_kook;
         Aggs(aa).Pp_kook = Pp; % copy primary particle information into Aggs
         
         %-- Check the circle finder by overlaying on the original image 
