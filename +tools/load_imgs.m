@@ -13,12 +13,21 @@ tools.textheader('Loading images');
 % if not image information provided, use a UI to select files
 if ~exist('fd','var'); fd = []; end
 if isempty(fd); Imgs = get_fileref; end % use UI to get files
-if isa(fd, 'char'); Imgs = get_fileref(fd); end % get all images in folder given in Imgs
+
+if strcmp(fd(1:4), 'http')  % if web resource
+    Imgs(1).folder = '';
+    Imgs(1).fname = fd;
+    
+elseif isa(fd, 'char')  % get all images in local folder given in Imgs
+    Imgs = get_fileref(fd);
+end
+
 
 % if image number not specified, process all of the images.
 if ~exist('n','var'); n = []; end
 if isempty(n); n = 1:length(Imgs); end
 Imgs = Imgs(n);  % option to select only some of the images before read
+%-------------------------------------------------------------------------%
 
 
 %-- Read in image --------------------------------------------------------%
@@ -27,7 +36,7 @@ ln = length(n); % number of images
 disp('Reading files:');
 tools.textbar([0, ln]);
 for ii=ln:-1:1 % reverse order to pre-allocate
-    Imgs(ii).raw = imread([Imgs(ii).folder, filesep, Imgs(ii).fname]);
+    Imgs(ii).raw = imread([Imgs(ii).folder, Imgs(ii).fname]);
     Imgs(ii).raw = Imgs(ii).raw(:,:,1);
     tools.textbar([ln - ii + 1, ln])
 end
@@ -83,13 +92,13 @@ while flag == 0
         flag = 1;
         for ii=length(fname):-1:1
             Imgs(ii).fname = fname{ii};
-            Imgs(ii).folder = folder;
+            Imgs(ii).folder = [folder, filesep];
         end
     elseif Imgs.fname==0 % handle when no image was selected
         error('No image selected.');
     else % handle when only one image is selected
         Imgs.fname = fname;
-        Imgs.folder = folder;
+        Imgs.folder = [folder, filesep];
         flag = 1;
     end
 end
