@@ -7,8 +7,9 @@
 [![tsipkens](https://circleci.com/gh/tsipkens/atems.svg?style=shield)]() 
 
 <p align="left">
-  <img width="387" height="337.5" src="docs/header.png">
+  <img width="417.2" height="363.2" src="docs/header.png">
 </p>
+
 
 This codebase contains Matlab code for several methods of characterizing soot aggregates in TEM images. This includes methods for evaluating the aggregate projected area, perimeter, and primary particle diameter. Methods include Otsu thresholding, the pair correlation method (PCM), Hough circle transform (following [Kook](kook)), and tools to aid in manual analysis. This code is designed to replace a [previous, deprecated code](https://github.com/unatriva/UBC-PCM).
 
