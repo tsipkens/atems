@@ -1,4 +1,8 @@
 
+# Define job that installs Matlab and runs main_ci.
+# This reads image from the master branch's images folder,
+# using the GitHub remote. This runs most automatic methods
+# on the selected image, failing if an error occurs.
 jobs:
   build:
     machine:
@@ -13,7 +17,7 @@ workflows:
   version: 2
   workflow:
     jobs:
-      - build:
+      - build: # only run tests if commiting to master branch!
           filters:
             branches:
               only: master
