@@ -49,7 +49,7 @@ function Aggs = kook2(Aggs, f_plot)
 if ~exist('f_plot','var'); f_plot = []; end
 if isempty(f_plot); f_plot = 1; end
 
-tools.textheader('Performing Kook(2)');
+tools.textheader('Performing Kook.v2 (Hough)');
 
 
 %-- Sensitivity and Scaling Parameters -----------------------------------%
@@ -57,9 +57,9 @@ max_img_count = 255; % Maximum image count for 8-bit image
 self_subt = 0.8; % Self-subtraction level 
 mf = 1; % Median filter [x x] if needed 
 alpha = 0.1; % Shape of the negative Laplacian "unsharp" filter 0->1 0.1
-rmax = 30; % Maximum radius in pixel
-rmin = 6; % Minimum radius in pixel (Keep high enough to eliminate dummies)
-sens_val = 0.75; % the sensitivity (0?1) for the circular Hough transform 
+rmax = 50; % Maximum radius in pixel
+rmin = 8; % Minimum radius in pixel (Keep high enough to eliminate dummies)
+sens_val = 0.75; % the sensitivity (0->1) for the circular Hough transform 
 
 
 if f_plot==1; f0 = figure; end
@@ -79,8 +79,6 @@ for ii = 1:n_imgs % run loop as many times as images selected
     idx_agg = idx_agg(idx0);
     a1 = idx_agg(1);
     
-    if f_plot==1; tools.imshow(Aggs(a1).image); drawnow; end
-    
     %-- Crop footer and get scale ----------------------------------------%
     pixsize = Aggs(a1).pixsize; 
     img = Aggs(a1).image;
@@ -98,7 +96,8 @@ for ii = 1:n_imgs % run loop as many times as images selected
     img_canny = edge(img_unsharp, 'Canny'); % Canny edge detection
     
     % Imposing white background onto image. 
-    % This prevents the program from detecting any background particles. 
+    % This would prevent the program from detecting any background
+    % particles, but was found to be less useful in practice. 
     % img_canny = double(~img_binary) + double(img_canny0);
     %=====================================================================%
     
@@ -111,6 +110,7 @@ for ii = 1:n_imgs % run loop as many times as images selected
     
     %-- Check the circle finder by overlaying boundaries on the original image
     if and(f_plot==1, ~isempty(centers))
+        tools.imshow(Aggs(a1).image); drawnow;
         hold on;
         viscircles(centers, radii', 'EdgeColor', [0.1,0.1,0.1], ...
         	'LineWidth', 0.75, 'EnhanceVisibility', false);
@@ -133,15 +133,17 @@ for ii = 1:n_imgs % run loop as many times as images selected
 
         %-- Calculate Parameters (Add Histogram) -----------------------------%
         Pp.dp = Pp.radii .* pixsize .* 2;
-        Pp.dpg = nthroot(prod(Pp.dp), 1/length(Pp.dp)); % geometric mean
+        Pp.dpm = mean(Pp.dp); % mean
+        Pp.dpg = exp(mean(log(Pp.dp)));  % geometric mean
         Pp.sg = log(std(Pp.dp)); % geometric standard deviation
 
         Pp.Np = length(Pp.dp); % number of particles
-
-
-        Aggs(aa).dp_kook = exp(mean(log(Pp.dp)));  % geometric mean
-        Aggs(aa).dp = Aggs(aa).dp_kook;
+        
+        
+        % Copy data to Aggs structure.
         Aggs(aa).Pp_kook = Pp; % copy primary particle information into Aggs
+        Aggs(aa).dp_kook = Pp.dpg;  % goemetric mean
+        Aggs(aa).dp = Pp.dpg;
         
         %-- Check the circle finder by overlaying on the original image 
         %   Circles in blue if part of considered aggregates
@@ -160,7 +162,7 @@ for ii = 1:n_imgs % run loop as many times as images selected
 end % end of image loop
 
 dp = [Aggs.dp]; % compile dp output
-close(f0);
+if f_plot==1; close(f0); end
 
 tools.textheader();
 
