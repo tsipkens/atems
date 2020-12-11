@@ -27,9 +27,9 @@ for ii=(idx_dp0')
         continue;
     end
     
-    % Calculate the median.
-    out.(agg_field(4:end)) = nanmedian([Aggs.(agg_field)]);
-
+    % Calculate the geometric mean diameter.
+    out.(agg_field(4:end)) = exp(nanmean(log([Aggs.(agg_field)])));
+    
     % Compute geometric standard deviation.
     out.([agg_field(4:end), '_sg']) = ...
         exp(nanstd(log([Aggs.(agg_field)])));
