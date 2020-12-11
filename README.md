@@ -7,7 +7,7 @@
 [![tsipkens](https://circleci.com/gh/tsipkens/atems.svg?style=shield)]() 
 
 <p align="left">
-  <img width="417.2" height="363.2" src="docs/header.png">
+  <img width="310" src="docs/header.png">
 </p>
 
 
