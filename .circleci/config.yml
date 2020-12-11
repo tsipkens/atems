@@ -1,3 +1,4 @@
+
 jobs:
   build:
     machine:
@@ -6,7 +7,20 @@ jobs:
       - checkout
       - matlab/install
       - matlab/run-command:
-          command: main_ci
+          command:  main_ci
+
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - build
+        filters:
+          branches:
+            only:
+              - master
+
+
 orbs:
   matlab: mathworks/matlab@0.3.0
+
 version: 2.1
