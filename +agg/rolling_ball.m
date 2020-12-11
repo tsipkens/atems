@@ -1,7 +1,8 @@
 
-% ROLLING_BALL Perform a rolling ball transformation, as per Dastanpour et al.
-% Author:      Ramin Dastanpour
-% Modified:    Timothy Sipkens, 2019-11-06
+% ROLLING_BALL Perform a rolling ball transformation, following Dastanpour et al. (2016).
+% A different variant is used for newer functions (e.g., CNN and k-means).
+% Author: Ramin Dastanpour
+% Modified: Timothy Sipkens, 2019-11-06
 %=========================================================================%
 
 function [img_binary] = ...

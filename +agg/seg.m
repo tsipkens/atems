@@ -35,8 +35,9 @@ if ~exist('opts','var'); opts = []; end
 imgs_binary = cell(length(imgs),1); % pre-allocate
 for ii=1:n % loop through provided images
     
-    disp(['[== IMAGE ',num2str(ii), ' OF ', ...
-            num2str(length(imgs)), ' ============================]']);
+    % Add header for this image.
+    disp('{========================================}');
+    tools.textheader(['Image ', num2str(ii), ' of ', num2str(length(imgs))]);
     
     %-- Run slider to obtain binary image --------------------------------%
     [img_binary,~,~,~] = seg_sub(imgs{ii}, pixsize(ii), ...
@@ -48,9 +49,6 @@ for ii=1:n % loop through provided images
        mkdir('temp')
     end
     imwrite(imgs_binary{ii}, ['temp/segg_',num2str(ii),'.TIF']);
-    
-    disp('[== Complete =================================]');
-    disp(' ');
     
 end
 
@@ -91,6 +89,7 @@ if isfield(opts,'f_otsu'); f_otsu = opts.bool_otsu; end
 %-------------------------------------------------------------------------%
 
 
+
 %== Attempt 1: k-means segmentation + rolling ball transformation ========%
 if f_kmeans
     img_binary = agg.seg_kmeans(...
@@ -101,6 +100,8 @@ if f_kmeans
 else
     choice = 'No';
 end
+
+commandwindow;  % return focus to Matlab window
 
 
 
@@ -123,13 +124,17 @@ img_cropped = [];
 
 %== Attempt 3: Manual thresholding with slider UI ========================%
 if moreaggs==1
+    tools.textheader('slider method');
+    
+    % Access slider UI, using either:
+    %   if 'Yes, but refine' on previous output from user_input fnc.
+    %   OR zeros as a start
     img_binary = agg.seg_slider(img, img_binary, 1);
-        % access slider UI, using either:
-        % if 'Yes, but refine' on previous output from user_input fnc.
-        % OR zeros as a start
+        
+    tools.textheader();
 end
 
-commandwindow; % return focus to Matlab window
+commandwindow;  % return focus to Matlab window
 
 
 end
@@ -167,9 +172,10 @@ if strcmp(choice,'Yes, but refine')
         
     % If particles to remove, use the bwselect utility.
     else
-        uiwait(msgbox(['Please select (left click) particles to remove', ...
-            ' and press enter.']));
-        img_remove = bwselect(img_binary, 8);
+        uiwait(msgbox(['Please select (left click) particles ', ...
+            'to remove and press enter.']));
+        tools.imshow(img_binary);
+        img_remove = bwselect;
         img_binary = img_binary - img_remove;
     end
     

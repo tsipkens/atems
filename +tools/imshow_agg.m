@@ -25,6 +25,7 @@ if ~exist('opts','var'); opts = struct(); end
 if ~isfield(opts,'cmap'); opts.cmap = [0.12,0.59,0.96]; end  % color to use, default is a blue
 if ~isfield(opts,'f_text'); opts.f_text = 1; end  % whether or not to label aggregates with numbers
 if ~isfield(opts,'f_show'); opts.f_show = 0; end  % whether to show images if just saving
+if ~isfield(opts,'f_dp'); opts.f_dp = 1; end  % whether to show images if just saving
 %-------------------------------------------------------------------------%
 
 
@@ -51,11 +52,11 @@ end
 %-------------------------------------------------------------------------%
 
 
-if n_img>1; disp('Resolving images:'); tools.textbar([0, n_img]); end
+if n_img>1; tools.textheader('Plotting aggregates'); disp('Resolving images:'); tools.textbar([0, n_img]); end
 for ii=1:n_img % loop through images
     
     if and(n_img>1, nargout<2) % if more than one image, prepare to tile
-        subplot(N1, N2, ii);
+        h = subplot(N1, N2, ii);
     end
     
     %-- Determine which aggregates to plot for this image ----------------%
@@ -67,14 +68,29 @@ for ii=1:n_img % loop through images
     %-- Plot labelled image by default -----------------------------------%
     if f_img
         % find all of the aggregates in the image of interest
-        ind1 = find(idx0);
+        idx1 = find(idx0);
+        
+        if isempty(idx1)
+            warning(['No aggregates for image no. ', num2str(idx(ii)), '.']);
+            continue;
+        end
+        
         img_binary = zeros(size(Aggs(idx_agg(1)).image));
         for aa=idx_agg
             img_binary = or(img_binary,Aggs(aa).binary);
         end
 
         [~,~,i0] = tools.imshow_binary( ...
-            Aggs(ind1(1)).image, img_binary, opts);
+            Aggs(idx1(1)).image, img_binary, opts);
+        
+        % Make panels bigger.
+        if and(n_img>1, nargout<2)
+            title(num2str(idx(ii)));
+            sc_h = 1.175;
+            h.Position(3:4) = h.Position(3:4) .* sc_h;  % make panels 10% bigger
+            h.Position(1:2) = h.Position(1:2) - ...
+                h.Position(3:4) .* ((sc_h-1)/2);
+        end
     end % else: plot circles on existing image
 
 
@@ -100,11 +116,13 @@ for ii=1:n_img % loop through images
             'EnhanceVisibility', false, 'Color', opts.cmap);
 
         % Plot primary particle diameter from PCM if available
-        if isfield(Aggs,'dp') % if available plot reference dp
-            viscircles(fliplr(Aggs(aa).center_mass'), ...
-                Aggs(aa).dp / 2 ./ Aggs(aa).pixsize, ... % use default value of dp
-                'Color', [0.92,0.16,0.49], 'LineWidth', ...
-                0.75, 'EnhanceVisibility', false);
+        if opts.f_dp
+            if isfield(Aggs,'dp') % if available plot reference dp
+                viscircles(fliplr(Aggs(aa).center_mass'), ...
+                    Aggs(aa).dp / 2 ./ Aggs(aa).pixsize, ... % use default value of dp
+                    'Color', [0.92,0.16,0.49], 'LineWidth', ...
+                    0.75, 'EnhanceVisibility', false);
+            end
         end
         hold off;
     end
@@ -117,13 +135,13 @@ for ii=1:n_img % loop through images
     
     if n_img>1; tools.textbar([ii, n_img]); end
 end
-if n_img>1; disp('Complete.'); disp(' '); end
  
 
 %-- Parse outputs --------------------------------------------------------%
 if and(nargout>1, n_img==1); fr = fr{1}; end  % output image instead of cell if only one image
 
-if nargout==1; h = gca;  % output axis handle
+if nargout==0; clear h;  % clear h if not required
+elseif nargout==1; h = gca;  % output axis handle
 elseif nargout>1; h =[]; end  % axis handle not output if figure deleted
 
 if nargout>1; close(f0);  % if only saving images, delete figure
@@ -132,6 +150,8 @@ elseif n_img>1; f0.WindowState = 'maximized';  % otherwise, maximize the figure 
 if ~exist('i0','var'); i0 = []; end
 %-------------------------------------------------------------------------%
 
+drawnow;  % draw the plot
+if n_img>1; tools.textheader(); end
 
 end
 

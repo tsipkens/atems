@@ -7,38 +7,49 @@
 
 function [Imgs, imgs, pixsize] = load_imgs(fd, n)
 
+tools.textheader('Loading images');
+
 %-- Parse inputs ---------------------------------------------------------%
 % if not image information provided, use a UI to select files
 if ~exist('fd','var'); fd = []; end
 if isempty(fd); Imgs = get_fileref; end % use UI to get files
-if isa(fd, 'char'); Imgs = get_fileref(fd); end % get all images in folder given in Imgs
+
+if strcmp(fd(1:4), 'http')  % if web resource
+    Imgs(1).folder = '';
+    Imgs(1).fname = fd;
+    
+elseif isa(fd, 'char')  % get all images in local folder given in Imgs
+    Imgs = get_fileref(fd);
+end
+
 
 % if image number not specified, process all of the images.
 if ~exist('n','var'); n = []; end
 if isempty(n); n = 1:length(Imgs); end
+Imgs = Imgs(n);  % option to select only some of the images before read
+%-------------------------------------------------------------------------%
 
 
 %-- Read in image --------------------------------------------------------%
-disp('Reading images...');
 ln = length(n); % number of images
+
+disp('Reading files:');
 tools.textbar([0, ln]);
 for ii=ln:-1:1 % reverse order to pre-allocate
-    Imgs(ii).raw = imread([Imgs(ii).folder, filesep, Imgs(ii).fname]);
+    Imgs(ii).raw = imread([Imgs(ii).folder, Imgs(ii).fname]);
     Imgs(ii).raw = Imgs(ii).raw(:,:,1);
     tools.textbar([ln - ii + 1, ln])
 end
-disp('Complete.');
 disp(' ');
 
 % crop out footer and get scale from text
-disp('Attempting to detect footer and scale...');
 Imgs = detect_footer_scale(Imgs);
-disp('Complete.');
-disp(' ');
 
 % format other outputs
 imgs = {Imgs.cropped};
 pixsize = [Imgs.pixsize];
+
+tools.textheader();  % output footer text
 
 end
 
@@ -81,13 +92,13 @@ while flag == 0
         flag = 1;
         for ii=length(fname):-1:1
             Imgs(ii).fname = fname{ii};
-            Imgs(ii).folder = folder;
+            Imgs(ii).folder = [folder, filesep];
         end
     elseif Imgs.fname==0 % handle when no image was selected
         error('No image selected.');
     else % handle when only one image is selected
         Imgs.fname = fname;
-        Imgs.folder = folder;
+        Imgs.folder = [folder, filesep];
         flag = 1;
     end
 end
@@ -104,6 +115,9 @@ end
 %   Crops the footer from the image and determines the scale.
 function [Imgs, pixsizes] = detect_footer_scale(Imgs)
 
+disp('Looking for footers/scale:');
+tools.textbar([0, length(Imgs)]);
+
 for jj=1:length(Imgs)
     
     %== Designed for UBC footer. =========================================%
@@ -116,44 +130,43 @@ for jj=1:length(Imgs)
     
     f_nm = 1;  % flag indicating nanometers (detected below)
     
-    for ii = 1:size(Imgs(jj).raw,1)
-        if sum(Imgs(jj).raw(ii,:)) > ...
-                (0.9 * size(Imgs(jj).raw,2) * white) % 85% white row
-            FooterEdge = ii;
-            Imgs(jj).cropped = Imgs(jj).raw(1:FooterEdge-1, :);
-            footer  = Imgs(jj).raw(FooterEdge:end, :);
-            
-            footer_found = 1;  % flag that footer was found
-            
-            %-- Detecting magnification and/or pixel size ----------------%
-            o1 = ocr(footer);
-            Imgs(jj).ocr = o1;
+    % Search for row satisying 
+    f_footrow = sum(Imgs(jj).raw, 2) > ...
+    	(0.9 * size(Imgs(jj).raw,2) * white);
+    ii = find(f_footrow, 1);  % first 90% white row
+    
+    if ~isempty(ii)  % if found footer satisyfing above
+        Imgs(jj).cropped = Imgs(jj).raw(1:ii-1, :);
+        footer  = Imgs(jj).raw(ii:end, :);
 
-            % Look for pixel size.
-            pixsize_end = strfind(o1.Text,' nm/pix')-1;
-            if isempty(pixsize_end) % if not found, try nmlpix
-                pixsize_end = strfind(o1.Text,' nmlpix')-1;
+        footer_found = 1;  % flag that footer was found
+
+        %-- Detecting magnification and/or pixel size ----------------%
+        o1 = ocr(footer);
+        Imgs(jj).ocr = o1;
+
+        % Look for pixel size.
+        pixsize_end = strfind(o1.Text,' nm/pix')-1;
+        if isempty(pixsize_end) % if not found, try nmlpix
+            pixsize_end = strfind(o1.Text,' nmlpix')-1;
+
+            if isempty(pixsize_end)
+                pixsize_end = strfind(o1.Text,' pm/pix')-1; % micrometer
 
                 if isempty(pixsize_end)
-                    pixsize_end = strfind(o1.Text,' pm/pix')-1; % micrometer
-
-                    if isempty(pixsize_end)
-                        pixsize_end = strfind(o1.Text,' pmlpix')-1;
-                    end
-                    f_nm = 0;
+                    pixsize_end = strfind(o1.Text,' pmlpix')-1;
                 end
+                f_nm = 0;
             end
-            
-            % Interpret OCR text and compute pixel size.
-            pixsize_start = strfind(o1.Text,'Cal')+5;
-            Imgs(jj).pixsize = str2double(...
-                o1.Text(pixsize_start:pixsize_end));
-            
-            % If given in micrometers, convert.
-            if f_nm==0; Imgs(jj).pixsize = Imgs(jj).pixsize*1e3; end
-            
-            break;
         end
+
+        % Interpret OCR text and compute pixel size.
+        pixsize_start = strfind(o1.Text,'Cal')+5;
+        Imgs(jj).pixsize = str2double(...
+            o1.Text(pixsize_start:pixsize_end));
+
+        % If given in micrometers, convert.
+        if f_nm==0; Imgs(jj).pixsize = Imgs(jj).pixsize*1e3; end
     end
     
     
@@ -187,7 +200,8 @@ for jj=1:length(Imgs)
             if f_nm==0; Imgs(jj).pixsize = Imgs(jj).pixsize * 1e3; end
 
             Imgs(jj).cropped = Imgs(jj).raw;  % scale bar in image, cannot crop
-            continue;
+            
+            footer_found = 1; % mark that text has been found
         end
     end
     
@@ -195,10 +209,9 @@ for jj=1:length(Imgs)
     if footer_found == 0
         Imgs(jj).cropped = Imgs(jj).raw;
         Imgs(jj).pixsize = NaN;  % return NaN if nothing found
-        continue;
     end
     
-
+    tools.textbar([jj, length(Imgs)]);
 end
 
 pixsizes = [Imgs.pixsize];

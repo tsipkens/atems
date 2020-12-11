@@ -6,27 +6,25 @@
 % Author: Timothy Sipkens, 2020-08-13
 % Version: 6
 % 
-%-------------------------------------------------------------------------%
-% Inputs: 
+% INPUTS: 
 %   imgs      A cell array of images OR a single image.
 %   pixsizes  The size of a pixel in nm/px, either as a scalar value for 
 %             all of the images OR a vector with one entry per image.
 %             If not given, assumed to be 1 nm/px, with implications for
 %             the rolling ball transform.
 % 
-% Outputs:
+% OUTPUTS:
 %   img_binary  A cell array of binary / classified images, where 1
 %               indicates particles and 0 indicates background.
 %   img_kmeans  The k-means classified image, prior to apply the rolling
 %               ball transform. 
 %   feature_set Colour-equivalent images of the feature set used as
 %               input to the k-means classifier.
-%-------------------------------------------------------------------------%
 %
 %=========================================================================%
 
-function [img_binary,img_kmeans,feature_set] = ...
-    seg_kmeans(imgs,pixsizes)
+function [img_binary, img_kmeans, feature_set] = ...
+    seg_kmeans(imgs, pixsizes, opts)
 
 
 %-- Parse inputs ---------------------------------------------------------%
@@ -43,43 +41,44 @@ n = length(imgs); % number of images to consider
 if ~exist('pixsizes','var'); pixsizes = []; end
 if isempty(pixsizes); pixsizes = ones(size(imgs)); end
 if length(pixsizes)==1; pixsizes = pixsizes .* ones(size(imgs)); end % extend if scalar
+
+if ~exist('opts', 'var'); opts = struct(); end
+if ~isfield(opts, 'minsize'); opts.minsize = 50; end
 %-------------------------------------------------------------------------%
+
+
+tools.textheader('k-means');
 
 % Loop over images, calling seg function below on each iteration.
 img_binary{n} = []; % pre-allocate cells
 img_kmeans{n} = [];
 feature_set{n} = [];
+
+disp('Segmenting images:'); tools.textbar([0, n]);
 for ii=1:n
-    if n>1 % if more than one image, output text indicating image number
-        disp(['[== IMAGE ',num2str(ii), ' OF ', ...
-            num2str(length(imgs)), ' ============================]']);
-    end
     
     img = imgs{ii}; pixsize = pixsizes(ii); % values for this iteration
     
     
 %== CORE FUNCTION ========================================================%
-    morph_param = 0.8/pixsize % parameter used to adjust morphological operations
+    morph_param = 0.8/pixsize; % parameter used to adjust morphological operations
+    
     
     %== STEP 1: Attempt to the remove background gradient ================%
-    disp('Subtracting background...');
     img = agg.bg_subtract(img); % background subtraction
-    disp('Complete.');
-    disp(' ');
+    tools.textbar([(ii-1)+0.45, n]);
     
     
-
+    
     %== STEP 2: Pre-process image ========================================%
     %-- A: Perform denoising ---------------------------------------------%
-    disp('Denoising...');
     img_denoise = imbilatfilt(img);
     % img_denoise = tools.imtotvar_sb_atv(img,15); % alternate total variation denoise
-    disp('Complete.');
-    disp(' ');
+    tools.textbar([(ii-1)+0.49, n]); % partial textbar update
+    
     
     
     %-- B: Use texture in bottom hat images ------------------------------%
-    disp('Computing texture layer...');
     se = strel('disk',20);
     i10 = imbothat(img_denoise,se);
 
@@ -88,12 +87,12 @@ for ii=1:n
     se12 = strel('disk', max(round(5*morph_param),1));
     i12 = imclose(i11, se12);
     i12 = im2uint8(i12 ./ max(max(i12)));
-    disp('Complete.');
-    disp(' ');
-
-
+    
+    tools.textbar([(ii-1)+0.7, n]); % partial textbar update
+    
+    
+    
     %-- C: Perform adjusted threshold ------------------------------------%
-    disp('Computing adjusted threshold layer...');
     i1 = im2uint8(img_denoise);
     i1 = imgaussfilt(i1,max(round(5*morph_param),1));
 
@@ -117,6 +116,7 @@ for ii=1:n
     if isempty(lvl4)
         lvl4 = 1;
         warning('Adjusted threshold failed. Using Otsu.');
+        if n>1; tools.textbar([0, n]); tools.textbar([ii-1, n]); end
     end
     
     lvl4 = lvl3(lvl4(1)); % use the first case found in preceding line
@@ -139,9 +139,10 @@ for ii=1:n
         end
     end
     i5 = imgaussfilt(im2uint8(i5.*255), 15);
-    disp('Complete.');
-    disp(' ');
-
+    
+    tools.textbar([(ii-1)+0.82, n]); % partial textbar update
+    
+    
 
     %-- Combine feature set ----------------------------------------------%
     feature_set{ii} = single(cat(3,...
@@ -152,38 +153,39 @@ for ii=1:n
     
     
     
+    
     %== STEP 3: Perform kmeans segmentation ==============================%
-    disp('Performing k-means...');
     bw = imsegkmeans(feature_set{ii}, 2);
-    disp('Complete.');
-    disp(' ');
     bw = bw==1;
 
     [~,ind_max] = max([mean(img_denoise(bw)),mean(img_denoise(~bw))]);
     img_kmeans{ii} = bw==(ind_max-1);
-
-
-
+    
+    tools.textbar([(ii-1)+0.99, n]); % partial textbar update
+    
+    
+    
     %== STEP 4: Rolling Ball Transformation ==============================%
+    % Disk size limited by size of holes in particle.
     ds = round(4 * morph_param);
     se6 = strel('disk', max(ds, 1));
-        % disk size limited by size of holes in particle
     i7 = imclose(img_kmeans{ii}, se6);
-
+    
+    % Disk size must be less than se6 to 
+    % maintain connectivity. 
     se7 = strel('disk', max(ds-1, 0));
-        % disk size must be less than se6 to maintain connectivity
     img_rb = imopen(i7, se7);
     
-    img_binary{ii} = bwareaopen(img_rb, 50); % remove particles below 50 pixels
+    % Remove particles below opts.minsize pixels.
+    % By default, removes aggregates smaller than 50 pixels.
+    img_binary{ii} = bwareaopen(img_rb, opts.minsize);
 %=========================================================================%
     
     
-    if n>1 % if more than one image, output text
-        disp('[== Complete. ==================================]');
-        disp(' ');
-        disp(' ');
-    end
+    tools.textbar([ii, n]);  % if more than one image, output text
 end
+tools.textheader();
+
 
 % If a single image, cell arrays are unnecessary.
 % Extract and just output images. 
