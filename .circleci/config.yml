@@ -6,7 +6,7 @@ jobs:
       - checkout
       - matlab/install
       - matlab/run-command:
-          command: main_auto
+          command: main_ci
 orbs:
   matlab: mathworks/matlab@0.3.0
 version: 2.1
