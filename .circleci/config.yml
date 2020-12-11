@@ -10,14 +10,14 @@ jobs:
           command:  main_ci
 
 workflows:
-  version: 2
   workflow:
+    triggers:
+      filters:
+        branches:
+          only:
+            - master
     jobs:
       - build:
-        filters:
-          branches:
-            only:
-              - master
 
 orbs:
   matlab: mathworks/matlab@0.3.0
