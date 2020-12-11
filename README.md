@@ -4,6 +4,7 @@
 
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 [![Version](https://img.shields.io/badge/Version-1.0+-blue.svg)]()
+[![tsipkens](https://circleci.com/gh/tsipkens/atems.svg?style=shield)]() 
 
 <p align="left">
   <img width="387" height="337.5" src="docs/header.png">
