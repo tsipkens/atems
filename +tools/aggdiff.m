@@ -45,7 +45,8 @@ out.accuracy_b = (sum(and(~i0b, ~i1b)) + sum(and(i0b, i1b))) ./ length(i0b) .* 1
 
 
 %-- Compute % difference in da -------------------------------------------%
-out.da_pd = (median([Aggs.da]) ./ median([Aggs0.da]) - 1) .* 100;
+out.da_pd = (exp(mean(log([Aggs.da]))) ./ ...
+    exp(mean(log([Aggs0.da]))) - 1) .* 100;
 
 
 %-- Match aggregates and compare da --------------------------------------%
