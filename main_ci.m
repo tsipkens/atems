@@ -14,15 +14,15 @@ fname = {Imgs.fname};
 %== Run thresholding for all of the images ===============================%
 % k-means
 [imgs_km] = agg.seg_kmeans(Imgs);
-Aggs_km = agg.analyze_binary(imgs_km, imgs, pixsizes, fname);
+Aggs_km = agg.analyze_binary(imgs_km, imgs, pixsizes, fname, [], 0);
 
 % New Otsu
 imgs_otsu = agg.seg_otsu(imgs, pixsizes);
-Aggs_otsu = agg.analyze_binary(imgs_otsu, imgs, pixsizes, fname);
+Aggs_otsu = agg.analyze_binary(imgs_otsu, imgs, pixsizes, fname, [], 0);
 
 % Original Otsu
 imgs_otsu_o = agg.seg_otsu_orig(imgs, pixsizes);
-Aggs_otsu_o = agg.analyze_binary(imgs_otsu_o, imgs, pixsizes, fname);
+Aggs_otsu_o = agg.analyze_binary(imgs_otsu_o, imgs, pixsizes, fname, [], 0);
 %=========================================================================%
 
 
