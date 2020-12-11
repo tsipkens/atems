@@ -13,25 +13,26 @@ fname = {Imgs.fname};
 
 %== Run thresholding for all of the images ===============================%
 % k-means
-[imgs_km] = agg.seg_kmeans(Imgs);
-Aggs_km = agg.analyze_binary(imgs_km, imgs, pixsizes, fname, [], 0);
+imgs_km = agg.seg_kmeans(Imgs);
+Aggs = agg.analyze_binary(imgs_km, imgs, pixsizes, fname, [], 0);
 
 % New Otsu
 imgs_otsu = agg.seg_otsu(imgs, pixsizes);
-Aggs_otsu = agg.analyze_binary(imgs_otsu, imgs, pixsizes, fname, [], 0);
+agg.analyze_binary(imgs_otsu, imgs, pixsizes, fname, [], 0);
 
 % Original Otsu
 imgs_otsu_o = agg.seg_otsu_orig(imgs, pixsizes);
-Aggs_otsu_o = agg.analyze_binary(imgs_otsu_o, imgs, pixsizes, fname, [], 0);
+agg.analyze_binary(imgs_otsu_o, imgs, pixsizes, fname, [], 0);
 %=========================================================================%
 
 
 
 
 %== Primary particle sizing ==============================================%
-Aggs_pp = pp.edm_sbs(Aggs_km);
-Aggs_pp = pp.kook2(Aggs_pp, 0);
-Aggs_pp = pp.pcm(Aggs_pp);
+pp.edm_sbs(Aggs);
+pp.kook2(Aggs, 0);
+pp.pcm(Aggs);
+pp.edm_ws(Aggs, [], 0);
 %=========================================================================%
 
 
