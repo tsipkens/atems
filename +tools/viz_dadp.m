@@ -11,7 +11,7 @@
 %           p2(3) - d_{p,100}, primary particle size for 100 nm aggregate
 %=========================================================================%
 
-function [h, p2] = viz_dadp(Aggs_da, dp, cm, f_legend)
+function [h, p2, R] = viz_dadp(Aggs_da, dp, cm, f_legend)
 
 % Parse inputs
 if isstruct(Aggs_da); da = [Aggs_da.da]; dp = [Aggs_da.dp];
@@ -43,7 +43,7 @@ t1 = max([xlims(2),ylims(2)]);
 
 
 % Plot dp-da relation
-p1 = polyfit(log10(da), log10(dp),1);
+p1 = polyfit(log10(da), log10(dp), 1);
 p1_val = 10 .^ polyval(p1, log10(xlims));
 p2 = [10^p1(2), ... % pre-factor for fit
     p1(1), ... % power for fit
@@ -52,7 +52,7 @@ loglog(xlims, p1_val, 'Color', cm);
 
 
 % Plot universal relation from Olfert and Rogak
-loglog(xlims, 10.^(log10(17.8) + 0.35.*log10(xlims./100)), 'k--');
+loglog(xlims, 10 .^ (log10(17.8) + 0.35.*log10(xlims./100)), 'k--');
 
 
 %-- Plot 2-sigma ellipse -------------------------------------------------%
@@ -63,7 +63,8 @@ Sigma = cov(log10(da), log10(dp)); % covariance of plotting ellipse
 t = linspace(0, 2*pi); % points around the edge of the circle
 a = (V*sqrt(D)) * [cos(t(:))'; sin(t(:))']; % points on the ellipse
 
-loglog(10.^(a(1, :)+mu(1)), 10.^(a(2, :)+mu(2)), '--', ...
+loglog(10.^(a(1, :) + mu(1)), ...
+    10.^(a(2, :) + mu(2)), '-', ...
     'Color', cm);
 %-------------------------------------------------------------------------%
 
