@@ -36,8 +36,7 @@ if isempty(f_backup); f_backup = 0; end
 %-------------------------------------------------------------------------%
 
 
-disp('Performing PCM:');
-
+tools.textheader('PCM');
 
 %-- Check whether the data folder is available ---------------------------%
 if exist('data','dir') ~= 7 % 7 if exist parameter is a directory
@@ -50,7 +49,9 @@ figure; % generate figure for visualizing current aggregate
 
 %== Main image processing loop ===========================================%
 n_aggs = length(Aggs);
-tools.textbar(0);
+
+disp('Characterizing aggregates:');
+tools.textbar([0, n_aggs]);
 
 for aa = 1:n_aggs % loop over each aggregate in the provided structure
     
@@ -116,7 +117,7 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
     pcf = pcf ./ denominator; % update pair correlation function
     pcf_smooth = smooth(pcf); % smooth the pair correlation function
     
-    % adjust PCF to be monotonically decreasing
+    % Adjust PCF to be monotonically decreasing.
     for kk=1:(size(pcf_smooth)-1)
         if pcf_smooth(kk) <= pcf_smooth(kk+1)
             pcf_smooth(kk+1) = pcf_smooth(kk) - 1e-12;
@@ -124,6 +125,12 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
     end
     pcf_smooth = pcf_smooth ./ max(pcf_smooth); % normalize by initial value
     
+    % If too small to have enough points to interpolated between.
+    if length(pcf_smooth)==1
+        Aggs(aa).dp_pcm1 = Aggs(aa).da;
+        Aggs(aa).dp = Aggs(aa).dp_pcm1;
+        continue;
+    end
     
     
     %== 3-5: Primary particle sizing =====================================%
@@ -133,6 +140,15 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
         2 * interp1(pcf_smooth, r1, pcf_simple);
         % dp from simple PCM (labelled PCM1)
         % given by diameter corresponding to 91.3% of PCF
+    
+    % Catch case where particle is small and nearly spherical.
+    % Otherwise NaN would be output.
+    if and(and(isnan(Aggs(aa).dp_pcm1), ...  % if previous method failed
+            Aggs(aa).num_pixels<500), ...   % and small number of pixels
+            Aggs(aa).aspect_ratio<1.4)  % and small aspect ratio
+        Aggs(aa).dp_pcm1 = Aggs(aa).da;  % assign da to dp
+    end
+    
     Aggs(aa).dp = Aggs(aa).dp_pcm1; % assign main primary particle diameter and dp_pcm1
     
         
@@ -175,12 +191,11 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
         end
     end
     
-    tools.textbar(aa / n_aggs);
+    tools.textbar([aa, n_aggs]);
 end
 
 close; % close current figure
 
-disp('Complete.');
-disp(' ');
+tools.textheader();
 
 end

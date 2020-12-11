@@ -4,7 +4,7 @@
 %=========================================================================%
 
 function [imgs_binary] = seg_adapt_rb(imgs, ...
-    sensitivity, pixsizes, minparticlesize, coeffs) 
+    pixsizes, minparticlesize, coeffs) 
 
 %-- Parse inputs ---------------------------------------------------------%
 if isstruct(imgs)
@@ -18,36 +18,54 @@ end
 n = length(imgs); % number of images to consider
 
 if ~exist('pixsizes','var'); pixsizes = []; end
-if isempty(pixsizes); pixsizes = ones(size(img)); end
+if isempty(pixsizes); pixsizes = ones(size(imgs)); end
 if length(pixsizes)==1; pixsizes = pixsizes .* ones(size(imgs)); end % extend if scalar
 
 if ~exist('minparticlesize','var'); minparticlesize = []; end
 if ~exist('coeffs','var'); coeffs = []; end
 
-if ~exist('sensitivity','var'); sensitivity = []; end
-if isempty(sensitivity); sensitivity = 0.52; end
+if ~exist('opts','var'); opts = struct(); end
+if ~isfield(opts, 'sens'); opts.sens = 0.6; end
+if ~isfield(opts, 'minsize'); opts.minsize = 1500; end
 %-------------------------------------------------------------------------%
 
+
+tools.textheader('Adaptive thresholding');
 
 % Loop over images, calling seg function below on each iteration.
 imgs_binary{n} = []; % pre-allocate cell
 
+disp('Segmenting images:'); tools.textbar([0, n]);
 for ii=1:n
     img = imgs{ii}; pixsize = pixsizes(ii); % values for this iteration
     
+    
 %== CORE FUNCTION ========================================================%
+    %== Step 0b: Perform denoising of the image ==========================%
+    %   New to this implementation.
+    img = imbilatfilt(img);
+    
+    
     %== Step 1: Apply intensity threshold (Otsu) =========================%
-    level = adaptthresh(img, sensitivity,...
-        'ForegroundPolarity', 'dark');
-            % applies adaptive thresholding
+    level = adaptthresh(img, opts.sens, ...  % applies adaptive thresholding
+        'ForegroundPolarity', 'dark', ...
+        'NeighborhoodSize', 16*floor(size(img)/16)+1);  % double default
     bw = ~imbinarize(img, level);
     
-    bw = imclearborder(bw); % clear aggregates on border
-
+    % Remove some background pixels already.
+    bw = bwareaopen(bw, opts.minsize/2);
+    
+    
     %== Step 2: Rolling Ball Transformation ==============================%
-    imgs_binary{ii} = agg.rolling_ball(bw, pixsize, minparticlesize, coeffs);
+    imgs_rb = agg.rolling_ball(bw, pixsize, minparticlesize, coeffs);
+    
+    % Remove remaining small aggregates.
+    imgs_binary{ii} = bwareaopen(imgs_rb, opts.minsize);
 %=========================================================================%
     
+    
+    tools.textbar([ii, n]);  % if more than one image, output text
 end
+tools.textheader();
 
 end

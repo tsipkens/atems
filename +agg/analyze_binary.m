@@ -40,7 +40,8 @@ if f_plot==1; f0 = figure; end % intialize a new figure to show progress
 Aggs = struct([]); % initialize Aggs structure
 id = 0;
 
-disp('Calculating aggregate areas...');
+tools.textheader('Analyzing binaries');
+disp('Progress:'); tools.textbar([0, length(imgs_binary)]);
 for ii=1:length(imgs_binary) % loop through provided images
 
     img_binary = imgs_binary{ii};
@@ -62,6 +63,11 @@ for ii=1:length(imgs_binary) % loop through provided images
     end
     
     
+    % Remove aggregates below 10 pixels, which will
+    % cause problems with primary particle sizing.
+    % Segmentation technqiues may impose different minimums.
+    img_binary = bwareaopen(img_binary, 10);
+    
     % Detect distinct aggregates
     CC = bwconncomp(img_binary); % find seperate aggregates
     naggs = CC.NumObjects; % count number of aggregates
@@ -71,8 +77,7 @@ for ii=1:length(imgs_binary) % loop through provided images
     % Skip this image and continue on. 
     if naggs>50; continue; end
     
-    
-    % If no aggregates, skip image
+    % If no aggregates, skip image. 
     if naggs==0; continue; end
     
     
@@ -81,7 +86,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         % pre-allocate new space for aggregates and assign filename
 
     %== Main loop to analyze each aggregate ==============================%
-    if f_plot==1; tools.imshow_binary(img, img_binary); end
+    if f_plot==1; set(groot,'CurrentFigure',f0); tools.imshow_binary(img, img_binary); end
     
     for jj = 1:naggs % loop through number of found aggregates
         
@@ -130,18 +135,19 @@ for ii=1:length(imgs_binary) % loop through provided images
         [x,y] = find(img_binary ~= 0);
         Aggs0(jj).center_mass = [mean(x); mean(y)];
         
-        if f_plot==1; tools.imshow_agg(Aggs0, ii, 0); title(num2str(ii)); drawnow; end
+        if f_plot==1; set(groot,'CurrentFigure',f0); tools.imshow_agg(Aggs0, ii, 0); title(num2str(ii)); drawnow; end
     end
     
     if f_plot==1; pause(0.05); end % pause very briefly to show overall aggregates
     
     Aggs = [Aggs, Aggs0]; % append current aggregate data
+    
+    tools.textbar([ii, length(imgs_binary)]);
 end
 
-close(f0); % close figure showing progress
+if f_plot==1; close(f0); end % close figure showing progress
 
-disp('Completed aggregate analysis.');
-disp(' ');
+tools.textheader();
 
 end
 
@@ -187,7 +193,7 @@ function [img_cropped,img_binary,rect] = autocrop(img_orig, img_binary)
 
 [x,y] = find(img_binary);
 
-space = 25;
+space = 3;
 size_img = size(img_orig);
 
 % Find coordinates of top and bottom of aggregate

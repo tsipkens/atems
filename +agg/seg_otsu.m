@@ -27,13 +27,15 @@ if ~exist('minparticlesize','var'); minparticlesize = []; end
 if ~exist('coeffs','var'); coeffs = []; end
 %-------------------------------------------------------------------------%
 
+
+tools.textheader('Otsu thresholding');
+
 % Loop over images, calling seg function below on each iteration.
 img_binary{n} = []; % pre-allocate cells
 img_kmeans{n} = [];
 feature_set{n} = [];
 
-disp('Performing Otsu thresholding:');
-if n>1; tools.textbar(0); end
+disp('Segmenting images:'); tools.textbar([0, n]);
 for ii=1:n
     img = imgs{ii}; pixsize = pixsizes(ii); % values for this iteration
     
@@ -58,10 +60,9 @@ for ii=1:n
     img_binary{ii} = ~img_binary{ii};
 %=========================================================================%
     
-    if n>1; tools.textbar(ii / n); end
+    tools.textbar([ii, n]);
 end
-disp('Complete.');
-disp(' ');
+tools.textheader();
 
 % If a single image, cell arrays are unnecessary.
 % Extract and just output images. 
