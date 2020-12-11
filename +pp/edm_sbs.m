@@ -91,7 +91,7 @@ for aa=1:length(imgs_binary)  % loop over aggregates
 
     %== STEP 2: Interpolate data to a common set of sizes ================%
     %   Accommodates images with different pixel size onto a common scale
-    gi = griddedInterpolant(dp_count,counts);
+    gi = griddedInterpolant(dp_count,counts);   
     Sa = gi(dp_bin);
     
     
@@ -102,7 +102,7 @@ for aa=1:length(imgs_binary)  % loop over aggregates
     bet = 1.9658; % beta parameter in sigmoid function
     ome = -0.8515; % Omega parameter in sigmoid function
     a = 0.9966;
-    sigmoid = @(x) a./(1+exp(((log(x(1))-log(dp_bin))./log(x(2))-bet)./ome));
+    sigmoid = @(x) a./( 1+exp(((log(x(1))-log(dp_bin))./log(x(2))-bet)./ome));
         % x(1) = dpg, x(2) = spg
     
     opts = optimset('Display','off');

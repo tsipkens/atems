@@ -50,8 +50,12 @@ if isempty(f_plot); f_plot = 1; end
 
 tools.textheader('EDM-Watershed (EDM-WS)');
 
-
-if f_plot==1; f0 = figure; end
+% Create plot and associated variables.
+if f_plot==1
+    f0 = figure;
+    cm = [0,0,0;spring];
+    f0.WindowState = 'maximized';
+end
 
 %-- Main loop over binary images -----------------------------------------%
 disp('Characterizing aggregates:');
@@ -61,11 +65,14 @@ for aa=1:length(imgs_binary)  % loop over aggregates
     
     % If new image, plot the image.
     if f_plot==1
+        subplot(1,2,1);
         if aa==1
             tools.imshow(Aggs(aa).image); drawnow;
         elseif ~(Aggs(aa).img_id==Aggs(aa-1).img_id)
             tools.imshow(Aggs(aa).image); drawnow;
         end
+        
+        ax = subplot(1,2,2);
     end
 
     img_binary = imgs_binary{aa};
@@ -99,6 +106,7 @@ for aa=1:length(imgs_binary)  % loop over aggregates
         
         Pp.centers(ii,:) = [idx2, idx1];
     end
+    Pp.dpm = mean(Pp.dp);  % mean
     Pp.dpg = exp(mean(log(Pp.dp)));  % geometric mean
     
     
@@ -111,6 +119,13 @@ for aa=1:length(imgs_binary)  % loop over aggregates
     %-- Check the circle finder by overlaying on the original image 
     %   Circles in blue if part of considered aggregates
     if and(f_plot==1, ~isempty(Pp.centers))
+        imagesc(img_ws);
+        colormap(ax, cm);
+        axis image;
+        set(gca,'XTick',[]); % remove x-ticks
+        set(gca,'YTick',[]); % remove y-ticks
+        
+        subplot(1,2,1);
         hold on;
         viscircles(Pp.centers, Pp.radii', 'EdgeColor', [0.92,0.16,0.49], ...
             'LineWidth', 0.75, 'EnhanceVisibility', false);
@@ -124,7 +139,7 @@ for aa=1:length(imgs_binary)  % loop over aggregates
 
 end % end loop over aggregates
 
-close(f0);
+if f_plot==1; close(f0); end
 
 tools.textheader();
 
