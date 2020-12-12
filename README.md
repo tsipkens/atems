@@ -70,7 +70,7 @@ The submodule is not necessary for any of the scripts or methods included with t
 The first step in the image analysis process is to import images. Images can be handled in one of two ways. The first is as a Matlab structure, with one entry in the structure for each image loaded. To generate this structure by loading the sample images provided with the program, one can use the `tools.load_imgs` function as follows:
 
 ```Matlab
-Imgs = tools.load_imgs('images'); % load the images
+Imgs = tools.load_imgs('images');  % load the images
 ```
 
 The output structure contains the image file name and directory; the image itself, with the footer cropped; and the pixel size, read from the image footer. 
@@ -80,7 +80,7 @@ The output structure contains the image file name and directory; the image itsel
 One can also get the image to analyzer by selecting files them in a file explorer by omitting the string input: 
 
 ```Matlab
-Imgs = tools.load_imgs; % load the images
+Imgs = tools.load_imgs;  % load the images
 ```
 
 Proceeding, the image can also be handled is using a cell array of cropped images and pixel sizes. These are secondary outputs to the `tools.load_imgs` function: 
@@ -97,7 +97,7 @@ pixsizes = [Imgs.pixsize]; % pixel size for each image
 fname = {Imgs.fname};
 ```
 
-> NOTE: At the moment, this approach will load all of the images into memory. For computers with less memory, this could restrict the number of images that can be analyzed at one time. Batches of 250 images have been run successfully on a computer with 16 GB of RAM (Matlab limits memory usage to below this value). A simple work around is to load the images in groups, rather than all at once, and add an outer loop to proceed through the different groups.. The `tools.load_imgs(fd, n)` function is equipped to handle this, passing the second, optional argument `n` as the integer range of images to load into memory. For example, `n = 1:3` will load the first three images from the set specified by `fd`. 
+> NOTE: At the moment, this approach will load all of the images into memory. For computers with less memory, this could restrict the number of images that can be analyzed at one time. Batches of 250 images have been run successfully on a computer with 16 GB of RAM (Matlab limits memory usage to below this value). A simple work around is to load the images in groups, rather than all at once, and then add an outer loop to proceed through the different groups. The `tools.load_imgs(fd, n)` function is equipped to handle this, passing the second, optional argument `n` as the integer range of images to load into memory. For example, `n = 1:3` will load the first three images from the set specified by `fd`. 
 
 #### Aggregate-level segmentation
 
