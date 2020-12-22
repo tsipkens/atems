@@ -1,6 +1,9 @@
-<p align="left">
-  <img width="310" src="docs/atems_logo.svg">
-</p>
+<picture>
+  <source
+    srcset="docs/atems_logo.svg"
+    media="(prefers-color-scheme: dark)">
+  <img src="docs/atems_logo_reverse.svg" alt= "# ATEMS">
+</picture>
 
 **(Matlab *A*nalysis tools for *TEM* images of *S*oot)**
 
