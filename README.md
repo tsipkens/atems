@@ -57,7 +57,7 @@ This software was tested using Matlab 2020a (though most functions have been val
 
 If not already installed, these packages can be added to Matlab via the instructions available on [Matlab's website](https://www.mathworks.com/help/matlab/matlab_env/get-add-ons.html). 
 
-This program also has an *optional* submodule that adds support for perceptually uniform colormaps compiled from various sources and available at https://github.com/tsipkens/cmap. It can be added via git bash by
+This program also has an *optional* submodule that adds support for perceptually uniform colormaps compiled from various sources and available at https://github.com/tsipkens/cmap. It can be added via git using
 
 ```bash
 git submodule add -b master https://github.com/tsipkens/cmap
