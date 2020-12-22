@@ -13,6 +13,9 @@ results\
 temp/
 temp\
 
+cbs/
+cbs\
+
 +agg/seg_cnn.m
 +agg\seg_cnn.m
 

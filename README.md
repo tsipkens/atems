@@ -1,4 +1,6 @@
-# ATEMS
+<p align="left">
+  <img width="310" src="docs/atems_logo.svg">
+</p>
 
 **(Matlab *A*nalysis tools for *TEM* images of *S*oot)**
 
