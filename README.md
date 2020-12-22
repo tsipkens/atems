@@ -3,7 +3,7 @@
   <img src="docs/atems_logo.svg" alt= "# ATEMS" width="40%">
 </picture>
 
-**(Matlab *A*nalysis tools for *TEM* images of *S*oot)**
+(Matlab *A*nalysis tools for *TEM* images of *S*oot)
 
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 [![Version](https://img.shields.io/badge/Version-1.0+-blue.svg)]()
