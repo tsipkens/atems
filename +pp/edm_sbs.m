@@ -108,6 +108,8 @@ for aa=1:length(imgs_binary)  % loop over aggregates
     opts = optimset('Display','off');
     x0 = [25,1.5];
     x1 = lsqnonlin(@(x) (sigmoid(x) - Sa) ./ 100, x0, [], [], opts);
+    x1 = real(x1);
+    x1(x1<0) = NaN;
     Sa_fit = sigmoid(x1);
     
     Aggs(aa).dp_edm = x1(1); % geometric mean diameter for output
