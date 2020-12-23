@@ -70,7 +70,9 @@ The submodule is not necessary for any of the scripts or methods included with t
 
 ### Load images
 
-The first step in the image analysis process is to import images. Images can be handled in one of two ways. The first is as a Matlab structure, with one entry in the structure for each image loaded. To generate this structure by loading the sample images provided with the program, one can use the `tools.load_imgs` function as follows:
+The first step in the image analysis process is to import images. Images can be handled in one of two ways. 
+
+The first is as a Matlab structure, with one entry in the structure for each image loaded. To generate this structure, one can use the `tools.load_imgs` function, either giving a folder name as an input or no argument (to use a file explorer). To use the test images:
 
 ```Matlab
 Imgs = tools.load_imgs('images');  % load the images
@@ -80,13 +82,13 @@ The output structure contains the image file name and directory; the image itsel
 
 > NOTE: The latter two operations make use of the `tools.detect_footer_scale` function, which attempts to interpret the image footer and/or scale using image analysis tools. The method is known to work with TEM images taken at the University of British Columbia, where it applies optical character recognition to determine the pixel size from the footer text (stored in the `Imgs.pixsize` field) and crops the footer away. Black text on the image may also be readable more generally. Alternatively, the user can also call the `tools.ui_scale_bar` function to use a UI to get the pixel size.
 
-One can also get the image to analyzer by selecting files them in a file explorer by omitting the string input: 
+Alternative, to use the file explorer option: 
 
 ```Matlab
 Imgs = tools.load_imgs;  % load the images
 ```
 
-Proceeding, the image can also be handled is using a cell array of cropped images and pixel sizes. These are secondary outputs to the `tools.load_imgs` function: 
+Second, the image can also be handled using a cell array of cropped images and pixel sizes. These are secondary outputs to the `tools.load_imgs` function: 
 
 ```Matlab
 [Imgs, imgs, pixsizes] = tools.load_imgs('images'); % load the images
@@ -104,16 +106,16 @@ fname = {Imgs.fname};
 
 ### Aggregate-level segmentation
 
-The next step is to evaluate binaries that separate the image into pixels that are part of the background and pixels that are part of aggregates. This is done using the functions in the **agg** package. For example, a *k*-means segmentation specific to this problem can be performed using:
+The next step is to evaluate binary masks that separate the image into pixels that are part of the background and pixels that are part of aggregates. This is done using the functions in the **agg** package. For example, a *k*-means classifier can be used by calling:
 
 ```Matlab
 imgs_binary = agg.seg_kmeans(imgs, pixsizes, opts);
     % segment aggregates
 ```
 
-The result, `imgs_binary`, is either a single binary image (if one image is given as an input) or a cell array of image binaries (if multiple images are given as an input), with `1` if a pixel is considered part of the aggregate and `0` if it is not. Other approaches are also available and are discussed in Section 1 below. 
+The result, `imgs_binary`, is either a single binary image (if one image is given as an input) or a cell array of image binaries (if multiple images are given as an input), with `1` if a pixel is considered part of the aggregate and `0` if it is not. Other approaches are also available and are discussed in [Section 2](#2-aggregate-segmentation-package-agg) below. 
 
-Having segmented the image, aggregate characteristics can be determined by passing this binary image to an analysis function:
+Having segmented the image, aggregate characteristics can be determined by passing this binary image to the `tools.analyze_binary` function, e.g.:
 
 ```Matlab
 Aggs = agg.analyze_binary(...
@@ -133,14 +135,16 @@ or an Excel spreadsheet using:
 tools.write_excel(Aggs, fname);
 ```
 
-to be analyzed in other software and languages, where `fname` is the filename of the file to write to. The `Aggs` structure can also be visualized as an overlay on top of the TEM image using
+to be analyzed in other software and languages, where `fname` is the filename of the file to write to. 
+
+The `Aggs` structure can also be visualized as an overlay on top of the TEM image using
 
 ```Matlab
 figure(1);
 tools.imshow_agg(Aggs);
 ```
 
-The resultant image highlights pixels that are part of the aggregate, and plots a circle that corresponds to the radius of gyration. This output is similar to that shown in images above for the *k*-means and the manual slider methods above. 
+The resultant image highlights pixels that are part of the aggregate, and plots a circle that corresponds to the radius of gyration. This output is similar to that shown the image in the header of this README. 
 
 ### Determining the primary particle size
 
