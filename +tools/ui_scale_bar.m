@@ -1,6 +1,7 @@
 
 % UI_SCALE_BAR  Detecting pixel size using a UI to get the scale 
-% Adaptated from: PCM code by Dastanpour et al. (https://github.com/unatriva/UBC-PCM/blob/master/PCM_Main_Code_v5.m)
+% Adaptated from: PCM code by Dastanpour et al. 
+%   (https://github.com/unatriva/UBC-PCM/blob/master/PCM_Main_Code_v5.m)
 % Modified: Timothy Sipkens
 % 
 % NOTE: Operates on raw images, which can be specified as a cell array.
