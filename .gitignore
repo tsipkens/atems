@@ -13,8 +13,10 @@ results\
 temp/
 temp\
 
-cbs/
-cbs\
+python/
+python\
+carboseg/
+carboseg\
 
 +agg/seg_cnn.m
 +agg\seg_cnn.m
