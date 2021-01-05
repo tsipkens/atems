@@ -1,0 +1,12 @@
+name: carboseg
+channels:
+- conda-forge
+- defaults
+dependencies:
+- python=3.7
+- pillow
+- tqdm
+- albumentations
+- pip
+- pip:
+    - onnxruntime
