@@ -13,8 +13,7 @@
   <img width="310" src="docs/header.png">
 </p>
 
-
-This codebase contains Matlab code for several methods of characterizing soot aggregates in TEM images. This includes methods for evaluating the aggregate projected area, perimeter, and primary particle diameter. Methods include Otsu thresholding, the pair correlation method (PCM), Hough circle transform (following [Kook](kook)), and tools to aid in manual analysis. This code is designed to replace a [previous, deprecated code](https://github.com/unatriva/UBC-PCM).
+This codebase contains Matlab code for several methods of characterizing soot aggregates in TEM images. This includes methods for evaluating the aggregate projected area, perimeter, and primary particle diameter. Methods include Otsu thresholding, the pair correlation method (PCM), Hough circle transform (following [Kook](kook)), and tools to aid in manual analysis. This code is designed to replace a [previous, deprecated code](https://github.com/unatriva/UBC-PCM). 
 
 **Testing** of this codebase makes use of the `main_*` functions in the upper directory, which are described in [1. MAIN SCRIPTS (main_\*)](#1-main-scripts-main_) below. Specifically, `main_kmeans` and `main_auto` test the fully automated methods, while `main_0` allows for testing of the more manual methods (which require substantial user input). 
 
@@ -183,7 +182,7 @@ We will demonstrate the segmentation functions using a set of size sample images
 
 These images are included with this distribution in the `images/` folder. These images represent soot collected from a lab-scale flare ([Trivanovic et al., 2020][triv20]) and a diesel engine ([Kheirkhah et al., 2020][kheirkhah20]). 
 
-## 2.1 agg.seg* functions
+## 2.1 agg.seg\* functions
 
 The main functions implementing aggregate-level semantic segmentation have filenames following `agg.seg_*`. In each case, the output primarily consists of binary images of the same size as the original image but where pixels taken on logical values: `1` for pixels identified as part of the aggregate `0` for pixels identified as part of the background. The functions often take similar inputs, with main argument being `imgs`, which is one of:
 
@@ -195,7 +194,7 @@ Several methods also take `pixsize`, which denotes the size of each pixel in the
 
 The set of available methods is summarized below. 
 
-### A general segmentation function: seg
+### 2.1.1 A general segmentation function: seg
 
 The `agg.seg` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. Specifically, the method attempts: 
 
@@ -207,7 +206,7 @@ The `agg.seg` function is a general, multipurpose wrapper function that attempts
 
 This is repeated until the user has classifid all of the images that were passed to the function. 
 
-### *k*-means segmentation: seg_kmeans
+### 2.1.2 *k*-means segmentation: seg_kmeans
 
 This function applies a *k*-means segmentation approach following [Sipkens and Rogak][jaskmeans] and using three feature layers, which include: 
 
@@ -227,7 +226,45 @@ Finally, applying Matlab's `imsegkmeans` function, we achieve segmentations as f
 
 This is the most robust of the fully automated methods available with this distribution. However, while this will likely be adequate for many users, the technique still occasionally fails, particularly if the function does not adequately remove the background. The method also has some notable limitations when images are (i) *zoomed in* on a single aggregate while (ii) also slightly overexposed. 
 
-### Otsu thresholding: seg_otsu_rb*
+### 2.1.3 CNN segmentation and *carboseg*: seg_carboseg
+
+This function employs Python to implement a convolutional neural network (CNN) for segmentation. Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions from Max Frei (@maxfrei750). This requires the Python, as well as the environment associated with the code in that repository. The implementation here makes use of the ONNX file output from that procedure and employs the Python ONNX runtime for execution. 
+
+#### Creating the necessary Python environment
+
+Before using `agg.seg_carboseg`, one must start Python. One must first create the appropriate Python environment. If [conda](https://conda.io/en/latest/miniconda.html) is installed, one can use the following procedure: 
+
+**1.** Open the conda command line. 
+
+**2.** Change into the `carboseg/` directory in a cloned copy of the current repository, using:
+
+```shell
+cd carboseg
+```
+
+**3.** Create a new Python environment using the `environment.yml` file included in that directory, using:
+
+```shell
+conda env create --file environment.yml
+```
+
+This will create the `carboseg` environment. This will create a Python executable with the necessary dependencies to be used by Matlab . 
+
+#### Loading the Python environment in Matlab
+
+The current distribution includes a function to help in loading the Python environment using:
+
+```Matlab
+tools.load_python;
+```
+
+The user should edit the script to point to an appropriate Python executable generated by the previous procedure, representing an environment that includes the necessary packages to support the Python code.  For Windows, this code also adds the necessary folders and a reference to the local `carboseg` submodule. 
+
+#### Segmentation
+
+Finally, the user can use the `agg.seg_carboseg` function in a similar fashion to the other segmentation approaches. 
+
+### 2.1.4 Otsu thresholding: seg_otsu_rb\*
 
 These automated methods apply Otsu thresholding followed by a rolling ball transformation. Two versions of this function are included. 
 
@@ -243,7 +280,7 @@ Aggregates are often broken apart, which may be insufficient in itself. This imp
 
 This latter function generally performs better, though the results still often breaks up aggregates and should likely be compliment with some manual adjustments following initial thresholding. The technique generally underperformed relative to the previously mentioned *k*-means method. 
 
-### GUI-based slider method: seg_slider
+### 2.1.5 GUI-based slider method: seg_slider
 
 The function `agg.seg_slider` is a largely manual technique. The function enacts a GUI-based method with a slider for adaptive, semi-automatic thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps: 
 
@@ -270,7 +307,7 @@ Several sub-functions are included within the main file. This is a variant of th
 All of the above methods produce a common output: a binary image. The `agg.analyze_binary` function is now used to convert these binaries to aggregate characteristics, such as area in pixels, radius of gyration, area-equivalent diameter, aspect ratio, among other quantities. The function itself takes a binary image, the original image, and the pixel size as inputs, as follows. 
 
 ```Matlab
-Aggs = agg.analyze_binary(imgs_binary,imgs,pixsize,fname);
+Aggs = agg.analyze_binary(imgs_binary, imgs, pixsize, fname);
 ```
 
 The output is a MATLAB structured array, `Aggs`, containing information about the aggregate. The array has one entry for each aggregate found in the image, which is itself defined as any independent groupings of pixels. The `fname` argument is optional and adds this tag to the information in the output `Aggs` structure. 

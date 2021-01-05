@@ -34,7 +34,3 @@ opts.cmap = [0.92,0.16,0.49]; % red overlay
 tools.imshow_agg(Aggs, [], 1, opts); % tiled plot aggregates
 commandwindow; % return focus to Matlab window
 %=========================================================================%
-
-
-
-
