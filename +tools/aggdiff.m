@@ -19,8 +19,11 @@ i1 = reshape(i1, [numel(imgs{1}), length(imgs)]);
 % Find and flag images with no aggregates
 % (generally denotes method failure). 
 f_aggs = any((1:length(imgs))==[Aggs.img_id]');
+out.n_failed = sum(f_aggs==0);  % output number of failed images
+
 out.n_diff = sum((1:length(imgs))==[Aggs.img_id]') - ...
-    sum((1:length(imgs0))==[Aggs0.img_id]');
+    sum((1:length(imgs0))==[Aggs0.img_id]');  % difference in percieved aggregates per image
+
 
 % Final formatting, vectorize. Variables appended with "b" 
 % exclude images without aggregates.
@@ -47,6 +50,7 @@ out.accuracy_b = (sum(and(~i0b, ~i1b)) + sum(and(i0b, i1b))) ./ length(i0b) .* 1
 %-- Compute % difference in da -------------------------------------------%
 out.da_pd = (exp(mean(log([Aggs.da]))) ./ ...
     exp(mean(log([Aggs0.da]))) - 1) .* 100;
+out.dam_pd = (median([Aggs.da]) ./ median([Aggs0.da]) - 1) .* 100;
 
 
 %-- Match aggregates and compare da --------------------------------------%

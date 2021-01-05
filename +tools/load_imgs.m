@@ -14,12 +14,14 @@ tools.textheader('Loading images');
 if ~exist('fd','var'); fd = []; end
 if isempty(fd); Imgs = get_fileref; end % use UI to get files
 
-if strcmp(fd(1:4), 'http')  % if web resource
-    Imgs(1).folder = '';
-    Imgs(1).fname = fd;
-    
-elseif isa(fd, 'char')  % get all images in local folder given in Imgs
-    Imgs = get_fileref(fd);
+if ~isempty(fd)
+    if strcmp(fd(1:4), 'http')  % if web resource
+        Imgs(1).folder = '';
+        Imgs(1).fname = fd;
+
+    elseif isa(fd, 'char')  % get all images in local folder given in Imgs
+        Imgs = get_fileref(fd);
+    end
 end
 
 

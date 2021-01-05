@@ -1,6 +1,6 @@
 
-% ANALYZE_BINARY Label and analyze a binary mask to determine aggregate properties (e.g. Rg).
-% Author:  Timothy Sipkens
+% ANALYZE_BINARY  Label and analyze a binary mask to determine aggregate properties (e.g. Rg).
+% Author: Timothy Sipkens
 %=========================================================================%
 
 function [Aggs] = analyze_binary(imgs_binary, imgs, pixsize, ...
@@ -68,7 +68,8 @@ for ii=1:length(imgs_binary) % loop through provided images
     % Segmentation technqiues may impose different minimums.
     img_binary = bwareaopen(img_binary, 10);
     
-    % Detect distinct aggregates
+    
+    % Detect distinct aggregates.
     CC = bwconncomp(img_binary); % find seperate aggregates
     naggs = CC.NumObjects; % count number of aggregates
     
@@ -158,10 +159,9 @@ end
 %   Gyration calculates radius of gyration by assuming every pixel as an area
 %   of pixsize^2
 %   Author: Ramin Dastanpour
-%-------------------------------------------------------------------------%
+%   
 % Output:
 %   Rg      Radius of gyration [nm]
-%-------------------------------------------------------------------------%
 function [Rg] = gyration(img_binary,pixsize)
 
 
