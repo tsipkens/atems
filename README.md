@@ -231,7 +231,7 @@ Finally, applying Matlab's `imsegkmeans` function, we achieve segmentations as f
 
 This is the most robust of the fully automated methods available with this distribution. However, while this will likely be adequate for many users, the technique still occasionally fails, particularly if the function does not adequately remove the background. The method also has some notable limitations when images are (i) *zoomed in* on a single aggregate while (ii) also slightly overexposed. 
 
-### + CNN segmentation and **carboseg**: seg_carboseg
+### + CNN segmentation and carboseg: seg_carboseg
 
 This function employs Python to implement a convolutional neural network (CNN) for segmentation. Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions from Max Frei (@maxfrei750). This requires the Python, as well as the environment associated with the code in that repository. The implementation here makes use of the ONNX file output from that procedure and employs the Python ONNX runtime for execution. 
 
