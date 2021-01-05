@@ -68,6 +68,8 @@ git submodule init
 
 The submodule is not necessary for any of the scripts or methods included with this code. 
 
+Additional dependencies are required for use of the **carboseg** component of this program, including a copy of Python. See the appropriate section [below](#-cnn-segmentation-and-carboseg-seg_carboseg) for more information. 
+
 # Getting started
 
 ### Load images
