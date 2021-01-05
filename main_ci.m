@@ -1,5 +1,5 @@
 
-% MAIN_AUTO  Tests and compares multiple automated segmentation methods for CI.
+% MAIN_CI  Tests and compares multiple automated segmentation methods for continuous integration.
 % Author: Timothy Sipkens, 2020-8-25
 %=========================================================================%
 
