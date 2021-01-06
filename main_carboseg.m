@@ -28,7 +28,7 @@ Aggs = agg.analyze_binary(...
 
 %-- Generate plots of images ---------------------------------------------%
 f1 = figure(1); f1.WindowState = 'maximized';
-opts.cmap = [0.92,0.16,0.49]; % red overlay
+opts.cmap = [139, 10, 165] ./ 255; % red overlay
 
 % Plot for output to veiwer.
 tools.imshow_agg(Aggs, [], 1, opts); % tiled plot aggregates
