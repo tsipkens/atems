@@ -1,38 +1,38 @@
 
 % ANALYZE_BINARY  Label and analyze a binary mask to quantify aggregates.
-% Properties computed include the radius of gyration, projected
-% area-equivalent diameter, aspect ratio, etc.
+%  Properties computed include the radius of gyration, projected
+%  area-equivalent diameter, aspect ratio, etc.
 % 
-% AGGS = analyze_binary(IMGS_BINARY) uses the binary mask to identify
-% independent aggregates in the image. Applies a pixel size of 1 nm/pixel,
-% such that results will be given pixels rather than in nm. The output is a
-% data structure with one entry per identified aggregate. 
-% NOT RECOMMENDED. Preferred uses includes PIXSIZE and IMGS. 
+%  AGGS = analyze_binary(IMGS_BINARY) uses the binary mask to identify
+%  independent aggregates in the image. Applies a pixel size of 1 nm/pixel,
+%  such that results will be given pixels rather than in nm. The output is 
+%  a data structure with one entry per identified aggregate. 
+%  NOT RECOMMENDED. Preferred uses includes PIXSIZE and IMGS. 
 % 
-% AGGS = analyze_binary(IMGS_BINARY,IMGS) uses the IMGS data structure to
-% extract addition properties, such as the cropped image, filename, pixel
-% size.
+%  AGGS = analyze_binary(IMGS_BINARY,IMGS) uses the IMGS data structure to
+%  extract addition properties, such as the cropped image, filename, pixel
+%  size.
 % 
-% AGGS = analyze_binary(IMGS_BINARY,PIXSIZE) uses the pixel size of each
-% image to determine physical quantities from the aggregates, such as the
-% projected area-equivalent diameter in nm. 
-% NOT RECOMMENDED. Preferred uses includes IMGS. 
+%  AGGS = analyze_binary(IMGS_BINARY,PIXSIZE) uses the pixel size of each
+%  image to determine physical quantities from the aggregates, such as the
+%  projected area-equivalent diameter in nm. 
+%  NOT RECOMMENDED. Preferred uses includes IMGS. 
 % 
-% AGGS = analyze_binary(IMGS_BINARY,PIXSIZE,IMGS) uses the IMGS cell array
-% containing the original images in plotting and stores the result for
-% subsequent analysis. 
+%  AGGS = analyze_binary(IMGS_BINARY,PIXSIZE,IMGS) uses the IMGS cell array
+%  containing the original images in plotting and stores the result for
+%  subsequent analysis. 
 % 
-% AGGS = analyze_binary(IMGS_BINARY,PIXSIZE,IMGS,FNAME) also adds the
-% filename, FNAME, to the AGGS structure. 
+%  AGGS = analyze_binary(IMGS_BINARY,PIXSIZE,IMGS,FNAME) also adds the
+%  filename, FNAME, to the AGGS structure. 
 % 
-% AGGS = analyze_binary(IMGS_BINARY,PIXSIZE,IMGS,FNAME,F_EDGES) adds a flag
-% to determine whether aggregate at the border are cleared. F_EDGES = 1
-% removes the border aggregates. 
+%  AGGS = analyze_binary(IMGS_BINARY,PIXSIZE,IMGS,FNAME,F_EDGES) adds a 
+%  flag to determine whether aggregate at the border are cleared. 
+%  F_EDGES = 1 removes the border aggregates. 
 % 
-% AGGS = analyze_binary(IMGS_BINARY,PIXSIZE,IMGS,FNAME,F_EDGES,F_PLOT) adds
-% a flag of whether to plot the results as they are computed.
+%  AGGS = analyze_binary(IMGS_BINARY,PIXSIZE,IMGS,FNAME,F_EDGES,F_PLOT) 
+%  adds a flag of whether to plot the results as they are computed.
 % 
-% AUTHOR: Timothy Sipkens, 2019-11-26
+%  AUTHOR: Timothy Sipkens, 2019-11-26
 
 function [Aggs] = analyze_binary(imgs_binary, pixsize, ...
     imgs, fname, f_edges, f_plot)

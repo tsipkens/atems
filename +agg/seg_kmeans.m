@@ -1,27 +1,32 @@
 
 % SEG_KMEANS  Performs kmeans clustering on a modified feature set.
-%   Uses the technique described in Sipkens and Rogak (Submitted) 
-%   to segment soot aggregates in TEM images. This requires that image 
-%   annotations / footer information be removed.
-% Author: Timothy Sipkens, 2020-08-13
-% Version: 6
+%  Uses the technique described in Sipkens and Rogak (Submitted) 
+%  to segment soot aggregates in TEM images. This requires that image 
+%  annotations / footer information be removed.
 % 
-% INPUTS: 
-%   imgs      A cell array of images OR a single image.
-%   pixsizes  The size of a pixel in nm/px, either as a scalar value for 
-%             all of the images OR a vector with one entry per image.
-%             If not given, assumed to be 1 nm/px, with implications for
-%             the rolling ball transform.
+%  IMG_BINARY = seg_kmeans(IMGS) requires an IMGS data structure, with a
+%  cropped version of the images and the pixel sizes. The output is a 
+%  binary mask. 
 % 
-% OUTPUTS:
-%   img_binary  A cell array of binary / classified images, where 1
-%               indicates particles and 0 indicates background.
-%   img_kmeans  The k-means classified image, prior to apply the rolling
-%               ball transform. 
-%   feature_set Colour-equivalent images of the feature set used as
-%               input to the k-means classifier.
+%  IMG_BINARY = seg_kmeans(IMGS,PIXSIZES) uses a cell array of cropped
+%  images, IMGS, and an array of pixel sizes, PIXSIZES. The cell array of
+%  images can be replaced by a single image. The pixel size is given in
+%  nm/pixel. If not given, 1 nm/pixel is assumed, with implications for the
+%  rolling ball transform. As before, the output is a binary mask. 
+% 
+%  IMG_BINARY = seg_kmeans(IMGS,PIXSIZES,OPTS) adds a options data 
+%  structure that controls the minimum size of aggregates (in pixels) 
+%  allowed by the program. 
+% 
+%  [IMG_BINARY,IMG_KMEANS] = seg_kmeans(...) adds an output for the raw
+%  k-means clustered results, prior to the rolling ball transform. 
+% 
+%  [IMG_BINARY,IMG_KMEANS,FEATURE_SET] = seg_kmeans(...) adds an additional
+%  output for false RGB images with one colour per feature layer used by  
+%  the k-means clustering. 
 %
-%=========================================================================%
+%  AUTHOR: Timothy Sipkens, 2020-08-13
+%  VERSION: 6 (previous versions used different feature layers and weights)
 
 function [img_binary, img_kmeans, feature_set] = ...
     seg_kmeans(imgs, pixsizes, opts)
