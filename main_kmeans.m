@@ -2,7 +2,8 @@
 % MAIN_KMEANS  A script to explicitly test the k-means method. 
 % Test is performed on the sample images, by default. 
 % Optionally reads in manually binarized images. 
-% Author: Timothy Sipkens
+% 
+% AUTHOR: Timothy Sipkens
 %=========================================================================%
 
 
@@ -25,7 +26,7 @@ fname = {Imgs.fname}; % cell array of file names
 % imgs_binary = agg.seg_otsu(imgs, pixsizes);
 
 Aggs = agg.analyze_binary(...
-    imgs_binary, imgs, pixsizes, fname, 0); % determine aggregate properties
+    imgs_binary, pixsizes, imgs, fname, 0); % determine aggregate properties
 
 %-- Generate plots of images ---------------------------------------------%
 f1 = figure(1); f1.WindowState = 'maximized';
@@ -51,7 +52,7 @@ for ii=1:length(imgs)
 end
 
 Aggs0 = agg.analyze_binary(imgs_binary0, ...
-    imgs, pixsizes, fname, 0); % analyze manual binaries
+    pixsizes, imgs, fname, 0); % analyze manual binaries
 
 %-- Generate plots of images ---------------------------------------------%
 f2 = figure(2); f2.WindowState = 'maximized';

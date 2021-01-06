@@ -1,10 +1,35 @@
 
-% ANALYZE_BINARY  Label and analyze a binary mask to determine aggregate properties (e.g. Rg).
-% Author: Timothy Sipkens
-%=========================================================================%
+% ANALYZE_BINARY  Label and analyze a binary mask to quantify aggregates.
+% Properties computed include the radius of gyration, projected
+% area-equivalent diameter, aspect ratio, etc.
+% 
+% AGGS = analyze_binary(IMGS_BINARY) uses the binary mask to identify
+% independent aggregates in the image. Applies a pixel size of 1 nm/pixel,
+% such that results will be given pixels rather than in nm. The output is a
+% data structure with one entry per identified aggregate. 
+% 
+% AGGS = analyze_binary(IMGS_BINARY,PIXSIZE) uses the pixel size of each
+% image to determine physical quantities from the aggregates, such as the
+% projected area-equivalent diameter in nm. 
+% 
+% AGGS = analyze_binary(IMGS_BINARY,PIXSIZE,IMGS) uses the IMGS cell array
+% containing the original images in plotting and stores the result for
+% subsequent analysis. 
+% 
+% AGGS = analyze_binary(IMGS_BINARY,PIXSIZE,IMGS,FNAME) also adds the
+% filename, FNAME, to the AGGS structure. 
+% 
+% AGGS = analyze_binary(IMGS_BINARY,PIXSIZE,IMGS,FNAME,F_EDGES) adds a flag
+% to determine whether aggregate at the border are cleared. F_EDGES = 1
+% removes the border aggregates. 
+% 
+% AGGS = analyze_binary(IMGS_BINARY,PIXSIZE,IMGS,FNAME,F_EDGES,F_PLOT) adds
+% a flag of whether to plot the results as they are computed.
+% 
+% AUTHOR: Timothy Sipkens
 
-function [Aggs] = analyze_binary(imgs_binary, imgs, pixsize, ...
-    fname, f_edges, f_plot)
+function [Aggs] = analyze_binary(imgs_binary, pixsize, ...
+    imgs, fname, f_edges, f_plot)
 
 %-- Parse inputs ---------------------------------------------------------%
 if isstruct(imgs_binary) % consider case that structure is given as input
@@ -19,10 +44,13 @@ else
 end
 
 if ~exist('pixsize','var'); pixsize = []; end
-if isempty(pixsize); pixsize = ones(size(imgs)); end
+if isempty(pixsize); pixsize = ones(size(imgs_binary)); end
+
+if ~exist('imgs','var'); imgs = []; end
+if isempty(imgs); imgs = imgs_binary; end
 
 if ~exist('fname','var'); fname = []; end
-if isempty(fname); fname = cell(size(imgs)); end
+if isempty(fname); fname = cell(size(imgs_binary)); end
 
 % Flag for whether to remove aggregates at the edges of the images.
 % 1 removes border aggregates, other values keep border aggregates.
@@ -43,7 +71,7 @@ id = 0;
 tools.textheader('Analyzing binaries');
 disp('Progress:'); tools.textbar([0, length(imgs_binary)]);
 for ii=1:length(imgs_binary) % loop through provided images
-
+    
     img_binary = imgs_binary{ii};
     img = imgs{ii};
     

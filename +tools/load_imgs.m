@@ -20,7 +20,6 @@
 % and an array of pixel sizes in nm/pixel, PIXSIZE. 
 % 
 % AUTHOR: Timothy Sipkens, 2019-07-04
-%=========================================================================%
 
 function [Imgs, imgs, pixsize] = load_imgs(fd, n)
 
