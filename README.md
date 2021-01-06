@@ -181,7 +181,7 @@ The main scripts demonstrate further use of the code for specific scenarios and 
 
 This package contains an expandable library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background regions. Functions are accessed by appending `agg.` to the function name, e.g., `agg.seg_kmeans` to call the *k*-means segmentation procedure. 
 
-We will demonstrate the segmentation functions using a set of size sample images. 
+We will demonstrate the segmentation functions using a set of sample images. 
 
 ![original](docs/original.png)
 
@@ -189,7 +189,9 @@ These images are included with this distribution in the `images/` folder. These 
 
 ## 2.1 agg.seg\* functions
 
-The main functions implementing aggregate-level semantic segmentation have filenames following `agg.seg_*`. In each case, the output primarily consists of binary images of the same size as the original image but where pixels taken on logical values: `1` for pixels identified as part of the aggregate `0` for pixels identified as part of the background. The functions often take similar inputs, with main argument being `imgs`, which is one of:
+The main functions implementing aggregate-level semantic segmentation have filenames following the template `agg.seg_*`. In each case, the output primarily consists of binary images of the same size as the original image but where pixels take on logical values: `1` for pixels identified as part of the aggregate `0` for pixels identified as part of the background. 
+
+The functions often take similar inputs, with main argument being `imgs`, which is one of:
 
 1. a single image (after any footer or additional information have been removed), 
 2. a cell array of images (again with the footer removed); or
@@ -209,7 +211,7 @@ The `agg.seg` function is a general, multipurpose wrapper function that attempts
 
 3. Use the GUI-based slider method (the `seg_slider` function described below) to produce a largely-manual segmentation. 
 
-This is repeated until the user has classifid all of the images that were passed to the function. 
+This is repeated until the user has classified all of the images that were passed to the function. 
 
 ### + *k*-means segmentation: seg_kmeans
 
@@ -233,13 +235,13 @@ This is the most robust of the fully automated methods available with this distr
 
 ### + CNN segmentation and carboseg: seg_carboseg
 
-This function employs Python to implement a convolutional neural network (CNN) for segmentation. Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions from Max Frei (@maxfrei750). This requires the Python, as well as the environment associated with the code in that repository. The implementation here makes use of the ONNX file output from that procedure and employs the Python ONNX runtime for execution. 
+This function employs Python to implement a convolutional neural network (CNN) for segmentation. Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions by Max Frei (@maxfrei750). The implementation here makes use of the ONNX file output from that procedure and employs the Python ONNX runtime for execution. The following text describes creation of the necessary Python environment. 
 
 #### Creating the necessary Python environment
 
-Before using `agg.seg_carboseg`, one must start Python. One must first create the appropriate Python environment. If [conda](https://conda.io/en/latest/miniconda.html) is installed, one can use the following procedure: 
+If [conda](https://conda.io/en/latest/miniconda.html) is installed, one can use the following procedure to create the necessary Python environment: 
 
-**1.** Open the conda command line. 
+**1.** First, open the conda command line. 
 
 **2.** Change into the `carboseg/` directory in a cloned copy of the current repository, using:
 
@@ -253,11 +255,11 @@ cd carboseg
 conda env create --file environment.yml
 ```
 
-This will create the `carboseg` environment. This will create a Python executable with the necessary dependencies to be used by Matlab . 
+This will create the `carboseg` environment and the corresponding Python executable with the necessary dependencies to be used by Matlab . 
 
 #### Loading the Python environment in Matlab
 
-The current distribution includes a function to help in loading the Python environment using:
+The current distribution includes a function to aid in loading the Python environment, using:
 
 ```Matlab
 tools.load_python;
@@ -273,7 +275,7 @@ Finally, the user can use the `agg.seg_carboseg` function in a similar fashion t
 
 These automated methods apply Otsu thresholding followed by a rolling ball transformation. Two versions of this function are included. 
 
-**1.** The `agg.seg_otsu_rb_orig` function remains more true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. For the sample images, the following segmentations.
+**1.** The `agg.seg_otsu_rb_orig` function remains more true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. For the sample images, this results in the following segmentations.
 
 ![rb_orig](docs/otsu_rb_orig.png)
 
