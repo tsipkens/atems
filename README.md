@@ -171,7 +171,7 @@ The inner circle in this plot now indicates the primary particle size from PCM, 
 
 The main scripts demonstrate further use of the code for specific scenarios and are provided to **test the codebase**. Three such scripts are included: 
 
-**main_kmeans** script designed to specifically investigate the *k*-means approach to aggregate-level segmentation. By default, this is done on the sample images provided in the `images/` folder included with this distribution. This script will also read in some binaries (provided in the `images/slider/` folder) produced by the slider method beforehand for comparison. Finally, the primary particle size is computed for the *k*-means binaries and is plotted for the user. This script supports a European Aerosol Conference submission ([Sipkens et al., 2020][eac20]).
+**main_kmeans** is designed to specifically investigate the *k*-means approach to aggregate-level segmentation. By default, this is done on the sample images provided in the `images/` folder included with this distribution. This script will also read in some binaries (provided in the `images/slider/` folder) produced by the slider method beforehand for comparison. Finally, the primary particle size is computed for the *k*-means binaries and is plotted for the user. This script supports a European Aerosol Conference submission ([Sipkens et al., 2020][eac20]).
 
 **main_auto** runs through most of the fully automated techniques provided with this program (e.g., *k*-means, Otsu, PCM, etc.), applying them to the images provided in the `images/` folder. The binary images produced by each method are overlaid on the original images for inspection by the user. Outputs are similar to those presented in [Section 2](#2-aggregate-segmentation-package-agg) below. 
 
