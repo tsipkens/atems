@@ -193,9 +193,9 @@ The main functions implementing aggregate-level semantic segmentation have filen
 
 The functions often take similar inputs, with main argument being `imgs`, which is one of:
 
-1. a single image (after any footer or additional information have been removed), 
-2. a cell array of images (again with the footer removed); or
-3. an `Imgs` structure, containing the image information as fields. 
+1. a single image (after any footer or additional information have been removed); 
+3. an `Imgs` structure, containing the image information as fields; or
+3. a cell array of images (again with the footer removed).
 
 Several methods also take `pixsize`, which denotes the size of each pixel in the image. If an `Imgs` structure if provided, this information is expected to be contained in this structure and any `pixsize` input is ignored. Other arguments depend on the function (e.g., optional parameters for the rolling ball transform). 
 
