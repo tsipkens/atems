@@ -9,6 +9,10 @@
 % data structure with one entry per identified aggregate. 
 % NOT RECOMMENDED. Preferred uses includes PIXSIZE and IMGS. 
 % 
+% AGGS = analyze_binary(IMGS_BINARY,IMGS) uses the IMGS data structure to
+% extract addition properties, such as the cropped image, filename, pixel
+% size.
+% 
 % AGGS = analyze_binary(IMGS_BINARY,PIXSIZE) uses the pixel size of each
 % image to determine physical quantities from the aggregates, such as the
 % projected area-equivalent diameter in nm. 
