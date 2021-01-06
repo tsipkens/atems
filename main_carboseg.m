@@ -24,7 +24,7 @@ fname = {Imgs.fname}; % cell array of file names
 imgs_binary = agg.seg_carboseg(imgs, pixsizes);
 
 Aggs = agg.analyze_binary(...
-    imgs_binary, imgs, pixsizes, fname, 0); % determine aggregate properties
+    imgs_binary, pixsizes, imgs, fname, 0); % determine aggregate properties
 
 %-- Generate plots of images ---------------------------------------------%
 f1 = figure(1); f1.WindowState = 'maximized';
