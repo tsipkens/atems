@@ -45,6 +45,10 @@ end
 if ~exist('n','var'); n = []; end
 if isempty(n); n = 1:length(Imgs); end
 Imgs = Imgs(n);  % option to select only some of the images before read
+
+% This flag specified whether to attempt to remove
+% scale bars overlaid on the image. 
+f_replace = 1;
 %-------------------------------------------------------------------------%
 
 
@@ -61,7 +65,7 @@ end
 disp(' ');
 
 % crop out footer and get scale from text
-Imgs = detect_footer_scale(Imgs);
+Imgs = detect_footer_scale(Imgs, f_replace);
 
 % format other outputs
 imgs = {Imgs.cropped};
@@ -131,7 +135,7 @@ end
 
 %== DETECT_FOOTER_SCALE ==================================================%
 %   Crops the footer from the image and determines the scale.
-function [Imgs, pixsizes] = detect_footer_scale(Imgs)
+function [Imgs, pixsizes] = detect_footer_scale(Imgs, f_replace)
 
 disp('Looking for footers/scale:');
 tools.textbar([0, length(Imgs)]);
@@ -192,13 +196,19 @@ for jj=1:length(Imgs)
     if footer_found == 0
         bw1 = im2bw(1 - double(Imgs(jj).raw) ./ ...
             max(max(double(Imgs(jj).raw))), 0.98);
-        bw1 = bwareaopen(bw1, 350);
+        bw1 = bwareaopen(bw1, 140);
         
         footer = bw1;
         
         % Run OCR to get scalebar length.
         % Less reliable than above method and is worth spot checking.
         o1 = ocr(footer);
+        if isempty(o1)
+            o1 = ocr(footer, ...
+                'BackgroundColor', [0, 0, 0], ...
+                'TextLayout', 'Line');
+        end
+        
         Imgs(jj).ocr = o1;
         sc_end = strfind(o1.Text,' nm')-1;
         
@@ -220,7 +230,19 @@ for jj=1:length(Imgs)
             Imgs(jj).cropped = Imgs(jj).raw;  % scale bar in image, cannot crop
             
             footer_found = 1; % mark that text has been found
+            
+            % Get estimate of background for mean and std. dev.
+            % Use this to replace the scale bar and text with background noise.
+            if f_replace
+                img_bge = Imgs(jj).raw(im2bw(Imgs(jj).raw));
+                bw2 = imdilate(bw1, strel('square', 10));
+                Imgs(jj).cropped(bw2) = median(img_bge) + ...
+                    uint8(std(double(img_bge)) .* randn([sum(sum(bw2)), 1]));
+                Imgs(jj).cropped = reshape(Imgs(jj).cropped, size(Imgs(jj).raw));
+            end
+            
         end
+        
     end
     
     % If both of the above methods fail.
