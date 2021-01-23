@@ -1,33 +1,31 @@
 
-% TEXTBAR   Print out a text-based progress bar.
-% Author: Timothy Sipkens, 2020-11-02
-% Based on: Samuel Grauer, 2017-11-16 + tqdm for Python
+% TEXTBAR  Print out a text-based progress bar.
 % 
-% DESCRIPTION:
-%   textbar() or textbar(0) initializes a textbar without
+%  DESCRIPTION:
+%   tools.textbar() or textbar(0) initializes a textbar without
 %       a trailing fraction: 
 %           0% |                    |
 % 
-%   textbar(pct) displays a textbar with the provided percentage, 
+%   tools.textbar(pct) displays a textbar with the provided percentage, 
 %       removing text corresponding to the previous textbar.  
 %       For example, textbar(0.1) yields:
 %           10% |██                  |
 % 
-%   textbar([i(1), i(2)]) displays a textbar with an appended fraction, 
-%       again removing text corresponding to the previous textbar. 
+%   tools.textbar([i(1), i(2)]) displays a textbar with an appended 
+%       fraction, again removing text corresponding to the previous textbar. 
 %       In this case, i(1) corresponds to the current iterable, and 
 %       i(2) to the total. For example, textbar([1, 10]) yields:  
 %           10% |██                  | 1/10
 % 
-%   textbar([i(1), i(2), i(3), i(4), ...]) displays a textbar considering
+%   tools.textbar([i(1), i(2), i(3), i(4), ...]) displays a textbar considering
 %       multiple iterables. These are given as pairs of integers, starting
 %       from the most recent loop and moving outward. Integer pairs can be
 %       added for as many iterables are present. For example, 
 %       textbar([1, 3, 2, 5]) yields:
 %           27% |█████▌              | 4/15
 %    
-%   textbar(..., f_back) displays a textbar with control over whether the 
-%       previous textbar is removed, where f_back=1 will remove the
+%   tools.textbar(..., f_back) displays a textbar with control over whether  
+%       the previous textbar is removed, where f_back=1 will remove the
 %       previous text and f_back = 0 will not. By default, f_back=1, that
 %       is, textbar(0.4, 1) is the same as textbar(0.4). By contrast, 
 %       the code `for ii=1:3; textbar([ii, 3], 0); end` will yield:
@@ -35,10 +33,12 @@
 %            67% |█████████████▌      | 2/3
 %           100% |████████████████████| 3/3
 %           
-% NOTE:
+%  NOTE:
 %   If this function is in a tools package, append `tools.` to the 
 %   function call. For example: `tools.textbar(0)` to initialize bar.
-%=========================================================================%
+%  
+%  AUTHOR: Timothy Sipkens, 2020-11-02
+%  INSPIRED BY: Samuel Grauer, 2017-11-16 + tqdm for Python
 
 function textbar(i, f_back)
 
