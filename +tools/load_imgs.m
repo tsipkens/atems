@@ -64,7 +64,7 @@ for ii=ln:-1:1 % reverse order to pre-allocate
 end
 disp(' ');
 
-% crop out footer and get scale from text
+% Crop out footer/scale bar and get scale from text.
 Imgs = detect_footer_scale(Imgs, f_replace);
 
 % format other outputs
@@ -140,10 +140,14 @@ function [Imgs, pixsizes] = detect_footer_scale(Imgs, f_replace)
 disp('Looking for footers/scale:');
 tools.textbar([0, length(Imgs)]);
 
+% Outer loop allows for images with different footers/scale bars.
 for jj=1:length(Imgs)
     
-    %== Designed for UBC footer. =========================================%
-    % Look for footer as white box. Run OCR to find "*/pix" indicators of pixel size. 
+    
+    %== OPTION 1 =========================================================%
+    % Designed for UBC footer. Should work for any white footer 
+    % located at the bottom of the image. 
+    % Runs OCR to find "*/pix" indicators of pixel size. 
     % When the program reaches a row of only white pixels, removes
     % everything below it (specific to ubc photos). It will do nothing if
     % there is no footer or the footer is not pure white.
@@ -192,31 +196,41 @@ for jj=1:length(Imgs)
     end
     
     
-    % If above method failed, look for black text on image.
+    %== OPTION 2 =========================================================%
+    %   If above method failed, look for black text on image.
+    %   OCR is used to try to detect text. If found and f_remove=1, 
+    %   then then the text and scale bar are replaced with 
+    %   background noise.
+    %   This method is less reliable than above method and 
+    %   is worth spot checking.
     if footer_found == 0
+        % Binarize the image at a level 0.98*max.
         bw1 = im2bw(1 - double(Imgs(jj).raw) ./ ...
             max(max(double(Imgs(jj).raw))), 0.98);
+        
+        % Remove any small regions below 140 pixels.
         bw1 = bwareaopen(bw1, 140);
         
-        footer = bw1;
-        
-        % Run OCR to get scalebar length.
-        % Less reliable than above method and is worth spot checking.
-        o1 = ocr(footer);
-        if isempty(o1)
-            o1 = ocr(footer, ...
-                'BackgroundColor', [0, 0, 0], ...
-                'TextLayout', 'Line');
-        end
-        
+        % Run OCR to get find text corresponding to scale.
+        o1 = ocr(bw1, 'CharacterSet', '0123456789nm');
         Imgs(jj).ocr = o1;
-        sc_end = strfind(o1.Text,' nm')-1;
+        
+        % Filter for only relevant characters.
+        f_chars = regexp(o1.Text, '[0123456789nm]');  % flag if characters relevant
+        txt = o1.Text(f_chars);
+        o1_bboxs = o1.CharacterBoundingBoxes(f_chars, :);
+        
+        sc_end = strfind(txt, 'nm') - 1;
         
         if ~isempty(sc_end) % if text found
+            footer_found = 1; % mark that text has been found
+            
+            Imgs(jj).cropped = Imgs(jj).raw;  % scale bar in image, cannot crop
+            
             sc_start = 1;
             sc_length = str2double(...
-                o1.Text(sc_start:sc_end));  % length of scale bar in nm
-
+                txt(sc_start:sc_end));  % length of scale bar in nm
+            
             rp = regionprops(bw1);
             ar = [rp.BoundingBox];
             ar = reshape(ar', [4, length(ar)/4])';
@@ -227,23 +241,41 @@ for jj=1:length(Imgs)
             % If given in micrometers, convert.
             if f_nm==0; Imgs(jj).pixsize = Imgs(jj).pixsize * 1e3; end
 
-            Imgs(jj).cropped = Imgs(jj).raw;  % scale bar in image, cannot crop
             
-            footer_found = 1; % mark that text has been found
             
-            % Get estimate of background for mean and std. dev.
-            % Use this to replace the scale bar and text with background noise.
+            
+            % Use bounding boxes to replace the scale bar 
+            % and text with background noise.
             if f_replace
-                img_bge = Imgs(jj).raw(im2bw(Imgs(jj).raw));
-                bw2 = imdilate(bw1, strel('square', 10));
-                Imgs(jj).cropped(bw2) = median(img_bge) + ...
-                    uint8(std(double(img_bge)) .* randn([sum(sum(bw2)), 1]));
+                
+                % Get estimate of background. Used for median and std. dev.
+               img_bge = Imgs(jj).raw( ...
+                    imclose(imbinarize(Imgs(jj).cropped), strel('disk', 8)));
+                
+                % Convert the bounding boxes for the scale bar and
+                % the found characters to a mask. Dilate that mask to 
+                % cover potential border. This prevents replacing dark
+                % regions of the aggregate with background. 
+                bw2 = bbox2mask( ...
+                    cat(1, rp(ar_max).BoundingBox, ...
+                    o1_bboxs), ...
+                    size(Imgs(jj).cropped));
+                bw2 = imdilate(bw2, strel('square', 12));
+                mask2 = imdilate(bw2, strel('disk', 8)) - bw2;  % get nearby pixels
+                
+                % Replace dilated regions with Gaussian noise, 
+                % about median of estimated background.
+                Imgs(jj).cropped(bw2) = uint8(...
+                    median(double(Imgs(jj).cropped(logical(mask2)))) + ...
+                    std(double(Imgs(jj).cropped(logical(mask2)))) .* ...
+                    randn([sum(sum(bw2)), 1]));
                 Imgs(jj).cropped = reshape(Imgs(jj).cropped, size(Imgs(jj).raw));
             end
             
         end
         
     end
+    
     
     % If both of the above methods fail.
     if footer_found == 0
@@ -260,7 +292,7 @@ pixsizes = [Imgs.pixsize];
 if any(isnan(pixsizes))
     warning(['One or more footers or scales not found.', ...
         'In these cases, cropped image is raw image. ', ...
-        'Assign pixel size manually or using ui_scale_bar.m.']);
+        'Assign pixel size manually or using tools.ui_scale_bar.m.']);
     disp(' ');
 end
 
@@ -269,4 +301,18 @@ end
 
 
 
+%== BBOX2MASK ============================================================%
+%   Convert a series of bounding boxes to an image mask.
+function [mask] = bbox2mask(bboxs, img_size)
 
+[grid2, grid1] = meshgrid(1:img_size(2), 1:img_size(1));
+
+% Loop through bounding boxes and OR them.
+mask = zeros(img_size);  % initialize mask as zeros
+for ii=1:size(bboxs, 1)
+    mask = or(mask, ...
+        and(and(grid1 > bboxs(ii,2), grid1 < (bboxs(ii,2) + bboxs(ii,4))), ...
+        and(grid2 > bboxs(ii,1), grid2 < (bboxs(ii,1) + bboxs(ii,3)))));
+end
+
+end
