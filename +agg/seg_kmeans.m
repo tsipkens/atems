@@ -48,7 +48,10 @@ if isempty(pixsizes); pixsizes = ones(size(imgs)); end
 if length(pixsizes)==1; pixsizes = pixsizes .* ones(size(imgs)); end % extend if scalar
 
 if ~exist('opts', 'var'); opts = struct(); end
-if ~isfield(opts, 'minsize'); opts.minsize = 50; end
+if isstruct(opts)
+    if ~isfield(opts, 'minsize'); opts.minsize = 50; end
+else; opts.minsize = opts;
+end
 %-------------------------------------------------------------------------%
 
 
@@ -66,7 +69,7 @@ for ii=1:n
     
     
 %== CORE FUNCTION ========================================================%
-    morph_param = 0.8/pixsize; % parameter used to adjust morphological operations
+    morph_param = 0.8 / pixsize; % parameter used to adjust morphological operations
     
     
     %== STEP 1: Attempt to the remove background gradient ================%
@@ -84,8 +87,8 @@ for ii=1:n
     
     
     %-- B: Use texture in bottom hat images ------------------------------%
-    se = strel('disk',20);
-    i10 = imbothat(img_denoise,se);
+    se = strel('disk', 20);
+    i10 = imbothat(img_denoise, se);
 
     % i10 = imbilatfilt(img_denoise); % denoise, aids in correctly identifying edges below
     i11 = entropyfilt(i10, true(15)); % entropy filter, related to texture
@@ -120,7 +123,8 @@ for ii=1:n
     % If nothing found, revert to Otsu.
     if isempty(lvl4)
         lvl4 = 1;
-        warning('Adjusted threshold failed. Using Otsu.');
+        warning(['Adjusted threshold failed on image no. ', ...
+            num2str(ii), '. Using Otsu.']);
         if n>1; tools.textbar([0, n]); tools.textbar([ii-1, n]); end
     end
     
