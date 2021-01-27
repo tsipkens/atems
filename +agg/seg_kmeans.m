@@ -1,32 +1,33 @@
 
 % SEG_KMEANS  Performs kmeans clustering on a modified feature set.
-%  Uses the technique described in Sipkens and Rogak (Submitted) 
+%  Uses the technique described in Sipkens and Rogak (2020) 
 %  to segment soot aggregates in TEM images. This requires that image 
 %  annotations / footer information be removed.
 % 
-%  IMG_BINARY = seg_kmeans(IMGS) requires an IMGS data structure, with a
-%  cropped version of the images and the pixel sizes. The output is a 
+%  IMG_BINARY = agg.seg_kmeans(IMGS) requires an IMGS data structure, with 
+%  a cropped version of the images and the pixel sizes. The output is a 
 %  binary mask. 
 % 
-%  IMG_BINARY = seg_kmeans(IMGS,PIXSIZES) uses a cell array of cropped
+%  IMG_BINARY = agg.seg_kmeans(IMGS,PIXSIZES) uses a cell array of cropped
 %  images, IMGS, and an array of pixel sizes, PIXSIZES. The cell array of
 %  images can be replaced by a single image. The pixel size is given in
 %  nm/pixel. If not given, 1 nm/pixel is assumed, with implications for the
 %  rolling ball transform. As before, the output is a binary mask. 
 % 
-%  IMG_BINARY = seg_kmeans(IMGS,PIXSIZES,OPTS) adds a options data 
+%  IMG_BINARY = agg.seg_kmeans(IMGS,PIXSIZES,OPTS) adds a options data 
 %  structure that controls the minimum size of aggregates (in pixels) 
 %  allowed by the program. 
 % 
-%  [IMG_BINARY,IMG_KMEANS] = seg_kmeans(...) adds an output for the raw
+%  [IMG_BINARY,IMG_KMEANS] = agg.seg_kmeans(...) adds an output for the raw
 %  k-means clustered results, prior to the rolling ball transform. 
 % 
-%  [IMG_BINARY,IMG_KMEANS,FEATURE_SET] = seg_kmeans(...) adds an additional
-%  output for false RGB images with one colour per feature layer used by  
-%  the k-means clustering. 
+%  [IMG_BINARY,IMG_KMEANS,FEATURE_SET] = agg.seg_kmeans(...) adds an 
+%  additional output for false RGB images with one colour per feature layer 
+%  used by the k-means clustering. 
 %
 %  AUTHOR: Timothy Sipkens, 2020-08-13
-%  VERSION: 6 (previous versions used different feature layers and weights)
+%  VERSION: 6 (previous versions deprecated, they used different feature 
+%   layers and weights)
 
 function [img_binary, img_kmeans, feature_set] = ...
     seg_kmeans(imgs, pixsizes, opts)

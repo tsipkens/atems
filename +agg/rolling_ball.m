@@ -1,18 +1,28 @@
 
-% ROLLING_BALL Perform a rolling ball transformation, following Dastanpour et al. (2016).
-% A different variant is used for newer functions (e.g., CNN and k-means).
-% Author: Ramin Dastanpour
-% Modified: Timothy Sipkens, 2019-11-06
-%=========================================================================%
+% ROLLING_BALL Perform a rolling ball transformation.
+%  Follows the procedure from Dastanpour et al. (2016).
+%  A different variant is used for newer functions (e.g., CNN and k-means).
+%  
+%  [IMG_BINARY] = agg.rolling_ball(IMG_BINARY,PIXSIZE) uses the default
+%  rolling ball conditions specified in the "Parse inputs" section.
+%  Defaults taken from original Dastanpour code. 
+%  
+%  [IMG_BINARY] = agg.rolling_ball(IMG_BINARY,PIXSIZE,MINPARTICLESIZE) 
+%  uses MINPARTICLESIZE to influence the size of the morphological element
+%  sizes.
+%  
+%  [IMG_BINARY] = agg.rolling_ball(IMG_BINARY,PIXSIZE,MINPARTICLESIZE,COEFFS) 
+%  also adds a coefficient matrix defining the element size at a series of
+%  stages and for particles with different size classses. 
+%  
+%  AUTHOR: Ramin Dastanpour (orig.), Timothy Sipkens (only minor updates, 2019-11-06)
+
 
 function [img_binary] = ...
     rolling_ball(img_binary, pixsize, minparticlesize, coeffs)
 
 
 %== Parse inputs =========================================================%
-if ~exist('pixsize','var'); pixsize = []; end
-if isempty(pixsize); pixsize = 0.1; end
-
 if ~exist('minparticlesize','var'); minparticlesize = []; end
 if isempty(minparticlesize); minparticlesize = 4.9; end
 

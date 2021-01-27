@@ -1,11 +1,23 @@
 
-% SEG_OTSU_RB  Performs Otsu thresholding + a rolling ball transformation.
-% Authors:  Ramin Dastanpour, Steven N. Rogak, 2016-02
-%           Developed at the University of British Columbia
-% Modified: Timothy Sipkens
-%=========================================================================%
+% SEG_OTSU  Performs Otsu thresholding + a rolling ball transformation.
+%  
+%  [IMG_BINARY] = agg.seg_otsu(IMGS) requires an IMGS data structure, with 
+%  a cropped version of the images and the pixel sizes. The output is a 
+%  binary mask. 
+%  
+%  [IMG_BINARY] = agg.seg_otsu(IMGS,PIXSIZES) uses a cell array of cropped
+%  images, IMGS, and an array of pixel sizes, PIXSIZES. The cell array of
+%  images can be replaced by a single image. The pixel size is given in
+%  nm/pixel. If not given, 1 nm/pixel is assumed, with implications for the
+%  rolling ball transform. As before, the output is a binary mask. 
+%  
+%  [IMG_BINARY] = agg.seg_otsu(IMGS,PIXSIZES,MINPARTICLESIZE,COEFFS) 
+%  adds inputs to control the agg.rolling_ball(...) call. See that function 
+%  for more information on these inputs.
+% 
+%  AUTHORS: Timothy Sipkens (2020), Ramin Dastanpour (Original, 2016), Steven N. Rogak
 
-function [img_binary] = seg_otsu_rb(...
+function [img_binary] = seg_otsu(...
     imgs, pixsizes, minparticlesize, coeffs) 
 
 %-- Parse inputs ---------------------------------------------------------%
