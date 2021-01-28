@@ -208,8 +208,8 @@ for jj=1:length(Imgs)
         bw1 = im2bw(1 - double(Imgs(jj).raw) ./ ...
             max(max(double(Imgs(jj).raw))), 0.98);
         
-        % Remove any small regions below 140 pixels.
-        bw1 = bwareaopen(bw1, 140);
+        % Remove any small regions below a certain number of pixels.
+        bw1 = bwareaopen(bw1, 100);
         
         % Run OCR to get find text corresponding to scale.
         o1 = ocr(bw1, 'CharacterSet', '0123456789nm');
@@ -242,6 +242,8 @@ for jj=1:length(Imgs)
             if f_nm==0; Imgs(jj).pixsize = Imgs(jj).pixsize * 1e3; end
 
             
+            % NOTE: Show bw1 image to see the binary that should include 
+            % the overlaid text.
             
             
             % Use bounding boxes to replace the scale bar 
