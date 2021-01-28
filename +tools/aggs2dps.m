@@ -1,19 +1,18 @@
 
-% AGG2DPS  Compute statistics for primary particle size.
-% This loops through .
-% Author: Timothy Sipkens, 2020-12-02
+% AGGS2DPS  Compute statistics for primary particle size.
 % 
-% INPUT:
+%  INPUT:
 %   Aggs    Aggregate structure
 % 
-% OUTPUT:
+%  OUTPUT:
 %   out     Data structure with fields for the various primary 
 %           particle sizing technqiues. Generally, this includes 
 %           the goemetric mean and standard deviation across the
 %           range of aggregates. 
-%=========================================================================%
+%  
+%  AUTHOR: Timothy Sipkens, 2020-12-02
 
-function [out] = agg2dps(Aggs)
+function [out] = aggs2dps(Aggs)
 
 
 agg_fields = fields(Aggs);  % get the list of field names
