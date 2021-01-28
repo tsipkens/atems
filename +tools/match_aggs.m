@@ -1,6 +1,6 @@
 
 % MATCH_AGGS  Attempt to match two aggregates between two Aggs structures.
-% Looks for closest aggregate, limiting consideration to only 150 px.
+%  Looks for closest aggregate, limiting consideration to only 150 px.
 %=========================================================================%
 
 function [idx_a, idx_b] = match_aggs(Aggs_a, Aggs_b)

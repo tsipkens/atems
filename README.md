@@ -72,7 +72,9 @@ Additional dependencies are required for use of the **carboseg** component of th
 
 # Getting started
 
-### Load images
+The overall structure is summarized below and can be roughly broken down into three parts. 
+
+### STEP 1: Load images
 
 The first step in the image analysis process is to import images. Images can be handled in one of two ways. 
 
@@ -82,11 +84,7 @@ The first is as a Matlab structure, with one entry in the structure for each ima
 Imgs = tools.load_imgs('images');  % load the images
 ```
 
-The output structure contains the image file name and directory; the image itself, with the footer cropped; and the pixel size, read from the image footer. 
-
-> NOTE: The latter two operations make use of the `tools.detect_footer_scale` function, which attempts to interpret the image footer and/or scale using image analysis tools. The method is known to work with TEM images taken at the University of British Columbia, where it applies optical character recognition to determine the pixel size from the footer text (stored in the `Imgs.pixsize` field) and crops the footer away. Black text on the image may also be readable more generally. Alternatively, the user can also call the `tools.ui_scale_bar` function to use a UI to get the pixel size.
-
-Alternative, to use the file explorer option: 
+The output structure contains the image file name and directory; the  image itself, with and without the footer removed (or `cropped`); and  the pixel size, read from the image footer. Alternatively, one can use a file explorer to select the folders by  excluding any arguments: 
 
 ```Matlab
 Imgs = tools.load_imgs;  % load the images
@@ -95,7 +93,7 @@ Imgs = tools.load_imgs;  % load the images
 Second, the image can also be handled using a cell array of cropped images and pixel sizes. These are secondary outputs to the `tools.load_imgs` function: 
 
 ```Matlab
-[Imgs, imgs, pixsizes] = tools.load_imgs('images'); % load the images
+[~, imgs, pixsizes] = tools.load_imgs('images'); % load the images
 ```
 
 The images and pixel sizes can equivalently be extracted from the `Imgs` structure using:
@@ -106,9 +104,17 @@ pixsizes = [Imgs.pixsize]; % pixel size for each image
 fname = {Imgs.fname};
 ```
 
+We note that detecting the footer and pixel size (or scale) uses the `tools.detect_footer_scale(...)` subfunction of the `tools.load_imgs` method. This function attempts to interpret the image footer and/or scale using image analysis tools. The method is known to work with TEM images taken at the University of British Columbia, where it applies optical character recognition to determine the pixel size from the footer text (stored in the `Imgs.pixsize` field and/or output directly as `pixsizes`) and crops the footer away. Black text and a scale bar overlaid on the image may also be readable, but present more challenges such that determining the pixel size is not always successful. In cases where this latter approach is used, the code will attempt to fill the overlaid scale elements with background noise, to improve subsequent analyses. Should all of this fail, the user can also call the `tools.ui_scale_bar(img)` function to use a UI to estimate the pixel size for the single, raw image specified by `img`. Type
+
+```Matlab
+help tools.ui_scale_bar;
+```
+
+on the Matlab command line for more information on that function. 
+
 > NOTE: At the moment, this approach will load all of the images into memory. For computers with less memory, this could restrict the number of images that can be analyzed at one time. Batches of 250 images have been run successfully on a computer with 16 GB of RAM (Matlab limits memory usage to below this value). A simple work around is to load the images in groups, rather than all at once, and then add an outer loop to proceed through the different groups. The `tools.load_imgs(fd, n)` function is equipped to handle this, passing the second, optional argument `n` as the integer range of images to load into memory. For example, `n = 1:3` will load the first three images from the set specified by `fd`. 
 
-### Aggregate-level segmentation
+### STEP 2: Aggregate-level segmentation
 
 The next step is to evaluate binary masks that separate the image into pixels that are part of the background and pixels that are part of aggregates. This is done using the functions in the **agg** package. For example, a *k*-means classifier can be used by calling:
 
@@ -150,7 +156,7 @@ tools.imshow_agg(Aggs);
 
 The resultant image highlights pixels that are part of the aggregate, and plots a circle that corresponds to the radius of gyration. This output is similar to that shown the image in the header of this README. 
 
-### Determining the primary particle size
+### STEP 3: Determining the primary particle size
 
 Primary particle size information can finally be determined using functions in the **pp** package. The original pair correlation method (PCM), for example, can be applied by using the `Aggs` output from the `agg.analyze_binary` function as
 
