@@ -1,15 +1,26 @@
 
-% IMSHOW2  A wrapper for tools.imshow() that shows multiple images.
-% Timothy Sipkens, 2020-12-10
-%=========================================================================%
+% IMSHOW2  A wrapper for tools.imshow that shows multiple images.
+%  IMGS must be a cell (not a structure).
+%  
+%  AUTHOR: Timothy Sipkens, 2020-12-10
 
-function h = imshow2(imgs, cmap)
+function h = imshow2(imgs, cmap, n)
 
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('cmap','var'); cmap = []; end
-if isempty(cmap); cmap = gray; end
 
 if ~iscell(imgs); imgs = {imgs}; end
+
+% Incorporate indices of images to plot, if specified. 
+% By default consider all of the images. 
+if ~exist('n', 'var'); n = []; end
+if isempty(n); n = 1:length(imgs); end
+imgs = imgs(n);
+
+% Limits plotting to first 24 images (done for speed
+% and because images beyond this are too small on the grid).
+if length(imgs) > 24; imgs = imgs(1:24); end
+
 n_imgs = length(imgs);
 %-------------------------------------------------------------------------%
 
@@ -29,7 +40,7 @@ for ii=1:n_imgs % loop over images
         title(num2str(ii));
     end
     
-    tools.imshow(imgs{ii}); % show labelled image
+    tools.imshow(imgs{ii}, cmap); % show labelled image
     
 end
 
