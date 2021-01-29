@@ -14,6 +14,7 @@ function [img_binary] = seg_otsu_orig(...
     imgs, pixsizes, minparticlesize, coeffs) 
 
 %-- Parse inputs ---------------------------------------------------------%
+if ~exist('pixsizes', 'var'); pixsizes = []; end
 [imgs, pixsizes, n] = agg.parse_inputs(imgs, pixsizes);
 
 if ~exist('minparticlesize','var'); minparticlesize = []; end

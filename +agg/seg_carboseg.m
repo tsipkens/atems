@@ -9,6 +9,7 @@ function [img_binary] = seg_carboseg(imgs, pixsizes)
 
 
 %-- Parse inputs ---------------------------------------------------------%
+if ~exist('pixsizes', 'var'); pixsizes = []; end
 [imgs, pixsizes, n] = agg.parse_inputs(imgs, pixsizes);
 %-------------------------------------------------------------------------%
 

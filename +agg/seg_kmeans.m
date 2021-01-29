@@ -34,6 +34,7 @@ function [img_binary, img_kmeans, feature_set] = ...
 
 
 %-- Parse inputs ---------------------------------------------------------%
+if ~exist('pixsizes', 'var'); pixsizes = []; end
 [imgs, pixsizes, n] = agg.parse_inputs(imgs, pixsizes);
 
 if ~exist('opts', 'var'); opts = struct(); end
