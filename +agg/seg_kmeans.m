@@ -24,10 +24,19 @@
 %  [IMG_BINARY,IMG_KMEANS,FEATURE_SET] = agg.seg_kmeans(...) adds an 
 %  additional output for false RGB images with one colour per feature layer 
 %  used by the k-means clustering. 
-%
+%  
+%  ------------------------------------------------------------------------
+%  
+%  VERSION: 
+%   Previous versions, deprecated, used different feature layers and weights.
+%    <strong>6+</strong>:  Three, equally-weighted feature layers as described by 
+%         Sipkens and Rogak (J. Aerosol Sci.). 
+%    <strong>6.1</strong>: Improves the adjusted feature layer for 
+%         clumpy aggregates.
+%  
+%  ------------------------------------------------------------------------
+%  
 %  AUTHOR: Timothy Sipkens, 2020-08-13
-%  VERSION: 6 (previous versions deprecated, they used different feature 
-%   layers and weights)
 
 function [img_binary, img_kmeans, feature_set] = ...
     seg_kmeans(imgs, pixsizes, opts)
@@ -99,7 +108,10 @@ for ii=1:n
     
     % Now, loop through threshold values above Otsu 
     % and find number of pixels that are part of the aggregates.
-    lvl3 = 1:0.002:1.25;
+    % NOTE: Original lvl3 went up to 1.25, which, while faster, cause
+    %  problems for particularily clumpy aggregates. May cause some 
+    %  backward compatibility issues. 
+    lvl3 = 1:0.002:1.35;
     n_in = ones(size(lvl3));
     for ll=1:length(lvl3) % loop, increasing the threshold level
         n_in(ll) = sum(sum(~im2bw(i1, min(lvl2 * lvl3(ll), 1))));
@@ -111,11 +123,17 @@ for ii=1:n
     lvl4 = find(((n_in - n_in_pred) ./ n_in_pred) > 0.10); % cases that devaite 10% from initial trend
     
     % If nothing found, revert to Otsu.
+    % To debug, one can plot the Otsu result using: 
+    %  tools.imshow_binary(imgs{ii}, i2a);
+    % or 
+    %  plot(lvl3, n_in);
+    % Results more often for dense aggregates.
     if isempty(lvl4)
         lvl4 = 1;
         warning(['Adjusted threshold failed on image no. ', ...
             num2str(ii), '. Using Otsu.']);
-        if n>1; tools.textbar([0, n]); tools.textbar([ii-1, n]); end
+        disp(' ');
+        tools.textbar([0, n]); tools.textbar([(ii-1)+0.7, n]);
     end
     
     lvl4 = lvl3(lvl4(1)); % use the first case found in preceding line
