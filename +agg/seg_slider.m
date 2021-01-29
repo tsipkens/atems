@@ -20,9 +20,9 @@
 %  small part of the image. By default, F_CROP = 1 and does use the crop
 %  tools. Note, IMGS_BINARY can be empty.
 %  
-% AUTHOR: Timothy Sipkens, 2019-10-11 (modified)
-%  Ramin Dastanpour, 2016-02 (based on)
-%  Developed at the University of British Columbia
+%  AUTHOR: Timothy Sipkens, 2019-10-11 (modified)
+%   Ramin Dastanpour, 2016-02 (based on)
+%   Developed at the University of British Columbia
 
 function [imgs_binary] = seg_slider(imgs, imgs_binary, f_crop) 
 
