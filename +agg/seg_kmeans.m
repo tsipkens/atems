@@ -34,19 +34,7 @@ function [img_binary, img_kmeans, feature_set] = ...
 
 
 %-- Parse inputs ---------------------------------------------------------%
-if isstruct(imgs) % convert input images to a cell array
-    Imgs = imgs;
-    imgs = {Imgs.cropped};
-    pixsizes = [Imgs.pixsize];
-elseif ~iscell(imgs)
-    imgs = {imgs};
-end
-
-n = length(imgs); % number of images to consider
-
-if ~exist('pixsizes','var'); pixsizes = []; end
-if isempty(pixsizes); pixsizes = ones(size(imgs)); end
-if length(pixsizes)==1; pixsizes = pixsizes .* ones(size(imgs)); end % extend if scalar
+[imgs, pixsizes, n] = agg.parse_inputs(imgs, pixsizes);
 
 if ~exist('opts', 'var'); opts = struct(); end
 if isstruct(opts)

@@ -21,19 +21,7 @@ function [img_binary] = seg_otsu(...
     imgs, pixsizes, minparticlesize, coeffs) 
 
 %-- Parse inputs ---------------------------------------------------------%
-if isstruct(imgs)
-    Imgs_str = imgs;
-    imgs = {Imgs_str.cropped};
-    pixsize = [Imgs_str.pixsize];
-elseif ~iscell(imgs)
-    imgs = {imgs};
-end
-
-n = length(imgs); % number of images to consider
-
-if ~exist('pixsizes','var'); pixsizes = []; end
-if isempty(pixsizes); pixsizes = ones(size(imgs)); end
-if length(pixsizes)==1; pixsizes = pixsizes .* ones(size(imgs)); end % extend if scalar
+[imgs, pixsizes, n] = agg.parse_inputs(imgs, pixsizes);
 
 if ~exist('minparticlesize','var'); minparticlesize = []; end
 if ~exist('coeffs','var'); coeffs = []; end

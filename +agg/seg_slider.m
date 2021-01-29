@@ -22,28 +22,29 @@ function [imgs_binary] = seg_slider(imgs, imgs_binary, f_crop)
 
 
 %== Parse input ==========================================================%
+% Use common inputs parser, noting that pixel size is not
+% used as an input to this function.
+[imgs, ~, n] = agg.parse_inputs(imgs, []);
+
 if ~exist('f_crop','var'); f_crop = []; end
 if isempty(f_crop); f_crop = 1; end
 
-if isstruct(imgs) % convert input images to a cell array
-    Imgs_str = imgs;
-    imgs = {Imgs_str.cropped};
-    pixsizes = [Imgs_str.pixsize];
-elseif ~iscell(imgs)
-    imgs = {imgs};
-end
-
-n = length(imgs); % number of images to consider
-
-% initial cellular array of image binaries, if particle binary is not provided
-if ~exist('imgs_binary','var'); imgs_binary{n} = []; end
+% Initial cellular array of image binaries, if image 
+% binary is not provided. Empty if not provided.
+if ~exist('imgs_binary','var'); imgs_binary = []; end
+if isempty(imgs_binary); imgs_binary{n} = []; end
 if ~iscell(imgs_binary); imgs_binary = {imgs_binary}; end
+
+% Check to make sure there is an equal number of binary 
+% and imags inputs, if supplied. If not supplied, imgs_binary{n} = [];
+% ensures appropriate length.
+if length(imgs_binary) ~= n
+    error('Size mismatch between imgs and imgs_binary');
+end
 %=========================================================================%
 
 
-img_binary0 = []; % binary stored over multiple thresholds
-
-f0 = figure; % initialize a figure
+f0 = figure; % initialize a new figure for UI
 f0.WindowState = 'maximized'; % maximize the figure window
 
 

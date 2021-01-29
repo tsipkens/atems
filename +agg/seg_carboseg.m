@@ -9,19 +9,7 @@ function [img_binary] = seg_carboseg(imgs, pixsizes)
 
 
 %-- Parse inputs ---------------------------------------------------------%
-if isstruct(imgs) % convert input images to a cell array
-    Imgs = imgs;
-    imgs = {Imgs.cropped};
-    pixsizes = [Imgs.pixsize];
-elseif ~iscell(imgs)
-    imgs = {imgs};
-end
-
-n = length(imgs); % number of images to consider
-
-if ~exist('pixsizes','var'); pixsizes = []; end
-if isempty(pixsizes); pixsizes = ones(size(imgs)); end
-if length(pixsizes)==1; pixsizes = pixsizes .* ones(size(imgs)); end % extend if scalar
+[imgs, pixsizes, n] = agg.parse_inputs(imgs, pixsizes);
 %-------------------------------------------------------------------------%
 
 
@@ -37,8 +25,8 @@ disp(' ');
 
 img_binary = {};
 disp('Running CNN classifier in Python:');
-tools.textbar([0, length(imgs)]);
-for ii=1:length(imgs)
+tools.textbar([0, n]);
+for ii=1:n
     img_py = py.numpy.array(cat(3, imgs{ii}, imgs{ii}, imgs{ii}));  % format input
     
     img_binary0 = seg.segment_image(img_py);  % apply classifier
