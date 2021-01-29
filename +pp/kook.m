@@ -1,30 +1,39 @@
 
 % KOOK  Original Kook function, modified only to be incorporated as a function.
-%
-% Automatic primary particle finder v1.2 (works on Matlab 2012a or higher + 
-% Image Processing Toolbox)
-% The code implements pre-processing (Median Filter and unsharp masking), 
-% Canny edge detection, and  Circular Hough Transform.
-%
-% Original code written by Qing Nian Chan on 18 Sep 2014
-% Modified by Sanghoon Kook for diesel soot applications on 27 Sep 2014
-% Last update by original authors on 19 Dec 2014 by Sanghoon Kook
+%  Automatic primary particle finder v1.2 (works on Matlab 2012a or higher + 
+%  Image Processing Toolbox)
+%  This code implements pre-processing (Median Filter and unsharp masking), 
+%  Canny edge detection, and  Circular Hough Transform.
 % 
-% Modifications by UBC: 
-% 1. TEMscale -> pixsize (using tools.getfooterscale)
-% 2. Included references to img
-% 3. Updates to commenting
-% 4. Update to output (dpdist is original output)
-% 5. Added option as to whether of not to generate plots
+%  [PP] = pp.kook(IMG,PIXSIZE) uses the single image specified by IMG
+%  and the scalar pixel size in PIZSIZE to apply's Kook et al.'s Hough
+%  transform-based method. Returns a structure, with the average and
+%  individual primary particle size information for a single image. 
+%  
+%  [PP] = pp.kook(IMG,PIXSIZE,F_PLOT) adds a flag of whether or not to
+%  produce a plot the the primary particle sizes on top of the image. By
+%  default, this flag is set to one and will plot the primary particles.
+%  
+%  [PP,DP] = pp.kook(...) adds an output with the mean primary particle
+%  size in the image. 
+%  
+%  ------------------------------------------------------------------------
+%  
+%  NOTE:
+%   Consistent with previous code, this does not break the primary particles
+%   up by aggregate. For that code, please refer to the pp.kook2
+%   function in this package. 
 %
-%-------------------------------------------------------------------------%
-%
-% Inputs:
-%   img        A single image to be analyzed
-%   pixsize    Size of the pixels
-%   f_plot     A boolean determining whether or not to generate plots
+%  Original code written by Qing Nian Chan on 18 Sep 2014.
+%  Modified by Sanghoon Kook for diesel soot applications on 27 Sep 2014.
+%  Last update by original authors on 19 Dec 2014 by Sanghoon Kook.
 % 
-%=========================================================================%
+%  MODS BY UBC: 
+%   1. TEMscale -> pixsize (using tools.getfooterscale)
+%   2. Included references to img
+%   3. Updates to commenting
+%   4. Update to output (dpdist is original output)
+%   5. Added option as to whether of not to generate plots
 
 function [Pp, dp] = kook(img, pixsize, f_plot)
 
