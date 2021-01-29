@@ -30,11 +30,14 @@ function [pixsizes] = ui_scale_bar(imgs, n)
 %-- Parse inputs ---------------------------------------------------------%
 if isstruct(imgs)
     Imgs = imgs;
-    imgs = {Imgs(1).raw}; % use raw image
+    imgs = {Imgs.raw}; % use raw image
 end
 if ~iscell(imgs); imgs = {imgs}; end
 
-imgs = imgs{n};
+if ~exist('n', 'var'); n = []; end
+if isempty(n); n = 1:length(imgs); end
+
+imgs = imgs(n);
 %-------------------------------------------------------------------------%
 
 
