@@ -74,6 +74,8 @@ Additional dependencies are required for use of the **carboseg** component of th
 
 The overall structure is summarized below and can be roughly broken down into three parts. 
 
+![original](docs/process.png)
+
 ### STEP 1: Load images
 
 The first step in the image analysis process is to import images. Images can be handled in one of two ways. 
@@ -104,7 +106,7 @@ pixsizes = [Imgs.pixsize]; % pixel size for each image
 fname = {Imgs.fname};
 ```
 
-We note that detecting the footer and pixel size (or scale) uses the `tools.detect_footer_scale(...)` subfunction of the `tools.load_imgs(...)` method. This function attempts to interpret the image footer and/or scale using image analysis tools. The method is known to work with TEM images taken at the University of British Columbia, where it applies optical character recognition to determine the pixel size from the footer text (stored in the `Imgs.pixsize` field and/or output directly as `pixsizes`) and crops the footer away. Black text and a scale bar overlaid on the image may also be readable, but present more challenges such that determining the pixel size is not always successful. In cases where this latter approach is used, the code will attempt to fill the overlaid scale elements with background noise, to improve subsequent analyses. Should all of this fail, the user can also call the `tools.ui_scale_bar(imgs)` function to use a UI to estimate the pixel size for the cell of raw images specified by `imgs`. Type
+We note that detecting the footer and pixel size (or scale) uses the `detect_footer_scale(...)` subfunction of the `tools.load_imgs(...)` method. This function attempts to interpret the image footer and/or scale using image analysis tools. The method is known to work with TEM images taken at the University of British Columbia, where it applies optical character recognition to determine the pixel size from the footer text (stored in the `Imgs.pixsize` field and/or output directly as `pixsizes`) and crops the footer away. Black text and a scale bar overlaid on the image may also be readable, but present more challenges such that determining the pixel size is not always successful. In cases where this latter approach is used, the code will attempt to fill the overlaid scale elements with background noise, to improve subsequent analyses. Should all of this fail, the user can also call the `tools.ui_scale_bar(imgs)` function to use a UI to estimate the pixel size for the cell of raw images specified by `imgs`. Type
 
 ```Matlab
 help tools.ui_scale_bar;
