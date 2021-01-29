@@ -78,7 +78,7 @@ The overall structure is summarized below and can be roughly broken down into th
 
 The first step in the image analysis process is to import images. Images can be handled in one of two ways. 
 
-The first is as a Matlab structure, with one entry in the structure for each image loaded. To generate this structure, one can use the `tools.load_imgs` function, either giving a folder name as an input or no argument (to use a file explorer). To use the test images:
+The first is as a Matlab structure, with one entry in the structure for each image loaded. To generate this structure, one can use the `tools.load_imgs(...)` function, either giving a folder name as an input or no argument (to use a file explorer). To use the test images:
 
 ```Matlab
 Imgs = tools.load_imgs('images');  % load the images
@@ -90,7 +90,7 @@ The output structure contains the image file name and directory; the  image itse
 Imgs = tools.load_imgs;  % load the images
 ```
 
-Second, the image can also be handled using a cell array of cropped images and pixel sizes. These are secondary outputs to the `tools.load_imgs` function: 
+Second, the image can also be handled using a cell array of cropped images and pixel sizes. These are secondary outputs to the `tools.load_imgs(...)` function: 
 
 ```Matlab
 [~, imgs, pixsizes] = tools.load_imgs('images'); % load the images
@@ -104,7 +104,7 @@ pixsizes = [Imgs.pixsize]; % pixel size for each image
 fname = {Imgs.fname};
 ```
 
-We note that detecting the footer and pixel size (or scale) uses the `tools.detect_footer_scale(...)` subfunction of the `tools.load_imgs` method. This function attempts to interpret the image footer and/or scale using image analysis tools. The method is known to work with TEM images taken at the University of British Columbia, where it applies optical character recognition to determine the pixel size from the footer text (stored in the `Imgs.pixsize` field and/or output directly as `pixsizes`) and crops the footer away. Black text and a scale bar overlaid on the image may also be readable, but present more challenges such that determining the pixel size is not always successful. In cases where this latter approach is used, the code will attempt to fill the overlaid scale elements with background noise, to improve subsequent analyses. Should all of this fail, the user can also call the `tools.ui_scale_bar(img)` function to use a UI to estimate the pixel size for the single, raw image specified by `img`. Type
+We note that detecting the footer and pixel size (or scale) uses the `tools.detect_footer_scale(...)` subfunction of the `tools.load_imgs(...)` method. This function attempts to interpret the image footer and/or scale using image analysis tools. The method is known to work with TEM images taken at the University of British Columbia, where it applies optical character recognition to determine the pixel size from the footer text (stored in the `Imgs.pixsize` field and/or output directly as `pixsizes`) and crops the footer away. Black text and a scale bar overlaid on the image may also be readable, but present more challenges such that determining the pixel size is not always successful. In cases where this latter approach is used, the code will attempt to fill the overlaid scale elements with background noise, to improve subsequent analyses. Should all of this fail, the user can also call the `tools.ui_scale_bar(imgs)` function to use a UI to estimate the pixel size for the cell of raw images specified by `imgs`. Type
 
 ```Matlab
 help tools.ui_scale_bar;
@@ -116,7 +116,7 @@ on the Matlab command line for more information on that function.
 
 ### STEP 2: Aggregate-level segmentation
 
-The next step is to evaluate binary masks that separate the image into pixels that are part of the background and pixels that are part of aggregates. This is done using the functions in the **agg** package. For example, a *k*-means classifier can be used by calling:
+The next step is to evaluate binary masks that separate the image into pixels that are part of the background and pixels that are part of aggregates. This is done using the functions in the **+agg** package. For example, a *k*-means classifier can be used by calling:
 
 ```Matlab
 imgs_binary = agg.seg_kmeans(imgs, pixsizes, opts);
@@ -125,7 +125,7 @@ imgs_binary = agg.seg_kmeans(imgs, pixsizes, opts);
 
 The result, `imgs_binary`, is either a single binary image (if one image is given as an input) or a cell array of image binaries (if multiple images are given as an input), with `1` if a pixel is considered part of the aggregate and `0` if it is not. Other approaches are also available and are discussed in [Section 2](#2-aggregate-segmentation-package-agg) below. 
 
-Having segmented the image, aggregate characteristics can be determined by passing this binary image to the `tools.analyze_binary` function, e.g.:
+Having segmented the image, aggregate characteristics can be determined by passing this binary image to the `tools.analyze_binary(...)` function, e.g.:
 
 ```Matlab
 Aggs = agg.analyze_binary(...
@@ -145,9 +145,7 @@ or an Excel spreadsheet using:
 tools.write_excel(Aggs, fname);
 ```
 
-to be analyzed in other software and languages, where `fname` is the filename of the file to write to. 
-
-The `Aggs` structure can also be visualized as an overlay on top of the TEM image using
+to be analyzed in other software and languages, where `fname` is the filename of the file to write to. The `Aggs` structure can also be visualized as an overlay on top of the TEM image using
 
 ```Matlab
 figure(1);
@@ -158,13 +156,13 @@ The resultant image highlights pixels that are part of the aggregate, and plots 
 
 ### STEP 3: Determining the primary particle size
 
-Primary particle size information can finally be determined using functions in the **pp** package. The original pair correlation method (PCM), for example, can be applied by using the `Aggs` output from the `agg.analyze_binary` function as
+Primary particle size information can finally be determined using functions in the **+pp** package. The original pair correlation method (PCM), for example, can be applied by using the `Aggs` output from the `agg.analyze_binary(...)` function as
 
 ```Matlab
-Aggs = pp.pcm(Aggs); % apply PCM
+Aggs = pp.pcm(Aggs); % apply pair correlation method
 ```
 
-The output is an updated `Aggs` structure that also contains an estimate of the primary particle size for each aggregate. Having done this, the primary particle size can be visualized along with the radius of gyration noted above by passing the updated `Aggs` structure to the `tools.plot_aggregates` function:
+The output is an updated `Aggs` structure that also contains an estimate of the primary particle size for each aggregate. Having done this, the primary particle size can be visualized along with the radius of gyration noted above by passing the updated `Aggs` structure to the `tools.plot_aggregates(...)` function:
 
 ```Matlab
 figure(1);
@@ -185,7 +183,7 @@ The main scripts demonstrate further use of the code for specific scenarios and 
 
 # 2. AGGREGATE SEGMENTATION PACKAGE (+agg)
 
-This package contains an expandable library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background regions. Functions are accessed by appending `agg.` to the function name, e.g., `agg.seg_kmeans` to call the *k*-means segmentation procedure. 
+This package contains an expandable library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background regions. Functions are accessed by appending `agg.` to the function name, e.g., `agg.seg_kmeans(...)` to call the *k*-means segmentation procedure. 
 
 We will demonstrate the segmentation functions using a set of sample images. 
 
@@ -215,7 +213,7 @@ The `agg.seg` function is a general, multipurpose wrapper function that attempts
 
 2. The **Otsu** classifier, with the same prompts following segmentation. 
 
-3. Use the GUI-based slider method (the `seg_slider` function described below) to produce a largely-manual segmentation. 
+3. Use the GUI-based slider method (the `agg.seg_slider(...)` function described below) to produce a largely-manual segmentation. 
 
 This is repeated until the user has classified all of the images that were passed to the function. 
 
@@ -275,19 +273,19 @@ The user should edit the script to point to an appropriate Python executable gen
 
 #### Segmentation
 
-Finally, the user can use the `agg.seg_carboseg` function in a similar fashion to the other segmentation approaches. 
+Finally, the user can use the `agg.seg_carboseg(...)` function in a similar fashion to the other segmentation approaches. 
 
 ### + Otsu thresholding: seg_otsu_rb\*
 
 These automated methods apply Otsu thresholding followed by a rolling ball transformation. Two versions of this function are included. 
 
-**1.** The `agg.seg_otsu_rb_orig` function remains more true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. For the sample images, this results in the following segmentations.
+**1.** The `agg.seg_otsu_rb_orig(...)` function remains more true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. For the sample images, this results in the following segmentations.
 
 ![rb_orig](docs/otsu_rb_orig.png)
 
-Aggregates are often broken apart, which may be insufficient in itself. This implementation can be complimented with `agg.seg_slider`, described below, to fill in the gaps between the aggregates and add missing aggregates. 
+Aggregates are often broken apart, which may be insufficient in itself. This implementation can be complimented with `agg.seg_slider(...)`, described below, to fill in the gaps between the aggregates and add missing aggregates. 
 
-**2.** Stemming from the deficiencies of the above function, the `agg.seg_otsu_rb` function updates the above implementation by (*i*) not immediately removing boundary aggregates, (*ii*) adding a background subtraction step using the `agg.bg_subtract` function, and (*iii*) adding a bilateral denoising step. This results in the following segmentations.
+**2.** Stemming from the deficiencies of the above function, the `agg.seg_otsu_rb(...)` function updates the above implementation by (*i*) not immediately removing boundary aggregates, (*ii*) adding a background subtraction step using the `agg.bg_subtract(...)` function, and (*iii*) adding a bilateral denoising step. This results in the following segmentations.
 
 ![otsu_rb](docs/otsu_rb.png)
 
@@ -295,7 +293,7 @@ This latter function generally performs better, though the results still often b
 
 ### + GUI-based slider method: seg_slider
 
-The function `agg.seg_slider` is a largely manual technique. The function enacts a GUI-based method with a slider for adaptive, semi-automatic thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps: 
+The function `agg.seg_slider(...)` is a largely manual technique. The function enacts a GUI-based method with a slider for adaptive, semi-automatic thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps: 
 
 1. The user is first prompted to **crop** around a single aggregate. This allows the user to zoom in on the image for the remaining steps. 
 2. The user uses a lasso tool to draw around the aggregate. The excluded regions are used for **background subtraction** in cropped region of the image. 
@@ -317,7 +315,7 @@ Several sub-functions are included within the main file. This is a variant of th
 
 ## 2.2 analyze_binary
 
-All of the above methods produce a common output: a binary image. The `agg.analyze_binary` function is now used to convert these binaries to aggregate characteristics, such as area in pixels, radius of gyration, area-equivalent diameter, aspect ratio, among other quantities. The function itself takes a binary image, the original image, and the pixel size as inputs, as follows. 
+All of the above methods produce a common output: a binary image. The `agg.analyze_binary(...)` function is now used to convert these binaries to aggregate characteristics, such as area in pixels, radius of gyration, area-equivalent diameter, aspect ratio, among other quantities. The function itself takes a binary image, the original image, and the pixel size as inputs, as follows. 
 
 ```Matlab
 Aggs = agg.analyze_binary(imgs_binary, imgs, pixsize, fname);
@@ -331,7 +329,7 @@ Multiple of these methods make use of the *rolling ball transformation*, applied
 
 # 3. PRIMARY PARTICLE ANALYSIS PACKAGE (+pp)
 
-The +pp package contains multiple methods for determining the primary particle size of the aggregates of interest. Often this requires a binary mask of the image that can be generated using the +agg package methods. After applying most of the methods, the primary particle size will be stored in (*i*) the `Aggs.dp` field and (*ii*) another `Aggs` field with additional information specifying the method used (e.g., `Aggs.dp_pcm1`  contains a PCM-derived primary particle diameter). For the former, whichever method was last used will overwrite the `Aggs.dp` field, which then acts as a default value that is used by other functions (by the `tools.imshow_agg` function). 
+The +pp package contains multiple methods for determining the primary particle size of the aggregates of interest. Often this requires a binary mask of the image that can be generated using the +agg package methods. After applying most of the methods, the primary particle size will be stored in (*i*) the `Aggs.dp` field and (*ii*) another `Aggs` field with additional information specifying the method used (e.g., `Aggs.dp_pcm1`  contains a PCM-derived primary particle diameter). For the former, whichever method was last used will overwrite the `Aggs.dp` field, which then acts as a default value that is used by other functions (by the `tools.imshow_agg(...)` function). 
 
 ### + PCM
 
@@ -388,21 +386,21 @@ tools.imshow_binary(img, img_binary, opts);
 
 will plot the overlays in a yellow. 
 
-The related `tools.imshow_agg` function will plot the binaries, as above, and add aggregate-level information to the plot, including: (*i*) the aggregate number; (*ii*) the radius of gyration about the center of the aggregate; and (*iii*) the average primary particle diameter, if this information is available (the function will use the `Aggs.dp` field, which will contain primary particle information from the most recently applied method). 
+The related `tools.imshow_agg(...)` function will plot the binaries, as above, and add aggregate-level information to the plot, including: (*i*) the aggregate number; (*ii*) the radius of gyration about the center of the aggregate; and (*iii*) the average primary particle diameter, if this information is available (the function will use the `Aggs.dp` field, which will contain primary particle information from the most recently applied method). 
 
 ### Functions to write data to files (tools.write*)
 
 This set of functions writes data to files, with the precise format depending on the function. 
 
-The `write_excel` and `write_json` functions write aggregate-level information to Excel and JSON formats respectively. The precise output will depend on what information is contained in the `Aggs` structure given to the method. For example, `Aggs` structures with primary particle information will have that information output to the Excel or JSON files. 
+The `tools.write_excel(...)` and `tools.write_json(...)` functions write aggregate-level information to Excel and JSON formats respectively. The precise output will depend on what information is contained in the `Aggs` structure given to the method. For example, `Aggs` structures with primary particle information will have that information output to the Excel or JSON files. 
 
-The `write_images` function, in contrast, take a cell of images (or a single image) and writes them to a series of files, specified by the `fnames` argument, in the folder specified by the `folder` argument. For example, this can be used to write the binary images presented at the beginning of this README to a temporary folder using
+The `tools.write_images(...)` function, in contrast, take a cell of images (or a single image) and writes them to a series of files, specified by the `fnames` argument, in the folder specified by the `folder` argument. For example, this can be used to write the binary images presented at the beginning of this README to a temporary folder using
 
 ```Matlab
 tools.imwrite(imgs_binary, fname, 'temp');
 ```
 
-This function is also useful when paired with the `tools.imshow_agg` function to write images with binary overlays and radius of gyration information (such as those presented throughout this README). For a series of images that have been processed to produce an `Aggs` structure, this can be accomplished using: 
+This function is also useful when paired with the `tools.imshow_agg(...)` function to write images with binary overlays and radius of gyration information (such as those presented throughout this README). For a series of images that have been processed to produce an `Aggs` structure, this can be accomplished using: 
 
 ```Matlab
 imgs_agg{length(imgs)} = []; % initialize cell
