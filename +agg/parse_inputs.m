@@ -47,7 +47,10 @@ end
 if ~iscell(imgs)
     imgs = {imgs};  % convert to a cell for future handling
 end
+n = length(imgs);  % also return the number of images in the set
 
+
+% Handle PIXSIZES variable.
 if ~exist('pixsizes', 'var'); pixsizes = []; end % make sure pixsizes exists
 
 % See if there are any entries missing on non-sensical.
@@ -55,6 +58,7 @@ if ~exist('pixsizes', 'var'); pixsizes = []; end % make sure pixsizes exists
 if or(any(isnan(pixsizes)), any(pixsizes==0))
     warning(['Some pixel sizes were missing and assigned a value of 1 nm/px. ', ...
         'This may cause errors in classification and should be checked.']);
+    disp(' ');
     
     if isempty(pixsizes); pixsizes = ones(size(imgs));
     else; pixsizes(pixsizes==0) = 1; pixsizes(isnan(pixsizes)) = 1; end
@@ -62,11 +66,13 @@ end
 
 % Extend pxiel sizes if input is a scalar. 
 % Output will be the same lengths as imgs.
-if length(pixsizes)==1
+if length(pixsizes) == 1
     pixsizes = pixsizes .* ones(size(imgs));
+    
+elseif length(pixsizes) ~= length(imgs)
+    error('IMGS and PIXSIZES size mismatch.')
+    
 end
-
-n = length(imgs);  % also return the number of images in the set
 
 
 
