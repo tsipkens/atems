@@ -315,6 +315,10 @@ Several sub-functions are included within the main file. This is a variant of th
 
 > We note that this code saw important bug updates since the original code by [Dastanpour et al. (2016)][dastanpour2016]. This includes fixing how the original code would repeatedly apply a Gaussian filter every time the user interacted with the slider in the GUI (which may cause some backward compatibility issues), a reduction in the use of global variables, memory savings, and other performance improvements. 
 
+### + An improved GUI-based slider method: seg_slider2
+
+The core of this method is that same as the GUI-based method described above but sees an overhaul of the user interface. This implementation makes use of Matlab's app builder, requiring newer Matlab versions to work. 
+
 ## 2.2 analyze_binary
 
 All of the above methods produce a common output: a binary image. The `agg.analyze_binary(...)` function is now used to convert these binaries to aggregate characteristics, such as area in pixels, radius of gyration, area-equivalent diameter, aspect ratio, among other quantities. The function itself takes a binary image, the original image, and the pixel size as inputs, as follows. 
