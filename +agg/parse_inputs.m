@@ -69,7 +69,7 @@ end
 if length(pixsizes) == 1
     pixsizes = pixsizes .* ones(size(imgs));
     
-elseif length(pixsizes) ~= length(imgs)
+elseif and(~isempty(pixsizes), length(pixsizes) ~= length(imgs))
     error('IMGS and PIXSIZES size mismatch.')
     
 end
