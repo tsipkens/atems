@@ -9,12 +9,9 @@ function [imgs_binary] = seg_adapt_rb(imgs, ...
 %-- Parse inputs ---------------------------------------------------------%
 if ~exist('pixsizes', 'var'); pixsizes = []; end
 [imgs, pixsizes, n] = agg.parse_inputs(imgs, pixsizes);
-
-n = length(imgs); % number of images to consider
-
-if ~exist('pixsizes','var'); pixsizes = []; end
-if isempty(pixsizes); pixsizes = ones(size(imgs)); end
-if length(pixsizes)==1; pixsizes = pixsizes .* ones(size(imgs)); end % extend if scalar
+if isempty(pixsizes)
+    error('PIXSIZES is a required argument unless Imgs structure is given.');
+end
 
 if ~exist('minparticlesize','var'); minparticlesize = []; end
 if ~exist('coeffs','var'); coeffs = []; end
