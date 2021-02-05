@@ -9,8 +9,6 @@ import requests
 from PIL import Image
 from tqdm import tqdm
 
-# TODO: Support dynamic input sizes.
-
 
 class Segmenter:
     def __init__(
@@ -26,7 +24,6 @@ class Segmenter:
             print("Complete.\n")
 
         self.onnx_session = rt.InferenceSession(str(self.checkpoint_path))
-        self.input_name = self.onnx_session.get_inputs()[0].name
 
     @staticmethod
     def read_image(image_path):
@@ -82,12 +79,13 @@ class Segmenter:
 
         # Produce raw prediction.
         input_name = self.onnx_session.get_inputs()[0].name
-        prediction = self.onnx_session.run(None, {input_name: image.astype(np.float32)})[0]
+        output_name = self.onnx_session.get_outputs()[0].name
+        prediction = self.onnx_session.run([output_name], {input_name: image})[0]
 
         # Format output and return.
         return prediction.squeeze().round().astype(bool)
 
-    def run(self, image_paths):
+    def run_images(self, image_paths):
         """
         Upper level wrapper to classify a series of images.
         Takes a list of file paths as input.
@@ -149,4 +147,3 @@ class Segmenter:
         progress_bar.close()
         if total_size != 0 and progress_bar.n != total_size:
             raise RuntimeError("Error while downloading checkpoint file.")
-

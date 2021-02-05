@@ -1,49 +1,56 @@
 
 % SEG_SLIDER Performs background correction and manual thresholding on a user-defined portion of the image.
-% Author:   Timothy Sipkens, 2019-10-11 (modified)
-%           Ramin Dastanpour, 2016-02 (based on)
-%           Developed at the University of British Columbia
-% 
-%-------------------------------------------------------------------------%
-% Inputs: 
-%   imgs          Either (1) an Imgs structure, (2) a cellular array of 
-%                 images, or (3) a single image.
-% 
-%   imgs_binary   Partially pre-classified binary image (allows for
-%                 modification to existing binary using this method).
-%                 (OPTIONAL)
-%   
-%   f_crop        Whether or not to run the image crop tool (to zoom in on
-%                 small parts of the image).
-%                 (OPTIONAL, default = 1)
-%=========================================================================%
+%  
+%  [IMGS_BINARY] = agg.seg_slider(IMGS) applies the slider method to the
+%  images speified in IMGS, an Imgs data structure. IMGS_BINARY is a binary
+%  mask resulting from the procedure.
+%  
+%  [IMGS_BINARY] = agg.seg_slider({IMGS}) applies the slider method to the
+%  images speified in IMGS, a cell of cropped images.
+%  
+%  [IMG_BINARY] = agg.seg_slider(IMG) applies the slider method to the
+%  single, copped image given by IMG.
+%  
+%  [IMG_BINARY] = agg.seg_slider(...,IMGS_BINARY) adds the options for a
+%  pre-classified binary image, which allows for modification of an
+%  existing binary mask. 
+%  
+%  [IMG_BINARY] = agg.seg_slider(...,IMGS_BINARY,F_CROP) adds a flag
+%  specifying whether of not to run the image crop tool to focus in on
+%  small part of the image. By default, F_CROP = 1 and does use the crop
+%  tools. Note, IMGS_BINARY can be empty.
+%  
+%  AUTHOR: Timothy Sipkens, 2019-10-11 (modified)
+%   Ramin Dastanpour, 2016-02 (based on)
+%   Developed at the University of British Columbia
 
 function [imgs_binary] = seg_slider(imgs, imgs_binary, f_crop) 
 
 
 %== Parse input ==========================================================%
+% Use common inputs parser, noting that pixel size is not
+% used as an input to this function.
+[imgs, ~, n] = agg.parse_inputs(imgs, []);
+
 if ~exist('f_crop','var'); f_crop = []; end
 if isempty(f_crop); f_crop = 1; end
 
-if isstruct(imgs) % convert input images to a cell array
-    Imgs_str = imgs;
-    imgs = {Imgs_str.cropped};
-    pixsizes = [Imgs_str.pixsize];
-elseif ~iscell(imgs)
-    imgs = {imgs};
-end
-
-n = length(imgs); % number of images to consider
-
-% initial cellular array of image binaries, if particle binary is not provided
-if ~exist('imgs_binary','var'); imgs_binary{n} = []; end
+% Initial cellular array of image binaries, if image 
+% binary is not provided. Empty if not provided.
+if ~exist('imgs_binary','var'); imgs_binary = []; end
+if isempty(imgs_binary); imgs_binary{n} = []; end
 if ~iscell(imgs_binary); imgs_binary = {imgs_binary}; end
+
+% Check to make sure there is an equal number of binary 
+% and imags inputs, if supplied. If not supplied, imgs_binary{n} = [];
+% ensures appropriate length.
+if length(imgs_binary) ~= n
+    error('Size mismatch between imgs and imgs_binary');
+end
 %=========================================================================%
 
 
-img_binary0 = []; % binary stored over multiple thresholds
-
-f0 = figure; % initialize a figure
+f0 = figure; % initialize a new figure for UI
 f0.WindowState = 'maximized'; % maximize the figure window
 
 

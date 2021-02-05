@@ -1,11 +1,11 @@
 
-% SEG	Sequential attempts at semi-automatic detection of the aggregates on TEM images.
+% SEG  Sequential attempts at semi-automatic detection of the aggregates on TEM images.
 %           Attempts k-means + rolling ball, Otsu + rolling ball, slider
 %           thresholding. Acts as a wrapper function for implementing 
 %           several other seg*.m methods
-% Author:   Ramin Dastanpour, Steven N. Rogak
-%           Developed at the University of British Columbia
-% Modified: Timothy Sipkens, 2019
+% AUTHOR: Ramin Dastanpour, Steven N. Rogak
+%         Developed at the University of British Columbia
+% MODIFIED: Timothy Sipkens, 2019
 %=========================================================================%
 
 

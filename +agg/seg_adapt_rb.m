@@ -7,19 +7,11 @@ function [imgs_binary] = seg_adapt_rb(imgs, ...
     pixsizes, minparticlesize, coeffs) 
 
 %-- Parse inputs ---------------------------------------------------------%
-if isstruct(imgs)
-    Imgs_str = imgs;
-    imgs = {Imgs_str.cropped};
-    pixsize = [Imgs_str.pixsize];
-elseif ~iscell(imgs)
-    imgs = {imgs};
+if ~exist('pixsizes', 'var'); pixsizes = []; end
+[imgs, pixsizes, n] = agg.parse_inputs(imgs, pixsizes);
+if isempty(pixsizes)
+    error('PIXSIZES is a required argument unless Imgs structure is given.');
 end
-
-n = length(imgs); % number of images to consider
-
-if ~exist('pixsizes','var'); pixsizes = []; end
-if isempty(pixsizes); pixsizes = ones(size(imgs)); end
-if length(pixsizes)==1; pixsizes = pixsizes .* ones(size(imgs)); end % extend if scalar
 
 if ~exist('minparticlesize','var'); minparticlesize = []; end
 if ~exist('coeffs','var'); coeffs = []; end

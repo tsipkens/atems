@@ -1,49 +1,59 @@
 
 % SEG_KMEANS  Performs kmeans clustering on a modified feature set.
-%   Uses the technique described in Sipkens and Rogak (Submitted) 
-%   to segment soot aggregates in TEM images. This requires that image 
-%   annotations / footer information be removed.
-% Author: Timothy Sipkens, 2020-08-13
-% Version: 6
+%  Uses the technique described in Sipkens and Rogak (2020) 
+%  to segment soot aggregates in TEM images. This requires that image 
+%  annotations / footer information be removed.
 % 
-% INPUTS: 
-%   imgs      A cell array of images OR a single image.
-%   pixsizes  The size of a pixel in nm/px, either as a scalar value for 
-%             all of the images OR a vector with one entry per image.
-%             If not given, assumed to be 1 nm/px, with implications for
-%             the rolling ball transform.
+%  IMG_BINARY = agg.seg_kmeans(IMGS) requires an IMGS data structure, with 
+%  a cropped version of the images and the pixel sizes. The output is a 
+%  binary mask. 
 % 
-% OUTPUTS:
-%   img_binary  A cell array of binary / classified images, where 1
-%               indicates particles and 0 indicates background.
-%   img_kmeans  The k-means classified image, prior to apply the rolling
-%               ball transform. 
-%   feature_set Colour-equivalent images of the feature set used as
-%               input to the k-means classifier.
-%
-%=========================================================================%
+%  IMG_BINARY = agg.seg_kmeans(IMGS,PIXSIZES) uses a cell array of cropped
+%  images, IMGS, and an array of pixel sizes, PIXSIZES. The cell array of
+%  images can be replaced by a single image. The pixel size is given in
+%  nm/pixel. If not given, 1 nm/pixel is assumed, with implications for the
+%  rolling ball transform. As before, the output is a binary mask. 
+% 
+%  IMG_BINARY = agg.seg_kmeans(IMGS,PIXSIZES,OPTS) adds a options data 
+%  structure that controls the minimum size of aggregates (in pixels) 
+%  allowed by the program. 
+% 
+%  [IMG_BINARY,IMG_KMEANS] = agg.seg_kmeans(...) adds an output for the raw
+%  k-means clustered results, prior to the rolling ball transform. 
+% 
+%  [IMG_BINARY,IMG_KMEANS,FEATURE_SET] = agg.seg_kmeans(...) adds an 
+%  additional output for false RGB images with one colour per feature layer 
+%  used by the k-means clustering. 
+%  
+%  ------------------------------------------------------------------------
+%  
+%  VERSION: 
+%   Previous versions, deprecated, used different feature layers and weights.
+%    <strong>6+</strong>:  Three, equally-weighted feature layers as described by 
+%         Sipkens and Rogak (J. Aerosol Sci.). 
+%    <strong>6.1</strong>: Improves the adjusted feature layer for 
+%         clumpy aggregates.
+%  
+%  ------------------------------------------------------------------------
+%  
+%  AUTHOR: Timothy Sipkens, 2020-08-13
 
 function [img_binary, img_kmeans, feature_set] = ...
     seg_kmeans(imgs, pixsizes, opts)
 
 
 %-- Parse inputs ---------------------------------------------------------%
-if isstruct(imgs) % convert input images to a cell array
-    Imgs = imgs;
-    imgs = {Imgs.cropped};
-    pixsizes = [Imgs.pixsize];
-elseif ~iscell(imgs)
-    imgs = {imgs};
+if ~exist('pixsizes', 'var'); pixsizes = []; end
+[imgs, pixsizes, n] = agg.parse_inputs(imgs, pixsizes);
+if isempty(pixsizes)
+    error('PIXSIZES is a required argument unless Imgs structure is given.');
 end
 
-n = length(imgs); % number of images to consider
-
-if ~exist('pixsizes','var'); pixsizes = []; end
-if isempty(pixsizes); pixsizes = ones(size(imgs)); end
-if length(pixsizes)==1; pixsizes = pixsizes .* ones(size(imgs)); end % extend if scalar
-
 if ~exist('opts', 'var'); opts = struct(); end
-if ~isfield(opts, 'minsize'); opts.minsize = 50; end
+if isstruct(opts)
+    if ~isfield(opts, 'minsize'); opts.minsize = 50; end
+else; opts.minsize = opts;
+end
 %-------------------------------------------------------------------------%
 
 
@@ -61,7 +71,7 @@ for ii=1:n
     
     
 %== CORE FUNCTION ========================================================%
-    morph_param = 0.8/pixsize; % parameter used to adjust morphological operations
+    morph_param = 0.8 / pixsize; % parameter used to adjust morphological operations
     
     
     %== STEP 1: Attempt to the remove background gradient ================%
@@ -79,8 +89,8 @@ for ii=1:n
     
     
     %-- B: Use texture in bottom hat images ------------------------------%
-    se = strel('disk',20);
-    i10 = imbothat(img_denoise,se);
+    se = strel('disk', 20);
+    i10 = imbothat(img_denoise, se);
 
     % i10 = imbilatfilt(img_denoise); % denoise, aids in correctly identifying edges below
     i11 = entropyfilt(i10, true(15)); % entropy filter, related to texture
@@ -101,7 +111,10 @@ for ii=1:n
     
     % Now, loop through threshold values above Otsu 
     % and find number of pixels that are part of the aggregates.
-    lvl3 = 1:0.002:1.25;
+    % NOTE: Original lvl3 went up to 1.25, which, while faster, cause
+    %  problems for particularily clumpy aggregates. May cause some 
+    %  backward compatibility issues. 
+    lvl3 = 1:0.002:1.35;
     n_in = ones(size(lvl3));
     for ll=1:length(lvl3) % loop, increasing the threshold level
         n_in(ll) = sum(sum(~im2bw(i1, min(lvl2 * lvl3(ll), 1))));
@@ -113,10 +126,17 @@ for ii=1:n
     lvl4 = find(((n_in - n_in_pred) ./ n_in_pred) > 0.10); % cases that devaite 10% from initial trend
     
     % If nothing found, revert to Otsu.
+    % To debug, one can plot the Otsu result using: 
+    %  tools.imshow_binary(imgs{ii}, i2a);
+    % or 
+    %  plot(lvl3, n_in);
+    % Results more often for dense aggregates.
     if isempty(lvl4)
         lvl4 = 1;
-        warning('Adjusted threshold failed. Using Otsu.');
-        if n>1; tools.textbar([0, n]); tools.textbar([ii-1, n]); end
+        warning(['Adjusted threshold failed on image no. ', ...
+            num2str(ii), '. Using Otsu.']);
+        disp(' ');
+        tools.textbar([0, n]); tools.textbar([(ii-1)+0.7, n]);
     end
     
     lvl4 = lvl3(lvl4(1)); % use the first case found in preceding line

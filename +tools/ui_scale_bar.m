@@ -1,14 +1,31 @@
 
-% UI_SCALE_BAR  Detecting pixel size using a UI to get the scale 
-% Adaptated from: PCM code by Dastanpour et al. 
-%   (https://github.com/unatriva/UBC-PCM/blob/master/PCM_Main_Code_v5.m)
-% Modified: Timothy Sipkens
+% UI_SCALE_BAR  Detect the pixel size using a simple UI.
+%  Adaptated from: PCM code by Dastanpour et al. 
+%  (https://github.com/unatriva/UBC-PCM/blob/master/PCM_Main_Code_v5.m)
 % 
-% NOTE: Operates on raw images, which can be specified as a cell array.
-% Otherwise, provide input as Imgs structure. 
-%=========================================================================%
+%  [!] Operates on raw images, which can be specified as a cell array.
+%  Otherwise, provide input as Imgs structure.
+%  
+%  [PIXSIZES] = tools.ui_scale_bar(IMG) applies the method to the
+%  single, raw image specified by IMG. PIXSIZES will be a scalar.
+%  
+%  [PIXSIZES] = tools.ui_scale_bar({IMGS}) applies the UI method to all of
+%  the raw images provided in the cell array. PIXSIZES will be an array of
+%  the same length as {IMGS}.
+%  
+%  [PIXSIZES] = tools.ui_scale_bar(IMGS) extracts the raw images from an
+%  input Imgs structure and applies the UI method. PIXSIZES will be an
+%  array of the same length as the number of entries in the IMGS structure.
+%  
+%  [PIXSIZES] = tools.ui_scale_bar(...,N) applies the UI method to the
+%  entires specified by N. N is a vector containing the integers of the
+%  entries to consider. The default is to apply the UI method to all of the
+%  inputs, the same as is N = 1:length(IMGS). For example, to apply the UI
+%  method to the first and third images, N = [1,3]. The output PIXSIZES
+%  will be the same lengths as N, containing the pixel sizes for only the
+%  select images in the order prescribed by N. 
 
-function [pixsizes] = ui_scale_bar(imgs)
+function [pixsizes] = ui_scale_bar(imgs, n)
 
 %-- Parse inputs ---------------------------------------------------------%
 if isstruct(imgs)
@@ -16,6 +33,11 @@ if isstruct(imgs)
     imgs = {Imgs.raw}; % use raw image
 end
 if ~iscell(imgs); imgs = {imgs}; end
+
+if ~exist('n', 'var'); n = []; end
+if isempty(n); n = 1:length(imgs); end
+
+imgs = imgs(n);
 %-------------------------------------------------------------------------%
 
 
