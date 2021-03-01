@@ -97,8 +97,8 @@ str_p00 = [repmat(' ', [1, 3-length(str_p00)]), str_p00];  % pad with necessary 
 
 % Format text for middle of the bar.
 nc = ceil(pct * n_dot);  % number of completed elements
-str_p01 = repmat(char(9608), [1, nc]);  % completed portion of bar
-if ((nc - pct * n_dot) > 0.5); str_p01(end) = char(9612); end  % allow for half blocks
+str_p01 = repmat('█', [1, nc]);  % completed portion of bar
+if ((nc - pct * n_dot) > 0.5); str_p01(end) = '▌'; end  % allow for half blocks
 str_p02 = repmat(' ', [1, n_dot-nc]);  % uncompleted portion of bar
 
 
@@ -115,9 +115,14 @@ str_p03 = [str_p03, repmat(' ', [1, n_frac-length(str_p03)])];  % pad with neces
 
 % Compile formatted sting.
 str_out = [' ', str_p00, '%%', ' |', str_p01, str_p02, '| ', str_p03];
+str_all = [str_out, repmat(' ', [1, n_str-length(str_out)]), '\n'];
 
-
-fprintf([str_back, str_out, repmat(' ', [1, n_str-length(str_out)]), '\n']);
+if pct<(1-eps)
+    fprintf([str_back, str_all]);
+else
+    fprintf([str_back, str_all, ...
+        char(8), ' [', 8, '< <strong>DONE</strong>]', 8, '\n']);  % add orange, bold DONE
+end
 %-------------------------------------------------------------------------%
 
 end
