@@ -370,7 +370,7 @@ The `pp.manual` function can be used to manual draw circles around the soot prim
 
 This package contains a series of functions that help in visualizing or analyzing the aggregates that transcend multiple methods or functions. We discuss a few examples here and refer the reader to individual functions for more information. 
 
-### Functions to show images (tools.imshow*)
+### + Functions to show images (tools.imshow*)
 
 These functions aid in visualizing the resultant images. For example, 
 
@@ -396,7 +396,7 @@ will plot the overlays in a yellow.
 
 The related `tools.imshow_agg(...)` function will plot the binaries, as above, and add aggregate-level information to the plot, including: (*i*) the aggregate number; (*ii*) the radius of gyration about the center of the aggregate; and (*iii*) the average primary particle diameter, if this information is available (the function will use the `Aggs.dp` field, which will contain primary particle information from the most recently applied method). 
 
-### Functions to write data to files (tools.write*)
+### + Functions to write data to files (tools.write*)
 
 This set of functions writes data to files, with the precise format depending on the function. 
 
@@ -432,7 +432,7 @@ f1 = figure(1); f1.WindowState = 'maximized';
 
 to maximize the figure window, to generate higher quality output. 
 
-### Functions to visualize post-processed results (tools.viz*)
+### + Functions to visualize post-processed results (tools.viz*)
 
 This set of functions is intended to generate formatted plots of post-processed results. For example, `tools.viz_darho` generates a scatter plot of the area-equivalent diameter versus effective density estimated for each aggregate. 
 
