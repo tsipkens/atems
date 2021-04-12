@@ -244,7 +244,7 @@ This `seg_carboseg(...)` function employs Python to implement a convolutional ne
 
 > We also note that, as of this writing, Matlab does not support the necessary layers to import the ONNX as a native Matlab object. 
 
-#### + Setup: Creating the necessary Python environment
+#### Setup: Creating the necessary Python environment
 
 If [conda](https://conda.io/en/latest/miniconda.html) is installed, one can use the following procedure to create the necessary Python environment: 
 
@@ -274,7 +274,7 @@ conda env create --file environment-gpu.yml
 
 One must then point to the appropriate alternative Python interpretter. Now, one can apply the CNN, either (*i*) directly through Matlab or (*ii*) by using Matlab in conjunction with a Python IDE. 
 
-#### + Segmentation directly using Matlab
+#### Segmentation directly using Matlab
 
 To start, the current distribution includes a function to aid in loading the Python environment:
 
@@ -291,7 +291,7 @@ Finally, the user can use the `agg.seg_carboseg(...)` function in a similar fash
 
 For an implementation of this procedure, see the `main_carboseg` script in the upper directory of this repository.
 
-#### + Segmentation using Python (with read/write to Matlab)
+#### Segmentation using Python (with read/write to Matlab)
 
 Alternatively, one can save the images, load them in a Python function directly, save the results, and reload the images in Matlab. This can be broken into three steps. First, load the images, as before, and save the cropped images to a folder, `fd_in`, for reading in Python,  
 
