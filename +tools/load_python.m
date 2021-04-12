@@ -3,8 +3,6 @@
 % AUTHOR: Timothy Sipkens, 2021-01-05
 %=========================================================================%
 
-py_exec = 'C:\Users\tsipk\anaconda3\envs\carboseg\python.exe';
-
 %-- Start python environment ---------------------------------------------%
 tools.textheader('Initializing python');
 

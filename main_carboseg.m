@@ -1,7 +1,8 @@
 
 % MAIN_CARBOSEG  A script to explicitly test the carboseg method. 
-% Test is performed on the sample images, by default. 
-% AUTHOR: Timothy Sipkens, 2021-01-05
+%  Test is performed on the sample images, by default. 
+%  
+%  AUTHOR: Timothy Sipkens, 2021-01-05
 %=========================================================================%
 
 clear;
@@ -12,11 +13,12 @@ clc;
 % Load python environment. 
 % Comment if Python is already loaded.
 % Uncomment if Python is not loaded.
+py_exec = 'C:\Users\tsipk\anaconda3\envs\carboseg\python.exe';
 tools.load_python;
 
 
 % Load images.
-[Imgs, imgs, pixsizes] = tools.load_imgs('images'); % OPTION 3: load all images in 'images' folder
+[Imgs, imgs, pixsizes] = tools.load_imgs('images'); % use 'images' folder
 fname = {Imgs.fname}; % cell array of file names
 
 

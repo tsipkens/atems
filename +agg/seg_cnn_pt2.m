@@ -1,9 +1,9 @@
 
 % SEG_CNN_PT2  A simple function that read binary images from a data folder.
-% Expects segmentations produced by the CarbonBlackSegmentation package:
-% See https://github.com/maxfrei750/CarbonBlackSegmentation. 
+%  Expects segmentations produced by the CarbonBlackSegmentation package:
+%  See https://github.com/maxfrei750/CarbonBlackSegmentation. 
 % 
-% NOTE:
+%  NOTE:
 %   A rolling ball transform is applied only and always when the pixsize
 %   argument is given. 
 %   In other words, if one does NOT want to apply the rolling ball
