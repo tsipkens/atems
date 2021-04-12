@@ -15,8 +15,8 @@ clc;
 % Uncomment if Python is not loaded.
 % Replace py_exec with appropriate path, likely replacing 'tsipk' 
 % with the appropriate user folder
-py_exec = 'C:\Users\tsipk\anaconda3\envs\carboseg\python.exe';
-tools.load_python;  % only load once, comment after or restart Matlab
+py_exec = 'C:\Users\tsipk\anaconda3\envs\carboseg-gpu\python.exe';
+% tools.load_python;  % only load once, comment after or restart Matlab
 
 
 % Load images.
