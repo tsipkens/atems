@@ -36,7 +36,7 @@ imgs_binary = cell(length(imgs),1); % pre-allocate
 for ii=1:n % loop through provided images
     
     % Add header for this image.
-    disp('{========================================}');
+    disp(['[[', 8, '===========================================]', 8, ']']);
     tools.textheader(['Image ', num2str(ii), ' of ', num2str(length(imgs))]);
     
     %-- Run slider to obtain binary image --------------------------------%
