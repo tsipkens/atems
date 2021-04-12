@@ -42,7 +42,7 @@ for ii=1:n % loop through provided images
     %-- Run slider to obtain binary image --------------------------------%
     [img_binary,~,~,~] = seg_sub(imgs{ii}, pixsize(ii), ...
         [], [], opts); % includes removing aggregates from border
-    imgs_binary{ii} = img_binary;
+    imgs_binary{ii} = img_binary{1};
     
     % Write binaries to temporary file (in case an error occurs).
     if ~exist('temp', 'dir')
@@ -129,7 +129,7 @@ if moreaggs==1
     % Access slider UI, using either:
     %   if 'Yes, but refine' on previous output from user_input fnc.
     %   OR zeros as a start
-    img_binary = agg.seg_slider(img, img_binary, 1);
+    img_binary = agg.seg_slider(img, img_binary);
         
     tools.textheader();
 end

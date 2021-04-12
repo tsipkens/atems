@@ -330,9 +330,9 @@ Aggregates are often broken apart, which may be insufficient in itself. This imp
 
 This latter function generally performs better, though the results still often breaks up aggregates and should likely be compliment with some manual adjustments following initial thresholding. The technique generally underperformed relative to the previously mentioned *k*-means method. 
 
-### + seg_slider: GUI-based slider method
+### + seg_slider_orig: GUI-based slider method
 
-The function `agg.seg_slider(...)` is a largely manual technique. The function enacts a GUI-based method with a slider for adaptive, semi-automatic thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps: 
+The function `agg.seg_slider_orig(...)` is a largely manual technique. The function enacts a GUI-based method with a slider for adaptive, semi-automatic thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps: 
 
 1. The user is first prompted to **crop** around a single aggregate. This allows the user to zoom in on the image for the remaining steps. 
 2. The user uses a lasso tool to draw around the aggregate. The excluded regions are used for **background subtraction** in cropped region of the image. 
@@ -352,7 +352,7 @@ Several sub-functions are included within the main file. This is a variant of th
 
 > We note that this code saw important bug updates since the original code by [Dastanpour et al. (2016)][dastanpour2016]. This includes fixing how the original code would repeatedly apply a Gaussian filter every time the user interacted with the slider in the GUI (which may cause some backward compatibility issues), a reduction in the use of global variables, memory savings, and other performance improvements. 
 
-### + seg_slider2: An improved GUI-based slider method
+### + seg_slider: An improved GUI-based slider method
 
 The core of this method is that same as the GUI-based method described above but sees an overhaul of the user interface. This implementation makes use of Matlab's app builder, requiring newer Matlab versions to work. 
 
