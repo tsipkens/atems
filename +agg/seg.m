@@ -42,7 +42,9 @@ for ii=1:n % loop through provided images
     %-- Run slider to obtain binary image --------------------------------%
     [img_binary,~,~,~] = seg_sub(imgs{ii}, pixsize(ii), ...
         [], [], opts); % includes removing aggregates from border
-    imgs_binary{ii} = img_binary{1};
+    
+    if iscell(img_binary); img_binary = img_binary{1}; end
+    imgs_binary{ii} = img_binary;
     
     % Write binaries to temporary file (in case an error occurs).
     if ~exist('temp', 'dir')
