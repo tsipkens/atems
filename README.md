@@ -206,7 +206,7 @@ Several methods also take `pixsize`, which denotes the size of each pixel in the
 
 The set of available methods is summarized below. 
 
-### + A general segmentation function: seg
+### + seg: A general segmentation function
 
 The `agg.seg` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. Specifically, the method attempts: 
 
@@ -218,7 +218,7 @@ The `agg.seg` function is a general, multipurpose wrapper function that attempts
 
 This is repeated until the user has classified all of the images that were passed to the function. 
 
-### + *k*-means segmentation: seg_kmeans
+### + seg_kmeans: *k*-means segmentation
 
 This function applies a *k*-means segmentation approach following [Sipkens and Rogak][jaskmeans] and using three feature layers, which include: 
 
@@ -238,13 +238,13 @@ Finally, applying Matlab's `imsegkmeans` function, we achieve segmentations as f
 
 This is the most robust of the fully automated methods available with this distribution. However, while this will likely be adequate for many users, the technique still occasionally fails, particularly if the function does not adequately remove the background. The method also has some notable limitations when images are (i) *zoomed in* on a single aggregate while (ii) also slightly overexposed. 
 
-### + CNN segmentation and carboseg
+### + carboseg and CNN segmentation 
 
-This `seg_carboseg(...)` function employs Python to implement a convolutional neural network (CNN) for segmentation. Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions by Max Frei (@maxfrei750). The implementation here makes use of the ONNX file output from that procedure and employs the Python ONNX runtime for execution. Use of this function requires the necessary Python environment as a pre-requisite. 
+This `seg_carboseg(...)` function employs Python to implement a convolutional neural network (CNN) for segmentation. Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions by Max Frei ([@maxfrei750](https://github.com/maxfrei750)). The implementation here makes use of the ONNX file output (to be downloaded [here]()) from that procedure and employs the Python ONNX runtime for execution. Use of this function requires the necessary Python environment as a pre-requisite. 
 
 > Even then, there are known issues with the Matlab calls to Python, including freezing indefinitely in the `seg_carboseg(...)` function call. In these instances, it may be better to save pre-processed images (with footer cropped), run the code in Python, and reload the images into Matlab. See [Running in Python](#-running-in-python) for this option. 
 
-> We also note that, as of this writing, Matlab does not support the necessary layers to import the ONNX file directly. 
+> We also note that, as of this writing, Matlab does not support the necessary layers to import the ONNX as a native Matlab object. 
 
 #### + Creating the necessary Python environment
 
@@ -289,7 +289,7 @@ Alternatively, one can save the images, load them in a Python function directly,
 
 In a Python IDE, one can now run the `main(...)` function in the `carboseg/` folder, using, editing the script to point to the appropriate folder where the images were saved. 
 
-### + Otsu thresholding: seg_otsu_rb\*
+### + seg_otsu_rb\*: Otsu thresholding
 
 These automated methods apply Otsu thresholding followed by a rolling ball transformation. Two versions of this function are included. 
 
@@ -305,7 +305,7 @@ Aggregates are often broken apart, which may be insufficient in itself. This imp
 
 This latter function generally performs better, though the results still often breaks up aggregates and should likely be compliment with some manual adjustments following initial thresholding. The technique generally underperformed relative to the previously mentioned *k*-means method. 
 
-### + GUI-based slider method: seg_slider
+### + seg_slider: GUI-based slider method
 
 The function `agg.seg_slider(...)` is a largely manual technique. The function enacts a GUI-based method with a slider for adaptive, semi-automatic thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps: 
 
@@ -327,7 +327,7 @@ Several sub-functions are included within the main file. This is a variant of th
 
 > We note that this code saw important bug updates since the original code by [Dastanpour et al. (2016)][dastanpour2016]. This includes fixing how the original code would repeatedly apply a Gaussian filter every time the user interacted with the slider in the GUI (which may cause some backward compatibility issues), a reduction in the use of global variables, memory savings, and other performance improvements. 
 
-### + An improved GUI-based slider method: seg_slider2
+### + seg_slider2: An improved GUI-based slider method
 
 The core of this method is that same as the GUI-based method described above but sees an overhaul of the user interface. This implementation makes use of Matlab's app builder, requiring newer Matlab versions to work. 
 
