@@ -33,7 +33,7 @@ group = group';
 dp_vec = dp_vec';
 
 
-boxplot(dp_vec, group, 'width', 0.5);
+boxplot(dp_vec, group, 'width', 0.5, 'symbol', '');
 
 
 % Overlay scatter

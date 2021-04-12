@@ -6,7 +6,6 @@
 (Matlab ***A***nalysis tools for ***TEM*** images of ***S***oot)
 
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
-[![Version](https://img.shields.io/badge/Version-1.0+-blue.svg)]()
 [![tsipkens](https://circleci.com/gh/tsipkens/atems.svg?style=shield)]() 
 
 <p align="left">
@@ -207,21 +206,9 @@ Several methods also take `pixsize`, which denotes the size of each pixel in the
 
 The set of available methods is summarized below. 
 
-### + A general segmentation function: seg
+### + seg_kmeans: *k*-means segmentation
 
-The `agg.seg` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. Specifically, the method attempts: 
-
-1. The ***k*-means** classifier (following [Sipkens and Rogak][jaskmeans]), prompting the user after segmentation is complete. The user can either (*i*) accept the result as is, (*ii*) reject the output altogether and move on to the next method, (*iii*) choose to remove particles, or (*iv*) add either entirely new particles or add pixels to existing particles (which involves skipping ahead to Step 3, using the current segmentation as a starting point). 
-
-2. The **Otsu** classifier, with the same prompts following segmentation. 
-
-3. Use the GUI-based slider method (the `agg.seg_slider(...)` function described below) to produce a largely-manual segmentation. 
-
-This is repeated until the user has classified all of the images that were passed to the function. 
-
-### + *k*-means segmentation: seg_kmeans
-
-This function applies a *k*-means segmentation approach following [Sipkens and Rogak][jaskmeans] and using three feature layers, which include: 
+This function applies a *k*-means segmentation approach following [Sipkens and Rogak (2021)][jaskmeans] and using three feature layers, which include: 
 
 FEATURE 1. a *denoised* version of the image, 
 
@@ -229,21 +216,19 @@ FEATURE 2. a measure of *texture* in the image, and
 
 FEATURE 3. an Otsu-like classified image, with the *threshold adjusted* upwards. 
 
-Compiling these different feature layers results in a three layer image that will be used for segmentation. This is roughly equivalent to segmenting colour images, if each of the layers was assigned a colour. For example, compilation of these feature layers for the sample images results in the following feature layers and compiled RGB image: 
-
-![fcolour](docs/fcolour.png)
-
-Finally, applying Matlab's `imsegkmeans` function, we achieve segmentations as follows: 
+Compiling these different feature layers results in a three layer image that will be used for segmentation. This is roughly equivalent to segmenting colour images, if each of the layers was assigned a colour. For example, compilation of these feature layers for the sample images results in the following feature layers and compiled RGB image. More details of the method are given in the [associated paper][jaskmeans]. Finally, applying Matlab's `imsegkmeans` function, we achieve segmentations as follows: 
 
 ![kmeans](docs/kmeans.png)
 
 This is the most robust of the fully automated methods available with this distribution. However, while this will likely be adequate for many users, the technique still occasionally fails, particularly if the function does not adequately remove the background. The method also has some notable limitations when images are (i) *zoomed in* on a single aggregate while (ii) also slightly overexposed. 
 
-### + CNN segmentation and carboseg: seg_carboseg
+### + carboseg and CNN segmentation 
 
-This function employs Python to implement a convolutional neural network (CNN) for segmentation. Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions by Max Frei (@maxfrei750). The implementation here makes use of the ONNX file output from that procedure and employs the Python ONNX runtime for execution. The following text describes creation of the necessary Python environment. 
+This `seg_carboseg(...)` function employs Python to implement a convolutional neural network (CNN) for segmentation. Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions by Max Frei ([@maxfrei750](https://github.com/maxfrei750)). The implementation here makes use of the ONNX file output (to be downloaded [here](https://uni-duisburg-essen.sciebo.de/s/J7bS47nZadg4bBH/download)) from that procedure and employs the Python ONNX runtime for execution. Use of this function requires the necessary Python environment as a pre-requisite. 
 
-#### Creating the necessary Python environment
+> We also note that, as of this writing, Matlab does not support the necessary layers to import the ONNX as a native Matlab object. 
+
+#### Setup: Creating the necessary Python environment
 
 If [conda](https://conda.io/en/latest/miniconda.html) is installed, one can use the following procedure to create the necessary Python environment: 
 
@@ -252,8 +237,10 @@ If [conda](https://conda.io/en/latest/miniconda.html) is installed, one can use 
 **2.** Change into the `carboseg/` directory in a cloned copy of the current repository, using:
 
 ```shell
-cd carboseg
+cd [path]/carboseg
 ```
+
+where `[path]` is the path the parent Matlab repository. 
 
 **3.** Create a new Python environment using the `environment.yml` file included in that directory, using:
 
@@ -261,23 +248,59 @@ cd carboseg
 conda env create --file environment.yml
 ```
 
-This will create the `carboseg` environment and the corresponding Python executable with the necessary dependencies to be used by Matlab . 
+This will create the **carboseg** environment and the corresponding Python executable with the necessary dependencies. 
 
-#### Loading the Python environment in Matlab
+Alternatively, one can set up an environment to take advantage of a GPU. The example here applied to CUDA-enabled scenerios. In this case, one can create a **carboseg-gpu** environmnet using:
 
-The current distribution includes a function to aid in loading the Python environment, using:
+```shell
+conda env create --file environment-gpu.yml
+```
+
+One must then point to the appropriate alternative Python interpretter. Now, one can apply the CNN, either (*i*) directly through Matlab or (*ii*) by using Matlab in conjunction with a Python IDE. 
+
+#### Segmentation directly using Matlab
+
+To start, the current distribution includes a function to aid in loading the Python environment:
 
 ```Matlab
+py_exec = path_to_exe;
 tools.load_python;
 ```
 
-The user should edit the script to point to an appropriate Python executable generated by the previous procedure, representing an environment that includes the necessary packages to support the Python code.  For Windows, this code also adds the necessary folders and a reference to the local `carboseg` submodule. 
+where `path_to_exe` is the path to the Python executable for the **carboseg** environment. The user should edit the script to point to an appropriate Python executable generated by the previous procedure  For Windows, this code also adds the necessary folders and a reference to the local `carboseg` submodule. 
 
-#### Segmentation
+Finally, the user can use the `agg.seg_carboseg(...)` function in a similar fashion to the other segmentation approaches, noting the limitations at the beginning of this section. Optimally, the function should run with the standard inputs and outputs common to the other classifiers discussed here. 
 
-Finally, the user can use the `agg.seg_carboseg(...)` function in a similar fashion to the other segmentation approaches. 
+For an implementation of this procedure, see the `main_carboseg` script in the upper directory of this repository.
 
-### + Otsu thresholding: seg_otsu_rb\*
+> NOTE: There are known issues with the Matlab calls to Python, including freezing indefinitely in the `seg_carboseg(...)` function call and Python environment errors. Potential workaround for the freezing/hanging is to add a debug point in the `seg_carbonseg(...)` function near the top of the file or to restart Matlab and run the scripts in a new session. In these instances, it may be better to save pre-processed images (with footer cropped), run the code in Python, and reload the images into Matlab. See the next subsection for this option. 
+
+> NOTE: If CUDA is available and the batch of images is reasonably large, it may be faster to save the images and run the classification on a GPU in Python directly (again, see the next subsection for this option). 
+
+#### Segmentation using Python (with read/write to Matlab)
+
+Alternatively, one can save the images, load them in a Python function directly, save the results, and reload the images in Matlab. This can be broken into three steps. First, load the images, as before, and save the cropped images to a folder, `fd_in`, for reading in Python,  
+
+```Matlab
+% Load images (here using the 'images' folder).
+[Imgs, imgs, pixsizes] = tools.load_imgs('images');
+fnames = {Imgs.fname};  % also extract file names
+
+agg.seg_ext(imgs, fnames, fd_in);  % save the images to `fd` folder
+```
+
+Second, in a Python IDE, one can now run the `main.py` script in the `carboseg/` folder, editing the script to point to the appropriate folder where Matlab saved the cropped images from the previous step. Finally, one can return to Matlab and read in processed images using the `agg.seg_cnn_pt2(...)` method, 
+
+```Matlab
+imgs_binary = agg.seg_cnn_pt2(fnames, fd_out, pixsizes)
+```
+
+where `fd_out` is the new folder containing the classified binaries from Python. The `imgs_binary` contains a cell of binary images, matching the other classifiers here. Note that the image file name should be made consistent between calls, such that the images can be appropriately matched when transitioning back and forth between Matlab and Python. One can now proceed with post-processing analogous to the other classifiers. 
+
+For an implementation of this procedure, see the `main_carboseg_ext` script in the upper directory of this repository.
+
+
+### + seg_otsu_rb\*: Otsu thresholding
 
 These automated methods apply Otsu thresholding followed by a rolling ball transformation. Two versions of this function are included. 
 
@@ -293,9 +316,9 @@ Aggregates are often broken apart, which may be insufficient in itself. This imp
 
 This latter function generally performs better, though the results still often breaks up aggregates and should likely be compliment with some manual adjustments following initial thresholding. The technique generally underperformed relative to the previously mentioned *k*-means method. 
 
-### + GUI-based slider method: seg_slider
+### + seg_slider_orig: GUI-based slider method
 
-The function `agg.seg_slider(...)` is a largely manual technique. The function enacts a GUI-based method with a slider for adaptive, semi-automatic thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps: 
+The function `agg.seg_slider_orig(...)` is a largely manual technique. The function enacts a GUI-based method with a slider for adaptive, semi-automatic thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps: 
 
 1. The user is first prompted to **crop** around a single aggregate. This allows the user to zoom in on the image for the remaining steps. 
 2. The user uses a lasso tool to draw around the aggregate. The excluded regions are used for **background subtraction** in cropped region of the image. 
@@ -315,11 +338,23 @@ Several sub-functions are included within the main file. This is a variant of th
 
 > We note that this code saw important bug updates since the original code by [Dastanpour et al. (2016)][dastanpour2016]. This includes fixing how the original code would repeatedly apply a Gaussian filter every time the user interacted with the slider in the GUI (which may cause some backward compatibility issues), a reduction in the use of global variables, memory savings, and other performance improvements. 
 
-### + An improved GUI-based slider method: seg_slider2
+### + seg_slider: An improved GUI-based slider method
 
 The core of this method is that same as the GUI-based method described above but sees an overhaul of the user interface. This implementation makes use of Matlab's app builder, requiring newer Matlab versions to work. 
 
 ![slider2](docs/slider2_screenshot.png)
+
+### + seg: A general segmentation function
+
+The `agg.seg` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. Specifically, the method attempts: 
+
+1. The ***k*-means** classifier (following [Sipkens and Rogak][jaskmeans]), prompting the user after segmentation is complete. The user can either (*i*) accept the result as is, (*ii*) reject the output altogether and move on to the next method, (*iii*) choose to remove particles, or (*iv*) add either entirely new particles or add pixels to existing particles (which involves skipping ahead to Step 3, using the current segmentation as a starting point). 
+
+2. The **Otsu** classifier, with the same prompts following segmentation. 
+
+3. Use the GUI-based slider method (the `agg.seg_slider(...)` function described below) to produce a largely-manual segmentation. 
+
+This is repeated until the user has classified all of the images that were passed to the function. 
 
 ## 2.2 analyze_binary
 

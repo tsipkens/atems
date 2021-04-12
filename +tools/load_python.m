@@ -3,8 +3,6 @@
 % AUTHOR: Timothy Sipkens, 2021-01-05
 %=========================================================================%
 
-py_exec = 'C:\Users\tsipk\anaconda3\envs\carboseg\python.exe';
-
 %-- Start python environment ---------------------------------------------%
 tools.textheader('Initializing python');
 
@@ -26,7 +24,7 @@ p = strjoin(p, ';');
 
 setenv('PATH', p);
 
-pyenv('ExecutionMode', 'OutOfProcess');  % execute outside of Matlab
+pe = pyenv('ExecutionMode', 'OutOfProcess');  % execute outside of Matlab
 
 % Add carboseg folder, containing python code.
 addpath carboseg;

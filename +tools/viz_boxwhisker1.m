@@ -25,7 +25,7 @@ for ii=1:length(varargin)
 end
 
 
-boxplot(dp_vec, group, 'width', 0.5);
+boxplot(dp_vec, group, 'width', 0.5,'symbol', '');
 
 
 % Overlay scatter

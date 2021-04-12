@@ -1,22 +1,15 @@
 
-% MAIN_CARBOSEG  A script to explicitly test the carboseg method. 
-%  Test is performed on the sample images, by default. 
+% MAIN_CARBOSEG_EXT  A script to test the carboseg method, using external saves.
+%  This differs from main_carboseg in that it saves and loads images for
+%  processing by external Python IDE.
 %  
 %  AUTHOR: Timothy Sipkens, 2021-01-05
 %=========================================================================%
 
+
 clear;
 close all;
 clc;
-
-
-% Load python environment. 
-% Comment if Python is already loaded.
-% Uncomment if Python is not loaded.
-% Replace py_exec with appropriate path, likely replacing 'tsipk' 
-% with the appropriate user folder
-py_exec = 'C:\Users\tsipk\anaconda3\envs\carboseg-gpu\python.exe';
-% tools.load_python;  % only load once, comment after or restart Matlab
 
 
 % Load images.
@@ -24,9 +17,23 @@ py_exec = 'C:\Users\tsipk\anaconda3\envs\carboseg-gpu\python.exe';
 fnames = {Imgs.fname}; % cell array of file names
 
 
-%== Run CARBOSEG for all of the images ===================================%
-imgs_binary = agg.seg_carboseg(imgs, pixsizes);
+% Write images to input folder.
+fnames_png = agg.seg_ext(imgs, fnames, 'carboseg/input', 'png');
 
+
+% Wait for external processing in Python.
+% Press any key to continue when Python processing completed.
+disp('Waiting for external processing in Python.');
+disp('Press any key when done to continue ...');
+pause;
+tools.textdone(2);
+
+
+% Read in files and apply rolling ball transform.
+imgs_binary = agg.seg_cnn_pt2(fnames_png, 'carboseg/output', pixsizes);
+
+
+% Continue with post-processing...
 Aggs = agg.analyze_binary(...
     imgs_binary, pixsizes, imgs, fnames, 0); % determine aggregate properties
 

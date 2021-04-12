@@ -167,3 +167,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+
+carboseg/FPN-resnet50-imagenet.onnx
