@@ -281,7 +281,9 @@ where `path_to_exe` is the path to the Python executable for the **carboseg** en
 
 Finally, the user can use the `agg.seg_carboseg(...)` function in a similar fashion to the other segmentation approaches, noting the limitations at the beginning of this section. Optimally, the function should run with the standard inputs and outputs common to the other classifiers discussed here. 
 
-> NOTE: There are known issues with the Matlab calls to Python, including freezing indefinitely in the `seg_carboseg(...)` function call and Python environment errors. In these instances, it may be better to save pre-processed images (with footer cropped), run the code in Python, and reload the images into Matlab. See the next subsection for this option. 
+> NOTE: There are known issues with the Matlab calls to Python, including freezing indefinitely in the `seg_carboseg(...)` function call and Python environment errors. A workaround for the freezing/hanging is to add a debug point in the `seg_carbonseg(...)` function near the top of the file. In these instances, it may be better to save pre-processed images (with footer cropped), run the code in Python, and reload the images into Matlab. See the next subsection for this option. 
+
+For an implementation of this procedure, see the `main_carboseg` script in the upper directory of this repository.
 
 #### + Segmentation using Python (with read/write to Matlab)
 
@@ -302,6 +304,8 @@ imgs_binary = agg.seg_cnn_pt2(fnames, fd_out, pixsizes)
 ```
 
 where `fd_out` is the new folder containing the classified binaries from Python. The `imgs_binary` contains a cell of binary images, matching the other classifiers here. Note that the image file name should be made consistent between calls, such that the images can be appropriately matched when transitioning back and forth between Matlab and Python. One can now proceed with post-processing analogous to the other classifiers. 
+
+For an implementation of this procedure, see the `main_carboseg_ext` script in the upper directory of this repository.
 
 
 ### + seg_otsu_rb\*: Otsu thresholding
