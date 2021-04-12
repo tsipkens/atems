@@ -24,7 +24,7 @@ p = strjoin(p, ';');
 
 setenv('PATH', p);
 
-pyenv('ExecutionMode', 'OutOfProcess');  % execute outside of Matlab
+pe = pyenv('ExecutionMode', 'OutOfProcess');  % execute outside of Matlab
 
 % Add carboseg folder, containing python code.
 addpath carboseg;
