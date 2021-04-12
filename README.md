@@ -240,7 +240,7 @@ This is the most robust of the fully automated methods available with this distr
 
 ### + carboseg and CNN segmentation 
 
-This `seg_carboseg(...)` function employs Python to implement a convolutional neural network (CNN) for segmentation. Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions by Max Frei ([@maxfrei750](https://github.com/maxfrei750)). The implementation here makes use of the ONNX file output (to be downloaded [here]()) from that procedure and employs the Python ONNX runtime for execution. Use of this function requires the necessary Python environment as a pre-requisite. 
+This `seg_carboseg(...)` function employs Python to implement a convolutional neural network (CNN) for segmentation. Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions by Max Frei ([@maxfrei750](https://github.com/maxfrei750)). The implementation here makes use of the ONNX file output (to be downloaded [here](https://uni-duisburg-essen.sciebo.de/s/J7bS47nZadg4bBH/download)) from that procedure and employs the Python ONNX runtime for execution. Use of this function requires the necessary Python environment as a pre-requisite. 
 
 > We also note that, as of this writing, Matlab does not support the necessary layers to import the ONNX as a native Matlab object. 
 
@@ -266,7 +266,13 @@ conda env create --file environment.yml
 
 This will create the **carboseg** environment and the corresponding Python executable with the necessary dependencies. 
 
-One can now proceed to apply the CNN, either (*i*) directly through Matlab or (*ii*) by using Matlab in conjunction with a Python IDE. 
+Alternatively, one can set up an environment to take advantage of a GPU. The example here applied to CUDA-enabled scenerios. In this case, one can create a **carboseg-gpu** environmnet using:
+
+```shell
+conda env create --file environment-gpu.yml
+```
+
+One must then point to the appropriate alternative Python interpretter. Now, one can apply the CNN, either (*i*) directly through Matlab or (*ii*) by using Matlab in conjunction with a Python IDE. 
 
 #### + Segmentation directly using Matlab
 
