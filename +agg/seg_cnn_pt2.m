@@ -11,7 +11,7 @@
 %   ball transform, one MUST supply pixsize. 
 %=========================================================================%
 
-function [img_binary] = seg_cnn_pt2(fnames, fd, pixsize)
+function [img_binary] = seg_cnn_pt2(fnames, fd, pixsizes)
 
 %-- Get file names and parse inputs --------------------------------------%
 if isstruct(fnames) % convert input images to a cell array
@@ -22,31 +22,26 @@ if ~iscell(fnames); fnames = {fnames}; end
 if ~exist('fd', 'var'); fd = []; end
 if isempty(fd)
     uiwait(msgbox( ...
-        'Select upper directory of CarbonBlackSegmentation code.'));
+        'Select the output (from Python) image folder.'));
     fd = uigetdir('', ...
-        'Select directory'); % browse to get CarbonBlackSegmentation directory
-    
-    % Look for deployment folder to determine if appropriate directory
-    if ~exist([fd, '\deployment'], 'dir')
-        error('Invalid CarbonBlackSegmentation directory.');
-    end
+        'Select directory'); % browse to get output image directory
 end
 
-if ~exist('pixsize', 'var'); pixsize = []; end
-if and(~isempty(pixsize), length(pixsize)==1)
-    pixsize = pixsize .* ones(size(fnames));  % extend pixel size if scalar
+if ~exist('pixsizes', 'var'); pixsizes = []; end
+if and(~isempty(pixsizes), length(pixsizes)==1)
+    pixsizes = pixsizes .* ones(size(fnames));  % extend pixel size if scalar
 end
 %-------------------------------------------------------------------------%
 
 img_binary = {};
 for ii=length(fnames):-1:1
-    img_binary{ii} = imread([fd, '\results\', fnames{ii}]);
+    img_binary{ii} = imread([fd, filesep, fnames{ii}]);
     img_binary{ii} = img_binary{ii}(:,:,1)~=0;
     
     %-{
     %== Rolling Ball Transformation ==============================%
-    if ~isempty(pixsize)  % if pixel size given, apply rolling ball transform
-        morph_param = 0.8/pixsize(ii); % parameter used to adjust morphological operations
+    if ~isempty(pixsizes)  % if pixel size given, apply rolling ball transform
+        morph_param = 0.8/pixsizes(ii); % parameter used to adjust morphological operations
 
         % Disk size limited by size of holes in particle.
         ds = round(4 * morph_param);
