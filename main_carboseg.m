@@ -13,20 +13,22 @@ clc;
 % Load python environment. 
 % Comment if Python is already loaded.
 % Uncomment if Python is not loaded.
+% Replace py_exec with appropriate path, likely replacing 'tsipk' 
+% with the appropriate user folder
 py_exec = 'C:\Users\tsipk\anaconda3\envs\carboseg\python.exe';
-tools.load_python;
+tools.load_python;  % only load once, comment after or restart Matlab
 
 
 % Load images.
 [Imgs, imgs, pixsizes] = tools.load_imgs('images'); % use 'images' folder
-fname = {Imgs.fname}; % cell array of file names
+fnames = {Imgs.fname}; % cell array of file names
 
 
 %== Run CARBOSEG for all of the images ===================================%
 imgs_binary = agg.seg_carboseg(imgs, pixsizes);
 
 Aggs = agg.analyze_binary(...
-    imgs_binary, pixsizes, imgs, fname, 0); % determine aggregate properties
+    imgs_binary, pixsizes, imgs, fnames, 0); % determine aggregate properties
 
 %-- Generate plots of images ---------------------------------------------%
 f1 = figure(1); f1.WindowState = 'maximized';
