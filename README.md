@@ -206,21 +206,9 @@ Several methods also take `pixsize`, which denotes the size of each pixel in the
 
 The set of available methods is summarized below. 
 
-### + seg: A general segmentation function
-
-The `agg.seg` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. Specifically, the method attempts: 
-
-1. The ***k*-means** classifier (following [Sipkens and Rogak][jaskmeans]), prompting the user after segmentation is complete. The user can either (*i*) accept the result as is, (*ii*) reject the output altogether and move on to the next method, (*iii*) choose to remove particles, or (*iv*) add either entirely new particles or add pixels to existing particles (which involves skipping ahead to Step 3, using the current segmentation as a starting point). 
-
-2. The **Otsu** classifier, with the same prompts following segmentation. 
-
-3. Use the GUI-based slider method (the `agg.seg_slider(...)` function described below) to produce a largely-manual segmentation. 
-
-This is repeated until the user has classified all of the images that were passed to the function. 
-
 ### + seg_kmeans: *k*-means segmentation
 
-This function applies a *k*-means segmentation approach following [Sipkens and Rogak][jaskmeans] and using three feature layers, which include: 
+This function applies a *k*-means segmentation approach following [Sipkens and Rogak (2021)][jaskmeans] and using three feature layers, which include: 
 
 FEATURE 1. a *denoised* version of the image, 
 
@@ -228,11 +216,7 @@ FEATURE 2. a measure of *texture* in the image, and
 
 FEATURE 3. an Otsu-like classified image, with the *threshold adjusted* upwards. 
 
-Compiling these different feature layers results in a three layer image that will be used for segmentation. This is roughly equivalent to segmenting colour images, if each of the layers was assigned a colour. For example, compilation of these feature layers for the sample images results in the following feature layers and compiled RGB image: 
-
-![fcolour](docs/fcolour.png)
-
-Finally, applying Matlab's `imsegkmeans` function, we achieve segmentations as follows: 
+Compiling these different feature layers results in a three layer image that will be used for segmentation. This is roughly equivalent to segmenting colour images, if each of the layers was assigned a colour. For example, compilation of these feature layers for the sample images results in the following feature layers and compiled RGB image. More details of the method are given in the [associated paper][jaskmeans]. Finally, applying Matlab's `imsegkmeans` function, we achieve segmentations as follows: 
 
 ![kmeans](docs/kmeans.png)
 
@@ -301,7 +285,7 @@ Alternatively, one can save the images, load them in a Python function directly,
 fnames = {Imgs.fname};  % also extract file names
 
 agg.seg_ext(imgs, fnames, fd_in);  % save the images to `fd` folder
-``` 
+```
 
 Second, in a Python IDE, one can now run the `main.py` script in the `carboseg/` folder, editing the script to point to the appropriate folder where Matlab saved the cropped images from the previous step. Finally, one can return to Matlab and read in processed images using the `agg.seg_cnn_pt2(...)` method, 
 
@@ -357,6 +341,18 @@ Several sub-functions are included within the main file. This is a variant of th
 The core of this method is that same as the GUI-based method described above but sees an overhaul of the user interface. This implementation makes use of Matlab's app builder, requiring newer Matlab versions to work. 
 
 ![slider2](docs/slider2_screenshot.png)
+
+### + seg: A general segmentation function
+
+The `agg.seg` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. Specifically, the method attempts: 
+
+1. The ***k*-means** classifier (following [Sipkens and Rogak][jaskmeans]), prompting the user after segmentation is complete. The user can either (*i*) accept the result as is, (*ii*) reject the output altogether and move on to the next method, (*iii*) choose to remove particles, or (*iv*) add either entirely new particles or add pixels to existing particles (which involves skipping ahead to Step 3, using the current segmentation as a starting point). 
+
+2. The **Otsu** classifier, with the same prompts following segmentation. 
+
+3. Use the GUI-based slider method (the `agg.seg_slider(...)` function described below) to produce a largely-manual segmentation. 
+
+This is repeated until the user has classified all of the images that were passed to the function. 
 
 ## 2.2 analyze_binary
 
