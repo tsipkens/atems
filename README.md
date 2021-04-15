@@ -224,7 +224,7 @@ This is the most robust of the fully automated methods available with this distr
 
 ### + carboseg and CNN segmentation 
 
-This `seg_carboseg(...)` function employs Python to implement a convolutional neural network (CNN) for segmentation. Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions by Max Frei ([@maxfrei750](https://github.com/maxfrei750)). The implementation here makes use of the ONNX file output (to be downloaded [here](https://uni-duisburg-essen.sciebo.de/s/J7bS47nZadg4bBH/download)) from that procedure and employs the Python ONNX runtime for execution. Use of this function requires the necessary Python environment as a pre-requisite. 
+This `seg_carboseg(...)` function employs Python to implement a convolutional neural network (CNN) for segmentation as descriped by [Sipkens et al.][ptech.cnn] Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions by Max Frei ([@maxfrei750](https://github.com/maxfrei750)). The implementation here makes use of the ONNX file output (to be downloaded [here](https://uni-duisburg-essen.sciebo.de/s/J7bS47nZadg4bBH/download)) from that procedure and employs the Python ONNX runtime for execution. Use of this function requires the necessary Python environment as a pre-requisite. 
 
 > We also note that, as of this writing, Matlab does not support the necessary layers to import the ONNX as a native Matlab object. 
 
@@ -495,9 +495,13 @@ Finally, the progress bar in the function `tools.textbar`, which is used to indi
 
 On use of this code or the *k*-means segmentation procedure described [above](#k-means-segmentation-seg_kmeans), please cite: 
 
-> [Sipkens, T. A., Rogak, S. N. (Accepted). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. *Journal of Aerosol Science*, 105699.][jaskmeans]
+> [Sipkens, T. A., Rogak, S. N. (2021). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. Journal of Aerosol Science, 105699.][jaskmeans]
 
 Users of the pair correlation method (PCM), the Euclidean distance mapping-surface based scale (EBD-SBS), and Hough transform (following Kook et al.) codes should acknowledge the corresponding studies under the acknowledgements above. Please also consider citing this repository directly. 
+
+When using the CNN method (e.g., carboseg) please cite
+
+[Sipkens, T.A., Frei, M., Baldelli, A., Kirchen, P., Kruis, F. E., & Rogak, S. N. (In Press). Characterizing soot in TEM images using a convolutional neural network. Powder Technology.][ptech.cnn]
 
 #### References
 
@@ -513,7 +517,9 @@ Users of the pair correlation method (PCM), the Euclidean distance mapping-surfa
 
 [Sipkens, T. A., Zhou., L., Rogak, S. N. (2020). Aggregate-level segmentation of soot TEM images by unsupervised machine learning. *European Aerosol Conference*, Aachen, Germany.][eac20]
 
-[Sipkens, T. A., Rogak, S. N. (Accepted). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. *Journal of Aerosol Science*, 105699.][jaskmeans]
+[Sipkens, T. A., Rogak, S. N. (2021). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. *Journal of Aerosol Science*, 105699.][jaskmeans]
+
+[Sipkens, T.A., Frei, M., Baldelli, A., Kirchen, P., Kruis, F. E., & Rogak, S. N. (In Press). Characterizing soot in TEM images using a convolutional neural network. Powder Technology.][ptech.cnn]
 
 [Trivanovic, U., Sipkens, T. A., Kazemimanesh, M., Baldelli, A., Jefferson, A. M., Conrad, B. M., Johnson, M. R., Corbin, J. C., Olfert, J. S., & Rogak, S. N. (2020). Morphology and size of soot from gas flares as a function of fuel and water addition. *Fuel*, *279*, 118478.][triv20]
 
@@ -525,3 +531,4 @@ Users of the pair correlation method (PCM), the Euclidean distance mapping-surfa
 [eac20]: https://doi.org/10.13140/RG.2.2.14433.12648
 [jaskmeans]: https://doi.org/10.1016/j.jaerosci.2020.105699
 [kheirkhah20]: https://doi.org/10.1080/02786826.2020.1758623
+[ptech.cnn]: https://doi.org/10.1016/j.powtec.2021.04.026
