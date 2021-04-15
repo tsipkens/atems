@@ -27,10 +27,13 @@ n_imgs = length(imgs);
 
 % If more than one image, prepare to tile and maximize figure.
 if n_imgs>1
+    clf;  % clear current figure contents
+    
     N1 = floor(sqrt(n_imgs));
     N2 = ceil(n_imgs/N1);
     subplot(N1, N2, 1);
 end
+
 
 
 for ii=1:n_imgs % loop over images
