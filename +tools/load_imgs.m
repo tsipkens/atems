@@ -99,7 +99,7 @@ while flag == 0
     
     % Browse or get file information.
     if isempty(fd) % if no folder, user browses for images (tif,jpg)
-        [fname, folder] = uigetfile({'*.tif;*.jpg', 'TEM image (*.tif;*.jpg)'}, ...
+        [fname, folder] = uigetfile({'*.tif;*.jpg;*.png', 'TEM image (*.tif;*.jpg)'}, ...
             'Select Images', dir_start, 'MultiSelect', 'on');
     else % if folder is given, get all tif files in the folder
         t0 = [ ...  % pattern to match filenames
