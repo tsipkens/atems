@@ -1,25 +1,25 @@
 
 % LOAD_IMGS  Loads images from files.
+%  
+%  IMGS = load_imgs() uses a file explorer to select files, loads the
+%  images, and attempts to detect the footer and scale of the image (using
+%  the detect_footer_scale subfunction). Information is output in the form
+%  of a data struture, with one entry per image. 
+%  
+%  IMGS = load_imgs(FD) loads all of the images in the folder specified by
+%  the input string, FD. For example, the sample images can be loaded using
+%  IMGS = load_imgs('images'). 
+%  
+%  IMGS = load_imgs(FD,N) loads the images specified by array N. By
+%  default, N spans 1 to the number of images in the given folder. For
+%  example, the 2nd and 3rd images can be loaded using N = [2,3]. This
+%  allows for partial loading of larger data sets for batch processing. 
+%  
+%  [~,IMGS,PIXSIZE] = load_imgs(...) loads images and outputs the imported
+%  images after the detector footer has been remvoed as a cell array, IMGS,
+%  and an array of pixel sizes in nm/pixel, PIXSIZE. 
 % 
-% IMGS = load_imgs() uses a file explorer to select files, loads the
-% images, and attempts to detect the footer and scale of the image (using
-% the detect_footer_scale subfunction). Information is output in the form
-% of a data struture, with one entry per image. 
-% 
-% IMGS = load_imgs(FD) loads all of the images in the folder specified by
-% the input string, FD. For example, the sample images can be loaded using
-% IMGS = load_imgs('images'). 
-% 
-% IMGS = load_imgs(FD,N) loads the images specified by array N. By
-% default, N spans 1 to the number of images in the given folder. For
-% example, the 2nd and 3rd images can be loaded using N = [2,3]. This
-% allows for partial loading of larger data sets for batch processing. 
-% 
-% [~,IMGS,PIXSIZE] = load_imgs(...) loads images and outputs the imported
-% images after the detector footer has been remvoed as a cell array, IMGS,
-% and an array of pixel sizes in nm/pixel, PIXSIZE. 
-% 
-% AUTHOR: Timothy Sipkens, 2019-07-04
+%  AUTHOR: Timothy Sipkens, 2019-07-04
 
 function [Imgs, imgs, pixsize] = load_imgs(fd, n)
 
@@ -207,6 +207,12 @@ for jj=1:length(Imgs)
         % Binarize the image at a level 0.98*max.
         bw1 = im2bw(1 - double(Imgs(jj).raw) ./ ...
             max(max(double(Imgs(jj).raw))), 0.98);
+        
+        % If no text, loop for white text isntead of black.
+        if nnz(bw1) < 500
+            bw1 = ~im2bw(1 - double(Imgs(jj).raw) ./ ...
+                max(max(double(Imgs(jj).raw))), 0.01);
+        end
         
         % Remove any small regions below a certain number of pixels.
         bw1 = bwareaopen(bw1, 100);
