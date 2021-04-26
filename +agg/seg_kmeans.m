@@ -66,7 +66,11 @@ if isstruct(opts)
 
 % If string, assume load from file name.
 elseif isa(opts, 'char')
-    opts = tools.load_config(opts);
+    if strcmp(opts((end-3):end), 'json')  % expects JSON file path
+        opts = tools.load_config(opts);
+    else  % otherwise, input is expected to be version number (e.g., 'v6.1')
+        opts = tools.load_config(['+agg/config/', opts, '.json']);
+    end
 
 % Otherwise, load default properties. 
 else
@@ -82,7 +86,7 @@ img_binary{n} = []; % pre-allocate cells
 img_kmeans{n} = [];
 feature_set{n} = [];
 
-disp('Segmenting images:'); tools.textbar([0, n]);
+disp(' Segmenting images:'); tools.textbar([0, n]);
 for ii=1:n
     
     img = imgs{ii}; pixsize = pixsizes(ii); % values for this iteration
