@@ -46,7 +46,7 @@ commandwindow;
 
 %== Primary particle sizing ==============================================%
 Aggs_pp = pp.edm_sbs(Aggs_km);
-Aggs_pp = pp.kook2(Aggs_pp, 0);
+Aggs_pp = pp.hough_kook2(Aggs_pp, 0);
 Aggs_pp = pp.pcm(Aggs_pp);
 %=========================================================================%
 

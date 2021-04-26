@@ -30,7 +30,7 @@ agg.analyze_binary(imgs_otsu_o, pixsizes, imgs, fname, [], 0);
 
 %== Primary particle sizing ==============================================%
 pp.edm_sbs(Aggs);
-pp.kook2(Aggs, 0);
+pp.hough_kook2(Aggs, 0);
 pp.pcm(Aggs);
 pp.edm_ws(Aggs, [], 0);
 %=========================================================================%

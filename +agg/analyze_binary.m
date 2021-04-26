@@ -75,7 +75,7 @@ Aggs = struct([]); % initialize Aggs structure
 id = 0;
 
 tools.textheader('Analyzing binaries');
-disp('Progress:'); tools.textbar([0, length(imgs_binary)]);
+disp(' Progress:'); tools.textbar([0, length(imgs_binary)]);
 for ii=1:length(imgs_binary) % loop through provided images
     
     img_binary = imgs_binary{ii};

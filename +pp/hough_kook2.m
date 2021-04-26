@@ -1,17 +1,17 @@
 
-% KOOK2  Performs modified Kook algorithm that considers aggregate binaries.
+% HOUGH_KOOK2  Performs modified Kook algorithm that considers aggregate binaries.
 % 
-%  [AGGS] = pp.kook2(AGGS) repackages the original code by Kook et al.
+%  [AGGS] = pp.hough_kook2(AGGS) repackages the original code by Kook et al.
 %  to work with the common data structures in this larger code. Uses the
 %  individual aggregate information in AGGS to assign Hough transform
 %  circles to individual aggregates and filters out background circles. 
 %  
-%  [AGGS] = pp.kook2(AGGS,F_PLOT) adds a flag for whether to produce a
+%  [AGGS] = pp.hough_kook2(AGGS,F_PLOT) adds a flag for whether to produce a
 %  plot of the primary particle sizes overlaid on the image for each
 %  aggregate. By default, F_PLOT = 1 and the images will be plotted. Set
 %  F_PLOT = 0 to speed execution. 
 % 
-%  [AGGS] = pp.kook2(AGGS,F_PLOT,OPTS) adds an options stucture to control
+%  [AGGS] = pp.hough_kook2(AGGS,F_PLOT,OPTS) adds an options stucture to control
 %  the algorithm. For defaults, see the "OPTIONS" section of the code below.
 %  Note that if this argument is supplied, one must provide all seven
 %  of the fields in the OPTS structure. Again, see the "OPTIONS"
@@ -48,7 +48,7 @@
 %  This code was modified by Yiling Kang and Timothy Sipkens at the
 %  University of British Columbia. 
 
-function Aggs = kook2(Aggs, f_plot, opts)
+function Aggs = hough_kook2(Aggs, f_plot, opts)
 
 %-- Parse inputs and load image ------------------------------------------%
 if ~exist('f_plot','var'); f_plot = []; end
