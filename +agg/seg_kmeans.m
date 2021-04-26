@@ -125,9 +125,18 @@ for ii=1:n
             % min(*, 1) prevents loop from going above max. brightness
     end
     n_in = movmean(n_in, 10); % apply moving average to smooth out curve, remove kinks
-    p = polyfit(lvl3(1:10), n_in(1:10), 1); % fit linear curve to inital points
-    n_in_pred = p(1).*lvl3 + p(2); % predicted values of number of pixels in aggregates
-    lvl4 = find(((n_in - n_in_pred) ./ (n_in_pred + eps)) > opts.lvl5); % cases that devaite 10% from initial trend
+    
+    if strcmp(opts.lvlfun, 'lin')
+        p = polyfit(lvl3(1:10), n_in(1:10), 1); % fit linear curve to inital points
+        n_in_pred = p(1).*lvl3 + p(2); % predicted values of number of pixels in aggregates
+        lvlfun = (n_in - n_in_pred) ./ (n_in_pred + eps);
+    else
+        fun = @(x) max(n_in) ./ (1 + exp(-x(1) .* (lvl3 - x(2))));
+        x1 = lsqnonlin(@(x) n_in - fun(x), [60, 1.2], ...
+            [], [], struct('Display', 'off'));
+        lvlfun = fun(x1) ./ max(n_in);
+    end
+    lvl4 = find(lvlfun > opts.lvl5); % cases that devaite 10% from initial trend
     
     % If nothing found, revert to Otsu.
     % To debug, one can plot the Otsu result using: 
