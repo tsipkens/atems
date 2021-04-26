@@ -62,6 +62,7 @@ if isstruct(opts)
     for ii=1:length(fields)  % loop through input fields and overwrite
         opts0.(fields{ii}) = opts.(fields{ii});  % overwrite
     end
+    opts = opts0;
 
 % If string, assume load from file name.
 elseif isa(opts, 'char')
