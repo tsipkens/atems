@@ -222,7 +222,7 @@ Compiling these different feature layers results in a three layer image that wil
 
 This is the most robust of the fully automated methods available with this distribution. However, while this will likely be adequate for many users, the technique still occasionally fails, particularly if the function does not adequately remove the background. The method also has some notable limitations when images are (i) *zoomed in* on a single aggregate while (ii) also slightly overexposed. 
 
-The k-means method is associated with configuration files (cf., [+agg/conifg/](https://github.com/tsipkens/atems/tree/master/%2Bagg/config)), which include different versions and allow for tweaking of the options associated with the method. See the `agg.seg_kmeans(...)` function header for more information on versions. 
+The k-means method is associated with configuration files (cf., [+agg/conifg/](https://github.com/tsipkens/atems/tree/master/%2Bagg/config)), which include different versions and allow for tweaking of the options associated with the method. See the `seg_kmeans(...)` function header or type `help agg.seg_kmeans` for more information on versions. 
 
 ### + carboseg and CNN segmentation 
 
