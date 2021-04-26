@@ -29,10 +29,12 @@
 %  
 %  VERSION: 
 %   Previous versions, deprecated, used different feature layers and weights.
-%    <strong>6+</strong>:  Three, equally-weighted feature layers as described by 
-%         Sipkens and Rogak (J. Aerosol Sci.). 
-%    <strong>6.1</strong>: Improves the adjusted feature layer for 
-%         clumpy aggregates.
+%    <strong>6+</strong>:  Three, equally-weighted feature layers as  
+%         described by Sipkens and Rogak (J. Aerosol Sci., 2021). 
+%    <strong>6.1</strong>: Improves the adjusted feature layer 
+%         for clumpy aggregates.
+%    <strong>6.2</strong>: Switches to s-curve fitting for  
+%         computing the adjusted threhold layer.
 %  
 %  ------------------------------------------------------------------------
 %  
