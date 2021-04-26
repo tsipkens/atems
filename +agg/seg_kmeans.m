@@ -49,10 +49,14 @@ if isempty(pixsizes)
     error('PIXSIZES is a required argument unless Imgs structure is given.');
 end
 
-if ~exist('opts', 'var'); opts = struct(); end
+if ~exist('opts', 'var'); opts = []; end
 if isstruct(opts)
     if ~isfield(opts, 'minsize'); opts.minsize = 50; end
-else; opts.minsize = opts;
+elseif isa(opts, 'char')
+    opts = tools.load_config(opts);
+else
+    opts = tools.load_config( ...
+        '+agg/config/v6.1.json');
 end
 %-------------------------------------------------------------------------%
 
@@ -114,7 +118,7 @@ for ii=1:n
     % NOTE: Original lvl3 went up to 1.25, which, while faster, cause
     %  problems for particularily clumpy aggregates. May cause some 
     %  backward compatibility issues. 
-    lvl3 = 1:0.002:1.35;
+    lvl3 = opts.lvl3;
     n_in = ones(size(lvl3));
     for ll=1:length(lvl3) % loop, increasing the threshold level
         n_in(ll) = sum(sum(~im2bw(i1, min(lvl2 * lvl3(ll), 1))));
@@ -123,7 +127,7 @@ for ii=1:n
     n_in = movmean(n_in, 10); % apply moving average to smooth out curve, remove kinks
     p = polyfit(lvl3(1:10), n_in(1:10), 1); % fit linear curve to inital points
     n_in_pred = p(1).*lvl3 + p(2); % predicted values of number of pixels in aggregates
-    lvl4 = find(((n_in - n_in_pred) ./ n_in_pred) > 0.10); % cases that devaite 10% from initial trend
+    lvl4 = find(((n_in - n_in_pred) ./ (n_in_pred + eps)) > opts.lvl5); % cases that devaite 10% from initial trend
     
     % If nothing found, revert to Otsu.
     % To debug, one can plot the Otsu result using: 
@@ -144,7 +148,7 @@ for ii=1:n
     
     % Close the higher threshold image 
     % to remove noisy points now included in binary.
-    se3 = strel('disk',max(round(5*morph_param),1));
+    se3 = strel('disk', max(round(5*morph_param), 1));
     i3 = imclose(i2b,se3);
         
     % Check if regions originally included in the Otsu threshold
