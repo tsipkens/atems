@@ -93,14 +93,13 @@ for ll = idx % run loop as many times as aggregates selected
     
     %== Save results =====================================================%
     %   Format output and autobackup data ------------------------%
-    disp('Saving temporary data...');
+    disp(' Saving temporary data ...');
     Aggs(ll).Pp_manual = Pp(ll); % copy Pp data structure into Aggs
     Aggs(ll).dp = mean(Pp(ll).dp);
     save(['temp',filesep,'Pp_manual.mat'],'Pp'); % backup Pp
-    disp('Complete.');
-    disp(' ');
+    tools.textdone(2);
     
-    disp('Overall progress:');
+    disp(' Overall progress:');
     tools.textbar(0);
     tools.textbar(find(ll==idx) / length(idx));
     disp(' ');

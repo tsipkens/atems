@@ -50,7 +50,7 @@ figure; % generate figure for visualizing current aggregate
 %== Main image processing loop ===========================================%
 n_aggs = length(Aggs);
 
-disp('Characterizing aggregates:');
+disp(' Characterizing aggregates:');
 tools.textbar([0, n_aggs]);
 
 for aa = 1:n_aggs % loop over each aggregate in the provided structure
@@ -184,9 +184,9 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
     %   Autobackup data (every ten particles)
     if f_backup==1
         if mod(aa,10)==0
-            disp('Saving data...');
+            disp(' Saving data ...');
             save(['temp',filesep,'pcm_data.mat'],'Aggs'); % backup img_data
-            disp('Complete.');
+            tools.textdone(2);
             tools.textbar(0); % reinitilize space for textbar
         end
     end

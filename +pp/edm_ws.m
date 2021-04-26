@@ -58,7 +58,7 @@ if f_plot==1
 end
 
 %-- Main loop over binary images -----------------------------------------%
-disp('Characterizing aggregates:');
+disp(' Characterizing aggregates:');
 tools.textbar([0, length(imgs_binary)]);
 
 for aa=1:length(imgs_binary)  % loop over aggregates
