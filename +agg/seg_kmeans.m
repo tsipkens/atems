@@ -49,14 +49,25 @@ if isempty(pixsizes)
     error('PIXSIZES is a required argument unless Imgs structure is given.');
 end
 
-if ~exist('opts', 'var'); opts = []; end
+default_opts = '+agg/config/v6.1.json';  % default, load this config file
+if ~exist('opts', 'var'); opts = []; end  % if no opts specified
+
+% If is pre-specified structure, 
+% load and partially/fully overwrite defaults.
 if isstruct(opts)
-    if ~isfield(opts, 'minsize'); opts.minsize = 50; end
+    opts0 = tools.load_config(default_opts);  % load defaults
+    fields = fieldnames(opts);  % field names of input
+    for ii=1:length(fields)  % loop through input fields and overwrite
+        opts0.(fields{ii}) = opts.(fields{ii});  % overwrite
+    end
+
+% If string, assume load from file name.
 elseif isa(opts, 'char')
     opts = tools.load_config(opts);
+
+% Otherwise, load default properties. 
 else
-    opts = tools.load_config( ...
-        '+agg/config/v6.1.json');
+    opts = tools.load_config(default_opts);
 end
 %-------------------------------------------------------------------------%
 
