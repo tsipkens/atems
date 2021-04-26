@@ -126,9 +126,10 @@ for ii=1:n
     
     % Now, loop through threshold values above Otsu 
     % and find number of pixels that are part of the aggregates.
-    % NOTE: Original lvl3 went up to 1.25, which, while faster, cause
-    %  problems for particularily clumpy aggregates. May cause some 
-    %  backward compatibility issues. 
+    % NOTE: For original v6, lvl3 went up to 1.25, which, while faster, 
+    %  caused problems for particularily clumpy aggregates. 
+    %  Subsequent updates may cause some minor differences
+    %  relative to Sipkens and Rogak (2021).
     lvl3 = opts.lvl3;
     n_in = ones(size(lvl3));
     for ll=1:length(lvl3) % loop, increasing the threshold level
@@ -137,17 +138,23 @@ for ii=1:n
     end
     n_in = movmean(n_in, 10); % apply moving average to smooth out curve, remove kinks
     
+    %-- Fit a curve --%
+    % OPTION 1: Fit a linear trend to the first ten points.
+    % Then look for deviationf rom trend.
     if strcmp(opts.lvlfun, 'lin')
         p = polyfit(lvl3(1:10), n_in(1:10), 1); % fit linear curve to inital points
         n_in_pred = p(1).*lvl3 + p(2); % predicted values of number of pixels in aggregates
         lvlfun = (n_in - n_in_pred) ./ (n_in_pred + eps);
+    
+    % OPTION 2: Fit an s-curve to a larger range.
+    % Look for lvl5 from bottom of s-curve.
     else
         fun = @(x) max(n_in) ./ (1 + exp(-x(1) .* (lvl3 - x(2))));
         x1 = lsqnonlin(@(x) n_in - fun(x), [60, 1.2], ...
             [], [], struct('Display', 'off'));
         lvlfun = fun(x1) ./ max(n_in);
     end
-    lvl4 = find(lvlfun > opts.lvl5); % cases that devaite 10% from initial trend
+    lvl4 = find(lvlfun > opts.lvl5);  % cases that devaite lvl5% from initial trend
     
     % If nothing found, revert to Otsu.
     % To debug, one can plot the Otsu result using: 
@@ -189,11 +196,8 @@ for ii=1:n
     
 
     %-- Combine feature set ----------------------------------------------%
-    feature_set{ii} = single(cat(3,...
-        repmat(i12,[1,1,1]),...
-        repmat(i5,[1,1,1]),...
-        repmat(img_denoise,[1,1,1])...
-        ));
+    feature_set{ii} = single(cat(3, ...
+        i12, i5, img_denoise));
     
     
     
@@ -211,7 +215,7 @@ for ii=1:n
     
     %== STEP 4: Rolling Ball Transformation ==============================%
     % Disk size limited by size of holes in particle.
-    ds = round(4 * morph_param);
+    ds = round(opts.morphsc * morph_param);
     se6 = strel('disk', max(ds, 1));
     i7 = imclose(img_kmeans{ii}, se6);
     

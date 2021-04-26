@@ -1,7 +1,10 @@
+// VERSION 6.2
+// AUTHOR: Timothy Sipkens, 2021-04-26
 {
     "version": 6.2,
     "lvl3": "0.2:0.002:1.5",  // range of thresholds to build curve
     "lvl5": 0.08,             // where to threshold on hist curve
     "lvlfun": "s",            // type of adjusted threshold
+    "morphsc": 4,              // Modify morph. parameter for rolling ball
     "minsize": 50             // minimum particle size to consider
 }
