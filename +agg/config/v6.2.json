@@ -1,7 +1,7 @@
 {
     "version": 6.2,
-    "lvl3": "0.2:0.002:1.5",
-    "lvl5": 0.08,
-    "lvlfun": "s",
-    "minsize": 50
+    "lvl3": "0.2:0.002:1.5",  // range of thresholds to build curve
+    "lvl5": 0.08,             // where to threshold on hist curve
+    "lvlfun": "s",            // type of adjusted threshold
+    "minsize": 50             // minimum particle size to consider
 }
