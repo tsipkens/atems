@@ -91,6 +91,36 @@ for ii=1:length(imgs_binary) % loop through provided images
     end
     
     
+    % Check if any of the borders are >20% aggregate. 
+    % This is likely a problem image, try to mask result. 
+    nn = [nnz(img_binary(:, 1)) / size(img_binary, 1), ...
+        nnz(img_binary(:, end)) / size(img_binary, 1), ...
+        nnz(img_binary(1, :)) / size(img_binary, 2), ...
+        nnz(img_binary(end, :)) / size(img_binary, 2)];
+    if any(nn > 0.2)
+        ia = img_binary;
+        % Zero edges that are not problematic
+        % (avoids real aggreagates on border).
+        if ~(nn(1) > 0.2); ia(:, 1) = 0; end
+        if ~(nn(2) > 0.2); ia(:, end) = 0; end
+        if ~(nn(3) > 0.2); ia(1, :) = 0; end
+        if ~(nn(4) > 0.2); ia(end, :) = 0; end
+        
+        % Examine just remaining border regions.
+        img_edges = ia - imclearborder(ia);
+        
+        % For generating a cirle excluding border regions.
+        [i1, i2] = meshgrid(1:size(img_binary, 2), 1:size(img_binary, 1));
+        fun = @(x) sqrt((i1 - x(1)).^2 + (i2 - x(2)).^2) > x(3);
+        
+        img_edm = bwdist(img_edges);  % euclidean distance map (EDM)
+        [~, m1] = max(max(img_edm, [], 1));  % find peak of EDM
+        [~, m2] = max(max(img_edm, [], 2));
+        img_binary = ...
+            or(fun([m1, m2, img_edm(m2, m1) - 100]), img_binary);
+    end
+    
+    
     % If clearing aggregate borders...
     if f_edges
         img_binary = imclearborder(img_binary);
