@@ -186,10 +186,6 @@ The main scripts demonstrate further use of the code for specific scenarios and 
 
 This package contains an expandable library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background regions. Functions are accessed by appending `agg.` to the function name, e.g., `agg.seg_kmeans(...)` to call the *k*-means segmentation procedure. 
 
-We will demonstrate the segmentation functions using a set of sample images. 
-
-![original](docs/original.png)
-
 These images are included with this distribution in the `images/` folder. These images represent soot collected from a lab-scale flare ([Trivanovic et al., 2020][triv20]) and a diesel engine ([Kheirkhah et al., 2020][kheirkhah20]). 
 
 ## 2.1 agg.seg\* functions
@@ -206,17 +202,13 @@ Several methods also take `pixsize`, which denotes the size of each pixel in the
 
 The set of available methods is summarized below. 
 
-### + **seg_kmeans** | *k*-means segmentation
+### + **seg_kmeans** / *k*-means segmentation
 
-This function applies a *k*-means segmentation approach following [Sipkens and Rogak (2021)][jaskmeans] and using three feature layers, which include: 
+This function applies a *k*-means segmentation approach following [Sipkens and Rogak (2021)][jaskmeans] and using three feature layers, which include: (*i*) a *denoised* version of the image; (*ii*) a measure of *texture* in the image; and (*iii*) an Otsu-like classified image, with the *threshold adjusted* upwards. This method works well for a large range of images, e.g., 
 
-FEATURE 1. a *denoised* version of the image, 
+![i_kmeans](docs/kmeans.png)
 
-FEATURE 2. a measure of *texture* in the image, and 
-
-FEATURE 3. an Otsu-like classified image, with the *threshold adjusted* upwards. 
-
-This method will likely be adequate for many users, the technique still occasionally fails, particularly if the function does not adequately remove the background. The method also has some notable limitations when images are (i) *zoomed in* on a single aggregate while (ii) also slightly overexposed. The k-means method is associated with configuration files (cf., [+agg/conifg/](https://github.com/tsipkens/atems/tree/master/%2Bagg/config)), which include different versions and allow for tweaking of the options associated with the method. See the `seg_kmeans(...)` function header or type `help agg.seg_kmeans` for more information, including configuration versions and function arguments. 
+Though, the technique still occasionally fails, particularly if the function does not adequately remove the background. The method also has some notable limitations when images are (i) *zoomed in* on a single aggregate while (ii) also slightly overexposed. The k-means method is associated with configuration files (cf., [+agg/conifg/](https://github.com/tsipkens/atems/tree/master/%2Bagg/config)), which include different versions and allow for tweaking of the options associated with the method. See the `seg_kmeans(...)` function header or type `help agg.seg_kmeans` for more information, including configuration versions and function arguments. 
 
 ### + **carboseg** and CNN segmentation 
 
@@ -296,35 +288,35 @@ where `fd_out` is the new folder containing the classified binaries from Python.
 For an implementation of this procedure, see the `main_carboseg_ext` script in the upper directory of this repository.
 
 
-### + **seg_otsu_rb\*** | Otsu thresholding
+### + **seg_otsu_rb\*** / Otsu thresholding
 
 These automated methods apply Otsu thresholding followed by a rolling ball transformation. Two versions of this function are included. 
 
-**1.** The `agg.seg_otsu_rb_orig(...)` function remains more true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. For the sample images, this results in the following segmentations.
+**A.** The `agg.seg_otsu_rb_orig(...)` function remains more true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. For the sample images, this often results in fragmented segmentations, e.g., 
 
 ![rb_orig](docs/otsu_rb_orig.png)
 
-Aggregates are often broken apart, which may be insufficient in itself. This implementation can be complimented with `agg.seg_slider(...)`, described below, to fill in the gaps between the aggregates and add missing aggregates. 
+As the technique may be insufficient on its own, this implementation can be complimented with `agg.seg_slider(...)`, described [below](#-seg_slider_orig--gui-based-slider-method), to fill in the gaps between the aggregates and add missing aggregates. 
 
-**2.** Stemming from the deficiencies of the above function, the `agg.seg_otsu_rb(...)` function updates the above implementation by (*i*) not immediately removing boundary aggregates, (*ii*) adding a background subtraction step using the `agg.bg_subtract(...)` function, and (*iii*) adding a bilateral denoising step. This results in the following segmentations.
+**B.** Stemming from the deficiencies of the above function, the `agg.seg_otsu_rb(...)` function updates the above implementation by (*i*) not immediately removing boundary aggregates, (*ii*) adding a background subtraction step using the `agg.bg_subtract(...)` function, and (*iii*) adding a bilateral denoising step. This results in the following segmentations.
 
 ![otsu_rb](docs/otsu_rb.png)
 
 This latter function generally performs better, though the results still often breaks up aggregates and should likely be compliment with some manual adjustments following initial thresholding. The technique generally underperformed relative to the previously mentioned *k*-means method. 
 
-### + **seg_slider_orig** | GUI-based slider method
+### + **seg_slider_orig** / GUI-based slider method
 
 The `agg.seg_slider_orig(...)` method is a largely manual technique originally developed by [Ramin Dastanpour](https://github.com/rdastanpour) ([Dastanpour et al., 2016)][dastanpour2016]). The function enacts a GUI-based method with a slider for adaptive, semi-automatic thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). It is worth noting that the mostly manual nature of this approach will resulting in variability and subjectiveness between users but that the human input often greatly improves the quality of the segmentations. See the `seg_slider_orig(...)` function header or type `help agg.seg_slider_orig`, including usage. 
 
 > We note that this code saw important bug updates since the original code by [Dastanpour et al. (2016)][dastanpour2016]. This includes fixing how the original code would repeatedly apply a Gaussian filter every time the user interacted with the slider in the GUI (which may cause some backward compatibility issues), a reduction in the use of global variables, memory savings, and other performance improvements. 
 
-### + **seg_slider** | An improved GUI-based slider method
+### + **seg_slider** / An improved GUI-based slider method
 
 The core of this method is that the as the GUI-based slider method described above but sees an overhaul of the user interface. This implementation makes use of Matlab's app builder, requiring newer Matlab versions to use. 
 
 ![slider2](docs/slider2_screenshot.png)
 
-### + **seg** | A general segmentation function
+### + **seg** / A general segmentation function
 
 The `agg.seg(...)` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. Specifically, the method attempts (*i*) the *k*-means classifier, (*ii*) followed by the Otsu classifier, and finally (*iii*) reverts to using the slider method. This is repeated until the user has classified all of the images that were passed to the function. 
 
@@ -346,17 +338,17 @@ Multiple of these methods make use of the *rolling ball transformation*, applied
 
 The +pp package contains multiple methods for determining the primary particle size of the aggregates of interest. Often this requires a binary mask of the image that can be generated using the +agg package methods. After applying most of the methods, the primary particle size will be stored in (*i*) the `Aggs.dp` field and (*ii*) another `Aggs` field with additional information specifying the method used (e.g., `Aggs.dp_pcm1`  contains a PCM-derived primary particle diameter). For the former, whichever method was last used will overwrite the `Aggs.dp` field, which then acts as a default value that is used by other functions (by the `tools.imshow_agg(...)` function). 
 
-### + **PCM**
+### + **pcm** / Pair correlation method
 
 The `pp.pcm` function contains code for the University of British Columbia's pair correlation method (PCM) method, originally developed by [Ramin Dastanpour](https://github.com/rdastanpour) ([Dastanpour et al. (2016)][dastanpour2016]). This package contains a significant improvements to code readability, memory use, and length relative to the previous code. The underlying method is largely unchanged, correlating the relationship between pixels to the primary particle size for a given aggregate. A single average primary particle diameter is given for each aggregate. [Dastanpour et al.][dastanpour2016] provided two different types of pair correlation function (PCF), corresponding to `Aggs.dp_pcm1`, previously denoted as *simple* and `Aggs.dp_pcm2`, previously denoted as *general*. Testing has generally suggested that the simple method perform better, and this value is assigned to `Aggs.dp` in the output from the PCM method. 
 
-### + **EDM-SBS**
+### + **edm_sbs** / EDM-SBS
 
-The Euclidean distance mapping, scale-based analysis (EDM-SBS) of [Bescond et al. (2014)][bescond] is implement in the `pp.edm_sbs` function. This is an adaptation of the original code for use with Matlab and using the binaries above in the place of output from imageJ. As such, some minor differences in output should be expected (which are challenging to compare, as the ImageJ output does not have a direct analog here). The method remains true to how it is described in [Bescond et al.][bescond] and ports some components from the original Scilab code (version 3, available [here](http://www.coria.fr/spip.php?article910)). 
+The Euclidean distance mapping, scale-based analysis (EDM-SBS) of [Bescond et al. (2014)][bescond] is implement in the `pp.edm_sbs(...)` function. This is an adaptation of the original code for use with Matlab and using the binaries above in the place of output from imageJ. As such, some minor differences in output should be expected (which are challenging to compare, as the ImageJ output does not have a direct analog here). The method remains true to how it is described in [Bescond et al.][bescond] and ports some components from the original Scilab code (version 3, available [here](http://www.coria.fr/spip.php?article910)). 
 
 Among the changes to the original EDM-SBS code, this implementation also applies the EDM-SBS method to individual aggregates. While this allows for a better comparison to the other methods here, the method was originally intended to evaluate the primary particle size distribution across a range of aggregates, with uncertaintainty ramifications. However, the linear nature of the curves generated by the method means that the overall EDM-SBS curve is simply approximated by the superposition of all of the aggregates. This is also output by the present code.  
 
-### + **kook\*** | Hough transform
+### + **kook\*** / Hough transform
 
 Two `pp.kook*(...)` functions are included with this program, which fit circles to features in the image using the Hough transform and the pre-processing steps described by [Kook et al. (2015)][kook]. 
 
