@@ -206,7 +206,7 @@ Several methods also take `pixsize`, which denotes the size of each pixel in the
 
 The set of available methods is summarized below. 
 
-### + seg_kmeans: *k*-means segmentation
+### + **seg_kmeans** | *k*-means segmentation
 
 This function applies a *k*-means segmentation approach following [Sipkens and Rogak (2021)][jaskmeans] and using three feature layers, which include: 
 
@@ -216,15 +216,9 @@ FEATURE 2. a measure of *texture* in the image, and
 
 FEATURE 3. an Otsu-like classified image, with the *threshold adjusted* upwards. 
 
-Compiling these different feature layers results in a three layer image that will be used for segmentation. This is roughly equivalent to segmenting colour images, if each of the layers was assigned a colour. For example, compilation of these feature layers for the sample images results in the following feature layers and compiled RGB image. More details of the method are given in the [associated paper][jaskmeans]. Finally, applying Matlab's `imsegkmeans(...)` function, we achieve segmentations as follows: 
+This method will likely be adequate for many users, the technique still occasionally fails, particularly if the function does not adequately remove the background. The method also has some notable limitations when images are (i) *zoomed in* on a single aggregate while (ii) also slightly overexposed. The k-means method is associated with configuration files (cf., [+agg/conifg/](https://github.com/tsipkens/atems/tree/master/%2Bagg/config)), which include different versions and allow for tweaking of the options associated with the method. See the `seg_kmeans(...)` function header or type `help agg.seg_kmeans` for more information, including configuration versions and function arguments. 
 
-![kmeans](docs/kmeans.png)
-
-This is the most robust of the fully automated methods available with this distribution. However, while this will likely be adequate for many users, the technique still occasionally fails, particularly if the function does not adequately remove the background. The method also has some notable limitations when images are (i) *zoomed in* on a single aggregate while (ii) also slightly overexposed. 
-
-The k-means method is associated with configuration files (cf., [+agg/conifg/](https://github.com/tsipkens/atems/tree/master/%2Bagg/config)), which include different versions and allow for tweaking of the options associated with the method. See the `seg_kmeans(...)` function header or type `help agg.seg_kmeans` for more information on versions. 
-
-### + carboseg and CNN segmentation 
+### + **carboseg** and CNN segmentation 
 
 This `seg_carboseg(...)` function employs Python to implement a convolutional neural network (CNN) for segmentation as described by [Sipkens et al.][ptech.cnn] Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions by Max Frei ([@maxfrei750](https://github.com/maxfrei750)). The implementation here makes use of the ONNX file output (to be downloaded [here](https://uni-duisburg-essen.sciebo.de/s/J7bS47nZadg4bBH/download)) from that procedure and employs the Python ONNX runtime for execution. Use of this function requires the necessary Python environment as a pre-requisite. 
 
@@ -302,7 +296,7 @@ where `fd_out` is the new folder containing the classified binaries from Python.
 For an implementation of this procedure, see the `main_carboseg_ext` script in the upper directory of this repository.
 
 
-### + seg_otsu_rb\*: Otsu thresholding
+### + **seg_otsu_rb\*** | Otsu thresholding
 
 These automated methods apply Otsu thresholding followed by a rolling ball transformation. Two versions of this function are included. 
 
@@ -318,45 +312,21 @@ Aggregates are often broken apart, which may be insufficient in itself. This imp
 
 This latter function generally performs better, though the results still often breaks up aggregates and should likely be compliment with some manual adjustments following initial thresholding. The technique generally underperformed relative to the previously mentioned *k*-means method. 
 
-### + seg_slider_orig: GUI-based slider method
+### + **seg_slider_orig** | GUI-based slider method
 
-The function `agg.seg_slider_orig(...)` is a largely manual technique. The function enacts a GUI-based method with a slider for adaptive, semi-automatic thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). This is done in several steps: 
-
-1. The user is first prompted to **crop** around a single aggregate. This allows the user to zoom in on the image for the remaining steps. 
-2. The user uses a lasso tool to draw around the aggregate. The excluded regions are used for **background subtraction** in cropped region of the image. 
-3. Gaussian blurring is then performed on the image to reduce the noise in the output binary image. Then, the user is prompted with a **slider** that is used to manually adjust the level of the threshold in the cropped region of the image. Very dark regions denotes sections above the selected threshold. The optimal threshold normally occurs when parts of the surrounding region are also considered above the threshold (i.e., show up as black) but do not connect to the main aggregate (see Step 4 in the figure below depicting the window progression). 
-4. The user is prompted to **select** which regions are aggregate, ignoring any white regions that may be above the threshold but are not part of the aggregate. 
-5. Finally, the user will be prompted to **check** whether the segmentation was successful by referring to an image with the resultant binary overlaid on the original image.
-
-The progression of windows generally appears as follows. 
-
-![manual_progress](docs/manual_progress.png)
-
-It is worth noting that the mostly manual nature of this approach will resulting in variability and subjectiveness between users. However, the human input often greatly improves the quality of the segmentations and, while more time-intensive, can act as a reference in considering the appropriateness of the other segmentation methods. A sample segmentation follows. 
-
-![slider](docs/slider.png)
-
-Several sub-functions are included within the main file. This is a variant of the method included with the distribution of the PCM code by [Dastanpour et al. (2016)][dastanpour2016]. 
+The `agg.seg_slider_orig(...)` method is a largely manual technique originally developed by [Ramin Dastanpour](https://github.com/rdastanpour) ([Dastanpour et al., 2016)][dastanpour2016]). The function enacts a GUI-based method with a slider for adaptive, semi-automatic thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). It is worth noting that the mostly manual nature of this approach will resulting in variability and subjectiveness between users but that the human input often greatly improves the quality of the segmentations. See the `seg_slider_orig(...)` function header or type `help agg.seg_slider_orig`, including usage. 
 
 > We note that this code saw important bug updates since the original code by [Dastanpour et al. (2016)][dastanpour2016]. This includes fixing how the original code would repeatedly apply a Gaussian filter every time the user interacted with the slider in the GUI (which may cause some backward compatibility issues), a reduction in the use of global variables, memory savings, and other performance improvements. 
 
-### + seg_slider: An improved GUI-based slider method
+### + **seg_slider** | An improved GUI-based slider method
 
-The core of this method is that same as the GUI-based method described above but sees an overhaul of the user interface. This implementation makes use of Matlab's app builder, requiring newer Matlab versions to work. 
+The core of this method is that the as the GUI-based slider method described above but sees an overhaul of the user interface. This implementation makes use of Matlab's app builder, requiring newer Matlab versions to use. 
 
 ![slider2](docs/slider2_screenshot.png)
 
-### + seg: A general segmentation function
+### + **seg** | A general segmentation function
 
-The `agg.seg` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. Specifically, the method attempts: 
-
-1. The ***k*-means** classifier (following [Sipkens and Rogak][jaskmeans]), prompting the user after segmentation is complete. The user can either (*i*) accept the result as is, (*ii*) reject the output altogether and move on to the next method, (*iii*) choose to remove particles, or (*iv*) add either entirely new particles or add pixels to existing particles (which involves skipping ahead to Step 3, using the current segmentation as a starting point). 
-
-2. The **Otsu** classifier, with the same prompts following segmentation. 
-
-3. Use the GUI-based slider method (the `agg.seg_slider(...)` function described below) to produce a largely-manual segmentation. 
-
-This is repeated until the user has classified all of the images that were passed to the function. 
+The `agg.seg(...)` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. Specifically, the method attempts (*i*) the *k*-means classifier, (*ii*) followed by the Otsu classifier, and finally (*iii*) reverts to using the slider method. This is repeated until the user has classified all of the images that were passed to the function. 
 
 ## 2.2 analyze_binary
 
@@ -376,23 +346,23 @@ Multiple of these methods make use of the *rolling ball transformation*, applied
 
 The +pp package contains multiple methods for determining the primary particle size of the aggregates of interest. Often this requires a binary mask of the image that can be generated using the +agg package methods. After applying most of the methods, the primary particle size will be stored in (*i*) the `Aggs.dp` field and (*ii*) another `Aggs` field with additional information specifying the method used (e.g., `Aggs.dp_pcm1`  contains a PCM-derived primary particle diameter). For the former, whichever method was last used will overwrite the `Aggs.dp` field, which then acts as a default value that is used by other functions (by the `tools.imshow_agg(...)` function). 
 
-### + PCM
+### + **PCM**
 
-The `pp.pcm` function contains code for the University of British Columbia's pair correlation method (PCM) method. This package contains a significant improvements to code readability, memory use, and length relative to the previous code provided with [Dastanpour et al. (2016)][dastanpour2016]. The underlying method is largely unchanged, correlating the relationship between pixels to the primary particle size for a given aggregate. A single average primary particle diameter is given for each aggregate. [Dastanpour et al.][dastanpour2016] provided two different types of pair correlation function (PCF), corresponding to `Aggs.dp_pcm1`, previously denoted as *simple* and `Aggs.dp_pcm2`, previously denoted as *general*. Testing has generally suggested that the simple method perform better, and this value is assigned to `Aggs.dp` in the output from the PCM method. 
+The `pp.pcm` function contains code for the University of British Columbia's pair correlation method (PCM) method, originally developed by [Ramin Dastanpour](https://github.com/rdastanpour) ([Dastanpour et al. (2016)][dastanpour2016]). This package contains a significant improvements to code readability, memory use, and length relative to the previous code. The underlying method is largely unchanged, correlating the relationship between pixels to the primary particle size for a given aggregate. A single average primary particle diameter is given for each aggregate. [Dastanpour et al.][dastanpour2016] provided two different types of pair correlation function (PCF), corresponding to `Aggs.dp_pcm1`, previously denoted as *simple* and `Aggs.dp_pcm2`, previously denoted as *general*. Testing has generally suggested that the simple method perform better, and this value is assigned to `Aggs.dp` in the output from the PCM method. 
 
-### + EDM-SBS
+### + **EDM-SBS**
 
 The Euclidean distance mapping, scale-based analysis (EDM-SBS) of [Bescond et al. (2014)][bescond] is implement in the `pp.edm_sbs` function. This is an adaptation of the original code for use with Matlab and using the binaries above in the place of output from imageJ. As such, some minor differences in output should be expected (which are challenging to compare, as the ImageJ output does not have a direct analog here). The method remains true to how it is described in [Bescond et al.][bescond] and ports some components from the original Scilab code (version 3, available [here](http://www.coria.fr/spip.php?article910)). 
 
 Among the changes to the original EDM-SBS code, this implementation also applies the EDM-SBS method to individual aggregates. While this allows for a better comparison to the other methods here, the method was originally intended to evaluate the primary particle size distribution across a range of aggregates, with uncertaintainty ramifications. However, the linear nature of the curves generated by the method means that the overall EDM-SBS curve is simply approximated by the superposition of all of the aggregates. This is also output by the present code.  
 
-### + Hough transform: kook*
+### + **kook\*** | Hough transform
 
-Two `pp.kook*` functions are included with this program, which fit circles to features in the image using the Hough transform and the pre-processing steps described by [Kook et al. (2015)][kook]. 
+Two `pp.kook*(...)` functions are included with this program, which fit circles to features in the image using the Hough transform and the pre-processing steps described by [Kook et al. (2015)][kook]. 
 
-The first function, `pp.kook`, contains a copy of the code provided by [Kook et al. (2015)][kook], with minor modifications to match the input/output of some of the other packages — namely to take a single image, `img`, and a pixel size, `pixsize` — and to output a `Pp` structure, which contains information for each circle. Note that the original function acts on images without trying to assign primary particles to an aggregate, something resolved in the second function below. This causes some compatibility issues in terms of comparing the output from this function to the other methods contained in this program. 
+The first function, `pp.kook(...)`, contains a copy of the code provided by [Kook et al. (2015)][kook], with minor modifications to match the input/output of some of the other packages — namely to take a single image, `img`, and a pixel size, `pixsize` — and to output a `Pp` structure, which contains information for each circle. Note that the original function acts on images without trying to assign primary particles to an aggregate, something resolved in the second function below. This causes some compatibility issues in terms of comparing the output from this function to the other methods contained in this program. 
 
-The `pp.kook2` function contains a modified version of the method proposed by [Kook et al. (2015)][kook] that excludes circles in the background and assigns primary particles to aggregates. This is done rather simply:  by checking if the center of the circles from the preceding procedure lie within the binary for a given aggregate. A sample output is as follows. 
+The `pp.kook2(...)` function contains a modified version of the method proposed by [Kook et al. (2015)][kook] that excludes circles in the background and assigns primary particles to aggregates. This is done rather simply:  by checking if the center of the circles from the preceding procedure lie within the binary for a given aggregate. A sample output is as follows. 
 
 ![kook2](docs/kook2.png)
 
@@ -400,15 +370,15 @@ Here, red circles are identified as part of an aggregate, while black circles ar
 
 ### + Manual sizing
 
-The `pp.manual` function can be used to manual draw circles around the soot primary particles. The code was developed at the University of British Columbia and represents a heavily modified version of the code associated with [Dastanpour and Rogak (2014)][dastanpour2014]. The current method uses two lines overlaid on each primary particle to select the length and width of the particle. This is converted to various quantities, such as the center of each primary particle and the overall mean primary particle diameter. 
+The `pp.manual(...)` function can be used to manual draw circles around the soot primary particles. The code was developed at the University of British Columbia and represents a heavily modified version of the code associated with [Dastanpour and Rogak (2014)][dastanpour2014]. The current method uses two lines overlaid on each primary particle to select the length and width of the particle. This is converted to various quantities, such as the center of each primary particle and the overall mean primary particle diameter. 
 
 
 # 4. ADDITIONAL TOOLS PACKAGE (+tools)
 
 This package contains a series of functions that help in visualizing or analyzing the aggregates that transcend multiple methods or functions. We discuss a few examples here and refer the reader to individual functions for more information. 
 
-### + Functions to show images (tools.imshow*)
-
+### + **tools.imshow\*** | Functions to show images
+**
 These functions aid in visualizing the resultant images. For example, 
 
 ```Matlab
@@ -433,7 +403,7 @@ will plot the overlays in a yellow.
 
 The related `tools.imshow_agg(...)` function will plot the binaries, as above, and add aggregate-level information to the plot, including: (*i*) the aggregate number; (*ii*) the radius of gyration about the center of the aggregate; and (*iii*) the average primary particle diameter, if this information is available (the function will use the `Aggs.dp` field, which will contain primary particle information from the most recently applied method). 
 
-### + Functions to write data to files (tools.write*)
+### + **tools.write\*** | Functions to write data to files
 
 This set of functions writes data to files, with the precise format depending on the function. 
 
@@ -469,7 +439,7 @@ f1 = figure(1); f1.WindowState = 'maximized';
 
 to maximize the figure window, to generate higher quality output. 
 
-### + Functions to visualize post-processed results (tools.viz*)
+### + **tools.viz\*** | Functions to visualize post-processed results
 
 This set of functions is intended to generate formatted plots of post-processed results. For example, `tools.viz_darho` generates a scatter plot of the area-equivalent diameter versus effective density estimated for each aggregate. 
 
@@ -483,7 +453,7 @@ This software is relaesed under an MIT license (see the corresponding license fi
 
 This code was primarily compiled by Timothy A. Sipkens while at the University of British Columbia (UBC), who can be contacted at [tsipkens@mail.ubc.ca](mailto:tsipkens@mail.ubc.ca). 
 
-Pieces of this code were adapted from various sources and features snippets written by several individuals at UBC, including Ramin Dastanpour, [Una Trivanovic](https://github.com/unatriva), Alberto Baldelli, Yiling Kang, Yeshun (Samuel) Ma, and Steven Rogak, among others.
+Pieces of this code were adapted from various sources and features snippets written by several individuals at UBC, including [Ramin Dastanpour](https://github.com/rdastanpour), [Una Trivanovic](https://github.com/unatriva), Alberto Baldelli, Yiling Kang, Yeshun (Samuel) Ma, and Steven Rogak, among others.
 
 This program contains very significantly modified versions of the code distributed with [Dastanpour et al. (2016)][dastanpour2016]. The most recent version of the Dastanpour et al. code prior to this overhaul is available at https://github.com/unatriva/UBC-PCM (which itself presents a minor update from the original). That code forms the basis for some of the methods underlying the manual processing and the PCM method used in this code, as noted in the README above. However, significant optimizations have improved code legibility, performance, and maintainability (e.g., the code no longer uses global variables). 
 
