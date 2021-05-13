@@ -1,5 +1,57 @@
 
-% SEG_SLIDER_ORIG  Performs background correction and manual thresholding on a user-defined portion of the image.
+% SEG_SLIDER_ORIG  A method to use a slider GUI to segment images.
+%  
+%  This represents a largely manual technique originally developed by 
+%  Dastanpour et al. (2016). The function enacts a GUI-based 
+%  method with a slider for adaptive, semi-automatic thresholding 
+%  of the image (*adaptive* in that small sections of the 
+%  image can be cropped and assigned individually-selected 
+%  thresholds). This is done in several steps: 
+%  
+%  1. The user is first prompted to **crop** around a single
+%   aggregate. This allows the user to zoom in on the image 
+%  for the remaining steps. 
+%  
+%  2. The user uses a lasso tool to draw around the aggregate. 
+%  The excluded regions are used for **background subtraction** 
+%  in the cropped region of the image. 
+%  
+%  3. Gaussian blurring is then performed on the image to reduce 
+%  the noise in the output binary image. Then, the user is prompted 
+%  with a <strong>slider</strong> that is used to manually adjust the level 
+%  of the threshold in the cropped region of the image. Very dark regions 
+%  denotes sections above the selected threshold. The optimal threshold 
+%  normally occurs when parts of the surrounding region are also considered 
+%  above the threshold (i.e., show up as black) but do not connect to the 
+%  main aggregate (see Step 4 in the figure below depicting the window 
+%  progression). 
+%  
+%  4. The user is prompted to **select** which regions are aggregate, 
+%  ignoring any white regions that may be above the threshold but 
+%  are not part of the aggregate. 
+%  
+%  5. Finally, the user will be prompted to **check** 
+%  whether the segmentation was successful by referring to an image with  
+%  the resultant binary overlaid on the original image.
+%  
+%  The progression of windows is shown in docs/manual_progress.png. 
+%  
+%  <strong>NOTE</strong>: The mostly manual nature of this approach will resulting 
+%  in variability and subjectiveness between users. However, the human 
+%  input often greatly improves the quality of the segmentations and, 
+%  while more time-intensive, can act as a reference in considering the 
+%  appropriateness of the other segmentation methods. 
+%  
+%  <strong>NOTE</strong>: Several sub-functions are included within this file. 
+%  
+%  <strong>NOTE</strong>: We note that this code saw important bug updates since 
+%  the original code by Dastanpour et al. (2016). This includes fixing 
+%  how the original code would repeatedly apply a Gaussian filter 
+%  every time the user interacted with the slider in the GUI (which may 
+%  cause some backward compatibility issues), a reduction in the use of 
+%  global variables, memory savings, and other performance improvements. 
+%  
+%  ------------------------------------------------------------------------
 %  
 %  [IMGS_BINARY] = agg.seg_slider_orig(IMGS) applies the slider method to the
 %  images speified in IMGS, an Imgs data structure. IMGS_BINARY is a binary
@@ -20,8 +72,10 @@
 %  small part of the image. By default, F_CROP = 1 and does use the crop
 %  tools. Note, IMGS_BINARY can be empty.
 %  
+%  ------------------------------------------------------------------------
+%  
 %  AUTHOR: Timothy Sipkens, 2019-10-11 (modified)
-%   Ramin Dastanpour, 2016-02 (based on)
+%   Ramin Dastanpour, 2016-02 (based on, github.com/rdastanpour)
 %   Developed at the University of British Columbia
 
 function [imgs_binary] = seg_slider_orig(imgs, imgs_binary, f_crop) 
