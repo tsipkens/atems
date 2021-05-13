@@ -1,8 +1,50 @@
 
-% SEG_KMEANS  Performs kmeans clustering on a modified feature set.
-%  Uses the technique described in Sipkens and Rogak (2020) 
-%  to segment soot aggregates in TEM images. This requires that image 
-%  annotations / footer information be removed.
+% SEG_KMEANS  Performs k-means clustering on a modified feature set.
+%  
+%  This function applies a k-means segmentation approach following 
+%  Sipkens and Rogak (2021) and using three feature layers: 
+%  
+%  FEATURE 1. a *denoised* version of the image, 
+%  
+%  FEATURE 2. a measure of *texture* in the image, and 
+%  
+%  FEATURE 3. an Otsu-like classified image, with the 
+%  *threshold adjusted* upwards. 
+%  
+%  Compiling these different feature layers results in a three 
+%  layer image (see FEATURE_SET output) that will be used for segmentation. 
+%  This is roughly equivalent to segmenting colour images, if each of 
+%  the layers was assigned a colour. For example, compilation of these 
+%  feature layers for the sample images results in the following feature 
+%  layers and compiled RGB image. More details of the method are 
+%  given in the associated paper (Sipkens and Rogak, 2021). Finally,  
+%  applying Matlab's `imsegkmeans(...)` function, one achieved a 
+%  classified image.
+%  
+%  While this will likely be adequate for many users, the 
+%  technique still occasionally fails, particularly if the 
+%  function does not adequately remove the background. The 
+%  method also has some notable limitations when images are 
+%  (i) *zoomed in* on a single aggregate while (ii) also slightly 
+%  overexposed. 
+%  
+%  The k-means method is associated with configuration files 
+%  (cf., +agg/config/), which include different versions and allow 
+%  for tweaking of the options associated with the method. 
+%  See VERSIONS below for more information. 
+%  
+%  ------------------------------------------------------------------------
+%  
+%  VERSIONS: 
+%   Previous versions, deprecated, used different feature layers and weights.
+%    <strong>6+</strong>:  Three, equally-weighted feature layers as  
+%         described by Sipkens and Rogak (J. Aerosol Sci., 2021). 
+%    <strong>6.1</strong>: Improves the adjusted feature layer 
+%         for clumpy aggregates.
+%    <strong>6.2</strong>: Switches to s-curve fitting for  
+%         computing the adjusted threhold layer.
+%  
+%  ------------------------------------------------------------------------
 % 
 %  IMG_BINARY = agg.seg_kmeans(IMGS) requires an IMGS data structure, with 
 %  a cropped version of the images and the pixel sizes. The output is a 
@@ -24,17 +66,6 @@
 %  [IMG_BINARY,IMG_KMEANS,FEATURE_SET] = agg.seg_kmeans(...) adds an 
 %  additional output for false RGB images with one colour per feature layer 
 %  used by the k-means clustering. 
-%  
-%  ------------------------------------------------------------------------
-%  
-%  VERSION: 
-%   Previous versions, deprecated, used different feature layers and weights.
-%    <strong>6+</strong>:  Three, equally-weighted feature layers as  
-%         described by Sipkens and Rogak (J. Aerosol Sci., 2021). 
-%    <strong>6.1</strong>: Improves the adjusted feature layer 
-%         for clumpy aggregates.
-%    <strong>6.2</strong>: Switches to s-curve fitting for  
-%         computing the adjusted threhold layer.
 %  
 %  ------------------------------------------------------------------------
 %  
