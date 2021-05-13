@@ -1,15 +1,31 @@
 
 % SEG  Sequential attempts at semi-automatic detection of the aggregates on TEM images.
-%           Attempts k-means + rolling ball, Otsu + rolling ball, slider
-%           thresholding. Acts as a wrapper function for implementing 
-%           several other seg*.m methods
-% AUTHOR: Ramin Dastanpour, Steven N. Rogak
-%         Developed at the University of British Columbia
-% MODIFIED: Timothy Sipkens, 2019
-%=========================================================================%
+%  
+%  Multipurpose wrapper function that attempts several methods associated 
+%  with this codebase in sequence, prompting the user after each attempt. 
+%  Specifically, the method attempts : 
+%  
+%  1. The ***k*-means** classifier (following Sipkens and Rogak (2021)), 
+%  prompting the user after segmentation is complete. The user can either 
+%  (*i*) accept the result as is, (*ii*) reject the output altogether and 
+%  move on to the next method, (*iii*) choose to remove particles, or 
+%  (*iv*) add either entirely new particles or add pixels to existing 
+%  particles (which involves skipping ahead to Step 3, using the current 
+%  segmentation as a starting point). 
+%  
+%  2. The **Otsu** classifier, with the same prompts following segmentation. 
+%  
+%  3. Use the GUI-based slider method (the `agg.seg_slider(...)` function 
+%  described below) to produce a largely-manual segmentation. 
+%  
+%  ------------------------------------------------------------------------
+%  
+%  AUTHOR: Timothy Sipkens, 2019 (modified)
+%    Ramin Dastanpour (github.com/rdastanpour), Steven N. Rogak, 2016 (original)
+%    Developed at the University of British Columbia
 
 
-%== WRAPPER FUNCTION ====================================================%
+%== WRAPPER FUNCTION =====================================================%
 %   Used to loop over multiple images. 
 function [imgs_binary] = seg(imgs,pixsize,opts)
 
