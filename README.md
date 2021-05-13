@@ -192,15 +192,21 @@ These images are included with this distribution in the `images/` folder. These 
 
 The main functions implementing aggregate-level semantic segmentation have filenames following the template `agg.seg_*`. In each case, the output primarily consists of binary images of the same size as the original image but where pixels take on logical values: `1` for pixels identified as part of the aggregate `0` for pixels identified as part of the background. 
 
-The functions often take similar inputs, with main argument being `imgs`, which is one of:
+The functions often take similar inputs and provide a binary mask output. As a general template, 
+
+```Matlab
+img_binary = agg.seg_slider_orig(imgs, ...)
+```
+
+ where the `imgs` input is one of:
 
 1. a single image (after any footer or additional information have been removed); 
 3. an `Imgs` structure, containing the image information as fields; or
 3. a cell array of images (again with the footer removed).
 
-Several methods also take `pixsize`, which denotes the size of each pixel in the image. If an `Imgs` structure if provided, this information is expected to be contained in this structure and any `pixsize` input is ignored. Other arguments depend on the function (e.g., optional parameters for the rolling ball transform). 
+and the `img_binary` output is a cell of binary masks. Several methods also take `pixsize`, which denotes the size of each pixel in the image. If an `Imgs` structure if provided, this information is expected to be contained in this structure and any `pixsize` input is ignored. Other arguments depend on the function (e.g., optional parameters for the rolling ball transform). For input arguments relevant to any given method, please refer to function headers and/or definitions. 
 
-The set of available methods is summarized below. 
+Several of the available methods are summarized briefly below. 
 
 ### + **seg_kmeans** / *k*-means segmentation
 
@@ -210,13 +216,13 @@ This function applies a *k*-means segmentation approach following [Sipkens and R
 
 Though, the technique still occasionally fails, particularly if the function does not adequately remove the background. The method also has some notable limitations when images are (i) *zoomed in* on a single aggregate while (ii) also slightly overexposed. The k-means method is associated with configuration files (cf., [+agg/conifg/](https://github.com/tsipkens/atems/tree/master/%2Bagg/config)), which include different versions and allow for tweaking of the options associated with the method. See the `seg_kmeans(...)` function header or type `help agg.seg_kmeans` for more information, including configuration versions and function arguments. 
 
-### + **carboseg** and CNN segmentation 
+### + **carboseg** / Neural network-based segmentation 
 
 This `seg_carboseg(...)` function employs Python to implement a convolutional neural network (CNN) for segmentation as described by [Sipkens et al.][ptech.cnn] Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions by Max Frei ([@maxfrei750](https://github.com/maxfrei750)). The implementation here makes use of the ONNX file output (to be downloaded [here](https://uni-duisburg-essen.sciebo.de/s/J7bS47nZadg4bBH/download)) from that procedure and employs the Python ONNX runtime for execution. Use of this function requires the necessary Python environment as a pre-requisite. 
 
 > We also note that, as of this writing, Matlab does not support the necessary layers to import the ONNX as a native Matlab object. 
 
-#### Setup: Creating the necessary Python environment
+#### **Setup: Creating the necessary Python environment**
 
 If [conda](https://conda.io/en/latest/miniconda.html) is installed, one can use the following procedure to create the necessary Python environment: 
 
@@ -246,7 +252,7 @@ conda env create --file environment-gpu.yml
 
 One must then point to the appropriate alternative Python interpretter. Now, one can apply the CNN, either (*i*) directly through Matlab or (*ii*) by using Matlab in conjunction with a Python IDE. 
 
-#### Segmentation directly using Matlab
+#### **Segmentation directly using Matlab**
 
 To start, the current distribution includes a function to aid in loading the Python environment:
 
@@ -265,7 +271,7 @@ For an implementation of this procedure, see the `main_carboseg` script in the u
 
 > NOTE: If CUDA is available and the batch of images is reasonably large, it may be faster to save the images and run the classification on a GPU in Python directly (again, see the next subsection for this option). 
 
-#### Segmentation using Python (with read/write to Matlab)
+#### **Segmentation using Python (with read/write to Matlab)**
 
 Alternatively, one can save the images, load them in a Python function directly, save the results, and reload the images in Matlab. This can be broken into three steps. First, load the images, as before, and save the cropped images to a folder, `fd_in`, for reading in Python,  
 
@@ -302,7 +308,7 @@ As the technique may be insufficient on its own, this implementation can be comp
 
 ![otsu_rb](docs/otsu_rb.png)
 
-This latter function generally performs better, though the results still often breaks up aggregates and should likely be compliment with some manual adjustments following initial thresholding. The technique generally underperformed relative to the previously mentioned *k*-means method. 
+This latter function generally performs better, though the results are still significantly fragmented. The technique generally underperforms relative to the previously mentioned *k*-means method but acts as a good way to initialize more manual techniques. 
 
 ### + **seg_slider_orig** / GUI-based slider method
 
@@ -314,7 +320,7 @@ The `agg.seg_slider_orig(...)` method is a largely manual technique originally d
 
 The core of this method is that the as the GUI-based slider method described above but sees an overhaul of the user interface. This implementation makes use of Matlab's app builder, requiring newer Matlab versions to use. 
 
-![slider2](docs/slider2_screenshot.png)
+<img src="docs/slider2_screenshot.png" alt="slider2_screenshot" width="500"/>
 
 ### + **seg** / A general segmentation function
 
@@ -332,7 +338,7 @@ The output is a MATLAB structured array, `Aggs`, containing information about th
 
 ## 2.3 rolling_ball
 
-Multiple of these methods make use of the *rolling ball transformation*, applied using the `agg.rolling_ball` function included with this package. This transform fills in gaps inside aggregates, acting as a kind of noise filter. This is accomplished by way iterative morphological opening and closing. 
+Multiple of these methods make use of the **rolling ball transformation**, applied using the `agg.rolling_ball` function included with this package. This transform fills in gaps inside aggregates, acting as a kind of noise filter. This is accomplished by way iterative morphological opening and closing. 
 
 # 3. PRIMARY PARTICLE ANALYSIS PACKAGE (+pp)
 
@@ -369,7 +375,7 @@ The `pp.manual(...)` function can be used to manual draw circles around the soot
 
 This package contains a series of functions that help in visualizing or analyzing the aggregates that transcend multiple methods or functions. We discuss a few examples here and refer the reader to individual functions for more information. 
 
-### + **tools.imshow\*** | Functions to show images
+### + **tools.imshow\*** / Functions to show images
 **
 These functions aid in visualizing the resultant images. For example, 
 
@@ -395,7 +401,7 @@ will plot the overlays in a yellow.
 
 The related `tools.imshow_agg(...)` function will plot the binaries, as above, and add aggregate-level information to the plot, including: (*i*) the aggregate number; (*ii*) the radius of gyration about the center of the aggregate; and (*iii*) the average primary particle diameter, if this information is available (the function will use the `Aggs.dp` field, which will contain primary particle information from the most recently applied method). 
 
-### + **tools.write\*** | Functions to write data to files
+### + **tools.write\*** / Functions to write data to files
 
 This set of functions writes data to files, with the precise format depending on the function. 
 
@@ -431,7 +437,7 @@ f1 = figure(1); f1.WindowState = 'maximized';
 
 to maximize the figure window, to generate higher quality output. 
 
-### + **tools.viz\*** | Functions to visualize post-processed results
+### + **tools.viz\*** / Functions to visualize post-processed results
 
 This set of functions is intended to generate formatted plots of post-processed results. For example, `tools.viz_darho` generates a scatter plot of the area-equivalent diameter versus effective density estimated for each aggregate. 
 
@@ -451,7 +457,9 @@ This program contains very significantly modified versions of the code distribut
 
 Also included with this program is the Matlab code of [Kook et al. (2015)][kook], modified to accommodate the expected inputs and outputs common to the other functions.
 
-This code also contain an adaptation of EDM-SBS method of [Bescond et al. (2014)][bescond]. We thank the authors, in particular Jérôme Yon, for their help in understanding their original [Scilab code and ImageJ plugin](http://www.coria.fr/spip.php?article910). Modifications to allow the method to work directly on binary images (rather than a custom output from ImageJ) and to integrate the method into the Matlab environment may present some minor compatibility issues, but allows use of the aggregate segmentation methods given in the **agg** package. 
+This code also contain an adaptation of **EDM-SBS** method of [Bescond et al. (2014)][bescond]. We thank the authors, in particular Jérôme Yon, for their help in understanding their original [Scilab code and ImageJ plugin](http://www.coria.fr/spip.php?article910). Modifications to allow the method to work directly on binary images (rather than a custom output from ImageJ) and to integrate the method into the Matlab environment may present some minor compatibility issues, but allows use of the aggregate segmentation methods given in the **agg** package. 
+
+The **carboseg** method follows from collaborative work with [Max Frei](https://github.com/maxfrei750) and is associated with [Sipkens et al. (2021)][ptech.cnn]. 
 
 Finally, the progress bar in the function `tools.textbar`, which is used to indicate progress on some of the primary particle sizing techniques, is a modified version of that written by [Samuel Grauer](https://github.com/sgrauer). 
 
@@ -485,7 +493,7 @@ and see the [CarbonBlackSegmentation](https://github.com/maxfrei750/CarbonBlackS
 
 [Sipkens, T. A., Rogak, S. N. (2021). Technical note: Using k-means to identify soot aggregates in transmission electron microscopy images. *Journal of Aerosol Science*, 105699.][jaskmeans]
 
-[Sipkens, T.A., Frei, M., Baldelli, A., Kirchen, P., Kruis, F. E., & Rogak, S. N. (In Press). Characterizing soot in TEM images using a convolutional neural network. Powder Technology.][ptech.cnn]
+[Sipkens, T.A., Frei, M., Baldelli, A., Kirchen, P., Kruis, F. E., & Rogak, S. N. (2021) Characterizing soot in TEM images using a convolutional neural network. Powder Technology.][ptech.cnn]
 
 [Trivanovic, U., Sipkens, T. A., Kazemimanesh, M., Baldelli, A., Jefferson, A. M., Conrad, B. M., Johnson, M. R., Corbin, J. C., Olfert, J. S., & Rogak, S. N. (2020). Morphology and size of soot from gas flares as a function of fuel and water addition. *Fuel*, *279*, 118478.][triv20]
 
