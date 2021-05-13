@@ -1,4 +1,13 @@
 
+"""Function to run carboseg independent of Matlab.
+
+By default, results are read from the carboseg/input folder, 
+requiring that the images be saved in PNG format previously, 
+and written to the carboseg/output folder. 
+
+AUTHOR: Timothy Sipkens, Max Frei, 2020
+"""
+
 import glob
 
 from PIL import Image

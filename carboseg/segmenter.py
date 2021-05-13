@@ -11,6 +11,11 @@ from tqdm import tqdm
 
 
 class Segmenter:
+    """An object used for classifying images.
+    Contains the ONNX refernce and has methods that 
+    take images as an input and output classified masks. 
+    """
+
     def __init__(
         self,
     ):
