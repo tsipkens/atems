@@ -7,7 +7,9 @@
 %  independent aggregates in the image. Applies a pixel size of 1 nm/pixel,
 %  such that results will be given pixels rather than in nm. The output is 
 %  a data structure with one entry per identified aggregate. 
-% 
+%  NOT RECOMMENDED, as orig. image information is not transferred to 
+%  AGGS for subsequent analysis. 
+%  
 %  AGGS = analyze_binary(IMGS_BINARY,IMGS) uses the IMGS data structure to
 %  extract addition properties, such as the cropped image, filename, pixel
 %  size.
