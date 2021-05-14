@@ -52,7 +52,10 @@ if ~exist('pixsize','var'); pixsize = []; end
 if isempty(pixsize); pixsize = ones(size(imgs_binary)); end
 
 if ~exist('imgs','var'); imgs = []; end
-if isempty(imgs); imgs = imgs_binary; end
+if isempty(imgs)
+    imgs = imgs_binary;
+    for ii=1:length(imgs); imgs{ii} = uint8(imgs{ii}); end
+end
 if ~iscell(imgs); imgs = {imgs}; end
 
 if ~exist('fname','var'); fname = []; end
