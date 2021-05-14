@@ -7,7 +7,6 @@
 %  independent aggregates in the image. Applies a pixel size of 1 nm/pixel,
 %  such that results will be given pixels rather than in nm. The output is 
 %  a data structure with one entry per identified aggregate. 
-%  NOT RECOMMENDED. Preferred uses includes PIXSIZE and IMGS. 
 % 
 %  AGGS = analyze_binary(IMGS_BINARY,IMGS) uses the IMGS data structure to
 %  extract addition properties, such as the cropped image, filename, pixel
@@ -54,7 +53,9 @@ if isempty(pixsize); pixsize = ones(size(imgs_binary)); end
 if ~exist('imgs','var'); imgs = []; end
 if isempty(imgs)
     imgs = imgs_binary;
-    for ii=1:length(imgs); imgs{ii} = uint8(imgs{ii}); end
+    for ii=1:length(imgs)
+        imgs{ii} = uint8(155 .* ~imgs{ii} + 100);
+    end
 end
 if ~iscell(imgs); imgs = {imgs}; end
 
