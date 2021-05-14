@@ -16,7 +16,7 @@
 %  AGGS = analyze_binary(IMGS_BINARY,PIXSIZE) uses the pixel size of each
 %  image to determine physical quantities from the aggregates, such as the
 %  projected area-equivalent diameter in nm. 
-%  NOT RECOMMENDED. Preferred uses includes IMGS. 
+%  NOT RECOMMENDED. Preferred use includes IMGS. 
 % 
 %  AGGS = analyze_binary(IMGS_BINARY,PIXSIZE,IMGS) uses the IMGS cell array
 %  containing the original images in plotting and stores the result for
@@ -46,7 +46,6 @@ if isstruct(imgs_binary) % consider case that structure is given as input
 else
     % consider case that a single image is given
     if ~iscell(imgs_binary); imgs_binary = {imgs_binary}; end
-    if ~iscell(imgs); imgs = {imgs}; end
 end
 
 if ~exist('pixsize','var'); pixsize = []; end
@@ -54,6 +53,7 @@ if isempty(pixsize); pixsize = ones(size(imgs_binary)); end
 
 if ~exist('imgs','var'); imgs = []; end
 if isempty(imgs); imgs = imgs_binary; end
+if ~iscell(imgs); imgs = {imgs}; end
 
 if ~exist('fname','var'); fname = []; end
 if isempty(fname); fname = cell(size(imgs_binary)); end
