@@ -95,7 +95,8 @@ for ll = idx % run loop as many times as aggregates selected
     %   Format output and autobackup data ------------------------%
     disp(' Saving temporary data ...');
     Aggs(ll).Pp_manual = Pp(ll); % copy Pp data structure into Aggs
-    Aggs(ll).dp = mean(Pp(ll).dp);
+    Aggs(ll).dp_manual = median(Pp(ll).dp);
+    Aggs(ll).dp = Aggs(ll).dp_manual;
     save(['temp',filesep,'Pp_manual.mat'],'Pp'); % backup Pp
     tools.textdone(2);
     
