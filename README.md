@@ -1,5 +1,4 @@
 <picture>
-  <source srcset="docs/atems_logo_reverse.svg" media="(prefers-color-scheme: dark)">
   <img src="docs/atems_logo.svg" alt= "# ATEMS" width="50%">
 </picture>
 
