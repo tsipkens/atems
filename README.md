@@ -1,5 +1,5 @@
 <picture>
-  <img src="docs/atems_logo.svg" alt= "# ATEMS" width="30%">
+  <img src="docs/atems_logo.svg" alt= "# ATEMS" width="35%">
 </picture>
 
 (Matlab ***A***nalysis tools for ***TEM*** images of ***S***oot)
