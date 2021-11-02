@@ -309,17 +309,15 @@ As the technique may be insufficient on its own, this implementation can be comp
 
 This latter function generally performs better, though the results are still significantly fragmented. The technique generally underperforms relative to the previously mentioned *k*-means method but acts as a good way to initialize more manual techniques. 
 
-### + **seg_slider_orig** / GUI-based slider method
+### + **seg_slider_orig\*** / GUI-based slider methods
 
 The `agg.seg_slider_orig(...)` method is a largely manual technique originally developed by [Ramin Dastanpour](https://github.com/rdastanpour) ([Dastanpour et al., 2016)][dastanpour2016]). The function enacts a GUI-based method with a slider for adaptive, semi-automatic thresholding of the image (*adaptive* in that small sections of the image can be cropped and assigned individually-selected thresholds). It is worth noting that the mostly manual nature of this approach will resulting in variability and subjectiveness between users but that the human input often greatly improves the quality of the segmentations. See the `seg_slider_orig(...)` function header or type `help agg.seg_slider_orig`, including usage. 
 
 > We note that this code saw important bug updates since the original code by [Dastanpour et al. (2016)][dastanpour2016]. This includes fixing how the original code would repeatedly apply a Gaussian filter every time the user interacted with the slider in the GUI (which may cause some backward compatibility issues), a reduction in the use of global variables, memory savings, and other performance improvements. 
 
-### + **seg_slider** / An improved GUI-based slider method
+The core of the `seg_slider(...)` method is the same as the GUI-based slider method described above but sees an overhaul of the user interface. This implementation makes use of MATLAB's app builder, requiring newer MATLAB versions to use. 
 
-The core of this method is that the as the GUI-based slider method described above but sees an overhaul of the user interface. This implementation makes use of MATLAB's app builder, requiring newer MATLAB versions to use. 
-
-<img src="docs/slider2_screenshot.png" alt="slider2_screenshot" width="500"/>
+<img src="docs/slider2_screenshot.png" alt="slider2_screenshot" width="400"/>
 
 ### + **seg** / A general segmentation function
 
