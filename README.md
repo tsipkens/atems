@@ -2,7 +2,7 @@
   <img src="docs/atems_logo.svg" alt= "# ATEMS" width="55%">
 </picture>
 
-(Matlab ***A***nalysis tools for ***TEM*** images of ***S***oot)
+(MATLAB ***A***nalysis tools for ***TEM*** images of ***S***oot)
 
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 [![tsipkens](https://circleci.com/gh/tsipkens/atems.svg?style=shield)]() 
@@ -11,9 +11,25 @@
   <img width="350" src="docs/header.png">
 </p>
 
+#### In this README
+
+[A. Dependencies](#dependencies): What do I need to run this codebase? 
+
+[B. Getting started](#getting-started): Walking through a sample code
+
+[C. Components](#1-main-scripts-main_): Details on the structure of this codebase
+
+- [1. Main scripts (main_\*)](#1-main-scripts-main_): Testing the codebase
+- [2. Aggregate segmentation package (+agg)](#2-aggregate-segmentation-package-agg)
+  - [carboseg](#-carboseg--neural-network-based-segmentation): Using a Python-based neural network
+- [3. Primary particle analysis package (+pp)](#3-primary-particle-analysis-package-pp)
+- [4. Additional tools package (+tools)](#4-additional-tools-package-tools)
+
+[D. Backmatter](#contributors-and-acknowledgements): Contributors, acknowledgements, how to cite, and references
+
 ---------
 
-This codebase contains Matlab code for several methods of characterizing soot aggregates in TEM images. This includes methods for evaluating the aggregate projected area, perimeter, and primary particle diameter. Methods include Otsu thresholding, the pair correlation method (PCM), Hough circle transform (following [Kook et al. (2015)](kook)), and tools to aid in manual analysis. This code is designed to replace a [previous, deprecated code](https://github.com/unatriva/UBC-PCM). 
+This codebase contains MATLAB code for several methods of characterizing soot aggregates in TEM images. This includes methods for evaluating the aggregate projected area, perimeter, and primary particle diameter. Methods include Otsu thresholding, the pair correlation method (PCM), Hough circle transform (following [Kook et al. (2015)](kook)), the Euclidean distance mapping, scale-based analysis (EDM-SBS) method of [Bescond et al. (2014)][bescond], and tools to aid in manual analysis. This code is designed to replace a [previous, deprecated code](https://github.com/unatriva/UBC-PCM). 
 
 **Testing** of this codebase makes use of the `main_*` functions in the upper directory, which are described in [1. MAIN SCRIPTS (main_\*)](#1-main-scripts-main_) below. Specifically, `main_kmeans` and `main_auto` test the fully automated methods, while `main_0` allows for testing of the more manual methods (which require substantial user input). 
 
@@ -25,31 +41,9 @@ The program is primarily composed of two analysis packages, which will be discus
 
 This code also includes a set of utility functions in the **+tools** package and Python code necessary to implement a convolutional neural network used for segmentation in the [carboseg](https://github.com/tsipkens/atems/tree/master/carboseg) folder. 
 
-# Table of contents
+# A. Dependencies
 
-[Dependencies](#dependencies)
-
-[Getting started](#getting-started): Walking through a sample code
-
-[Components](#1-main-scripts-main_)
-
-- [1. Main scripts (main_\*)](#1-main-scripts-main_): Testing the codebase
-
-- [2. Aggregate segmentation package (+agg)](#2-aggregate-segmentation-package-agg)
-
-- [3. Primary particle analysis package (+pp)](#3-primary-particle-analysis-package-pp)
-
-- [4. Additional tools package (+tools)](#4-additional-tools-package-tools)
-
-[Contributors and acknowledgements](#contributors-and-acknowledgements)
-
-[How to cite](#how-to-cite)
-
-[References](#references)
-
-# Dependencies
-
-This software was tested using Matlab 2020a (though most functions have been validated against older versions) and depends on the following Matlab toolboxes: 
+This software was tested using MATLAB 2020a (though most functions have been validated against older versions) and depends on the following MATLAB toolboxes: 
 
 1. the curve fitting toolbox, 
 2. the financial toolbox, 
@@ -57,7 +51,7 @@ This software was tested using Matlab 2020a (though most functions have been val
 4. the optimization toolbox, and 
 5. the video and image blockset. 
 
-If not already installed, these packages can be added to Matlab via the instructions available on [Matlab's website](https://www.mathworks.com/help/matlab/matlab_env/get-add-ons.html). 
+If not already installed, these packages can be added to MATLAB via the instructions available on [MATLAB's website](https://www.mathworks.com/help/matlab/matlab_env/get-add-ons.html). 
 
 This program also has an *optional* submodule that adds support for perceptually uniform colormaps compiled from various sources and available at https://github.com/tsipkens/cmap. It can be added via git using
 
@@ -70,7 +64,7 @@ The submodule is not necessary for any of the scripts or methods included with t
 
 Additional dependencies are required for use of the **[carboseg](https://github.com/tsipkens/atems/tree/master/carboseg)** or convolutional neureal network component of this program, including a copy of Python. See the appropriate [section below](#+-carboseg-and-cnn-segmentation) for more information. 
 
-# Getting started
+# B. Getting started
 
 The overall structure of scripts associated with this code can be broken down into three steps. 
 
@@ -80,7 +74,7 @@ The overall structure of scripts associated with this code can be broken down in
 
 The first step in the image analysis process is to import images. Images can be handled in one of two ways. 
 
-The first is as a Matlab structure, with one entry in the structure for each image loaded. To generate this structure, one can use the `tools.load_imgs(...)` function, either giving a folder name as an input or no argument (to use a file explorer). To use the test images:
+The first is as a MATLAB structure, with one entry in the structure for each image loaded. To generate this structure, one can use the `tools.load_imgs(...)` function, either giving a folder name as an input or no argument (to use a file explorer). To use the test images:
 
 ```Matlab
 Imgs = tools.load_imgs('images');  % load the images
@@ -112,9 +106,9 @@ We note that detecting the footer and pixel size (or scale) uses the `detect_foo
 help tools.ui_scale_bar;
 ```
 
-on the Matlab command line for more information on that function. 
+on the MATLAB command line for more information on that function. 
 
-> NOTE: At the moment, this approach will load all of the images into memory. For computers with less memory, this could restrict the number of images that can be analyzed at one time. Batches of 250 images have been run successfully on a computer with 16 GB of RAM (Matlab limits memory usage to below this value). A simple work around is to load the images in groups, rather than all at once, and then add an outer loop to proceed through the different groups. The `tools.load_imgs(fd, n)` function is equipped to handle this, passing the second, optional argument `n` as the integer range of images to load into memory. For example, `n = 1:3` will load the first three images from the set specified by `fd`. 
+> NOTE: At the moment, this approach will load all of the images into memory. For computers with less memory, this could restrict the number of images that can be analyzed at one time. Batches of 250 images have been run successfully on a computer with 16 GB of RAM (MATLAB limits memory usage to below this value). A simple work around is to load the images in groups, rather than all at once, and then add an outer loop to proceed through the different groups. The `tools.load_imgs(fd, n)` function is equipped to handle this, passing the second, optional argument `n` as the integer range of images to load into memory. For example, `n = 1:3` will load the first three images from the set specified by `fd`. 
 
 ### STEP 2: Aggregate-level segmentation
 
@@ -173,7 +167,9 @@ tools.imshow_agg(Aggs);
 
 The inner circle in this plot now indicates the primary particle size from PCM, the larger circle the radius of gyration from *k*-means, and the number indicating the index used by the program to identify each aggregate. Images produced using this type of procedure will feature heavily in the remainder of this README. 
 
-# 1. MAIN SCRIPTS (main_\*)
+# C. Components
+
+## 1. MAIN SCRIPTS (main_\*)
 
 The main scripts demonstrate further use of the code for specific scenarios and are provided to **test the codebase**. Three such scripts are included: 
 
@@ -181,15 +177,15 @@ The main scripts demonstrate further use of the code for specific scenarios and 
 
 **main_auto** runs through most of the fully automated techniques provided with this program (e.g., *k*-means, Otsu, PCM, etc.), applying them to the images provided in the [images](https://github.com/tsipkens/atems/tree/master/images) folder. The binary images produced by each method are overlaid on the original images for inspection by the user. Outputs are similar to those presented in [Section 2](#2-aggregate-segmentation-package-agg) below. 
 
-**main_0** script presents use of the `agg.seg(...)` general segmentation function, described [below](#a-general-segmentation-function-seg), as well as how to read in one's own images. At the end of the script, data is written to an Excel file for examination external to Matlab. Note that this requires that the user's images be formatted appropriately, either with a horizontal footer below the TEM image that has a white background or a cropped TEM image, in which case the user will have to provide pixel size information. Sample images on which the method have been tested are again found in the  [images](https://github.com/tsipkens/atems/tree/master/images) folder. 
+**main_0** script presents use of the `agg.seg(...)` general segmentation function, described [below](#a-general-segmentation-function-seg), as well as how to read in one's own images. At the end of the script, data is written to an Excel file for examination external to MATLAB. Note that this requires that the user's images be formatted appropriately, either with a horizontal footer below the TEM image that has a white background or a cropped TEM image, in which case the user will have to provide pixel size information. Sample images on which the method have been tested are again found in the  [images](https://github.com/tsipkens/atems/tree/master/images) folder. 
 
-# 2. AGGREGATE SEGMENTATION PACKAGE (+agg)
+## 2. AGGREGATE SEGMENTATION PACKAGE (+agg)
 
 This package contains an expandable library of functions aimed at performing semantic segmentation of the TEM images into aggregate and background regions. Functions are accessed by appending `agg.` to the function name, e.g., `agg.seg_kmeans(...)` to call the *k*-means segmentation procedure. 
 
 These images are included with this distribution in the `images/` folder. These images represent soot collected from a lab-scale flare ([Trivanovic et al., 2020][triv20]) and a diesel engine ([Kheirkhah et al., 2020][kheirkhah20]). 
 
-## 2.1 agg.seg\* functions
+### 2.1 agg.seg\* functions
 
 The main functions implementing aggregate-level semantic segmentation have filenames following the template `agg.seg_*`. In each case, the output primarily consists of binary images of the same size as the original image but where pixels take on logical values: `1` for pixels identified as part of the aggregate `0` for pixels identified as part of the background. 
 
@@ -221,7 +217,7 @@ Though, the technique still occasionally fails, particularly if the function doe
 
 This `seg_carboseg(...)` function employs Python to implement a convolutional neural network (CNN) for segmentation as described by [Sipkens et al.][ptech.cnn] Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions by Max Frei ([@maxfrei750](https://github.com/maxfrei750)). The implementation here makes use of the ONNX file output (to be downloaded [here](https://uni-duisburg-essen.sciebo.de/s/J7bS47nZadg4bBH/download)) from that procedure and employs the Python ONNX runtime for execution. Use of this function requires the necessary Python environment as a pre-requisite. 
 
-> We also note that, as of this writing, Matlab does not support the necessary layers to import the ONNX as a native Matlab object. 
+> We also note that, as of this writing, MATLAB does not support the necessary layers to import the ONNX as a native MATLAB object. 
 
 #### **Setup: Creating the necessary Python environment**
 
@@ -235,7 +231,7 @@ If [conda](https://conda.io/en/latest/miniconda.html) is installed, one can use 
 cd [path]/carboseg
 ```
 
-where `[path]` is the path the parent Matlab repository. 
+where `[path]` is the path the parent MATLAB repository. 
 
 **3.** Create a new Python environment using the `environment.yml` file included in that directory, using:
 
@@ -251,9 +247,9 @@ Alternatively, one can set up an environment to take advantage of a GPU. The exa
 conda env create --file environment-gpu.yml
 ```
 
-One must then point to the appropriate alternative Python interpretter. Now, one can apply the CNN, either (*i*) directly through Matlab or (*ii*) by using Matlab in conjunction with a Python IDE. 
+One must then point to the appropriate alternative Python interpretter. Now, one can apply the CNN, either (*i*) directly through MATLAB or (*ii*) by using MATLAB in conjunction with a Python IDE. 
 
-#### **Segmentation directly using Matlab**
+#### **Segmentation directly using MATLAB**
 
 To start, the current distribution includes a function to aid in loading the Python environment:
 
@@ -268,13 +264,13 @@ Finally, the user can use the `agg.seg_carboseg(...)` function in a similar fash
 
 For an implementation of this procedure, see the `main_carboseg` script in the upper directory of this repository.
 
-> NOTE: There are known issues with the Matlab calls to Python, including freezing indefinitely in the `seg_carboseg(...)` function call and Python environment errors. Potential workaround for the freezing/hanging is to add a debug point in the `seg_carbonseg(...)` function near the top of the file or to restart Matlab and run the scripts in a new session. In these instances, it may be better to save pre-processed images (with footer cropped), run the code in Python, and reload the images into Matlab. See the next subsection for this option. 
+> NOTE: There are known issues with the MATLAB calls to Python, including freezing indefinitely in the `seg_carboseg(...)` function call and Python environment errors. Potential workaround for the freezing/hanging is to add a debug point in the `seg_carbonseg(...)` function near the top of the file or to restart MATLAB and run the scripts in a new session. In these instances, it may be better to save pre-processed images (with footer cropped), run the code in Python, and reload the images into MATLAB. See the next subsection for this option. 
 
 > NOTE: If CUDA is available and the batch of images is reasonably large, it may be faster to save the images and run the classification on a GPU in Python directly (again, see the next subsection for this option). 
 
-#### **Segmentation using Python (with read/write to Matlab)**
+#### **Segmentation using Python (with read/write to MATLAB)**
 
-Alternatively, one can save the images, load them in a Python function directly, save the results, and reload the images in Matlab. This can be broken into three steps. First, load the images, as before, and save the cropped images to a folder, `fd_in`, for reading in Python,  
+Alternatively, one can save the images, load them in a Python function directly, save the results, and reload the images in MATLAB. This can be broken into three steps. First, load the images, as before, and save the cropped images to a folder, `fd_in`, for reading in Python,  
 
 ```Matlab
 % Load images (here using the 'images' folder).
@@ -284,13 +280,13 @@ fnames = {Imgs.fname};  % also extract file names
 agg.seg_ext(imgs, fnames, fd_in);  % save the images to `fd` folder
 ```
 
-Second, in a Python IDE, one can now run the `main.py` script in the [carboseg](https://github.com/tsipkens/atems/tree/master/carboseg) folder, editing the script to point to the appropriate folder where Matlab saved the cropped images from the previous step. Finally, one can return to Matlab and read in processed images using the `agg.seg_cnn_pt2(...)` method, 
+Second, in a Python IDE, one can now run the `main.py` script in the [carboseg](https://github.com/tsipkens/atems/tree/master/carboseg) folder, editing the script to point to the appropriate folder where MATLAB saved the cropped images from the previous step. Finally, one can return to MATLAB and read in processed images using the `agg.seg_cnn_pt2(...)` method, 
 
 ```Matlab
 imgs_binary = agg.seg_cnn_pt2(fnames, fd_out, pixsizes)
 ```
 
-where `fd_out` is the new folder containing the classified binaries from Python. The `imgs_binary` contains a cell of binary images, matching the other classifiers here. Note that the image file name should be made consistent between calls, such that the images can be appropriately matched when transitioning back and forth between Matlab and Python. One can now proceed with post-processing analogous to the other classifiers. 
+where `fd_out` is the new folder containing the classified binaries from Python. The `imgs_binary` contains a cell of binary images, matching the other classifiers here. Note that the image file name should be made consistent between calls, such that the images can be appropriately matched when transitioning back and forth between MATLAB and Python. One can now proceed with post-processing analogous to the other classifiers. 
 
 For an implementation of this procedure, see the `main_carboseg_ext` script in the upper directory of this repository.
 
@@ -319,7 +315,7 @@ The `agg.seg_slider_orig(...)` method is a largely manual technique originally d
 
 ### + **seg_slider** / An improved GUI-based slider method
 
-The core of this method is that the as the GUI-based slider method described above but sees an overhaul of the user interface. This implementation makes use of Matlab's app builder, requiring newer Matlab versions to use. 
+The core of this method is that the as the GUI-based slider method described above but sees an overhaul of the user interface. This implementation makes use of MATLAB's app builder, requiring newer MATLAB versions to use. 
 
 <img src="docs/slider2_screenshot.png" alt="slider2_screenshot" width="500"/>
 
@@ -327,7 +323,7 @@ The core of this method is that the as the GUI-based slider method described abo
 
 The `agg.seg(...)` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. Specifically, the method attempts (*i*) the *k*-means classifier, (*ii*) followed by the Otsu classifier, and finally (*iii*) reverts to using the slider method. This is repeated until the user has classified all of the images that were passed to the function. 
 
-## 2.2 analyze_binary
+### 2.2 analyze_binary
 
 All of the above methods produce a common output: a binary image. The `agg.analyze_binary(...)` function is now used to convert these binaries to aggregate characteristics, such as area in pixels, radius of gyration, area-equivalent diameter, aspect ratio, among other quantities. The function itself takes a binary image, the original image, and the pixel size as inputs, as follows. 
 
@@ -337,11 +333,11 @@ Aggs = agg.analyze_binary(imgs_binary, imgs, pixsize, fname);
 
 The output is a MATLAB structured array, `Aggs`, containing information about the aggregate. The array has one entry for each aggregate found in the image, which is itself defined as any independent groupings of pixels. The `fname` argument is optional and adds this tag to the information in the output `Aggs` structure. 
 
-## 2.3 rolling_ball
+### 2.3 rolling_ball
 
 Multiple of these methods make use of the **rolling ball transformation**, applied using the `agg.rolling_ball` function included with this package. This transform fills in gaps inside aggregates, acting as a kind of noise filter. This is accomplished by way iterative morphological opening and closing. 
 
-# 3. PRIMARY PARTICLE ANALYSIS PACKAGE (+pp)
+## 3. PRIMARY PARTICLE ANALYSIS PACKAGE (+pp)
 
 The +pp package contains multiple methods for determining the primary particle size of the aggregates of interest. Often this requires a binary mask of the image that can be generated using the +agg package methods. After applying most of the methods, the primary particle size will be stored in (*i*) the `Aggs.dp` field and (*ii*) another `Aggs` field with additional information specifying the method used (e.g., `Aggs.dp_pcm1`  contains a PCM-derived primary particle diameter). For the former, whichever method was last used will overwrite the `Aggs.dp` field, which then acts as a default value that is used by other functions (by the `tools.imshow_agg(...)` function). 
 
@@ -351,7 +347,7 @@ The `pp.pcm` function contains code for the University of British Columbia's pai
 
 ### + **edm_sbs** / EDM-SBS
 
-The Euclidean distance mapping, scale-based analysis (EDM-SBS) of [Bescond et al. (2014)][bescond] is implement in the `pp.edm_sbs(...)` function. This is an adaptation of the original code for use with Matlab and using the binaries above in the place of output from imageJ. As such, some minor differences in output should be expected (which are challenging to compare, as the ImageJ output does not have a direct analog here). The method remains true to how it is described in [Bescond et al.][bescond] and ports some components from the original Scilab code (version 3, available [here](http://www.coria.fr/spip.php?article910)). 
+The Euclidean distance mapping, scale-based analysis (EDM-SBS) of [Bescond et al. (2014)][bescond] is implement in the `pp.edm_sbs(...)` function. This is an adaptation of the original code for use with MATLAB and using the binaries above in the place of output from imageJ. As such, some minor differences in output should be expected (which are challenging to compare, as the ImageJ output does not have a direct analog here). The method remains true to how it is described in [Bescond et al.][bescond] and ports some components from the original Scilab code (version 3, available [here](http://www.coria.fr/spip.php?article910)). 
 
 Among the changes to the original EDM-SBS code, this implementation also applies the EDM-SBS method to individual aggregates. While this allows for a better comparison to the other methods here, the method was originally intended to evaluate the primary particle size distribution across a range of aggregates, with uncertaintainty ramifications. However, the linear nature of the curves generated by the method means that the overall EDM-SBS curve is simply approximated by the superposition of all of the aggregates. This is also output by the present code.  
 
@@ -372,7 +368,7 @@ Here, red circles are identified as part of an aggregate, while black circles ar
 The `pp.manual(...)` function can be used to manual draw circles around the soot primary particles. The code was developed at the University of British Columbia and represents a heavily modified version of the code associated with [Dastanpour and Rogak (2014)][dastanpour2014]. The current method uses two lines overlaid on each primary particle to select the length and width of the particle. This is converted to various quantities, such as the center of each primary particle and the overall mean primary particle diameter. 
 
 
-# 4. ADDITIONAL TOOLS PACKAGE (+tools)
+## 4. ADDITIONAL TOOLS PACKAGE (+tools)
 
 This package contains a series of functions that help in visualizing or analyzing the aggregates that transcend multiple methods or functions. We discuss a few examples here and refer the reader to individual functions for more information. 
 
@@ -444,6 +440,8 @@ This set of functions is intended to generate formatted plots of post-processed 
 
 --------------------------------------------------------------------------
 
+# D. Back matter
+
 #### License
 
 This software is relaesed under an MIT license (see the corresponding license file for details).
@@ -456,9 +454,9 @@ Pieces of this code were adapted from various sources and features snippets writ
 
 This program contains very significantly modified versions of the code distributed with [Dastanpour et al. (2016)][dastanpour2016]. The most recent version of the Dastanpour et al. code prior to this overhaul is available at https://github.com/unatriva/UBC-PCM (which itself presents a minor update from the original). That code forms the basis for some of the methods underlying the manual processing and the PCM method used in this code, as noted in the README above. However, significant optimizations have improved code legibility, performance, and maintainability (e.g., the code no longer uses global variables). 
 
-Also included with this program is the Matlab code of [Kook et al. (2015)][kook], modified to accommodate the expected inputs and outputs common to the other functions.
+Also included with this program is the MATLAB code of [Kook et al. (2015)][kook], modified to accommodate the expected inputs and outputs common to the other functions.
 
-This code also contain an adaptation of **EDM-SBS** method of [Bescond et al. (2014)][bescond]. We thank the authors, in particular Jérôme Yon, for their help in understanding their original [Scilab code and ImageJ plugin](http://www.coria.fr/spip.php?article910). Modifications to allow the method to work directly on binary images (rather than a custom output from ImageJ) and to integrate the method into the Matlab environment may present some minor compatibility issues, but allows use of the aggregate segmentation methods given in the **agg** package. 
+This code also contain an adaptation of **EDM-SBS** method of [Bescond et al. (2014)][bescond]. We thank the authors, in particular Jérôme Yon, for their help in understanding their original [Scilab code and ImageJ plugin](http://www.coria.fr/spip.php?article910). Modifications to allow the method to work directly on binary images (rather than a custom output from ImageJ) and to integrate the method into the MATLAB environment may present some minor compatibility issues, but allows use of the aggregate segmentation methods given in the **agg** package. 
 
 The **carboseg** method follows from collaborative work with [Max Frei](https://github.com/maxfrei750) and is associated with [Sipkens et al. (2021)][ptech.cnn]. 
 
