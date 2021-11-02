@@ -73,9 +73,9 @@ where `fd_out` is the new folder containing the classified binaries from Python.
 
 For an implementation of this procedure, see the `main_carboseg_ext` script in the upper directory of this repository.
 
-### Reference
+#### Reference
 
 [Sipkens, T.A., Frei, M., Baldelli, A., Kirchen, P., Kruis, F. E., & Rogak, S. N. (2021) Characterizing soot in TEM images using a convolutional neural network. Powder Technology.][ptech.cnn]
 
-[ptech.cnn]: https://doi.org/10.1016/j.powtec.2021.04.026 
+[ptech.cnn]: https://doi.org/10.1016/j.powtec.2021.04.026
 
