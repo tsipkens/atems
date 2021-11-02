@@ -13,11 +13,11 @@
 
 #### In this README
 
-[A. Dependencies](#dependencies): What do I need to run this codebase? 
+[A. Dependencies](#a-dependencies): What do I need to run this codebase? 
 
-[B. Getting started](#getting-started): Walking through a sample code
+[B. Getting started](#b-getting-started): Walking through a sample code
 
-[C. Components](#1-main-scripts-main_): Details on the structure of this codebase
+[C. Components](#c-components): Details on the structure of this codebase
 
 - [1. Main scripts (main_\*)](#1-main-scripts-main_): Testing the codebase
 - [2. Aggregate segmentation package (+agg)](#2-aggregate-segmentation-package-agg)
@@ -25,7 +25,7 @@
 - [3. Primary particle analysis package (+pp)](#3-primary-particle-analysis-package-pp)
 - [4. Additional tools package (+tools)](#4-additional-tools-package-tools)
 
-[D. Backmatter](#contributors-and-acknowledgements): Contributors, acknowledgements, how to cite, and references
+[D. Backmatter](#d-contributors-and-acknowledgements): Contributors, acknowledgements, how to cite, and references
 
 ---------
 
