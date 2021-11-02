@@ -10,6 +10,7 @@
 <p align="left">
   <img width="350" src="docs/header.png">
 </p>
+
 ------
 
 This codebase contains MATLAB code for several methods of characterizing soot aggregates in TEM images. This includes methods for evaluating the aggregate projected area, perimeter, and primary particle diameter. Methods include Otsu thresholding, the pair correlation method (PCM), Hough circle transform (following [Kook et al. (2015)](kook)), the Euclidean distance mapping, scale-based analysis (EDM-SBS) method of [Bescond et al. (2014)][bescond], and tools to aid in manual analysis. This code is designed to replace a [previous, deprecated code](https://github.com/unatriva/UBC-PCM). 
@@ -24,7 +25,7 @@ The program is primarily composed of two analysis packages, which will be discus
 
 This code also includes a set of utility functions in the **+tools** package and Python code necessary to implement a convolutional neural network used for segmentation in the [carboseg](https://github.com/tsipkens/atems/tree/master/carboseg) folder. 
 
-#### In this README
+### In this README
 
 [A. Dependencies](#a-dependencies): What do I need to run this codebase? 
 
@@ -438,8 +439,6 @@ to maximize the figure window, to generate higher quality output.
 ### + **tools.viz\*** / Functions to visualize post-processed results
 
 This set of functions is intended to generate formatted plots of post-processed results. For example, `tools.viz_darho` generates a scatter plot of the area-equivalent diameter versus effective density estimated for each aggregate. 
-
---------------------------------------------------------------------------
 
 # D. Back matter
 
