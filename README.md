@@ -168,6 +168,8 @@ The inner circle in this plot now indicates the primary particle size from PCM, 
 
 # C. Components
 
+This section provides details of the overall structure of this codebase and the methods available for characterization of soot aggregates in TEM images. 
+
 ## 1. MAIN SCRIPTS (main_\*)
 
 The main scripts demonstrate further use of the code for specific scenarios and are provided to **test the codebase**. Three such scripts are included: 
