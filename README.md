@@ -33,7 +33,7 @@ This code also includes a set of utility functions in the **+tools** package and
 
 [C. Components](#c-components): Details on the structure of this codebase
 
-- [1. Main scripts (main_\*)](#1-main-scripts-main_testing-the-codebase): Testing the codebase
+- [1. Main scripts (main_\*)](#1-main-scripts-main_-testing-the-codebase): Testing the codebase
 - [2. Aggregate segmentation package (+agg)](#2-aggregate-segmentation-package-agg)
   - [carboseg](#-carboseg--neural-network-based-segmentation): Using a Python-based neural network
 - [3. Primary particle analysis package (+pp)](#3-primary-particle-analysis-package-pp)
@@ -377,7 +377,7 @@ This software is relaesed under an MIT license (see the corresponding license fi
 
 #### Contributors and acknowledgements
 
-This code was primarily compiled by Timothy A. Sipkens while at the University of British Columbia (UBC), who can be contacted at [tsipkens@mail.ubc.ca](mailto:tsipkens@mail.ubc.ca). 
+This code was primarily compiled by Timothy A. Sipkens while at the University of British Columbia (UBC), who can be contacted at [tsipkens@mail.ubc.ca](mailto:tsipkens@mail.ubc.ca). Other direct contributors include [Hamed Nikookar](https://github.com/Hamed-NKR) and [Darwin Zhu](https://github.com/darwinz7). 
 
 Pieces of this code were adapted from various sources and features snippets written by several individuals at UBC, including [Ramin Dastanpour](https://github.com/rdastanpour), [Una Trivanovic](https://github.com/unatriva), Alberto Baldelli, Yiling Kang, Yeshun (Samuel) Ma, and Steven Rogak, among others.
 
