@@ -33,7 +33,7 @@ This code also includes a set of utility functions in the **+tools** package and
 
 [C. Components](#c-components): Details on the structure of this codebase
 
-- [1. Main scripts (main_\*)](#1-main-scripts-main_): Testing the codebase
+- [1. Main scripts (main_\*)](#1-main-scripts-main_testing-the-codebase): Testing the codebase
 - [2. Aggregate segmentation package (+agg)](#2-aggregate-segmentation-package-agg)
   - [carboseg](#-carboseg--neural-network-based-segmentation): Using a Python-based neural network
 - [3. Primary particle analysis package (+pp)](#3-primary-particle-analysis-package-pp)
@@ -171,7 +171,7 @@ The inner circle in this plot now indicates the primary particle size from PCM, 
 
 This section provides details of the overall structure of this codebase and the methods available for characterization of soot aggregates in TEM images. 
 
-## 1. MAIN SCRIPTS (main_\*)
+## 1. MAIN SCRIPTS (main_\*): Testing the codebase
 
 The main scripts demonstrate further use of the code for specific scenarios and are provided to **test the codebase**. Three such scripts are included: 
 
