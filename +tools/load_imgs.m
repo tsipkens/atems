@@ -180,18 +180,17 @@ for jj=1:length(Imgs)
         Imgs(jj).ocr = o1;
 
         % Look for pixel size.
-        txts = {'nm/pix', 'nmlpix', 'pm/pix', 'pmlpix', ...
-            'nm/plx', 'nm/101x', ...
-            'um/pix', 'um/plx', 'um/101x'};
+        txts = {'nm/pix', 'nmlpix', 'nm/plx', 'nm/101x',...
+            'um/pix', 'umlpix','um/plx', 'um/101x',...
+            'pm/pix', 'pmlpix','pm/plx', 'pm/101x'};
         
         for kk = 1:length(txts)
             pixsize_end = strfind(o1.Text, txts(kk)) - 1;
             if ~isempty(pixsize_end)
                 % Mark if unit read is not nm.
-                if contains(txts(kk), 'um')
+                if or(contains(txts(kk), 'um'), ...
+                        contains(txts(kk), 'pm'))
                     f_nm = 0;
-                elseif contains(txts(kk), 'pm')
-                    f_nm = 2;
                 end
                 break;
             end
@@ -205,7 +204,7 @@ for jj=1:length(Imgs)
              'Cal"', 'cal"', 'Ca1"', 'ca1"', 'CaI"', 'caI"',...
              'Cal ', 'cal ', 'Ca1 ', 'ca1 ', 'CaI ', 'caI ',};
         
-         % Check if one can find any of the above strings.
+        % Check if one can find any of the above strings.
         for kk = 1:length(txts2)
             pixsize_start = strfind(o1.Text, txts2(kk)) + 5;
             if ~isempty(pixsize_start)
@@ -220,7 +219,7 @@ for jj=1:length(Imgs)
             while isempty(pixsize_start)
                 if isnan(str2double(o1.Text(pixpick))) &&...
                         (o1.Text(pixpick - 2) == ' ') ||...
-                        (o1.Text(pixpick - 2) == newline)  % search for newline of space
+                        (o1.Text(pixpick - 2) == newline)  % search for newline or space
                         pixsize_start = pixpick - 1;
                         break;
                 end
@@ -263,11 +262,9 @@ for jj=1:length(Imgs)
         
         % Finally, convert formatted text to a number.
         Imgs(jj).pixsize = str2double(o1_Text);
-
+        
         % Convert pixsize to nm.
         if f_nm == 0  % if given in micrometers
-            Imgs(jj).pixsize = Imgs(jj).pixsize / 1e3;
-        elseif f_nm == 2  % if given in picometers
             Imgs(jj).pixsize = Imgs(jj).pixsize * 1e3;
         end
         
