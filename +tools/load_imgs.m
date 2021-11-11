@@ -234,30 +234,34 @@ for jj=1:length(Imgs)
             o1_Text = strrep(o1_Text, 'o', '0');
             o1_Text = strrep(o1_Text, 'O', '0');
             o1_Text = strrep(o1_Text, '‘', '');
+            
             I_chk = strfind(o1_Text, 'I');
-            if I_chk == 2
-                o1_Text = strrep(o1_Text, 'I', '.');
-            else
-                o1_Text = strrep(o1_Text, 'I', '1');
+            if any(I_chk == 2)
+                o1_Text(I_chk(I_chk == 2)) =...
+                    strrep(o1_Text(I(I_chk == 2)), 'I', '.');
             end
+            o1_Text = strrep(o1_Text, 'I', '1');
+            
             l_chk = strfind(o1_Text, 'l');
-            if l_chk == 2
-                o1_Text = strrep(o1_Text, 'l', '.');
-            else
-                o1_Text = strrep(o1_Text, 'l', '1');
+            if any(l_chk == 2)
+                o1_Text(l_chk(l_chk == 2)) =...
+                    strrep(o1_Text(l(l_chk == 2)), 'l', '.');
             end
+            o1_Text = strrep(o1_Text, 'l', '1');
+            
             T_chk = strfind(o1_Text, 'T');
-            if T_chk == 2
-                o1_Text = strrep(o1_Text, 'T', '.');
-            else
-                o1_Text = strrep(o1_Text, 'T', '1');
+            if any(T_chk == 2)
+                o1_Text(T_chk(T_chk == 2)) =...
+                    strrep(o1_Text(T(T_chk == 2)), 'T', '.');
             end
+            o1_Text = strrep(o1_Text, 'T', '1');
+            
             spc_chk = strfind(o1_Text, ' ');
-            if spc_chk == 2
-                o1_Text = strrep(o1_Text, ' ', '.');
-            else
-                o1_Text = strrep(o1_Text, ' ', '');
+            if any(spc_chk == 2)
+                o1_Text(spc_chk(spc_chk == 2)) =...
+                    strrep(o1_Text(spc_chk(spc_chk == 2)), ' ', '.');
             end
+            o1_Text = strrep(o1_Text, ' ', '');
         end
         
         % Finally, convert formatted text to a number.
