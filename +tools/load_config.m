@@ -2,7 +2,7 @@
 % LOAD_CONFIG  Loads settings from configuration file (YML, YAML, or JSON). 
 %  
 %  Files are loaded in order supplied, overwriting properties where
-%  relevant. 
+%  relevant (e.g., in selecting the setting for k-means segmentation).
 %  
 %  AUTHOR: Timothy Sipkens, 2021-03-25
 

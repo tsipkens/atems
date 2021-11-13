@@ -262,7 +262,7 @@ The core of the `seg_slider(...)` method is the same as the GUI-based slider met
 
 The `agg.seg(...)` function is a general, multipurpose wrapper function that attempts several methods listed here in sequence, prompting the user after each attempt. Specifically, the method attempts (*i*) the *k*-means classifier, (*ii*) followed by the Otsu classifier, and finally (*iii*) reverts to using the slider method. This is repeated until the user has classified all of the images that were passed to the function. 
 
-### 2.2 analyze_binary
+### 2.2 analyze_binary / Getting particle properties
 
 All of the above methods produce a common output: a binary image. The `agg.analyze_binary(...)` function is now used to convert these binaries to aggregate characteristics, such as area in pixels, radius of gyration, area-equivalent diameter, aspect ratio, among other quantities. The function itself takes a binary image, the original image, and the pixel size as inputs, as follows. 
 
@@ -272,9 +272,9 @@ Aggs = agg.analyze_binary(imgs_binary, pixsize, imgs, fname);
 
 The output is a MATLAB structured array, `Aggs`, containing information about the aggregate. The array has one entry for each aggregate found in the image, which is itself defined as any independent groupings of pixels. The `fname` argument is optional and adds this tag to the information in the output `Aggs` structure. 
 
-### 2.3 rolling_ball
+### 2.3 rolling_ball / Apply a rolling ball transformation
 
-Multiple of these methods make use of the **rolling ball transformation**, applied using the `agg.rolling_ball` function included with this package. This transform fills in gaps inside aggregates, acting as a kind of noise filter. This is accomplished by way iterative morphological opening and closing. 
+Multiple of these methods make use of the **rolling ball transformation**, applied using the `agg.rolling_ball(...)` function included with this package. This transform fills in gaps inside aggregates, acting as a kind of noise filter. This is accomplished by way iterative morphological opening and closing. 
 
 ## 3. PRIMARY PARTICLE ANALYSIS PACKAGE (+pp)
 
