@@ -125,7 +125,7 @@ Having segmented the image, aggregate characteristics can be determined by passi
 
 ```Matlab
 Aggs = agg.analyze_binary(...
-    imgs_binary, imgs, pixsizes, fname);
+    imgs_binary, pixsizes, imgs, fname);
         % determine aggregate properties
 ```
 
@@ -161,11 +161,17 @@ Aggs = pp.pcm(Aggs); % apply pair correlation method
 The output is an updated `Aggs` structure that also contains an estimate of the primary particle size for each aggregate. Having done this, the primary particle size can be visualized along with the radius of gyration noted above by passing the updated `Aggs` structure to the `tools.plot_aggregates(...)` function:
 
 ```Matlab
-figure(1);
+figure(2);
 tools.imshow_agg(Aggs);
 ```
 
 The inner circle in this plot now indicates the primary particle size from PCM, the larger circle the radius of gyration from *k*-means, and the number indicating the index used by the program to identify each aggregate. Images produced using this type of procedure will feature heavily in the remainder of this README. 
+
+### Running this example
+
+Code associated with this example is given in the script **main_b.m**. The output should correspond to the figure shown below. 
+
+![](docs/output_b.png)
 
 # C. Components
 
@@ -174,6 +180,8 @@ This section provides details of the overall structure of this codebase and the 
 ## 1. MAIN SCRIPTS (main_\*): Testing the codebase
 
 The main scripts demonstrate further use of the code for specific scenarios and are provided to **test the codebase**. Three such scripts are included: 
+
+**main_b** is the script associated with the demonstration in [B. Getting started](#b-getting-started) above. 
 
 **main_kmeans** is designed to specifically investigate the *k*-means approach to aggregate-level segmentation. By default, this is done on the sample images provided in the [images](https://github.com/tsipkens/atems/tree/master/images) folder included with this distribution. This script will also read in some binaries (provided in the [images/slider](https://github.com/tsipkens/atems/tree/master/images/slider) folder) produced by the slider method beforehand for comparison. Finally, the primary particle size is computed for the *k*-means binaries and is plotted for the user. This script supports a European Aerosol Conference submission ([Sipkens et al., 2020][eac20]).
 
@@ -259,7 +267,7 @@ The `agg.seg(...)` function is a general, multipurpose wrapper function that att
 All of the above methods produce a common output: a binary image. The `agg.analyze_binary(...)` function is now used to convert these binaries to aggregate characteristics, such as area in pixels, radius of gyration, area-equivalent diameter, aspect ratio, among other quantities. The function itself takes a binary image, the original image, and the pixel size as inputs, as follows. 
 
 ```Matlab
-Aggs = agg.analyze_binary(imgs_binary, imgs, pixsize, fname);
+Aggs = agg.analyze_binary(imgs_binary, pixsize, imgs, fname);
 ```
 
 The output is a MATLAB structured array, `Aggs`, containing information about the aggregate. The array has one entry for each aggregate found in the image, which is itself defined as any independent groupings of pixels. The `fname` argument is optional and adds this tag to the information in the output `Aggs` structure. 
