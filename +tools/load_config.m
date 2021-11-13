@@ -1,5 +1,5 @@
 
-% LOAD_CONFIG  Loads settings from configuration file (YML, YAML, or JSON). 
+% LOAD_CONFIG  Loads settings from configuration file (JSON). 
 %  
 %  Files are loaded in order supplied, overwriting properties where
 %  relevant (e.g., in selecting the setting for k-means segmentation).
