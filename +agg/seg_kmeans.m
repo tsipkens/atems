@@ -42,7 +42,7 @@
 %    <strong>6.1</strong>: Improves the adjusted feature layer 
 %         for clumpy aggregates.
 %    <strong>6.2</strong>: Switches to s-curve fitting for  
-%         computing the adjusted threhold layer.
+%         computing the adjusted threhold layer. Not preferred.
 %  
 %  ------------------------------------------------------------------------
 % 
@@ -82,31 +82,14 @@ if isempty(pixsizes)
     error('PIXSIZES is a required argument unless Imgs structure is given.');
 end
 
-default_opts = '+agg/config/v6.1.json';  % default, load this config file
+default_opts = '+agg/config/km.v6.1.json';  % default, load this config file
 if ~exist('opts', 'var'); opts = []; end  % if no opts specified
-
-% If is pre-specified structure, 
-% load and partially/fully overwrite defaults.
-if isstruct(opts)
-    opts0 = tools.load_config(default_opts);  % load defaults
-    fields = fieldnames(opts);  % field names of input
-    for ii=1:length(fields)  % loop through input fields and overwrite
-        opts0.(fields{ii}) = opts.(fields{ii});  % overwrite
+if isa(opts, 'char')  % if string, check if folder included
+    if ~strcmp(opts(1:4), '+agg')
+        opts = ['+agg/config/km.', opts, '.json'];
     end
-    opts = opts0;
-
-% If string, assume load from file name.
-elseif isa(opts, 'char')
-    if strcmp(opts((end-3):end), 'json')  % expects JSON file path
-        opts = tools.load_config(opts);
-    else  % otherwise, input is expected to be version number (e.g., 'v6.1')
-        opts = tools.load_config(['+agg/config/', opts, '.json']);
-    end
-
-% Otherwise, load default properties. 
-else
-    opts = tools.load_config(default_opts);
 end
+opts = tools.load_config(opts, default_opts);
 %-------------------------------------------------------------------------%
 
 

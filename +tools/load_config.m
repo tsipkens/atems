@@ -1,5 +1,5 @@
 
-% LOAD_CONFIG  Loads settings from configuration file (JSON). 
+% LOAD_CONFIG  Loads or update settings from configuration file (JSON). 
 %  
 %  Files are loaded in order supplied, overwriting properties where
 %  relevant (e.g., in selecting the setting for k-means segmentation).
@@ -8,10 +8,30 @@
 
 function prop = load_config(fnames, prop)
 
+if isempty(fnames); fnames = {}; end
 if ~iscell(fnames); fnames = {fnames}; end
 
 if ~exist('prop', 'var'); prop = []; end
 if isempty(prop); prop = struct(); end
+
+% If default prop is given as a file name.
+% Load this file first. 
+if isa(prop, 'char')
+    prop = load_files({prop}, struct());
+end
+
+% If fnames is not empty, load the second file. 
+if ~isempty(fnames)
+    prop = load_files(fnames, prop);
+end
+
+end
+
+
+
+%== LOAD_FILES ==========================================%
+%   Loading settings from configuration file (JSON). 
+function prop = load_files(fnames, prop)
 
 for ii=1:length(fnames)
     
@@ -35,8 +55,8 @@ end
 end
 
 
-
-% INTERPRET  Attempt to interpret Matlab expressions.
+%== INTERPRET ===========================================%
+%   Attempt to interpret Matlab expressions.
 function e0 = interpret(f)
 
 if isa(f, 'char')
@@ -57,11 +77,11 @@ end
 
 
 
-
-% READ_JSON  Read JSON structured configuration files. 
-%  Allows for C++ or Javscript style commenting.
+%== READ_JSON ==========================================%
+%   Read JSON structured configuration files. 
+%   Allows for C++ or Javscript style commenting.
 %  
-%  AUTHOR: Timothy Sipkens, 2021-04-20
+%   AUTHOR: Timothy Sipkens, 2021-04-20
 
 function results = read_json(file)
 
