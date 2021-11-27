@@ -1,0 +1,7 @@
+// VERSION 2.s
+// AUTHOR: Timothy Sipkens, 2021-11-27
+{
+    "version": "2.s",
+    "norm": "old",      // type of PCF normalization (old = Dastanpout et al.)
+    "type": "simple"    // what type of diameter to output
+}

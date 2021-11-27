@@ -1,0 +1,7 @@
+// VERSION 1.g
+// AUTHOR: Timothy Sipkens, 2021-11-27
+{
+    "version": "1.g",
+    "norm": "max",      // type of PCF normalization (max = by max of PCF)
+    "type": "general"   // what type of diameter to output
+}

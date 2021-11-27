@@ -1,17 +1,26 @@
 
 % PCM  Performs the pair correlation method (PCM) of aggregate characterization
-% 
-% Developed at the University of British Columbia by Ramin Dastanpour and
-% Steven N. Rogak.
-%
-% Image processing package for the analysis of TEM images. Automatic
-% Aggsregate detection and automatic primary particle sizing
-%
-% This code was more recently modified by Timothy Sipkens at the University
-% of British Columbia
-%=========================================================================%
+%  
+%  Developed at the University of British Columbia by Ramin Dastanpour and
+%  Steven N. Rogak.
+%  
+%  Image processing package for the analysis of TEM images. Automatic
+%  Aggsregate detection and automatic primary particle sizing
+%  
+%  This code was more recently modified by Timothy Sipkens at the University
+%  of British Columbia. 
+%  
+%  ------------------------------------------------------------------------
+%  
+%  VERSIONS: 
+%    <strong>1.s</strong>: Default. Simple primary particle method. 
+%         Normalize PCF by maximum. 
+%    <strong>1.g</strong>: General primary particle method. 
+%         Normalize PCF by maximum. 
+%    <strong>0.s</strong>: Simple primary particle method. 
+%         Normalize PCF according to original Dastanpour method. 
 
-function [Aggs] = pcm(Aggs, f_plot, f_backup)
+function [Aggs] = pcm(Aggs, f_plot, f_backup, opts)
 
 %-- Parse inputs and load image ------------------------------------------%
 % Choose whether to plot pair correlation functions (PCFs).
@@ -22,17 +31,16 @@ if isempty(f_plot); f_plot = 0; end
 if ~exist('f_backup','var'); f_backup = []; end
 if isempty(f_backup); f_backup = 0; end
 
-% if isstruct(aggs)
-%     Aggs_str = aggs;
-%     aggs = {Aggs_str.Cropped};
-%     pixsize = [Aggs_str.pixsize];
-%     fname = {Aggs_str.fname};
-% elseif ~iscell(aggs)
-%     aggs = {aggs};
-% end
-% 
-% if ~exist('pixsize','var'); pixsize = []; end
-% if isempty(pixsize); pixsize = ones(size(aggs)); end
+
+%-- Handle options --%
+default_opts = '+pp/config/pcm.v1.s.json';  % default, load this config file
+if ~exist('opts', 'var'); opts = []; end  % if no opts specified
+if isa(opts, 'char')  % if string, check if folder included
+    if ~strcmp(opts(1:3), '+pp')
+        opts = ['+pp/config/pcm.', opts, '.json'];
+    end
+end
+opts = tools.load_config(opts, default_opts);
 %-------------------------------------------------------------------------%
 
 
@@ -123,7 +131,11 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
             pcf_smooth(kk+1) = pcf_smooth(kk) - 1e-12;
         end
     end
-    pcf_smooth = pcf_smooth ./ max(pcf_smooth); % normalize by initial value
+    
+    % Normalize by maximum, depending on options.
+    if strcmp(opts.norm, 'max')
+        pcf_smooth = pcf_smooth ./ max(pcf_smooth); % normalize by initial value
+    end
     
     % If too small to have enough points to interpolated between.
     if length(pcf_smooth)==1
@@ -135,37 +147,39 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
     
     %== 3-5: Primary particle sizing =====================================%
     %-- 3-5-1: Simple PCM ------------------------------------------------%
-    pcf_simple = 0.913;
-    Aggs(aa).dp_pcm1 = ...
-        2 * interp1(pcf_smooth, r1, pcf_simple);
-        % dp from simple PCM (labelled PCM1)
-        % given by diameter corresponding to 91.3% of PCF
-    
-    % Catch case where particle is small and nearly spherical.
-    % Otherwise NaN would be output.
-    if and(and(isnan(Aggs(aa).dp_pcm1), ...  % if previous method failed
-            Aggs(aa).num_pixels<500), ...   % and small number of pixels
-            Aggs(aa).aspect_ratio<1.4)  % and small aspect ratio
-        Aggs(aa).dp_pcm1 = Aggs(aa).da;  % assign da to dp
+    if strcmp(opts.type, 'simple')
+        pcf_simple = 0.913;
+        Aggs(aa).dp_pcm = ...
+            2 * interp1(pcf_smooth, r1, pcf_simple);
+            % dp from simple PCM (labelled PCM1)
+            % given by diameter corresponding to 91.3% of PCF
+
+        % Catch case where particle is small and nearly spherical.
+        % Otherwise NaN would be output.
+        if and(and(isnan(Aggs(aa).dp_pcm), ...  % if previous method failed
+                Aggs(aa).num_pixels<500), ...   % and small number of pixels
+                Aggs(aa).aspect_ratio<1.4)  % and small aspect ratio
+            Aggs(aa).dp_pcm = Aggs(aa).da;  % assign da to dp
+        end
+
+    %-- 3-5-2: Generalized PCM -------------------------------------------%
+    else
+        Rg_u     = 1.1 * data.Rg; % perturb Rg, 10% higher
+        Rg_l     = 0.9 * data.Rg; % perturb Rg, 10% lower
+        pcf_Rg   = interp1(r1, pcf_smooth, data.Rg); % PCF at Rg
+        pcf_Rg_u = interp1(r1, pcf_smooth, Rg_u); % PCF at upper Rg
+        pcf_Rg_l = interp1(r1, pcf_smooth, Rg_l); % PCF at lower Rg
+        Rg_slope = (pcf_Rg_u + pcf_Rg_l - pcf_Rg) / (Rg_u - Rg_l);
+            % dp/dr(Rg), slope by finite difference
+
+        pcf_general = (0.913 / 0.84) * ...
+            (0.7 + 0.003*Rg_slope^-0.24 + 0.2*data.aspect_ratio^-1.13);
+        Aggs(aa).dp_pcm = ...
+            2 * interp1(pcf_smooth, r1, pcf_general);
+            % dp from generalized PCM (labelled PCM2)
     end
     
-    Aggs(aa).dp = Aggs(aa).dp_pcm1; % assign main primary particle diameter and dp_pcm1
-    
-        
-    %-- 3-5-2: Generalized PCM -------------------------------------------%
-    Rg_u     = 1.1 * data.Rg; % perturb Rg, 10% higher
-    Rg_l     = 0.9 * data.Rg; % perturb Rg, 10% lower
-    pcf_Rg   = interp1(r1, pcf_smooth, data.Rg); % PCF at Rg
-    pcf_Rg_u = interp1(r1, pcf_smooth, Rg_u); % PCF at upper Rg
-    pcf_Rg_l = interp1(r1, pcf_smooth, Rg_l); % PCF at lower Rg
-    Rg_slope = (pcf_Rg_u + pcf_Rg_l - pcf_Rg) / (Rg_u - Rg_l);
-        % dp/dr(Rg), slope by finite difference
-
-    pcf_general = (0.913 / 0.84) * ...
-        (0.7 + 0.003*Rg_slope^-0.24 + 0.2*data.aspect_ratio^-1.13);
-    Aggs(aa).dp_pcm2 = ...
-        2 * interp1(pcf_smooth, r1, pcf_general);
-        % dp from generalized PCM (labelled PCM2)
+    Aggs(aa).dp = Aggs(aa).dp_pcm;  % assign main primary particle diameter and dp_pcm
        
         
     %-- Plot pair correlation function in line graph format --------------%
