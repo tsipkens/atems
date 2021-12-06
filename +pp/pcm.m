@@ -185,10 +185,10 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
     %-- Plot pair correlation function in line graph format --------------%
     if f_plot
         str = sprintf('Pair Correlation Line Plot %f ', pcf_simple);
-        figure, loglog(r, smooth(pcf), '-r'),...
+        figure, plot(r1, pcf_smooth, '-r'),...
             title (str), xlabel ('Radius'), ylabel('PCF(r)')
         hold on;
-        loglog(Aggs(aa).dp, pcf_simple,'*')
+        plot(Aggs(aa).dp / 2, pcf_simple, '*')
         close all;
     end
     
