@@ -40,7 +40,7 @@
 %  AUTHOR: Timothy Sipkens, 2020-11-02
 %  INSPIRED BY: Samuel Grauer, 2017-11-16 + tqdm for Python
 
-function textbar(i, f_back)
+function textbar(i, f_back, xtra_back)
 
 %--- Initialization ------------------------------------------------------%
 %-- Parse inputs ------------------------------------------%
@@ -48,6 +48,9 @@ if ~exist('i', 'var'); i = 0; end
 
 if ~exist('f_back', 'var'); f_back = []; end
 if isempty(f_back); f_back = 1; end  % by default, remove
+
+if ~exist('xtra_back', 'var'); xtra_back = []; end
+if isempty(xtra_back); xtra_back = 0; end  % by default, remove
 %----------------------------------------------------------%
 
 
@@ -78,7 +81,7 @@ if pct==0; f_back = 0; end
 
 
 %-- Other parameters ----%
-n_dot = 20;  % number of elements in progress bar
+n_dot = 16;  % number of elements in progress bar
 n_xtra = 10;  % padded elements  for percent / general spacing
 n_frac = 2 * length(num2str(i(2))) + 1;  % number of extra elements due to fraction
 n_str = n_dot + n_xtra + n_frac;
@@ -89,6 +92,7 @@ n_str = n_dot + n_xtra + n_frac;
 if f_back; str_back = repmat(char(8), [1, n_str]); % if continuing textbar
 else; str_back = ''; end  % if initializing textbar
 
+str_xtra = repmat(char(8), [1, xtra_back]);  % xtra backspaces
 
 % Format percentage leading bar.
 str_p00 = num2str(100 * pct, '%.0f');   % formatted percent
@@ -96,9 +100,11 @@ str_p00 = [repmat(' ', [1, 3-length(str_p00)]), str_p00];  % pad with necessary 
 
 
 % Format text for middle of the bar.
+fb = sprintf(strrep('\u2588', '\u', '\x'));  % full block
+lh = sprintf(strrep('\u258C', '\u', '\x'));  % left half block
 nc = ceil(pct * n_dot);  % number of completed elements
-str_p01 = repmat('█', [1, nc]);  % completed portion of bar
-if ((nc - pct * n_dot) > 0.5); str_p01(end) = '▌'; end  % allow for half blocks
+str_p01 = repmat(fb, [1, nc]);  % completed portion of bar
+if ((nc - pct * n_dot) > 0.5); str_p01(end) = lh; end  % allow for half blocks
 str_p02 = repmat(' ', [1, n_dot-nc]);  % uncompleted portion of bar
 
 
@@ -118,9 +124,9 @@ str_out = [' ', str_p00, '%%', ' |', str_p01, str_p02, '| ', str_p03];
 str_all = [str_out, repmat(' ', [1, n_str-length(str_out)]), '\n'];
 
 if pct<(1-eps)
-    fprintf([str_back, str_all]);
+    fprintf([str_xtra, str_back, str_all]);
 else
-    fprintf([str_back, str_all, ...
+    fprintf([str_xtra, str_back, str_all, ...
         char(8), ' [', 8, '< <strong>DONE</strong>]', 8, '\n']);  % add orange, bold DONE
 end
 %-------------------------------------------------------------------------%
