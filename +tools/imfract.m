@@ -2,10 +2,10 @@
 % IMFRACT  Compute fractal dimension using the image-based defintion.
 %  Uses the box-count method. 
 %  
-%  DF = fract(IMGS_BINARY) computes the fractal dimension for a single
+%  DF = tools.imfract(IMGS_BINARY) computes the fractal dimension for a single
 %  binary mask or a cell of binary masks. 
 %  
-%  DF = fract(AGGS) computes the fractal dimension using the binary masks
+%  DF = tools.imfract(AGGS) computes the fractal dimension using the binary masks
 %  in a given aggregate structure. 
 %  
 %  ------------------------------------------------------------------------
