@@ -228,9 +228,9 @@ end
 %== GYRATION =============================================================%
 %   Gyration calculates radius of gyration by assuming every pixel as an area
 %   of pixsize^2
-%   Author: Ramin Dastanpour
+%   AUTHOR: Ramin Dastanpour
 %   
-% Output:
+%  OUTPUT:
 %   Rg      Radius of gyration [nm]
 function [Rg] = gyration(img_binary,pixsize)
 
@@ -258,7 +258,7 @@ end
 
 %== AUTOCROP =============================================================%
 %   Automatically crops an image based on binary information
-%   Author:  Yeshun (Samuel) Ma, Timothy Sipkens, 2019-07-23
+%   AUTHOR:  Yeshun (Samuel) Ma, Timothy Sipkens, 2019-07-23
 function [img_cropped,img_binary,rect] = autocrop(img_orig, img_binary)
 
 [x,y] = find(img_binary);
@@ -276,6 +276,39 @@ y_bottom = max(min(y)-space,1);
 img_binary = img_binary(x_bottom:x_top,y_bottom:y_top);
 img_cropped = img_orig(x_bottom:x_top,y_bottom:y_top);
 rect = [y_bottom,x_bottom,(y_top-y_bottom),(x_top-x_bottom)];
+
+end
+
+
+
+
+%== GET_PERIMETER2 =============================================================%
+%   An updated method to get the perimeter of the aggregate. 
+%   AUTHOR:  Hamed Nikookar, Timothy Sipkens, 2022-03-25
+function p = get_perimeter2(img)
+
+mb = bwboundaries(~img);  % time-limiting step
+
+x_mb = mb{1}(:,2);  % get x and y coordinates
+y_mb = mb{1}(:,1);
+
+fx = [0; x_mb(2:end) ~= x_mb(1:end-1)];  % flag change in x
+fy = [0; y_mb(2:end) ~= y_mb(1:end-1)];  % flag change in y
+ii_mb = cumsum(and(fx, fy)) + 1;  % count diagonal elements
+
+% Combine first and last elements
+if (x_mb(1) == x_mb(end)) || (y_mb(1) == y_mb(end))
+    ii_mb(ii_mb == ii_mb(end)) = 1;
+end
+
+% Average x and y over each line segment.
+n2 = accumarray(ii_mb, ones(size(ii_mb)));  % number of pixels in segment
+x2 = accumarray(ii_mb, x_mb) ./ n2;  % average x of segment
+y2 = accumarray(ii_mb, y_mb) ./ n2;  % average y of segment
+p = sum(sqrt(diff(x2) .^ 2 + diff(y2) .^ 2));
+p = p + ...
+    sqrt((x2(end) - x2(1)) .^ 2 + ...
+    (y2(end) - y2(1)) .^ 2);  % join outline
 
 end
 
