@@ -385,7 +385,7 @@ This software is relaesed under an MIT license (see the corresponding license fi
 
 #### Contributors and acknowledgements
 
-This code was primarily compiled by Timothy A. Sipkens while at the University of British Columbia (UBC), who can be contacted at [tsipkens@uwaterloo.ca](mailto:tsipkens@uwaterloo.ca). This work was supported by Dr. Steven Rogak ([rogak@mech.ubc.ca](mailto:rogak@mech.ubc.ca)) Other direct contributors include [Hamed Nikookar](https://github.com/Hamed-NKR) and [Darwin Zhu](https://github.com/darwinz7). 
+This code was primarily compiled by Timothy A. Sipkens while at the University of British Columbia (UBC), who can be contacted at [tsipkens@uwaterloo.ca](mailto:tsipkens@uwaterloo.ca). This work was supported by Dr. Steven Rogak ([rogak@mech.ubc.ca](mailto:rogak@mech.ubc.ca)). Other direct contributors include [Hamed Nikookar](https://github.com/Hamed-NKR) and [Darwin Zhu](https://github.com/darwinz7). 
 
 Pieces of this code were adapted from various sources and features snippets written by several individuals at UBC, including [Ramin Dastanpour](https://github.com/rdastanpour), [Una Trivanovic](https://github.com/unatriva), Alberto Baldelli, Yiling Kang, Yeshun (Samuel) Ma, and Steven Rogak, among others.
 
