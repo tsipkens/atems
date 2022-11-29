@@ -176,102 +176,106 @@ for jj=1:length(Imgs)
         footer_found = 1;  % flag that footer was found
 
         %-- Detecting magnification and/or pixel size ----------------%
-        o1 = ocr(footer);
-        Imgs(jj).ocr = o1;
+        if license('test','computer_vision_toolbox')  % check if toolbox for OCR is installed
+            o1 = ocr(footer);
+            Imgs(jj).ocr = o1;
+    
+            % Look for pixel size.
+            txts = {'nm/pix', 'nmlpix', 'nm/plx', 'nm/101x',...
+                'um/pix', 'umlpix','um/plx', 'um/101x',...
+                'pm/pix', 'pmlpix','pm/plx', 'pm/101x'};
+            
+            for kk = 1:length(txts)
+                pixsize_end = strfind(o1.Text, txts(kk)) - 1;
+                if ~isempty(pixsize_end)
+                    % Mark if unit read is not nm.
+                    if or(contains(txts(kk), 'um'), ...
+                            contains(txts(kk), 'pm'))
+                        f_nm = 0;
+                    end
+                    break;
+                end
+            end
+            
+            
+            %-- Interpret OCR text and compute pixel size --------------------%
+            txts2 = {'Cal:', 'cal:', 'Ca1:', 'ca1:', 'CaI:', 'caI:',...
+                 'Cal-', 'cal-', 'Ca1-', 'ca1-', 'CaI-', 'caI-',...
+                 'Cal''', 'cal''', 'Ca1''', 'ca1''', 'CaI''', 'caI''',...
+                 'Cal"', 'cal"', 'Ca1"', 'ca1"', 'CaI"', 'caI"',...
+                 'Cal ', 'cal ', 'Ca1 ', 'ca1 ', 'CaI ', 'caI ',};
+            
+            % Check if one can find any of the above strings.
+            for kk = 1:length(txts2)
+                pixsize_start = strfind(o1.Text, txts2(kk)) + 5;
+                if ~isempty(pixsize_start)
+                    break;
+                end
+            end
+            
+            % If not found, step back through the string to 
+            % determine if one can find appropriate range.
+            if isempty(pixsize_start)
+                pixpick = pixsize_end - 2;  % initialize two before end
+                while isempty(pixsize_start)
+                    if isnan(str2double(o1.Text(pixpick))) &&...
+                            (o1.Text(pixpick - 2) == ' ') ||...
+                            (o1.Text(pixpick - 2) == newline)  % search for newline or space
+                            pixsize_start = pixpick - 1;
+                            break;
+                    end
+                    pixpick = pixpick - 1;
+                end
+            end
+            
+            % Check is numbers where misrepresented by characters
+            % e.g., zero was misread as "O"
+            o1_Text = o1.Text(pixsize_start:pixsize_end);
+            if isnan(str2double(o1_Text))
+                o1_Text = strrep(o1_Text, 'o', '0');
+                o1_Text = strrep(o1_Text, 'O', '0');
+                o1_Text = strrep(o1_Text, '‘', '');
+                
+                I_chk = strfind(o1_Text, 'I');
+                if any(I_chk == 2)
+                    o1_Text(I_chk(I_chk == 2)) =...
+                        strrep(o1_Text(I(I_chk == 2)), 'I', '.');
+                end
+                o1_Text = strrep(o1_Text, 'I', '1');
+                
+                l_chk = strfind(o1_Text, 'l');
+                if any(l_chk == 2)
+                    o1_Text(l_chk(l_chk == 2)) =...
+                        strrep(o1_Text(l(l_chk == 2)), 'l', '.');
+                end
+                o1_Text = strrep(o1_Text, 'l', '1');
+                
+                T_chk = strfind(o1_Text, 'T');
+                if any(T_chk == 2)
+                    o1_Text(T_chk(T_chk == 2)) =...
+                        strrep(o1_Text(T(T_chk == 2)), 'T', '.');
+                end
+                o1_Text = strrep(o1_Text, 'T', '1');
+                
+                spc_chk = strfind(o1_Text, ' ');
+                if any(spc_chk == 2)
+                    o1_Text(spc_chk(spc_chk == 2)) =...
+                        strrep(o1_Text(spc_chk(spc_chk == 2)), ' ', '.');
+                end
+                o1_Text = strrep(o1_Text, ' ', '');
+            end
+            
+            % Finally, convert formatted text to a number.
+            Imgs(jj).pixsize = str2double(o1_Text);
+            
+            % Convert pixsize to nm.
+            if f_nm == 0  % if given in micrometers
+                Imgs(jj).pixsize = Imgs(jj).pixsize * 1e3;
+            end
 
-        % Look for pixel size.
-        txts = {'nm/pix', 'nmlpix', 'nm/plx', 'nm/101x',...
-            'um/pix', 'umlpix','um/plx', 'um/101x',...
-            'pm/pix', 'pmlpix','pm/plx', 'pm/101x'};
-        
-        for kk = 1:length(txts)
-            pixsize_end = strfind(o1.Text, txts(kk)) - 1;
-            if ~isempty(pixsize_end)
-                % Mark if unit read is not nm.
-                if or(contains(txts(kk), 'um'), ...
-                        contains(txts(kk), 'pm'))
-                    f_nm = 0;
-                end
-                break;
-            end
+        else  % if OCR not available
+            Imgs(jj).pixsize = NaN;
         end
-        
-        
-        %-- Interpret OCR text and compute pixel size --------------------%
-        txts2 = {'Cal:', 'cal:', 'Ca1:', 'ca1:', 'CaI:', 'caI:',...
-             'Cal-', 'cal-', 'Ca1-', 'ca1-', 'CaI-', 'caI-',...
-             'Cal''', 'cal''', 'Ca1''', 'ca1''', 'CaI''', 'caI''',...
-             'Cal"', 'cal"', 'Ca1"', 'ca1"', 'CaI"', 'caI"',...
-             'Cal ', 'cal ', 'Ca1 ', 'ca1 ', 'CaI ', 'caI ',};
-        
-        % Check if one can find any of the above strings.
-        for kk = 1:length(txts2)
-            pixsize_start = strfind(o1.Text, txts2(kk)) + 5;
-            if ~isempty(pixsize_start)
-                break;
-            end
-        end
-        
-        % If not found, step back through the string to 
-        % determine if one can find appropriate range.
-        if isempty(pixsize_start)
-            pixpick = pixsize_end - 2;  % initialize two before end
-            while isempty(pixsize_start)
-                if isnan(str2double(o1.Text(pixpick))) &&...
-                        (o1.Text(pixpick - 2) == ' ') ||...
-                        (o1.Text(pixpick - 2) == newline)  % search for newline or space
-                        pixsize_start = pixpick - 1;
-                        break;
-                end
-                pixpick = pixpick - 1;
-            end
-        end
-        
-        % Check is numbers where misrepresented by characters
-        % e.g., zero was misread as "O"
-        o1_Text = o1.Text(pixsize_start:pixsize_end);
-        if isnan(str2double(o1_Text))
-            o1_Text = strrep(o1_Text, 'o', '0');
-            o1_Text = strrep(o1_Text, 'O', '0');
-            o1_Text = strrep(o1_Text, '‘', '');
-            
-            I_chk = strfind(o1_Text, 'I');
-            if any(I_chk == 2)
-                o1_Text(I_chk(I_chk == 2)) =...
-                    strrep(o1_Text(I(I_chk == 2)), 'I', '.');
-            end
-            o1_Text = strrep(o1_Text, 'I', '1');
-            
-            l_chk = strfind(o1_Text, 'l');
-            if any(l_chk == 2)
-                o1_Text(l_chk(l_chk == 2)) =...
-                    strrep(o1_Text(l(l_chk == 2)), 'l', '.');
-            end
-            o1_Text = strrep(o1_Text, 'l', '1');
-            
-            T_chk = strfind(o1_Text, 'T');
-            if any(T_chk == 2)
-                o1_Text(T_chk(T_chk == 2)) =...
-                    strrep(o1_Text(T(T_chk == 2)), 'T', '.');
-            end
-            o1_Text = strrep(o1_Text, 'T', '1');
-            
-            spc_chk = strfind(o1_Text, ' ');
-            if any(spc_chk == 2)
-                o1_Text(spc_chk(spc_chk == 2)) =...
-                    strrep(o1_Text(spc_chk(spc_chk == 2)), ' ', '.');
-            end
-            o1_Text = strrep(o1_Text, ' ', '');
-        end
-        
-        % Finally, convert formatted text to a number.
-        Imgs(jj).pixsize = str2double(o1_Text);
-        
-        % Convert pixsize to nm.
-        if f_nm == 0  % if given in micrometers
-            Imgs(jj).pixsize = Imgs(jj).pixsize * 1e3;
-        end
-        
     end
     
     
