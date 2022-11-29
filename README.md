@@ -48,8 +48,9 @@ This software was tested using MATLAB 2020a (though most functions have been val
 1. the curve fitting toolbox, 
 2. the financial toolbox, 
 3. the image toolbox, 
-4. the optimization toolbox, and 
-5. the video and image blockset. 
+4. the optimization toolbox, 
+5. the computer vision toolbox (for OCR capabilities), and 
+6. the video and image blockset. 
 
 If not already installed, these packages can be added to MATLAB via the instructions available on [MATLAB's website](https://www.mathworks.com/help/matlab/matlab_env/get-add-ons.html). 
 
