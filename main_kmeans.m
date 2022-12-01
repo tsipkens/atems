@@ -97,11 +97,11 @@ Aggs = pp.edm_sbs(Aggs);
 Aggs = pp.pcm(Aggs);
 
 figure(20);
-tools.viz_dadp([Aggs.da], [Aggs.dp_pcm1]);
+tools.viz_dadp([Aggs.da], [Aggs.dp_pcm]);
 ylabel('d_{p,PCM} [nm]');
 
 figure(21);
-loglog([Aggs.dp_pcm1], [Aggs.dp_edm], '.');
+loglog([Aggs.dp_pcm], [Aggs.dp_edm], '.');
 hold on;
 ylims = ylim;
 plot(ylims, ylims); % 1:1 line
