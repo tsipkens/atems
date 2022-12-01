@@ -176,7 +176,7 @@ for jj=1:length(Imgs)
         footer_found = 1;  % flag that footer was found
 
         %-- Detecting magnification and/or pixel size ----------------%
-        if license('test','computer_vision_toolbox')  % check if toolbox for OCR is installed
+        if license('test', 'vision')  % check if toolbox for OCR is installed
             o1 = ocr(footer);
             Imgs(jj).ocr = o1;
     
