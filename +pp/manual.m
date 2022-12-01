@@ -1,10 +1,26 @@
 
 % MANUAL Allows for manual primary particle sizing on an array of aggregates.
-% Modified by:  Timothy Sipkens, 2019-07-23
+%  
+%  ------------------------------------------------------------------------
+%  
+%  NOTE:  While this function can be used to run through an entire 
+%  aggregate structure, it is often safer to loop through the Aggs 
+%  structure in the parent code, which then saves the result of each 
+%  aggregate to the workspace before moving to the next aggregate. 
+%  Specifically, code akin to:
+%  
+%  for ii=1:length(Aggs)
+%   Aggs = pp.manual(Aggs, ii);
+%  end
+%  
+%  ------------------------------------------------------------------------
+%  
+%  MODIFIED:  Timothy Sipkens, 2019-07-23
+%  
 %   Pieces of this code are adapted from code by Ramin Dastanpour, 
 %   Hugo Tjong, Arka Soewono from the University of British Columbia, 
 %   Vanouver, BC, Canada. 
-%=========================================================================%
+
 
 function [Aggs, Pp, dp] = manual(Aggs, idx)
 
