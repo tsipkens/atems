@@ -210,7 +210,7 @@ for ii=1:n
             i5(bw1==jj) = 1; % add Otsu pixels back
         end
     end
-    i5 = imgaussfilt(im2uint8(i5.*255), 15);
+    i5 = imgaussfilt(im2uint8(i5.*255), 3.75 * opts.morphsc);
     
     tools.textbar([(ii-1)+0.82, n]); % partial textbar update
     
