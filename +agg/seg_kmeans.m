@@ -125,7 +125,7 @@ for ii=1:n
     
     
     %-- B: Use texture in bottom hat images ------------------------------%
-    se = strel('disk', 20);
+    se = strel('disk', round(5 * opts.morphsc));
     i10 = imbothat(img_denoise, se);
 
     % i10 = imbilatfilt(img_denoise); % denoise, aids in correctly identifying edges below
@@ -140,7 +140,7 @@ for ii=1:n
     
     %-- C: Perform adjusted threshold ------------------------------------%
     i1 = im2uint8(img_denoise);
-    i1 = imgaussfilt(i1,max(round(5*morph_param),1));
+    i1 = imgaussfilt(i1, max(round(5*morph_param),1));
 
     lvl2 = graythresh(i1); % simple Otsu threshold
     i2a = ~im2bw(i1, lvl2); % Otsu binary
