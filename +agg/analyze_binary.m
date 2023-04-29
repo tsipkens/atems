@@ -36,7 +36,7 @@
 %  AUTHOR: Timothy Sipkens, 2019-11-26
 
 function [Aggs] = analyze_binary(imgs_binary, pixsize, ...
-    imgs, fname, f_edges, f_plot)
+    imgs, fname, f_edges, f_plot, maxagg)
 
 %-- Parse inputs ---------------------------------------------------------%
 if isstruct(imgs_binary) % consider case that structure is given as input
@@ -73,6 +73,10 @@ if isempty(f_edges); f_edges = 1; end
 % Flag for whether to show progress in a figure.
 if ~exist('f_plot','var'); f_plot = []; end
 if isempty(f_plot); f_plot = 1; end
+
+% Flag for whether to show progress in a figure.
+if ~exist('maxagg','var'); maxagg = []; end
+if isempty(maxagg); maxagg = 50; end
 %-------------------------------------------------------------------------%
 
 
@@ -146,7 +150,7 @@ for ii=1:length(imgs_binary) % loop through provided images
     
     % If more than 50 aggregates were found, the method likely failed. 
     % Skip this image and continue on. 
-    if naggs>50; continue; end
+    if naggs>maxagg; continue; end
     
     % If no aggregates, skip image. 
     if naggs==0; continue; end

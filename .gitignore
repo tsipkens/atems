@@ -172,3 +172,4 @@ cython_debug/
 
 
 carboseg/FPN-resnet50-imagenet.onnx
++agg/config/km.v6.1s2.json
