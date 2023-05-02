@@ -147,6 +147,10 @@ for ii=1:length(imgs_binary) % loop through provided images
     CC = bwconncomp(img_binary); % find seperate aggregates
     naggs = CC.NumObjects; % count number of aggregates
     
+
+    % Compute background optical depth.
+    bg_level = mean(img(~img_binary));  % background image intensity
+    
     
     % If more than 50 aggregates were found, the method likely failed. 
     % Skip this image and continue on. 
@@ -207,7 +211,19 @@ for ii=1:length(imgs_binary) % loop through provided images
         Aggs0(jj).perimeter = sum(sum(img_edge~=0)) * ...
             pixsize(ii); % calculate aggregate perimeter
         
-        [x,y] = find(img_binary ~= 0);
+        %-- Circularity --%
+        % the degree of being far from a circle (1: circle, 0: straight line)
+        Aggs0(jj).perimeter2 = sum(sum(bwperim(img_binary)));
+        Aggs0(jj).perimeter3 = get_perimeter2(img_binary);
+        perimeter_circ = 2 * sqrt(pi * Aggs0(jj).area);  % perimeter of aggregate area-equivalent circle
+        Aggs0(jj).circularity = perimeter_circ / Aggs0(jj).perimeter3;  % aggregate area-equiv. circulirity
+        
+        %-- Optical depth --%
+        agg_grayscale = img(CC.PixelIdxList{1,jj});  % the selected agg's grayscale pixel values
+        Aggs0(jj).zbar_opt = (bg_level - mean(agg_grayscale)) / bg_level;  % agg's optical depth metric (1: black, 0: white)
+        
+        %-- Center-of-mass --%
+        [x, y] = find(img_binary ~= 0);
         Aggs0(jj).center_mass = [mean(x); mean(y)];
         
         if f_plot==1; set(groot,'CurrentFigure',f0); tools.imshow_agg(Aggs0, ii, 0); title(num2str(ii)); drawnow; end
@@ -236,7 +252,7 @@ end
 %   
 %  OUTPUT:
 %   Rg      Radius of gyration [nm]
-function [Rg] = gyration(img_binary,pixsize)
+function [Rg] = gyration(img_binary, pixsize)
 
 
 total_area = nnz(img_binary)*pixsize^2;
@@ -289,31 +305,34 @@ end
 %== GET_PERIMETER2 =============================================================%
 %   An updated method to get the perimeter of the aggregate. 
 %   AUTHOR:  Hamed Nikookar, Timothy Sipkens, 2022-03-25
-function p = get_perimeter2(img)
+function p = get_perimeter2(img_binary)
 
-mb = bwboundaries(~img);  % time-limiting step
-
-x_mb = mb{1}(:,2);  % get x and y coordinates
+mb = bwboundaries(img_binary);
+n_mb = length(mb{1});
+ 
+x_mb = mb{1}(:,2);
 y_mb = mb{1}(:,1);
+ii_mb = ones(n_mb,1);
 
-fx = [0; x_mb(2:end) ~= x_mb(1:end-1)];  % flag change in x
-fy = [0; y_mb(2:end) ~= y_mb(1:end-1)];  % flag change in y
-ii_mb = cumsum(and(fx, fy)) + 1;  % count diagonal elements
+[x_mb, y_mb] = poly2cw(x_mb, y_mb);
 
-% Combine first and last elements
-if (x_mb(1) == x_mb(end)) || (y_mb(1) == y_mb(end))
-    ii_mb(ii_mb == ii_mb(end)) = 1;
-end
-
-% Average x and y over each line segment.
-n2 = accumarray(ii_mb, ones(size(ii_mb)));  % number of pixels in segment
-x2 = accumarray(ii_mb, x_mb) ./ n2;  % average x of segment
-y2 = accumarray(ii_mb, y_mb) ./ n2;  % average y of segment
-p = sum(sqrt(diff(x2) .^ 2 + diff(y2) .^ 2));
-p = p + ...
-    sqrt((x2(end) - x2(1)) .^ 2 + ...
-    (y2(end) - y2(1)) .^ 2);  % join outline
-
+p = (x_mb(2:end) - x_mb(1:end-1)).^2 + (y_mb(2:end) - y_mb(1:end-1)).^2;
+p = sum(p);
+ 
 end
 
 
+% Order vertices in clockwise order.
+function [x, y] = poly2cw(x, y)
+
+cx = mean(x);
+cy = mean(y);
+
+a = atan2(y - cy, x - cx);
+
+[~, order] = sort(a);
+
+x = x(order);
+y = y(order);
+
+end
