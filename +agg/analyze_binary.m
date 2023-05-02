@@ -146,11 +146,9 @@ for ii=1:length(imgs_binary) % loop through provided images
     % Detect distinct aggregates.
     CC = bwconncomp(img_binary); % find seperate aggregates
     naggs = CC.NumObjects; % count number of aggregates
-    
 
     % Compute background optical depth.
     bg_level = mean(img(~img_binary));  % background image intensity
-    
     
     % If more than 50 aggregates were found, the method likely failed. 
     % Skip this image and continue on. 
@@ -208,14 +206,15 @@ for ii=1:length(imgs_binary) % loop through provided images
             pixsize(ii) ^ 2; % aggregate area [nm^2]
         Aggs0(jj).Rg = gyration(img_binary, pixsize(ii)); % calculate radius of gyration [nm]
         
-        Aggs0(jj).perimeter = pixsize(ii)* sum(sum(img_edge~=0)); % calculate aggregate perimeter
-        
+        %-- Perimeter --%
+        perimeter1 = pixsize(ii)* sum(sum(img_edge~=0)); % calculate aggregate perimeter
+        perimeter2 = pixsize(ii) * sum(sum(bwperim(img_binary)));
+        perimeter3 = pixsize(ii) * get_perimeter2(img_edge);  % edge midpoint connected perimeter
+        Aggs0(jj).perimeter = max(perimeter2, perimeter3);
+
         %-- Circularity --%
-        % the degree of being far from a circle (1: circle, 0: straight line)
-        Aggs0(jj).perimeter2 = pixsize(ii) * sum(sum(bwperim(img_binary)));
-        Aggs0(jj).perimeter3 = pixsize(ii) * get_perimeter2(img_edge);
-        perimeter_circ = 2 * sqrt(pi * Aggs0(jj).area);  % perimeter of aggregate area-equivalent circle
-        Aggs0(jj).circularity = perimeter_circ / Aggs0(jj).perimeter3;  % aggregate area-equiv. circulirity
+        %   The degree of being far from a circle (1: circle, 0: straight line).
+        Aggs0(jj).circularity = 4 * pi * Aggs0(jj).area / (Aggs0(jj).perimeter ^ 2);  % circularity
         
         %-- Optical depth --%
         agg_grayscale = img(CC.PixelIdxList{1,jj});  % the selected agg's grayscale pixel values
@@ -303,7 +302,10 @@ end
 
 %== GET_PERIMETER2 =============================================================%
 %   An updated method to get the perimeter of the aggregate. 
-%   AUTHOR:  Hamed Nikookar, Timothy Sipkens, 2022-03-25
+%   Uses midpoint of straight segments and connects them.
+%   This works much better for circles, as connecting the midpoint of the
+%   edges of a square rounds out corners too much. 
+%   AUTHOR:  Hamed Nikookar, Timothy Sipkens, 2023-05-02
 function p = get_perimeter2(img_binary)
 
 mb = bwboundaries(img_binary);
@@ -311,45 +313,44 @@ n_mb = length(mb{1});
  
 x_mb = mb{1}(:,2);
 y_mb = mb{1}(:,1);
-ii_mb = ones(n_mb,1);
+edges_mb = ones(n_mb,1);
 
-[x_mb, y_mb] = poly2cw(x_mb, y_mb);
+% [x_mb, y_mb] = poly2cw(x_mb, y_mb);
 
-%{
-p = (x_mb(2:end) - x_mb(1:end-1)).^2 + (y_mb(2:end) - y_mb(1:end-1)).^2;
-p = sum(p);
+%-{
+p_sq = sqrt((x_mb(2:end) - x_mb(1:end-1)).^2 + ...
+    (y_mb(2:end) - y_mb(1:end-1)).^2);
+p_sq = sum(p_sq);
 %}
 
-ii = 1;
+%-{
+% Compile and group edges.
+edges = 1;
 for i = 2 : n_mb
-    ii_mb(i) = ii;
-    if (x_mb(i) ~= x_mb(i-1)) && (y_mb(i) ~= y_mb(i-1))
-        ii_mb(i) = ii_mb(i) + 1;
-        ii = ii + 1;
+    if (x_mb(i) ~= x_mb(i-1)) && (y_mb(i) ~= y_mb(i-1))  % flag an angle transition
+        edges = edges + 1;
     end
+    edges_mb(i) = edges;
 end
 
 if (x_mb(1) == x_mb(end)) || (y_mb(1) == y_mb(end))
-    ii_mb(ii_mb == ii_mb(end)) = 1;
+    edges_mb(edges_mb == edges_mb(end)) = 1;
 end
 
-nn_mb = max(ii_mb);
+nn_mb = max(edges_mb);
 xx_mb = zeros(nn_mb,1);
 yy_mb = zeros(nn_mb,1);
-p = 0;
 
-for i = 1 : nn_mb
-    xx_mb(i) = mean(x_mb(ii_mb == i));
-    yy_mb(i) = mean(y_mb(ii_mb == i));
-    
-    if i > 1
-        p = p + sqrt((xx_mb(i) - xx_mb(i-1))^2 +...
-           (yy_mb(i) - yy_mb(i-1))^2);
-    end
+for ii = 1:nn_mb
+    xx_mb(ii) = mean(x_mb(edges_mb == ii));
+    yy_mb(ii) = mean(y_mb(edges_mb == ii));
 end
-p = p + sqrt((xx_mb(1) - xx_mb(end))^2 +...
-    (yy_mb(1) - yy_mb(end))^2);
- 
+p_circ = sum(sqrt((xx_mb(1:end) - xx_mb([2:end,1])).^2 + ...
+    (yy_mb(1:end) - yy_mb([2:end,1])).^2));
+%}
+
+p = p_circ;
+
 end
 
 
