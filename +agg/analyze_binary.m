@@ -213,7 +213,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         %-- Circularity --%
         % the degree of being far from a circle (1: circle, 0: straight line)
         Aggs0(jj).perimeter2 = pixsize(ii) * sum(sum(bwperim(img_binary)));
-        Aggs0(jj).perimeter3 = pixsize(ii) * get_perimeter2(img_binary);
+        Aggs0(jj).perimeter3 = pixsize(ii) * get_perimeter2(img_edge);
         perimeter_circ = 2 * sqrt(pi * Aggs0(jj).area);  % perimeter of aggregate area-equivalent circle
         Aggs0(jj).circularity = perimeter_circ / Aggs0(jj).perimeter3;  % aggregate area-equiv. circulirity
         
