@@ -217,7 +217,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         Aggs0(jj).circularity = 4 * pi * Aggs0(jj).area / (Aggs0(jj).perimeter ^ 2);  % circularity
         
         %-- Optical depth --%
-        agg_grayscale = img(CC.PixelIdxList{1,jj});  % the selected agg's grayscale pixel values
+        agg_grayscale = img(Aggs0(jj).binary);  % the selected agg's grayscale pixel values
         Aggs0(jj).zbar_opt = (bg_level - mean(agg_grayscale)) / bg_level;  % agg's optical depth metric (1: black, 0: white)
         
         %-- Center-of-mass --%
@@ -317,37 +317,32 @@ edges_mb = ones(n_mb,1);
 
 % [x_mb, y_mb] = poly2cw(x_mb, y_mb);
 
-%-{
-p_sq = sqrt((x_mb(2:end) - x_mb(1:end-1)).^2 + ...
-    (y_mb(2:end) - y_mb(1:end-1)).^2);
-p_sq = sum(p_sq);
-%}
-
-%-{
 % Compile and group edges.
 edges = 1;
 for i = 2 : n_mb
     if (x_mb(i) ~= x_mb(i-1)) && (y_mb(i) ~= y_mb(i-1))  % flag an angle transition
-        edges = edges + 1;
+        edges = edges + 1;  % found a new edge
     end
     edges_mb(i) = edges;
 end
 
+% Connect last pixel back to the first pixel. 
 if (x_mb(1) == x_mb(end)) || (y_mb(1) == y_mb(end))
     edges_mb(edges_mb == edges_mb(end)) = 1;
 end
 
+% Loop through edges and get midpoints. 
 nn_mb = max(edges_mb);
 xx_mb = zeros(nn_mb,1);
 yy_mb = zeros(nn_mb,1);
-
 for ii = 1:nn_mb
     xx_mb(ii) = mean(x_mb(edges_mb == ii));
     yy_mb(ii) = mean(y_mb(edges_mb == ii));
 end
+
+% Calculate perimeter by connecting midpoints. 
 p_circ = sum(sqrt((xx_mb(1:end) - xx_mb([2:end,1])).^2 + ...
     (yy_mb(1:end) - yy_mb([2:end,1])).^2));
-%}
 
 p = p_circ;
 
