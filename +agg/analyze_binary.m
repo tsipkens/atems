@@ -208,13 +208,12 @@ for ii=1:length(imgs_binary) % loop through provided images
             pixsize(ii) ^ 2; % aggregate area [nm^2]
         Aggs0(jj).Rg = gyration(img_binary, pixsize(ii)); % calculate radius of gyration [nm]
         
-        Aggs0(jj).perimeter = sum(sum(img_edge~=0)) * ...
-            pixsize(ii); % calculate aggregate perimeter
+        Aggs0(jj).perimeter = pixsize(ii)* sum(sum(img_edge~=0)); % calculate aggregate perimeter
         
         %-- Circularity --%
         % the degree of being far from a circle (1: circle, 0: straight line)
-        Aggs0(jj).perimeter2 = sum(sum(bwperim(img_binary)));
-        Aggs0(jj).perimeter3 = get_perimeter2(img_binary);
+        Aggs0(jj).perimeter2 = pixsize(ii) * sum(sum(bwperim(img_binary)));
+        Aggs0(jj).perimeter3 = pixsize(ii) * get_perimeter2(img_binary);
         perimeter_circ = 2 * sqrt(pi * Aggs0(jj).area);  % perimeter of aggregate area-equivalent circle
         Aggs0(jj).circularity = perimeter_circ / Aggs0(jj).perimeter3;  % aggregate area-equiv. circulirity
         
@@ -316,8 +315,40 @@ ii_mb = ones(n_mb,1);
 
 [x_mb, y_mb] = poly2cw(x_mb, y_mb);
 
+%{
 p = (x_mb(2:end) - x_mb(1:end-1)).^2 + (y_mb(2:end) - y_mb(1:end-1)).^2;
 p = sum(p);
+%}
+
+ii = 1;
+for i = 2 : n_mb
+    ii_mb(i) = ii;
+    if (x_mb(i) ~= x_mb(i-1)) && (y_mb(i) ~= y_mb(i-1))
+        ii_mb(i) = ii_mb(i) + 1;
+        ii = ii + 1;
+    end
+end
+
+if (x_mb(1) == x_mb(end)) || (y_mb(1) == y_mb(end))
+    ii_mb(ii_mb == ii_mb(end)) = 1;
+end
+
+nn_mb = max(ii_mb);
+xx_mb = zeros(nn_mb,1);
+yy_mb = zeros(nn_mb,1);
+p = 0;
+
+for i = 1 : nn_mb
+    xx_mb(i) = mean(x_mb(ii_mb == i));
+    yy_mb(i) = mean(y_mb(ii_mb == i));
+    
+    if i > 1
+        p = p + sqrt((xx_mb(i) - xx_mb(i-1))^2 +...
+           (yy_mb(i) - yy_mb(i-1))^2);
+    end
+end
+p = p + sqrt((xx_mb(1) - xx_mb(end))^2 +...
+    (yy_mb(1) - yy_mb(end))^2);
  
 end
 
