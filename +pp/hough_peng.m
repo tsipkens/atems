@@ -633,7 +633,7 @@ for k = 1 : size(circen,1),
         cirrad(k) = 0;
     else
         cirrad(k) = SgnCv_LMPos(end);
-        for i_radii = (length(SgnCv_LMPos) - 1) : -1 : 1,
+        for i_radii = (length(SgnCv_LMPos) - 1) : -1 : 1
             circen = [ circen; circen(k,:) ];
             cirrad = [ cirrad; SgnCv_LMPos(i_radii) ];
         end
@@ -643,7 +643,7 @@ end
 % Output
 varargout{1} = circen;
 varargout{2} = cirrad;
-if nargout > 3,
+if nargout > 3
     varargout{3} = dbg_LMmask;
 end
 
