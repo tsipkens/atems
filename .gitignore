@@ -9,8 +9,8 @@ results/
 results\
 +working/
 +\working
-figs/
-figs\
+docs/figs/
+docs\figs\
 
 temp/
 temp\
