@@ -18,7 +18,7 @@ n_imgs = length(imgs); % number of images
 
 if ~exist('opts','var'); opts = struct(); end
 if ~isfield(opts,'cmap')
-    opts.cmap = ones(max(max(imgs_binary{1})),1) * [0.12,0.59,0.96];
+    opts.cmap = ones(max(max(imgs_binary{1})),1) * [0,1,1];
         % blue, repeated for as many labels as exist in img_binary
 end
 if ~isfield(opts,'f_outline'); opts.f_outline = 1; end
