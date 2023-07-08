@@ -224,7 +224,11 @@ for ii=1:length(imgs_binary) % loop through provided images
         [x, y] = find(img_binary ~= 0);
         Aggs0(jj).center_mass = [mean(x); mean(y)];
         
-        if f_plot==1; set(groot,'CurrentFigure',f0); tools.imshow_agg(Aggs0, ii, 0); title(num2str(ii)); drawnow; end
+        if f_plot==1
+            if mod(jj, 10) == 0
+                set(groot,'CurrentFigure',f0); tools.imshow_agg(Aggs0, ii, 0); title(num2str(ii)); drawnow;
+            end
+        end
     end
     
     if f_plot==1; pause(0.05); end % pause very briefly to show overall aggregates

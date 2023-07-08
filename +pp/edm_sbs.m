@@ -75,7 +75,7 @@ for aa=1:length(imgs_binary)  % loop over aggregates
     
     img_dist = bwdist(~img_binary); % Euclidean distance to outside of aggregate
     for ii=1:se_max
-        counts(ii) = nnz(img_dist>se_vec(ii));
+        counts(ii) = nnz(img_dist > se_vec(ii));
             % count the number of non-zero pixels remaining
             
         if counts(ii)==0 % if all of the pixels are gone, exit loop
@@ -102,12 +102,13 @@ for aa=1:length(imgs_binary)  % loop over aggregates
     bet = 1.9658; % beta parameter in sigmoid function
     ome = -0.8515; % Omega parameter in sigmoid function
     a = 0.9966;
-    sigmoid = @(x) a./( 1+exp(((log(x(1))-log(dp_bin))./log(x(2))-bet)./ome));
+    sigmoid = @(x) a ./ (1 + ...
+        exp(((log(x(1)) - log(dp_bin)) ./ log(x(2)) - bet) ./ ome));
         % x(1) = dpg, x(2) = spg
     
     opts = optimset('Display','off');
-    x0 = [25,1.5];
-    x1 = lsqnonlin(@(x) (sigmoid(x) - Sa) ./ 100, x0, [], [], opts);
+    x0 = [25, 1.05];
+    x1 = lsqnonlin(@(x) (sigmoid(x) - Sa) ./ 100, x0, [], [100, 1.1], opts);
     x1 = real(x1);
     x1(x1<0) = NaN;
     Sa_fit = sigmoid(x1);
