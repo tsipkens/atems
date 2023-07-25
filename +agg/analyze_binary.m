@@ -181,7 +181,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         %-- Step 3-2: Prepare an image of the isolated aggregate ---------%
         img_binary = zeros(size(img_binary));
         img_binary(CC.PixelIdxList{1,jj}) = 1;
-        Aggs0(jj).binary = logical(img_binary); % store binary image
+        Aggs0(jj).binary = sparse(logical(img_binary)); % store binary image
         
         % Get a cropped version of the aggregate
         % 'autocrop' method included below.
@@ -293,7 +293,6 @@ x_top = min(max(x)+space,size_img(1));
 x_bottom = max(min(x)-space,1);
 y_top = min(max(y)+space,size_img(2)); 
 y_bottom = max(min(y)-space,1);
-
 
 img_binary = img_binary(x_bottom:x_top,y_bottom:y_top);
 img_cropped = img_orig(x_bottom:x_top,y_bottom:y_top);
