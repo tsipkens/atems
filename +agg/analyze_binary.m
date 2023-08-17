@@ -194,7 +194,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         img_dilated = imdilate(img_binary,SE);
         img_edge = img_dilated - img_binary;
         
-        [row, col] = find(imcrop(Aggs0(jj).binary, Aggs0(jj).rect));
+        [row, col] = find(imcrop(full(Aggs0(jj).binary), Aggs0(jj).rect));
         Aggs0(jj).length = max((max(row)-min(row)), (max(col)-min(col))) * pixsize(ii);
         Aggs0(jj).width = min((max(row)-min(row)), (max(col)-min(col))) * pixsize(ii);
         Aggs0(jj).aspect_ratio = Aggs0(jj).length / Aggs0(jj).width;
