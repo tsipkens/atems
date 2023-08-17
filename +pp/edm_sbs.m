@@ -73,7 +73,7 @@ for aa=1:length(imgs_binary)  % loop over aggregates
     
     counts = zeros(length(se_vec),1); % initialize counts
     
-    img_dist = bwdist(~img_binary); % Euclidean distance to outside of aggregate
+    img_dist = bwdist(~full(img_binary)); % Euclidean distance to outside of aggregate
     for ii=1:se_max
         counts(ii) = nnz(img_dist > se_vec(ii));
             % count the number of non-zero pixels remaining
