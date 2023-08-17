@@ -81,7 +81,7 @@ for ii=1:n_img % loop through images
             img_binary = or(img_binary,Aggs(aa).binary);
         end
 
-        [~,~,i0] = tools.imshow_binary( ...
+        [~,~,i0] = tools.imshow_binary2( ...
             Aggs(idx1(1)).image, img_binary, opts);
         
         % Make panels bigger.

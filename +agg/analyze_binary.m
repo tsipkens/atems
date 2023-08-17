@@ -225,7 +225,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         Aggs0(jj).center_mass = [mean(x); mean(y)];
         
         if f_plot==1
-            if mod(jj, 10) == 0
+            if mod(jj, 10) == 0  % show image after every 10 aggregates processed
                 set(groot,'CurrentFigure',f0); tools.imshow_agg(Aggs0, ii, 0); title(num2str(ii)); drawnow;
             end
         end
