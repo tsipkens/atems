@@ -218,7 +218,9 @@ for ii=1:length(imgs_binary) % loop through provided images
         
         %-- Optical depth --%
         agg_grayscale = img(Aggs0(jj).binary);  % the selected agg's grayscale pixel values
-        Aggs0(jj).zbar_opt = (bg_level - mean(agg_grayscale)) / bg_level;  % agg's optical depth metric (1: black, 0: white)
+        gray_extent = max(max(max(img)), 1) - min(min(img));
+        Aggs0(jj).depth = (mean(agg_grayscale) - bg_level) / ...
+            double(gray_extent - bg_level);  % agg's optical depth metric (1: black, 0: white)
         
         %-- Center-of-mass --%
         [x, y] = find(img_binary ~= 0);
