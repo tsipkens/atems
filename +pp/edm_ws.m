@@ -80,7 +80,7 @@ for aa=1:length(imgs_binary)  % loop over aggregates
 
     
     %-- Compute Eucldian distance map ------------------------------------%
-    img_edm = bwdist(~img_binary);
+    img_edm = bwdist(~full(img_binary));
     
     D = max(max(img_edm)) - img_edm;  % EDM to be used for watershed
     

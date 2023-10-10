@@ -291,10 +291,14 @@ for jj=1:length(Imgs)
         bw1 = im2bw(1 - double(Imgs(jj).raw) ./ ...
             max(max(double(Imgs(jj).raw))), 0.98);
         
-        % If no text, loop for white text isntead of black.
-        if nnz(bw1) < 500
+        % If no text, loop for white text instead of black.
+        if nnz(bw1) / numel(bw1) < 0.01
             bw1 = ~im2bw(1 - double(Imgs(jj).raw) ./ ...
-                max(max(double(Imgs(jj).raw))), 0.01);
+                max(max(double(Imgs(jj).raw))), 0.08);
+
+            se = strel('disk', 1);
+            bw1 = imclose(bw1, se);
+            bw1 = imopen(bw1, se);
         end
         
         % Remove any small regions below a certain number of pixels.

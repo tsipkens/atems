@@ -181,7 +181,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         %-- Step 3-2: Prepare an image of the isolated aggregate ---------%
         img_binary = zeros(size(img_binary));
         img_binary(CC.PixelIdxList{1,jj}) = 1;
-        Aggs0(jj).binary = logical(img_binary); % store binary image
+        Aggs0(jj).binary = sparse(logical(img_binary)); % store binary image
         
         % Get a cropped version of the aggregate
         % 'autocrop' method included below.
@@ -194,7 +194,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         img_dilated = imdilate(img_binary,SE);
         img_edge = img_dilated - img_binary;
         
-        [row, col] = find(imcrop(Aggs0(jj).binary, Aggs0(jj).rect));
+        [row, col] = find(imcrop(full(Aggs0(jj).binary), Aggs0(jj).rect));
         Aggs0(jj).length = max((max(row)-min(row)), (max(col)-min(col))) * pixsize(ii);
         Aggs0(jj).width = min((max(row)-min(row)), (max(col)-min(col))) * pixsize(ii);
         Aggs0(jj).aspect_ratio = Aggs0(jj).length / Aggs0(jj).width;
@@ -224,7 +224,11 @@ for ii=1:length(imgs_binary) % loop through provided images
         [x, y] = find(img_binary ~= 0);
         Aggs0(jj).center_mass = [mean(x); mean(y)];
         
-        if f_plot==1; set(groot,'CurrentFigure',f0); tools.imshow_agg(Aggs0, ii, 0); title(num2str(ii)); drawnow; end
+        if f_plot==1
+            if mod(jj, 10) == 0  % show image after every 10 aggregates processed
+                set(groot,'CurrentFigure',f0); tools.imshow_agg(Aggs0, ii, 0); title(num2str(ii)); drawnow;
+            end
+        end
     end
     
     if f_plot==1; pause(0.05); end % pause very briefly to show overall aggregates
@@ -289,7 +293,6 @@ x_top = min(max(x)+space,size_img(1));
 x_bottom = max(min(x)-space,1);
 y_top = min(max(y)+space,size_img(2)); 
 y_bottom = max(min(y)-space,1);
-
 
 img_binary = img_binary(x_bottom:x_top,y_bottom:y_top);
 img_cropped = img_orig(x_bottom:x_top,y_bottom:y_top);

@@ -9,8 +9,8 @@ results/
 results\
 +working/
 +\working
-figs/
-figs\
+docs/figs/
+docs\figs\
 
 temp/
 temp\
@@ -173,3 +173,4 @@ cython_debug/
 
 carboseg/FPN-resnet50-imagenet.onnx
 +agg/config/km.v6.1s2.json
+docs/paper/instructions.txt

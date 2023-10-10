@@ -94,6 +94,8 @@ opts = tools.load_config(opts, default_opts);
 
 
 tools.textheader('k-means');
+disp(['Loaded configuration: ', num2str(opts.version)]);
+disp(' ');
 
 % Loop over images, calling seg function below on each iteration.
 img_binary{n} = []; % pre-allocate cells
