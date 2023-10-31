@@ -216,6 +216,15 @@ for ii=1:length(imgs_binary) % loop through provided images
         %   The degree of being far from a circle (1: circle, 0: straight line).
         Aggs0(jj).circularity = 4 * pi * Aggs0(jj).area / (Aggs0(jj).perimeter ^ 2);  % circularity
         
+        %-- Gradient and sharpness --%
+        bw = 5;  % bandwith on border to gather pixels
+        [gx, gy] = gradient(double(imgaussfilt(img, 3)));
+        grad = sqrt(gx.^2 + gy.^2);  % norm of gradient
+
+        [grad, ds] = binner(img_binary, grad);
+        Aggs0(jj).sharp = log10(mean(grad(ds <= bw))) - ...
+            log10(mean((grad(ds > bw) + eps)));  % "+eps" avoids div. by zero
+
         %-- Optical depth --%
         agg_grayscale = img(Aggs0(jj).binary);  % the selected agg's grayscale pixel values
         gray_extent = max(max(max(img)), 1) - min(min(img));
@@ -304,7 +313,6 @@ end
 
 
 
-
 %== GET_PERIMETER2 =============================================================%
 %   An updated method to get the perimeter of the aggregate. 
 %   Uses midpoint of straight segments and connects them.
@@ -352,6 +360,29 @@ p_circ = sum(sqrt((xx_mb(1:end) - xx_mb([2:end,1])).^2 + ...
 p = p_circ;
 
 end
+
+
+
+%== BINNER ===============================================================%
+%   Bin the pixels from the boundary inwards and the report a quantity as a
+%   function of those bins. Note that statistics will be poor in the center
+%   of the particle do to a limit number of pixels. 
+%   
+%   AUTHOR:  Timothy Sipkens, Hamed. Nikookar, 2023-10-27
+function [xo, ds] = binner(img_binary, xi)
+
+d = bwdist(~imdilate(img_binary, ...  % distance to outside
+    strel('disk', 1)));  % expand by one pixel to capture some of outside
+
+ds = 1:max(max(d));
+xo = ones(size(ds));
+for ii=ds
+    fl = and(d <= ii, d > (ii - 1));  % flag pixels within a unit distance
+    xo(ii) = mean(xi(fl));  % take the mean of this distance from the outside
+end
+
+end
+
 
 
 % Order vertices in clockwise order.
