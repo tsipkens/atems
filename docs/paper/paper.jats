@@ -113,20 +113,47 @@ a Creative Commons Attribution 4.0 International License (CC BY
 </article-meta>
 </front>
 <body>
-<sec id="introduction">
-  <title>Introduction</title>
+<sec id="summary">
+  <title>Summary</title>
+  <p>The objective of <monospace>atems</monospace> is to provide a suite
+  of open source analysis tools (largely in Matlab) for transmission
+  electron microscopy (TEM) image analysis that are specifically
+  designed for soot and related carbonaceous particles (e.g., tarballs).
+  This codebase started as a manual analysis code by Dastanpour &amp;
+  Rogak
+  (<xref alt="2014" rid="ref-dastanpour2014" ref-type="bibr">2014</xref>),
+  with the first automated methods added by Dastanpour et al.
+  (<xref alt="2016" rid="ref-dastanpour2016" ref-type="bibr">2016</xref>).
+  The current, open source version has been streamlined and expanded to
+  include a larger suite of automated analysis methods from the
+  literature, as detailed in the following section. In this regard, a
+  key contribution of this codebase is to provide open source
+  implementations of multiple analysis methods spanning a range of
+  laboratories. This codebase places these methods in the same
+  framework, with the goal of enabling intercomparisons of analysis
+  routines across a range of data.</p>
+  <fig>
+    <caption><p>Sample TEM image of soot demonstrating the aggregate
+    structure, where <bold>a</bold> is an unlabeled image containing
+    soot aggregates and <bold>b</bold> is that same image with the
+    aggregates
+    labeled.<styled-content id="figU003Asoot"></styled-content></p></caption>
+    <graphic mimetype="image" mime-subtype="png" xlink:href="media/01-sample-image.png" />
+  </fig>
+</sec>
+<sec id="statement-of-need">
+  <title>Statement of need</title>
   <p>Soot, carbon black, and other carbonaceous particles have important
   climate, health, and technological impacts that depend on their
   morphology. These particles have complex shapes composed of a
   collection of small, primary particles in fractal arrangements, as
   shown in <xref alt="[fig:soot]" rid="figU003Asoot">[fig:soot]</xref>a.
-  Transmission electron microscopy (TEM) images of these particles allow
-  for detailed information about particle morphology that is unavailable
-  in other characterization techniques. However, extracting this
-  information requires image analysis across a statistically-significant
-  number of particles, with the quality of conclusions improving as the
-  number of characterized particles increases. For instance, Kelesidis
-  et al.
+  TEM images of these particles allow for detailed information about
+  particle morphology that is unavailable in other characterization
+  techniques. However, extracting this information requires image
+  analysis across a statistically-significant number of particles, with
+  the quality of conclusions improving as the number of characterized
+  particles increases. For instance, Kelesidis et al.
   (<xref alt="2020" rid="ref-kelesidis2020" ref-type="bibr">2020</xref>)
   suggested quantifying at least 400 primary particles per experimental
   condition in a premixed flame to get an accurate average primary
@@ -159,30 +186,6 @@ a Creative Commons Attribution 4.0 International License (CC BY
   et al., 2021</xref>). This limits comparability between laboratories
   (<xref alt="Sipkens et al., 2023" rid="ref-sipkens2023" ref-type="bibr">Sipkens
   et al., 2023</xref>).</p>
-  <p>The objective of <monospace>atems</monospace> is to provide a suite
-  of open source analysis tools (largely in Matlab) for TEM image
-  analysis that are specifically designed for soot and related
-  carbonaceous particles (e.g., tarballs). This codebase started as a
-  manual analysis code by Dastanpour &amp; Rogak
-  (<xref alt="2014" rid="ref-dastanpour2014" ref-type="bibr">2014</xref>),
-  with the first automated methods added by Dastanpour et al.
-  (<xref alt="2016" rid="ref-dastanpour2016" ref-type="bibr">2016</xref>).
-  The current, open source version has been streamlined and expanded to
-  include a larger suite of automated analysis methods from the
-  literature, as detailed in the following section. In this regard, a
-  key contribution of this codebase is to provide open source
-  implementations of multiple analysis methods spanning a range of
-  laboratories. This codebase places these methods in the same
-  framework, with the goal of enabling intercomparisons of analysis
-  routines across a range of data.</p>
-  <fig>
-    <caption><p>Sample TEM image of soot demonstrating the aggregate
-    structure, where <bold>a</bold> is an unlabeled image containing
-    soot aggregates and <bold>b</bold> is that same image with the
-    aggregates
-    labeled.<styled-content id="figU003Asoot"></styled-content></p></caption>
-    <graphic mimetype="image" mime-subtype="png" xlink:href="media/01-sample-image.png" />
-  </fig>
 </sec>
 <sec id="methods">
   <title>Methods</title>
