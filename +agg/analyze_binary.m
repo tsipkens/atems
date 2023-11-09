@@ -226,10 +226,9 @@ for ii=1:length(imgs_binary) % loop through provided images
             log10(mean((grad(ds > bw) + eps)));  % "+eps" avoids div. by zero
 
         %-- Optical depth --%
-        agg_grayscale = img(Aggs0(jj).binary);  % the selected agg's grayscale pixel values
-        gray_extent = max(max(max(img)), 1) - min(min(img));
-        Aggs0(jj).depth = (mean(agg_grayscale) - bg_level) / ...
-            double(gray_extent - bg_level);  % agg's optical depth metric (1: black, 0: white)
+        agg_grayscale = double(img(Aggs0(jj).binary));  % the selected agg's grayscale pixel values
+        gray_extent = double(max(max(max(img)), 1) - min(min(img)));
+        Aggs0(jj).depth = -(mean(agg_grayscale) - bg_level) / 255;  % agg's optical depth metric (1: black, 0: white)
         
         %-- Center-of-mass --%
         [x, y] = find(img_binary ~= 0);
