@@ -143,7 +143,6 @@ tools.textbar([0, length(Imgs)]);
 % Outer loop allows for images with different footers/scale bars.
 for jj=1:length(Imgs)
     
-    
     %== OPTION 1 =========================================================%
     % Designed for UBC footer. Should work for any white footer 
     % located at the bottom of the image. 
@@ -169,6 +168,12 @@ for jj=1:length(Imgs)
     	(0.9 * size(Imgs(jj).raw, 2) * white);
     ii = find(f_footrow, 1);  % first 90% white row
     
+    % If failed, instead look for black. 
+    if isempty(ii)
+        f_footrow = sum(Imgs(jj).raw, 2) == 0;
+        ii = find(f_footrow, 1);  % first black row
+    end
+    
     if ~isempty(ii)  % if found footer satisyfing above
         Imgs(jj).cropped = Imgs(jj).raw(1:ii-1, :);
         footer  = Imgs(jj).raw(ii:end, :);
@@ -178,12 +183,17 @@ for jj=1:length(Imgs)
         %-- Detecting magnification and/or pixel size ----------------%
         if license('test', 'video_and_image_blockset')  % check if toolbox for OCR is installed
             o1 = ocr(footer);
+            if isempty(o1.Text)
+                o1 = ocr(footer > 0);
+            end
+
             Imgs(jj).ocr = o1;
     
             % Look for pixel size.
             txts = {'nm/pix', 'nmlpix', 'nm/plx', 'nm/101x',...
                 'um/pix', 'umlpix','um/plx', 'um/101x',...
-                'pm/pix', 'pmlpix','pm/plx', 'pm/101x'};
+                'pm/pix', 'pmlpix','pm/plx', 'pm/101x', ...
+                'nm', 'um'};
             
             for kk = 1:length(txts)
                 pixsize_end = strfind(o1.Text, txts(kk)) - 1;
@@ -197,6 +207,25 @@ for jj=1:length(Imgs)
                 end
             end
             
+            % Alternative footer at NRC (black footer with scale bar).
+            % Scale bar code from below.
+            if isempty(pixsize_end)
+                footer = footer > 0;
+                rp = regionprops(footer);
+                ar = [rp.BoundingBox];
+                ar = reshape(ar', [4, length(ar)/4])';
+                ar = ar(:,3) ./ ar(:,4);  % arrive at aspect ratio
+                [~, ar_max] = max(ar); len = rp(ar_max).BoundingBox(3);  % pixel length of scale bar
+
+                o2 = split(o1.Text); o2 = str2num(o2{1});
+                if or(contains(o1.Text, 'pm'), contains(o1.Text, 'um'))
+                    o2 = o2 .* 1000;
+                end
+
+                Imgs(jj).pixsize = o2 / len;
+                tools.textbar([jj, length(Imgs)]);
+                continue;
+            end
             
             %-- Interpret OCR text and compute pixel size --------------------%
             txts2 = {'Cal:', 'cal:', 'Ca1:', 'ca1:', 'CaI:', 'caI:',...
@@ -228,7 +257,7 @@ for jj=1:length(Imgs)
                 end
             end
             
-            % Check is numbers where misrepresented by characters
+            % Check if numbers where misrepresented by characters
             % e.g., zero was misread as "O"
             o1_Text = o1.Text(pixsize_start:pixsize_end);
             if isnan(str2double(o1_Text))
@@ -295,7 +324,7 @@ for jj=1:length(Imgs)
         if nnz(bw1) / numel(bw1) < 0.01
             bw1 = ~im2bw(1 - double(Imgs(jj).raw) ./ ...
                 max(max(double(Imgs(jj).raw))), 0.08);
-
+            
             se = strel('disk', 1);
             bw1 = imclose(bw1, se);
             bw1 = imopen(bw1, se);
