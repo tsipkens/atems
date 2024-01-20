@@ -103,11 +103,11 @@ for aa=1:length(imgs_binary)  % loop over aggregates
     ome = -0.8515; % Omega parameter in sigmoid function
     a = 0.9966;
     sigmoid = @(x) a ./ (1 + ...
-        exp(((log(x(1)) - log(dp_bin)) ./ log(x(2)) - bet) ./ ome));
+        exp(((log(x(1)) - log(dp_bin)) ./ x(2) - bet) ./ ome));
         % x(1) = dpg, x(2) = spg
     
     opts = optimset('Display','off');
-    x0 = [25, 1.05];
+    x0 = [dp_bin(find(Sa < 0.5, 1)), log(1.5)];
     x1 = lsqnonlin(@(x) (sigmoid(x) - Sa) ./ 100, x0, [], [100, 1.1], opts);
     x1 = real(x1);
     x1(x1<0) = NaN;

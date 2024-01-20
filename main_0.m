@@ -35,7 +35,7 @@ tools.imshow_agg(Aggs_edm);
 
 
 figure(4);
-loglog([Aggs_pcm.dp], [Aggs_edm.dp], '.');
+loglog([Aggs_pcm.dp], [Aggs_edm.dp], 'o');
 hold on;
 loglog(xlim,xlim);
 hold off;
