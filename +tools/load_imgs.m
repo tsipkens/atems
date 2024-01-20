@@ -161,14 +161,14 @@ for jj=1:length(Imgs)
     
     footer_found = 0; % flag whether footer was found
     
-    f_nm = 1;  % flag indicating nanometers (detected below)
+    fl_nm = 1;  % flag indicating nanometers (detected below)
     
     % Search for row satisying 
     f_footrow = sum(Imgs(jj).raw, 2) > ...
     	(0.9 * size(Imgs(jj).raw, 2) * white);
     ii = find(f_footrow, 1);  % first 90% white row
     
-    % If failed, instead look for black. 
+    % If failed, instead look for black (e.g., NRC footer).
     if isempty(ii)
         f_footrow = sum(Imgs(jj).raw, 2) == 0;
         ii = find(f_footrow, 1);  % first black row
@@ -182,52 +182,54 @@ for jj=1:length(Imgs)
 
         %-- Detecting magnification and/or pixel size ----------------%
         if license('test', 'video_and_image_blockset')  % check if toolbox for OCR is installed
-            o1 = ocr(footer);
+            
+            %-- OCR ------------------------------------------------------%
+            o1 = ocr(footer);  % first try, straight OCR on footer
+
+            % If failed, try again on binary image.
             if isempty(o1.Text)
                 o1 = ocr(footer > 0);
             end
 
-            Imgs(jj).ocr = o1;
+            % If text not as expected. Retry OCR. This time without scale bar.
+            if ~any(contains(o1.Text, {'nm', 'pm', 'um'}))
+                rp = regionprops(footer > 0);
+                ar = [rp.BoundingBox];
+                ar = reshape(ar', [4, length(ar)/4])';
+                ar = ar(:,3) ./ ar(:,4);  % arrive at aspect ratio
+                [~, ar_max] = max(ar);
+                rp_bb = floor(rp(ar_max).BoundingBox);
     
-            % Look for pixel size.
+                footer_nobar = footer;
+                footer_nobar(rp_bb(2):rp_bb(2)+rp_bb(4), ...
+                    rp_bb(1):rp_bb(1)+rp_bb(3)) = 0;  % remover scale bar before OCR
+
+                o1 = ocr(footer_nobar > 0);
+            end
+
+            Imgs(jj).ocr = o1;
+            
+            %-- Interpret OCR text ---------------------------------------%
+            % Look for pixel size directly.
             txts = {'nm/pix', 'nmlpix', 'nm/plx', 'nm/101x',...
                 'um/pix', 'umlpix','um/plx', 'um/101x',...
                 'pm/pix', 'pmlpix','pm/plx', 'pm/101x', ...
-                'nm', 'um'};
+                'nm', 'um', 'pm'};
             
+            % Loop through options. Flag if nm/um.
             for kk = 1:length(txts)
                 pixsize_end = strfind(o1.Text, txts(kk)) - 1;
                 if ~isempty(pixsize_end)
                     % Mark if unit read is not nm.
                     if or(contains(txts(kk), 'um'), ...
                             contains(txts(kk), 'pm'))
-                        f_nm = 0;
+                        fl_nm = 0;
                     end
                     break;
                 end
             end
             
-            % Alternative footer at NRC (black footer with scale bar).
-            % Scale bar code from below.
-            if isempty(pixsize_end)
-                footer = footer > 0;
-                rp = regionprops(footer);
-                ar = [rp.BoundingBox];
-                ar = reshape(ar', [4, length(ar)/4])';
-                ar = ar(:,3) ./ ar(:,4);  % arrive at aspect ratio
-                [~, ar_max] = max(ar); len = rp(ar_max).BoundingBox(3);  % pixel length of scale bar
-
-                o2 = split(o1.Text); o2 = str2num(o2{1});
-                if or(contains(o1.Text, 'pm'), contains(o1.Text, 'um'))
-                    o2 = o2 .* 1000;
-                end
-
-                Imgs(jj).pixsize = o2 / len;
-                tools.textbar([jj, length(Imgs)]);
-                continue;
-            end
-            
-            %-- Interpret OCR text and compute pixel size --------------------%
+            %-- Interpret scale/number in footer -------------------------%
             txts2 = {'Cal:', 'cal:', 'Ca1:', 'ca1:', 'CaI:', 'caI:',...
                  'Cal-', 'cal-', 'Ca1-', 'ca1-', 'CaI-', 'caI-',...
                  'Cal''', 'cal''', 'Ca1''', 'ca1''', 'CaI''', 'caI''',...
@@ -235,6 +237,7 @@ for jj=1:length(Imgs)
                  'Cal ', 'cal ', 'Ca1 ', 'ca1 ', 'CaI ', 'caI ',};
             
             % Check if one can find any of the above strings.
+            % Then a per pixel value is reported directly.
             for kk = 1:length(txts2)
                 pixsize_start = strfind(o1.Text, txts2(kk)) + 5;
                 if ~isempty(pixsize_start)
@@ -246,7 +249,9 @@ for jj=1:length(Imgs)
             % determine if one can find appropriate range.
             if isempty(pixsize_start)
                 pixpick = pixsize_end - 2;  % initialize two before end
-                while isempty(pixsize_start)
+                if pixpick < 3; pixsize_start = 1; end  % then just select all text and continue
+
+                while and(isempty(pixsize_start), pixpick > 0)
                     if isnan(str2double(o1.Text(pixpick))) &&...
                             (o1.Text(pixpick - 2) == ' ') ||...
                             (o1.Text(pixpick - 2) == newline)  % search for newline or space
@@ -257,48 +262,46 @@ for jj=1:length(Imgs)
                 end
             end
             
+            % Save relevant text to variable.
+            o1_num = o1.Text(pixsize_start:pixsize_end);
+            
             % Check if numbers where misrepresented by characters
             % e.g., zero was misread as "O"
-            o1_Text = o1.Text(pixsize_start:pixsize_end);
-            if isnan(str2double(o1_Text))
-                o1_Text = strrep(o1_Text, 'o', '0');
-                o1_Text = strrep(o1_Text, 'O', '0');
-                o1_Text = strrep(o1_Text, '‘', '');
+            if isnan(str2double(o1_num))
+                o1_num = strrep(o1_num, 'o', '0');
+                o1_num = strrep(o1_num, 'O', '0');
+                o1_num = strrep(o1_num, '‘', '');
+
+                o1_num = strrep(o1_num, 'I', '1');
+                o1_num = strrep(o1_num, 'l', '1');
                 
-                I_chk = strfind(o1_Text, 'I');
-                if any(I_chk == 2)
-                    o1_Text(I_chk(I_chk == 2)) =...
-                        strrep(o1_Text(I(I_chk == 2)), 'I', '.');
-                end
-                o1_Text = strrep(o1_Text, 'I', '1');
-                
-                l_chk = strfind(o1_Text, 'l');
-                if any(l_chk == 2)
-                    o1_Text(l_chk(l_chk == 2)) =...
-                        strrep(o1_Text(l(l_chk == 2)), 'l', '.');
-                end
-                o1_Text = strrep(o1_Text, 'l', '1');
-                
-                T_chk = strfind(o1_Text, 'T');
-                if any(T_chk == 2)
-                    o1_Text(T_chk(T_chk == 2)) =...
-                        strrep(o1_Text(T(T_chk == 2)), 'T', '.');
-                end
-                o1_Text = strrep(o1_Text, 'T', '1');
-                
-                spc_chk = strfind(o1_Text, ' ');
-                if any(spc_chk == 2)
-                    o1_Text(spc_chk(spc_chk == 2)) =...
-                        strrep(o1_Text(spc_chk(spc_chk == 2)), ' ', '.');
-                end
-                o1_Text = strrep(o1_Text, ' ', '');
+                o1_num = strrep(o1_num, 'T', '1');
+                o1_num = strrep(o1_num, ' ', '');
+            end
+            
+            % Convert to a number.
+            o1_num = str2double(o1_num);
+            
+            % If not /px value, then need to interpret scale bar.
+            % Scale bar code from below.
+            % Alternative footer at NRC (black footer with scale bar).
+            if ~any(contains(o1.Text, {'pix', 'px', 'plx', '101x', 'Ca'}))
+                footer = footer > 0;
+                rp = regionprops(footer);
+                ar = [rp.BoundingBox];
+                ar = reshape(ar', [4, length(ar)/4])';
+                ar = ar(:,3) ./ ar(:,4);  % arrive at aspect ratio
+                [~, ar_max] = max(ar);
+                len = rp(ar_max).BoundingBox(3);  % pixel length of scale bar
+
+                o1_num = o1_num / len;
             end
             
             % Finally, convert formatted text to a number.
-            Imgs(jj).pixsize = str2double(o1_Text);
+            Imgs(jj).pixsize = o1_num;
             
             % Convert pixsize to nm.
-            if f_nm == 0  % if given in micrometers
+            if fl_nm == 0  % if given in micrometers
                 Imgs(jj).pixsize = Imgs(jj).pixsize * 1e3;
             end
 
@@ -361,7 +364,7 @@ for jj=1:length(Imgs)
             Imgs(jj).pixsize = sc_length / len;
             
             % If given in micrometers, convert.
-            if f_nm==0; Imgs(jj).pixsize = Imgs(jj).pixsize * 1e3; end
+            if fl_nm==0; Imgs(jj).pixsize = Imgs(jj).pixsize * 1e3; end
 
             
             % NOTE: Show bw1 image to see the binary that should include 
