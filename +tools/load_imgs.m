@@ -277,6 +277,7 @@ for jj=1:length(Imgs)
                 
                 o1_num = strrep(o1_num, 'T', '1');
                 o1_num = strrep(o1_num, ' ', '');
+                o1_num = strrep(o1_num, '_', '');
             end
             
             % Convert to a number.
