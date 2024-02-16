@@ -8,7 +8,8 @@ function [h, fr, i0] = imshow_agg(Aggs, idx, f_img, opts)
 %-- Parse inputs ---------------------------------------------------------%
 % Determine which images will be plotted
 if ~exist('idx','var'); idx = []; end % image index for plotting
-if isempty(idx); idx = unique([Aggs.img_id]); end % plot all of the images
+if isempty(idx); idx = 1:length(Aggs); end % plot all of the images
+idx = unique([Aggs(idx).img_id]);  % convert to image IDs
 
 % Exceptions if idx indicates many images
 if and(length(idx)>24, nargout<2) % plot a max. of 24 images (exception below)
@@ -32,7 +33,7 @@ if ~isfield(opts,'f_dp'); opts.f_dp = 1; end  % whether to show images if just s
 %-- Prepare figure for plotting ------------------------------------------%
 % Clear current figure if: plotting more than one image 
 % OR plotting original image.
-if nargout>1
+if nargout > 1
     fr{n_img} = [];  % inialize frame for output
     
     % New figure for saving plots, probably not shown to user.
@@ -40,7 +41,7 @@ if nargout>1
     else; f0 = figure('visible', 'off'); end
 else
     f0 = gcf; % otherwise get current figure
-    if or(f_img==1, n_img>1); clf; end
+    if n_img>1; clf; end
 end
 
 % If more than one image and not writing to file, tile figure.
@@ -84,9 +85,11 @@ for ii=1:n_img % loop through images
         [~,~,i0] = tools.imshow_binary2( ...
             Aggs(idx1(1)).image, img_binary, opts);
         
+        % Add title.
+        title(num2str(idx(ii)));
+        
         % Make panels bigger.
         if and(n_img>1, nargout<2)
-            title(num2str(idx(ii)));
             sc_h = 1.175;
             h.Position(3:4) = h.Position(3:4) .* sc_h;  % make panels 10% bigger
             h.Position(1:2) = h.Position(1:2) - ...
@@ -111,18 +114,26 @@ for ii=1:n_img % loop through images
                 num2str(Aggs(aa).id), 'Color', [0,0,0]);
         end
 
-        % Plot radius of gyration on plot
+        % Plot radius of gyration on plot.
         viscircles(fliplr(Aggs(aa).center_mass'),...
             Aggs(aa).Rg ./ Aggs(aa).pixsize, ... % / pixsize converts to pixel units
             'EnhanceVisibility', false, 'Color', opts.cmap);
 
-        % Plot primary particle diameter from PCM if available
+        % Plot area-equivalent diameter.
+        viscircles(fliplr(Aggs(aa).center_mass'),...
+            Aggs(aa).da ./ 2 ./ Aggs(aa).pixsize, ...
+            'EnhanceVisibility', false, 'Color', opts.cmap .* (1/4), ...
+            'LineWidth', 1);
+
+        % Plot primary particle diameter from PCM if available.
         if opts.f_dp
             if isfield(Aggs,'dp') % if available plot reference dp
-                viscircles(fliplr(Aggs(aa).center_mass'), ...
-                    Aggs(aa).dp / 2 ./ Aggs(aa).pixsize, ... % use default value of dp
-                    'Color', [0.92,0.16,0.49], 'LineWidth', ...
-                    0.75, 'EnhanceVisibility', false);
+                if ~isnan(Aggs(aa).dp)
+                    viscircles(fliplr(Aggs(aa).center_mass'), ...
+                        Aggs(aa).dp / 2 ./ Aggs(aa).pixsize, ... % use default value of dp
+                        'Color', [0.92,0.16,0.49], 'LineWidth', ...
+                        0.75, 'EnhanceVisibility', false);
+                end
             end
         end
         hold off;
