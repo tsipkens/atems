@@ -3,5 +3,6 @@
 {
     "version": "1.g",
     "norm": "max",      // type of PCF normalization (max = by max of PCF)
-    "type": "general"   // what type of diameter to output
+    "type": "general",  // what type of diameter to output
+    "smooth": 1         // traditional smoothing
 }

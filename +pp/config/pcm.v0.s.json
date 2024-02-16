@@ -3,5 +3,6 @@
 {
     "version": "2.s",
     "norm": "old",      // type of PCF normalization (old = Dastanpout et al.)
-    "type": "simple"    // what type of diameter to output
+    "type": "simple",   // what type of diameter to output
+    "smooth": 1         // traditional smoothing
 }

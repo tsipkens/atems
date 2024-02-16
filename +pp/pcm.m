@@ -52,7 +52,9 @@ if exist('data','dir') ~= 7 % 7 if exist parameter is a directory
 end
 
 
-figure; % generate figure for visualizing current aggregate
+if f_plot
+    figure; % generate figure for visualizing current aggregate
+end
 
 
 %== Main image processing loop ===========================================%
@@ -69,6 +71,13 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
     
     % Get data for this aggregate
     data = Aggs(aa); % initialize data structure for current aggregate
+
+    if isnan(pixsize)
+        Aggs(aa).dp_pcm = NaN;
+        Aggs(aa).dp = Aggs(aa).dp_pcm;
+        tools.textbar([aa, n_aggs]);
+        continue;
+    end
     
     
     
@@ -126,10 +135,31 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
     pcf_smooth = smooth(pcf); % smooth the pair correlation function
     
     % Adjust PCF to be monotonically decreasing.
-    for kk=1:(size(pcf_smooth)-1)
-        if pcf_smooth(kk) <= pcf_smooth(kk+1)
-            pcf_smooth(kk+1) = pcf_smooth(kk) - 1e-12;
+    if opts.smooth == 1
+        for kk=1:(size(pcf_smooth)-1)
+            if pcf_smooth(kk) <= pcf_smooth(kk+1)
+                pcf_smooth(kk+1) = pcf_smooth(kk) - 1e-12;
+            end
         end
+    else
+        [pcf_smooth, r1] = tools.pcf(img_binary);  % override PCF
+        r1 = r1 .* pixsize;
+        
+        % Remove zero entries.
+        fl0 = pcf_smooth == 0;
+        pcf_smooth(fl0) = [];
+        r1(fl0) = [];
+
+        %-{
+        [pcf_max, idx_max] = max(pcf_smooth);
+        pcf_smooth(1:idx_max) = pcf_max + (idx_max:-1:1) .* 1e-12;  % set values below max to max
+        
+        for kk=1:(size(pcf_smooth)-1)
+            if pcf_smooth(kk) <= pcf_smooth(kk+1)
+                pcf_smooth(kk+1) = pcf_smooth(kk) - 1e-12;
+            end
+        end
+        %}
     end
     
     % Normalize by maximum, depending on options.
@@ -148,19 +178,9 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
     %== 3-5: Primary particle sizing =====================================%
     %-- 3-5-1: Simple PCM ------------------------------------------------%
     if strcmp(opts.type, 'simple')
-        pcf_simple = 0.913;
-        Aggs(aa).dp_pcm = ...
-            2 * interp1(pcf_smooth, r1, pcf_simple);
-            % dp from simple PCM (labelled PCM1)
-            % given by diameter corresponding to 91.3% of PCF
-
-        % Catch case where particle is small and nearly spherical.
-        % Otherwise NaN would be output.
-        if and(and(isnan(Aggs(aa).dp_pcm), ...  % if previous method failed
-                Aggs(aa).num_pixels<500), ...   % and small number of pixels
-                Aggs(aa).aspect_ratio<1.4)  % and small aspect ratio
-            Aggs(aa).dp_pcm = Aggs(aa).da;  % assign da to dp
-        end
+        pcf_0 = 0.913;
+        % dp from simple PCM
+        % given by diameter corresponding to 91.3% of PCF
 
     %-- 3-5-2: Generalized PCM -------------------------------------------%
     else
@@ -172,11 +192,21 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
         Rg_slope = (pcf_Rg_u + pcf_Rg_l - pcf_Rg) / (Rg_u - Rg_l);
             % dp/dr(Rg), slope by finite difference
 
-        pcf_general = (0.913 / 0.84) * ...
+        pcf_0 = (0.913 / 0.84) * ...
             (0.7 + 0.003*Rg_slope^-0.24 + 0.2*data.aspect_ratio^-1.13);
-        Aggs(aa).dp_pcm = ...
-            2 * interp1(pcf_smooth, r1, pcf_general);
-            % dp from generalized PCM (labelled PCM2)
+        % dp from generalized PCM
+    end
+
+    % Get PCM diameter.
+    Aggs(aa).dp_pcm = ...
+        2 * interp1(pcf_smooth, r1, pcf_0);
+
+    % Catch case where particle is small and nearly spherical.
+    % Otherwise NaN would be output.
+    if and(and(isnan(Aggs(aa).dp_pcm), ...  % if previous method failed
+            Aggs(aa).num_pixels<500), ...   % and small number of pixels
+            Aggs(aa).aspect_ratio<1.4)  % and small aspect ratio
+        Aggs(aa).dp_pcm = Aggs(aa).da;  % assign da to dp
     end
     
     Aggs(aa).dp = Aggs(aa).dp_pcm;  % assign main primary particle diameter and dp_pcm
@@ -207,8 +237,6 @@ for aa = 1:n_aggs % loop over each aggregate in the provided structure
     
     tools.textbar([aa, n_aggs]);
 end
-
-close; % close current figure
 
 tools.textheader();
 

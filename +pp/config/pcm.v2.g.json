@@ -1,0 +1,8 @@
+// VERSION 1.g
+// AUTHOR: Timothy Sipkens, 2024-02-01
+{
+    "version": "1.g",
+    "norm": "max",      // type of PCF normalization (max = by max of PCF)
+    "type": "general",   // what type of diameter to output
+    "smooth": 2         // traditional smoothing
+}
