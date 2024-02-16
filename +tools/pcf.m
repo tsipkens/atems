@@ -1,9 +1,9 @@
 
-% PAIR_CORR  Compute the pair correlation function for a binary image. 
+% PCF  Compute the pair correlation function(PCF) for a binary image. 
 %  
 %  AUTHOR: Timothy Sipkens, 2023-12-13
 
-function [g, v] = pair_corr(img_binary, v, ns)
+function [g, v] = pcf(img_binary, v, ns)
 
 if ~exist('v', 'var'); v = []; end
 
@@ -22,7 +22,7 @@ if or(isempty(v), numel(v) == 1)
     end
 
     % v = linspace(1, maxd, 50)';
-    v = logspace(0, log10(maxd), 50)';
+    v = [logspace(0, log10(maxd), 50)]';
 end
 
 
@@ -31,7 +31,7 @@ g = zeros(size(v));
 
 for ii=1:length(v)
     
-    ri = randi(length(row), [ns,1]);
+    ri = randi(length(row), [ns,1]); % get random entries
 
     rthe = 2*pi .* rand([ns,1]);  % random angle
     rx = round(v(ii) .* sin(rthe));  % random x dir.
