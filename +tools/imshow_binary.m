@@ -31,7 +31,7 @@ else % if adding an outline
     
     % Use dilation to strengthen the aggregate's outline.
     se = strel('disk', 1);
-    img_dilated = or(img_binary - imdilate(img_binary, se), img_edge);
+    img_dilated = or(and(imdilate(img_edge, se), ~img_binary), img_edge);
     
     % Adds borders to labeled regions.
     i1 = uint8(~img_dilated) .* t0;
