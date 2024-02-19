@@ -4,10 +4,11 @@
 %  
 %  AUTHOR: Timothy Sipkens, 2020-12-10
 
-function h = imshow2(imgs, cmap, n)
+function h = imshow2(imgs, cmap, n, pixsizes)
 
 %-- Parse inputs ---------------------------------------------------------%
-if ~exist('cmap','var'); cmap = []; end
+if ~exist('cmap', 'var'); cmap = []; end
+if ~exist('pixsizes', 'var'); pixsizes = []; end
 
 if ~iscell(imgs); imgs = {imgs}; end
 
@@ -43,8 +44,12 @@ for ii=1:n_imgs % loop over images
         title(num2str(ii));
     end
     
-    tools.imshow(imgs{ii}, cmap); % show labelled image
-    
+    % Display image. 
+    if ~isempty(pixsizes)
+        tools.imshow(imgs{ii}, cmap, pixsizes(ii));
+    else
+        tools.imshow(imgs{ii}, cmap);
+    end
 end
 
 

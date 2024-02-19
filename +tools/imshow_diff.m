@@ -1,7 +1,8 @@
 
 % IMSHOW_DIFF  Plot original and labeled images side-by-side.
-% Author: Timothy Sipkens, 2024-01-29
-%=========================================================================%
+%  NOTE: IDX corresponds to the aggregate index, not the image index.
+%  
+%  Author: Timothy Sipkens, 2024-01-29
 
 function [] = imshow_diff(Aggs, idx, varargin)
 
@@ -15,6 +16,6 @@ tools.imshow_agg(Aggs, idx, varargin{:});
 subplot(1, 2, 1);
 img_id = Aggs(idx).img_id;
 img_id = find([Aggs.img_id] == img_id, 1);
-tools.imshow(Aggs(img_id).image);
+tools.imshow(Aggs(img_id).image, [], Aggs(img_id).pixsize);
 
 end
