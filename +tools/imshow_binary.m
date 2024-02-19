@@ -3,11 +3,13 @@
 % Author: Timothy Sipkens, 2019-07-24
 %=========================================================================%
 
-function [h, i1] = imshow_binary(img, img_binary, opts)
+function [h, i1] = imshow_binary(img, img_binary, pixsize, opts)
 
 %-- Parse inputs ---------------------------------------------------------%
 if iscell(img); img = img{1}; end  % select only first image
 if iscell(img_binary); img_binary = img_binary{1}; end
+
+if ~exist('pixsize', 'var'); pixsize = []; end
 
 if ~exist('opts','var'); opts = struct(); end
 if ~isfield(opts,'cmap')
@@ -37,7 +39,7 @@ else % if adding an outline
     i1 = uint8(~img_dilated) .* t0;
 end
 
-tools.imshow(i1); % show labelled image
+tools.imshow(i1, [], pixsize); % show labelled image
 
 if nargout>0; h = gca; end % organize output
 

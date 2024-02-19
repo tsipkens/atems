@@ -27,6 +27,7 @@ if ~isfield(opts,'cmap'); opts.cmap = [0.12,0.59,0.96]; end  % color to use, def
 if ~isfield(opts,'f_text'); opts.f_text = 1; end  % whether or not to label aggregates with numbers
 if ~isfield(opts,'f_show'); opts.f_show = 0; end  % whether to show images if just saving
 if ~isfield(opts,'f_dp'); opts.f_dp = 1; end  % whether to show images if just saving
+if ~isfield(opts,'f_scale'); opts.f_scale = 0; end  % whether to show scale bar
 %-------------------------------------------------------------------------%
 
 
@@ -81,9 +82,13 @@ for ii=1:n_img % loop through images
         for aa=idx_agg
             img_binary = or(img_binary,Aggs(aa).binary);
         end
+        
+        % Determine if scale bar is to be added.
+        if opts.f_scale; pixsize = Aggs(idx1(1)).pixsize;
+        else; pixsize = []; end
 
         [~,~,i0] = tools.imshow_binary2( ...
-            Aggs(idx1(1)).image, img_binary, opts);
+            Aggs(idx1(1)).image, img_binary, pixsize, opts);
         
         % Add title.
         title(num2str(idx(ii)));

@@ -15,6 +15,7 @@ if isempty(boundary); boundary = 20; end  % percent boundary
 
 % Parse inputs.
 imgs_binary = {Aggs(idx).binary};
+pixsizes = [Aggs(idx).pixsize];
 
 imgs = {Aggs(~cellfun(@isempty, {Aggs.image})).image};
 imgs = imgs([Aggs(idx).img_id]);
@@ -42,9 +43,9 @@ for ii=1:length(imgs_binary)
 end
 
 if f_plot == 1
-    tools.imshow_binary2(imgs, imgs_binary);
+    tools.imshow_binary2(imgs, imgs_binary, pixsizes);
 elseif f_plot == 2
-    tools.imshow2(imgs);
+    tools.imshow2(imgs, [], [], pixsizes);
 end
 
 end

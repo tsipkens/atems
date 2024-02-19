@@ -3,7 +3,7 @@
 % Author: Timothy Sipkens, 2019-07-24
 %=========================================================================%
 
-function [h,f,i0] = imshow_binary2(imgs, imgs_binary, varargin)
+function [h,f,i0] = imshow_binary2(imgs, imgs_binary, pixsizes, varargin)
 
 %-- Parse inputs ---------------------------------------------------------%
 % Convert images to cells, if they are not already.
@@ -15,6 +15,8 @@ if length(imgs)>24 % only plot up to 24 images
     imgs_binary = imgs_binary(1:24);
 end
 n_imgs = length(imgs); % number of images
+
+if ~exist('pixsizes', 'var'); pixsizes = []; end
 %-------------------------------------------------------------------------%
 
 
@@ -34,7 +36,13 @@ for ii=1:n_imgs % loop over images
         title(num2str(ii));
     end
     
-    [~, i1] = tools.imshow_binary(imgs{ii}, imgs_binary{ii}, varargin{:});
+    if isempty(pixsizes)
+        [~, i1] = tools.imshow_binary(...
+            imgs{ii}, imgs_binary{ii}, [], varargin{:});
+    else
+        [~, i1] = tools.imshow_binary(...
+            imgs{ii}, imgs_binary{ii}, pixsizes(ii), varargin{:});
+    end
     
     if ii==1
         if nargout>0; h = gca; end  % organize outputs
