@@ -62,7 +62,7 @@ git submodule init
 
 The submodule is not necessary for any of the scripts or methods included with this code. 
 
-Additional dependencies are required for use of the **[carboseg](https://github.com/tsipkens/atems/tree/master/carboseg)** or convolutional neureal network component of this program, including a copy of Python. See the appropriate [section below](#+-carboseg-and-cnn-segmentation) for more information. 
+Additional dependencies are required for use of the **[carboseg](https://github.com/tsipkens/atems/tree/master/carboseg)** or convolutional neural network component of this program, including a copy of Python. See the appropriate [section below](#+-carboseg-and-cnn-segmentation) for more information. 
 
 # B. Getting started
 
@@ -115,7 +115,7 @@ on the MATLAB command line for more information on that function.
 The next step is to evaluate binary masks that separate the image into pixels that are part of the background and pixels that are part of aggregates. This is done using the functions in the **+agg** package. For example, a *k*-means classifier can be used by calling:
 
 ```Matlab
-imgs_binary = agg.seg_kmeans(imgs, pixsizes, opts);
+imgs_binary = agg.seg_kmeans(imgs, pixsizes);
     % segment aggregates
 ```
 
@@ -175,7 +175,7 @@ Code associated with this example is given in the script **main_b.m**. The outpu
 
 # C. Components
 
-This section provides details of the overall structure of this codebase and the methods available for characterization of soot aggregates in TEM images. 
+This section provides details of the overall structure of this codebase and the methods available for the characterization of soot aggregates in TEM images. 
 
 ## 1. MAIN SCRIPTS (main_\*): Testing the codebase
 
