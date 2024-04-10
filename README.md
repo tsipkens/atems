@@ -64,6 +64,8 @@ The submodule is not necessary for any of the scripts or methods included with t
 
 Additional dependencies are required for use of the **[carboseg](https://github.com/tsipkens/atems/tree/master/carboseg)** or convolutional neural network component of this program, including a copy of Python. See the appropriate [section below](#+-carboseg-and-cnn-segmentation) for more information. 
 
+This code has been tested on Windows. Linux users may have some issues with loading images when supplying a string to `tools.load_imgs(...)`.
+
 # B. Getting started
 
 The overall structure of scripts associated with this code can be broken down into three steps. 
