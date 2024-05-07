@@ -185,7 +185,7 @@ if strcmp(choice,'Yes, but refine')
         'Remove particles','More particles or add to existing particles');
     
     % If more particles, set moreaggs = 1, which will skip ahead to Line 131
-    if strcmp(choice2, 'More particles or add to existing particles')
+    if strcmp(choice2, 'Interactive tool to adjust thresholding')
         moreaggs = 1;
         
     % If particles to remove, use the bwselect utility.
