@@ -234,17 +234,17 @@ This `seg_carboseg(...)` function employs Python to implement a convolutional ne
 Details on the setup and use of this component are given in the [README](carboseg/README.md) in the **carboseg** subfolder. Two options exist for interacting with the Python code: (1) initializing an instance of Python directly in MATLAB or (2) a multi-step procedure of exporting and reimporting images. 
 
 
-### + **seg_otsu_rb\*** / Otsu thresholding
+### + **seg_otsu\*** / Otsu thresholding
 
 These automated methods apply Otsu thresholding followed by a rolling ball transformation. Two versions of this function are included. 
 
-**A.** The `agg.seg_otsu_rb_orig(...)` function remains more true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. For the sample images, this often results in fragmented segmentations, e.g., 
+**A.** The `agg.seg_otsu_orig(...)` function remains more true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. For the sample images, this often results in fragmented segmentations, e.g., 
 
 ![rb_orig](docs/otsu_rb_orig.png)
 
 As the technique may be insufficient on its own, this implementation can be complimented with `agg.seg_slider(...)`, described [below](#-seg_slider_orig--gui-based-slider-method), to fill in the gaps between the aggregates and add missing aggregates. 
 
-**B.** Stemming from the deficiencies of the above function, the `agg.seg_otsu_rb(...)` function updates the above implementation by (*i*) not immediately removing boundary aggregates, (*ii*) adding a background subtraction step using the `agg.bg_subtract(...)` function, and (*iii*) adding a bilateral denoising step. This results in the following segmentations.
+**B.** Stemming from the deficiencies of the above function, the `agg.seg_otsu(...)` function updates the above implementation by (*i*) not immediately removing boundary aggregates, (*ii*) adding a background subtraction step using the `agg.bg_subtract(...)` function, and (*iii*) adding a bilateral denoising step. This results in the following segmentations.
 
 ![otsu_rb](docs/otsu_rb.png)
 
