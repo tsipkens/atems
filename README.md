@@ -43,13 +43,13 @@ This code also includes a set of utility functions in the **+tools** package and
 
 # A. Dependencies
 
-This software was tested using MATLAB 2020a (though most functions have been validated against older versions) and depends on the following MATLAB toolboxes: 
+This software was tested using MATLAB 2022a (though most functions have been validated against older versions). The current code depends on the following MATLAB toolboxes: 
 
 1. the curve fitting toolbox, 
 2. the financial toolbox, 
 3. the image toolbox, 
 4. the optimization toolbox, and 
-6. the video and image blockset (in the computer vision toolbox, which is used for OCR). 
+5. the video and image blockset (in the computer vision toolbox, which is used for OCR). 
 
 If not already installed, these packages can be added to MATLAB via the instructions available on [MATLAB's website](https://www.mathworks.com/help/matlab/matlab_env/get-add-ons.html). 
 
@@ -64,7 +64,7 @@ The submodule is not necessary for any of the scripts or methods included with t
 
 Additional dependencies are required for use of the **[carboseg](https://github.com/tsipkens/atems/tree/master/carboseg)** or convolutional neural network component of this program, including a copy of Python. See the appropriate [section below](#+-carboseg-and-cnn-segmentation) for more information. 
 
-This code has been tested on Windows. Linux users may have some issues with loading images when supplying a string to `tools.load_imgs(...)`.
+This code has been tested on Windows 10+. Linux users may have some issues with loading images when supplying a string to `tools.load_imgs(...)` (for example, because of differences in file separator). macOS users may encounter similar issues, including in writing aggregate structures to JSON files and in certain plotting functions. 
 
 # B. Getting started
 
@@ -234,17 +234,17 @@ This `seg_carboseg(...)` function employs Python to implement a convolutional ne
 Details on the setup and use of this component are given in the [README](carboseg/README.md) in the **carboseg** subfolder. Two options exist for interacting with the Python code: (1) initializing an instance of Python directly in MATLAB or (2) a multi-step procedure of exporting and reimporting images. 
 
 
-### + **seg_otsu_rb\*** / Otsu thresholding
+### + **seg_otsu\*** / Otsu thresholding
 
 These automated methods apply Otsu thresholding followed by a rolling ball transformation. Two versions of this function are included. 
 
-**A.** The `agg.seg_otsu_rb_orig(...)` function remains more true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. For the sample images, this often results in fragmented segmentations, e.g., 
+**A.** The `agg.seg_otsu_orig(...)` function remains more true to the original code of [Dastanpour et al. (2016)][dastanpour2016]. For the sample images, this often results in fragmented segmentations, e.g., 
 
 ![rb_orig](docs/otsu_rb_orig.png)
 
 As the technique may be insufficient on its own, this implementation can be complimented with `agg.seg_slider(...)`, described [below](#-seg_slider_orig--gui-based-slider-method), to fill in the gaps between the aggregates and add missing aggregates. 
 
-**B.** Stemming from the deficiencies of the above function, the `agg.seg_otsu_rb(...)` function updates the above implementation by (*i*) not immediately removing boundary aggregates, (*ii*) adding a background subtraction step using the `agg.bg_subtract(...)` function, and (*iii*) adding a bilateral denoising step. This results in the following segmentations.
+**B.** Stemming from the deficiencies of the above function, the `agg.seg_otsu(...)` function updates the above implementation by (*i*) not immediately removing boundary aggregates, (*ii*) adding a background subtraction step using the `agg.bg_subtract(...)` function, and (*iii*) adding a bilateral denoising step. This results in the following segmentations.
 
 ![otsu_rb](docs/otsu_rb.png)
 
@@ -294,11 +294,11 @@ Among the changes to the original EDM-SBS code, this implementation also applies
 
 ### + **kook\*** / Hough transform
 
-Two `pp.kook*(...)` functions are included with this program, which fit circles to features in the image using the Hough transform and the pre-processing steps described by [Kook et al. (2015)][kook]. 
+Two `pp.hough_kook**(...)` functions are included with this program, which fit circles to features in the image using the Hough transform and the pre-processing steps described by [Kook et al. (2015)][kook]. 
 
-The first function, `pp.kook(...)`, contains a copy of the code provided by [Kook et al. (2015)][kook], with minor modifications to match the input/output of some of the other packages — namely to take a single image, `img`, and a pixel size, `pixsize` — and to output a `Pp` structure, which contains information for each circle. Note that the original function acts on images without trying to assign primary particles to an aggregate, something resolved in the second function below. This causes some compatibility issues in terms of comparing the output from this function to the other methods contained in this program. 
+The first function, `pp.hough_kook*(...)`, contains a copy of the code provided by [Kook et al. (2015)][kook], with minor modifications to match the input/output of some of the other packages — namely to take a single image, `img`, and a pixel size, `pixsize` — and to output a `Pp` structure, which contains information for each circle. Note that the original function acts on images without trying to assign primary particles to an aggregate, something resolved in the second function below. This causes some compatibility issues in terms of comparing the output from this function to the other methods contained in this program. 
 
-The `pp.kook2(...)` function contains a modified version of the method proposed by [Kook et al. (2015)][kook] that excludes circles in the background and assigns primary particles to aggregates. This is done rather simply:  by checking if the center of the circles from the preceding procedure lie within the binary for a given aggregate. A sample output is as follows. 
+The `pp.hough_kook2(...)` function contains a modified version of the method proposed by [Kook et al. (2015)][kook] that excludes circles in the background and assigns primary particles to aggregates. This is done rather simply:  by checking if the center of the circles from the preceding procedure lie within the binary for a given aggregate. A sample output is as follows. 
 
 ![kook2](docs/kook2.png)
 
