@@ -43,13 +43,13 @@ This code also includes a set of utility functions in the **+tools** package and
 
 # A. Dependencies
 
-This software was tested using MATLAB 2020a (though most functions have been validated against older versions) and depends on the following MATLAB toolboxes: 
+This software was tested using MATLAB 2022a (though most functions have been validated against older versions). The current code depends on the following MATLAB toolboxes: 
 
 1. the curve fitting toolbox, 
 2. the financial toolbox, 
 3. the image toolbox, 
 4. the optimization toolbox, and 
-6. the video and image blockset (in the computer vision toolbox, which is used for OCR). 
+5. the video and image blockset (in the computer vision toolbox, which is used for OCR). 
 
 If not already installed, these packages can be added to MATLAB via the instructions available on [MATLAB's website](https://www.mathworks.com/help/matlab/matlab_env/get-add-ons.html). 
 
@@ -64,7 +64,7 @@ The submodule is not necessary for any of the scripts or methods included with t
 
 Additional dependencies are required for use of the **[carboseg](https://github.com/tsipkens/atems/tree/master/carboseg)** or convolutional neural network component of this program, including a copy of Python. See the appropriate [section below](#+-carboseg-and-cnn-segmentation) for more information. 
 
-This code has been tested on Windows. Linux users may have some issues with loading images when supplying a string to `tools.load_imgs(...)`.
+This code has been tested on Windows 10+. Linux users may have some issues with loading images when supplying a string to `tools.load_imgs(...)`.
 
 # B. Getting started
 
