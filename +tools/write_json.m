@@ -1,4 +1,10 @@
 
+% WRITE_JSON  Used to write structures for JSON files. 
+%  
+%  NOTE: There is a known issue on Mac systems where logicals cannot be
+%  written to the files. Omit the corresponding fields for those cases. 
+%  
+%  AUTHOR: Timothy Sipkens
 
 function [t2,t0] = write_json(var, fname)
 
