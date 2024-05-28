@@ -67,7 +67,7 @@ This code has been used in a number of studies in the literature. This code was 
 
 # Acknowledgements
 
-We wish to acknowledge related code released in association with some of the cited work. These including Matlab code provided in @kook2016 and [SciLab code](https://www.coria.fr/en/edm-sbs-automated-analysis-of-tem-images/) released in association with @bescond2014. The code from @altenhoff2020 was provided by the authors and adapted to the present format. 
+We wish to acknowledge related code released in association with some of the cited work. These include Matlab code provided in @kook2016 and [SciLab code](https://www.coria.fr/en/edm-sbs-automated-analysis-of-tem-images/) released in association with @bescond2014. The code from @altenhoff2020 was provided by the authors and adapted to the present format. 
 
 We also wish to acknowledge funding by the Canadian Council of the Arts (Killam Fellowship), the Natural Sciences and Engineering Research Council of Canada (NSERC), and Transport Canada. 
 
