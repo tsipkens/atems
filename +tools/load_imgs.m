@@ -251,14 +251,22 @@ for jj=1:length(Imgs)
                 pixpick = pixsize_end - 2;  % initialize two before end
                 if pixpick < 3; pixsize_start = 1; end  % then just select all text and continue
 
-                while and(isempty(pixsize_start), pixpick > 0)
+                while isempty(pixsize_start)
                     if isnan(str2double(o1.Text(pixpick))) &&...
                             (o1.Text(pixpick - 2) == ' ') ||...
-                            (o1.Text(pixpick - 2) == newline)  % search for newline or space
+                            (o1.Text(pixpick - 2) == newline)  % search for newline or space 
                             pixsize_start = pixpick - 1;
                             break;
                     end
                     pixpick = pixpick - 1;
+                    
+                    % If all the way to the beginning of the string. 
+                    % Assing pixsize_start to initial character. 
+                    % While loop will automatically break afterwards. 
+                    if pixpick == 2
+                        pixsize_start = 1;
+                        break;
+                    end
                 end
             end
             
@@ -278,6 +286,7 @@ for jj=1:length(Imgs)
                 o1_num = strrep(o1_num, 'T', '1');
                 o1_num = strrep(o1_num, ' ', '');
                 o1_num = strrep(o1_num, '_', '');
+                o1_num = strrep(o1_num, '-', '');
             end
             
             % Convert to a number.
