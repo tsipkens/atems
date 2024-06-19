@@ -251,7 +251,7 @@ for jj=1:length(Imgs)
                 pixpick = pixsize_end - 2;  % initialize two before end
                 if pixpick < 3; pixsize_start = 1; end  % then just select all text and continue
 
-                while isempty(pixsize_start)
+                while and(isempty(pixsize_start), pixpick > 0)
                     if isnan(str2double(o1.Text(pixpick))) &&...
                             (o1.Text(pixpick - 2) == ' ') ||...
                             (o1.Text(pixpick - 2) == newline)  % search for newline or space 
