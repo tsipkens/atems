@@ -10,7 +10,7 @@
 %  the input string, FD. For example, the sample images can be loaded using
 %  IMGS = load_imgs('images'). 
 %  
-%  IMGS = load_imgs(FD,N) loads the images specified by array N. By
+%  IMGS = load_imgs(FD, N) loads the images specified by array N. By
 %  default, N spans 1 to the number of images in the given folder. For
 %  example, the 2nd and 3rd images can be loaded using N = [2,3]. This
 %  allows for partial loading of larger data sets for batch processing. 
@@ -95,13 +95,18 @@ Imgs.fname = ''; % initialize image reference structure
 
 %-- Get file information -------------------------------------------------%
 while flag == 0
-    dir_start = 'images'; % initial directory to look for images
+    dir_start = 'images';  % initial directory to look for images
     
     % Browse or get file information.
-    if isempty(fd) % if no folder, user browses for images (tif,jpg)
+    if isempty(fd)  % if no folder, user browses for images (tif,jpg)
         [fname, folder] = uigetfile({'*.tif;*.jpg;*.png', 'TEM image (*.tif;*.jpg)'}, ...
             'Select Images', dir_start, 'MultiSelect', 'on');
-    else % if folder is given, get all tif files in the folder
+
+    elseif isfile(fd)  % then a single filename is given
+        [folder, fname, ext] = fileparts(fd);
+        fname = [fname, ext];
+
+    else  % if folder is given, get all tif files in the folder
         t0 = [ ...  % pattern to match filenames
             dir(fullfile(fd,'*.tif')), ...  % get TIF
             dir(fullfile(fd,'*.png')), ...  % get PNG
@@ -111,15 +116,15 @@ while flag == 0
     end
     
     % Format file information for output
-    if iscell(fname) % handle a cell array of files
+    if iscell(fname)  % handle a cell array of files
         flag = 1;
         for ii=length(fname):-1:1
             Imgs(ii).fname = fname{ii};
             Imgs(ii).folder = [folder, filesep];
         end
-    elseif Imgs.fname==0 % handle when no image was selected
+    elseif Imgs.fname==0  % handle when no image was selected
         error('No image selected.');
-    else % handle when only one image is selected
+    else  % handle when only one image is selected
         Imgs.fname = fname;
         Imgs.folder = [folder, filesep];
         flag = 1;

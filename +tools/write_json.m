@@ -1,9 +1,20 @@
 
+% WRITE_JSON  Used to write structures for JSON files. 
+%  NOTE: Saving large aggregate structures can be slow.
+%  
+%  AUTHOR: Timothy Sipkens
 
 function [t2,t0] = write_json(var, fname)
 
 fid = fopen(fname,'wt'); % open file, overwriting previous text
 
+% Binary field of Aggs structure is sparse logical. 
+% Convert of logical, as sparse structure cannot be stored. 
+if isfield(var, 'binary')
+    for ii=1:length(var)
+        var(ii).binary = full(var(ii).binary);
+    end
+end
 
 %-- Encode json ----------------------------------------------------------%
 t0 = jsonencode(var); % generate json text using built-in function

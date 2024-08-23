@@ -181,11 +181,11 @@ choice = questdlg(['Satisfied with automatic aggregate detection? ',...
 moreaggs = 0; % default, returned if 'Yes' is chosen
 if strcmp(choice,'Yes, but refine')
     choice2 = questdlg('How do you want to refine aggregate detection?',...
-        'agg detection','More particles or add to existing particles', ...
+        'agg detection','Interactive tool to adjust thresholding', ...
         'Remove particles','More particles or add to existing particles');
     
     % If more particles, set moreaggs = 1, which will skip ahead to Line 131
-    if strcmp(choice2, 'More particles or add to existing particles')
+    if strcmp(choice2, 'Interactive tool to adjust thresholding')
         moreaggs = 1;
         
     % If particles to remove, use the bwselect utility.
