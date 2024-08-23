@@ -28,6 +28,8 @@ if ~isfield(opts,'f_text'); opts.f_text = 1; end  % whether or not to label aggr
 if ~isfield(opts,'f_show'); opts.f_show = 0; end  % whether to show images if just saving
 if ~isfield(opts,'f_dp'); opts.f_dp = 1; end  % whether to show images if just saving
 if ~isfield(opts,'f_scale'); opts.f_scale = 0; end  % whether to show scale bar
+if ~isfield(opts,'f_diam'); opts.f_diam = 1; end  % whether to plot diameters
+if ~isfield(opts,'f_all'); opts.f_all = 1; end  % whether to plot all aggregates in image
 %-------------------------------------------------------------------------%
 
 
@@ -56,14 +58,14 @@ end
 
 if n_img>1; tools.textheader('Plotting aggregates');
     disp(' Resolving images:'); tools.textbar([0, n_img]); end
-for ii=1:n_img % loop through images
+for ii=1:n_img  % loop through images
     
-    if and(n_img>1, nargout<2) % if more than one image, prepare to tile
+    if and(n_img>1, nargout<2)  % if more than one image, prepare to tile
         h = subplot(N1, N2, ii);
     end
     
     %-- Determine which aggregates to plot for this image ----------------%
-    idx0 = [Aggs.img_id]==idx(ii);
+    idx0 = [Aggs.img_id] == idx(ii);
     idx_agg = 1:length(Aggs);
     idx_agg = idx_agg(idx0);
 
@@ -79,8 +81,10 @@ for ii=1:n_img % loop through images
         end
         
         img_binary = zeros(size(Aggs(idx_agg(1)).image));
+        
+        % Add mask for all aggregates in the image.
         for aa=idx_agg
-            img_binary = or(img_binary,Aggs(aa).binary);
+            img_binary = or(img_binary, Aggs(aa).binary);
         end
         
         % Determine if scale bar is to be added.
@@ -118,17 +122,19 @@ for ii=1:n_img % loop through images
             text(Aggs(aa).center_mass(2) + 20, Aggs(aa).center_mass(1), ...
                 num2str(Aggs(aa).id), 'Color', [0,0,0]);
         end
-
-        % Plot radius of gyration on plot.
-        viscircles(fliplr(Aggs(aa).center_mass'),...
-            Aggs(aa).Rg ./ Aggs(aa).pixsize, ... % / pixsize converts to pixel units
-            'EnhanceVisibility', false, 'Color', opts.cmap);
-
-        % Plot area-equivalent diameter.
-        viscircles(fliplr(Aggs(aa).center_mass'),...
-            Aggs(aa).da ./ 2 ./ Aggs(aa).pixsize, ...
-            'EnhanceVisibility', false, 'Color', opts.cmap .* (1/4), ...
-            'LineWidth', 1);
+        
+        if opts.f_diam
+            % Plot radius of gyration on plot.
+            viscircles(fliplr(Aggs(aa).center_mass'),...
+                Aggs(aa).Rg ./ Aggs(aa).pixsize, ... % / pixsize converts to pixel units
+                'EnhanceVisibility', false, 'Color', opts.cmap);
+    
+            % Plot area-equivalent diameter.
+            viscircles(fliplr(Aggs(aa).center_mass'),...
+                Aggs(aa).da ./ 2 ./ Aggs(aa).pixsize, ...
+                'EnhanceVisibility', false, 'Color', opts.cmap .* (1/4), ...
+                'LineWidth', 1);
+        end
 
         % Plot primary particle diameter from PCM if available.
         if opts.f_dp
