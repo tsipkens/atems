@@ -104,6 +104,7 @@ while flag == 0
     else % if folder is given, get all tif files in the folder
         t0 = [ ...  % pattern to match filenames
             dir(fullfile(fd,'*.tif')), ...  % get TIF
+            dir(fullfile(fd,'*.png')), ...  % get PNG
             dir(fullfile(fd,'*.jpg'))];  % get JPG
         fname = {t0.name};
         folder = t0(1).folder;
@@ -199,6 +200,8 @@ for jj=1:length(Imgs)
                 ar = ar(:,3) ./ ar(:,4);  % arrive at aspect ratio
                 [~, ar_max] = max(ar);
                 rp_bb = floor(rp(ar_max).BoundingBox);
+                rp_bb(1) = max(rp_bb(1), 1);
+                rp_bb(2) = max(rp_bb(2), 1);
     
                 footer_nobar = footer;
                 footer_nobar(rp_bb(2):rp_bb(2)+rp_bb(4), ...
