@@ -187,18 +187,54 @@ for ii=1:length(imgs_binary) % loop through provided images
         % 'autocrop' method included below.
         [~, ~, Aggs0(jj).rect] = autocrop(img, img_binary);
             
-        
+        % Add cyop here to speed code? 
         
         %== Compute aggregate dimensions/parameters ======================%
         SE = strel('disk', 1);
         img_dilated = imdilate(img_binary,SE);
         img_edge = img_dilated - img_binary;
+
+        img_erode = imerode(...  % erode one pixel after filling holes
+            imfill(img_binary, 'holes'), SE);
+        img_edge_in = img_binary - img_erode;  % internal edge
         
-        [row, col] = find(imcrop(full(Aggs0(jj).binary), Aggs0(jj).rect));
+        [row, col] = find(img_edge_in);  % use internal edge and find max/min-difference
+        if length(row) > 2e3  % downsample to avoid memory issues/improve speed
+            ri = randi(length(row), [2e3,1]);
+            row = row(ri);
+            col = col(ri);
+        end
+
+        % Aspect ratio in x-y space as imaged. 
         Aggs0(jj).length = max((max(row)-min(row)), (max(col)-min(col))) * pixsize(ii);
         Aggs0(jj).width = min((max(row)-min(row)), (max(col)-min(col))) * pixsize(ii);
-        Aggs0(jj).aspect_ratio = Aggs0(jj).length / Aggs0(jj).width;
+        Aggs0(jj).aspect_ratio0 = Aggs0(jj).length / Aggs0(jj).width;
         
+        % Aspect ratio, allowing for rotation.
+        d = sqrt((row - row') .^ 2 + (col - col') .^ 2);  % distances in boundary
+        [dmax, idx1] = max(d);  % max in first dimension
+        [dmax, idx2] = max(dmax);  idx1 = idx1(idx2);  % max in second dimension
+        Aggs0(jj).lmax = dmax * pixsize(ii);
+        
+        dy = col(idx2) - col(idx1);  % change in y along primary dim.
+        dx = row(idx2) - row(idx1);  % change in x along primary dim.
+        d = (dy .* row - dx .* col) ./ sqrt(dx .^ 2 + dy .^ 2);  % distance to line
+        dd = max(d) - min(d);
+        Aggs0(jj).lmin = dd * pixsize(ii);
+
+        Aggs0(jj).aspect_ratio = Aggs0(jj).lmax / Aggs0(jj).lmin;
+        
+        %{
+        % Debug plot.
+        imshow(~img_binary);  axis on;  axis image;
+        [~, idx3] = max(d);  [~, idx4] = min(d);
+        hold on;
+        plot([col(idx1), col(idx2)], [row(idx1), row(idx2)], 'ro-');
+        plot([col(idx3), col(idx4)], [row(idx3), row(idx4)], 'ro');
+        hold off;
+        %}
+        
+        % Equivalent diameters.
         Aggs0(jj).num_pixels = nnz(img_binary); % number of non-zero pixels
         Aggs0(jj).da = ((Aggs0(jj).num_pixels/pi)^.5) * ...
             2 * pixsize(ii); % area-equialent diameter [nm]
@@ -207,14 +243,27 @@ for ii=1:length(imgs_binary) % loop through provided images
         Aggs0(jj).Rg = gyration(img_binary, pixsize(ii)); % calculate radius of gyration [nm]
         
         %-- Perimeter --%
-        perimeter1 = pixsize(ii)* sum(sum(img_edge~=0)); % calculate aggregate perimeter
-        perimeter2 = pixsize(ii) * sum(sum(bwperim(img_binary)));
-        perimeter3 = pixsize(ii) * get_perimeter2(img_edge);  % edge midpoint connected perimeter
-        Aggs0(jj).perimeter = max(perimeter2, perimeter3);
+        perimeter1 = sum(sum(img_edge~=0)); % calculate aggregate perimeter
+        perimeter2 = sum(sum(bwperim(img_binary)));
+        perimeter3 = get_perimeter2(img_edge);  % edge midpoint connected perimeter
+        Aggs0(jj).perimeter = pixsize(ii) * max(perimeter2, perimeter3);
 
-        %-- Circularity --%
+        %-- Compactness / circularity --%
         %   The degree of being far from a circle (1: circle, 0: straight line).
         Aggs0(jj).circularity = 4 * pi * Aggs0(jj).area / (Aggs0(jj).perimeter ^ 2);  % circularity
+        Aggs0(jj).compact_b = Aggs0(jj).area / (pi * (Aggs0(jj).lmax / 2) ^ 2);
+
+        n = nnz(img_binary);
+        p = sum(sum(abs(img_binary(2:end, :) - img_binary(1:end-1, :)))) + ...  % vertical edges
+            sum(sum(abs(img_binary(:, 2:end) - img_binary(:, 1:end-1))));  % hori
+        Ld = (4 * nnz(img_binary) - p) / 2;
+        Ldmin = n - 1;
+        Ldmax = 2 * (n - sqrt(n));
+        Aggs0(jj).compact = (Ld - Ldmin) / (Ldmax - Ldmin);
+
+        %-- Texture --%
+        img_e = entropyfilt(img, true(25));
+        Aggs0(jj).entropy = mean(img(img_binary == 1));
         
         %-- Gradient and sharpness --%
         bw = 5;  % bandwith on border to gather pixels
@@ -224,7 +273,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         [grad, ds] = binner(img_binary, grad);
         Aggs0(jj).sharp = log10(mean(grad(ds <= bw))) - ...
             log10(mean((grad(ds > bw) + eps)));  % "+eps" avoids div. by zero
-
+        
         %-- Optical depth --%
         agg_grayscale = double(img(Aggs0(jj).binary));  % the selected agg's grayscale pixel values
         gray_extent = double(max(max(max(img)), 1) - min(min(img)));
@@ -236,7 +285,7 @@ for ii=1:length(imgs_binary) % loop through provided images
         
         if f_plot==1
             if mod(jj, 10) == 0  % show image after every 10 aggregates processed
-                set(groot,'CurrentFigure',f0); tools.imshow_agg(Aggs0, ii, 0); title(num2str(ii)); drawnow;
+                set(groot,'CurrentFigure',f0); tools.imshow_agg(Aggs0, jj, 0); title(num2str(ii)); drawnow;
             end
         end
     end
@@ -291,7 +340,7 @@ end
 %== AUTOCROP =============================================================%
 %   Automatically crops an image based on binary information
 %   AUTHOR:  Yeshun (Samuel) Ma, Timothy Sipkens, 2019-07-23
-function [img_cropped,img_binary,rect] = autocrop(img_orig, img_binary)
+function [img_cropped, img_binary, rect] = autocrop(img_orig, img_binary)
 
 [x,y] = find(img_binary);
 
@@ -325,32 +374,23 @@ n_mb = length(mb{1});
  
 x_mb = mb{1}(:,2);
 y_mb = mb{1}(:,1);
-edges_mb = ones(n_mb,1);
 
 % [x_mb, y_mb] = poly2cw(x_mb, y_mb);
 
 % Compile and group edges.
-edges = 1;
-for i = 2 : n_mb
-    if (x_mb(i) ~= x_mb(i-1)) && (y_mb(i) ~= y_mb(i-1))  % flag an angle transition
-        edges = edges + 1;  % found a new edge
-    end
-    edges_mb(i) = edges;
-end
+edges_mb = cumsum([1; ...
+    and(x_mb(2:end) ~= x_mb(1:end-1), y_mb(2:end) ~= y_mb(1:end-1))]);
 
 % Connect last pixel back to the first pixel. 
 if (x_mb(1) == x_mb(end)) || (y_mb(1) == y_mb(end))
     edges_mb(edges_mb == edges_mb(end)) = 1;
 end
 
-% Loop through edges and get midpoints. 
-nn_mb = max(edges_mb);
-xx_mb = zeros(nn_mb,1);
-yy_mb = zeros(nn_mb,1);
-for ii = 1:nn_mb
-    xx_mb(ii) = mean(x_mb(edges_mb == ii));
-    yy_mb(ii) = mean(y_mb(edges_mb == ii));
-end
+% Get midpoints of lines. 
+xx_mb = accumarray(edges_mb, x_mb) ./ ...
+    accumarray(edges_mb, ones(size(x_mb)));
+yy_mb = accumarray(edges_mb, y_mb) ./ ...
+    accumarray(edges_mb, ones(size(y_mb)));
 
 % Calculate perimeter by connecting midpoints. 
 p_circ = sum(sqrt((xx_mb(1:end) - xx_mb([2:end,1])).^2 + ...
@@ -363,7 +403,7 @@ end
 
 
 %== BINNER ===============================================================%
-%   Bin the pixels from the boundary inwards and the report a quantity as a
+%   Bin the pixels from the boundary inwards and report a quantity as a
 %   function of those bins. Note that statistics will be poor in the center
 %   of the particle do to a limit number of pixels. 
 %   
