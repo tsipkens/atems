@@ -174,3 +174,7 @@ cython_debug/
 carboseg/FPN-resnet50-imagenet.onnx
 +agg/config/km.v6.1s2.json
 docs/paper/instructions.txt
+images/PCMOutput/201805A_A6_004.TIF
+images/PCMOutput/Case1_E7_025.TIF
+images/PCMOutput/PCM_data.mat
+images/PCMOutput/PCM_Output.xls

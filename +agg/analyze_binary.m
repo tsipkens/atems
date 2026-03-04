@@ -33,10 +33,13 @@
 %  AGGS = analyze_binary(IMGS_BINARY,PIXSIZE,IMGS,FNAME,F_EDGES,F_PLOT) 
 %  adds a flag of whether to plot the results as they are computed.
 % 
+%  AGGS = analyze_binary(IMGS_BINARY,PIXSIZE,IMGS,FNAME,F_EDGES,F_ADV) 
+%  adds an input for advanced calculations. Omitted for speed. 
+% 
 %  AUTHOR: Timothy Sipkens, 2019-11-26
 
 function [Aggs] = analyze_binary(imgs_binary, pixsize, ...
-    imgs, fname, f_edges, f_plot, maxagg)
+    imgs, fname, f_edges, f_plot, maxagg, f_adv)
 
 %-- Parse inputs ---------------------------------------------------------%
 if isstruct(imgs_binary) % consider case that structure is given as input
@@ -77,6 +80,10 @@ if isempty(f_plot); f_plot = 1; end
 % Flag for whether to show progress in a figure.
 if ~exist('maxagg','var'); maxagg = []; end
 if isempty(maxagg); maxagg = 50; end
+
+% Flag for whether to show progress in a figure.
+if ~exist('f_adv','var'); f_adv = []; end
+if isempty(f_adv); f_adv = 0; end
 %-------------------------------------------------------------------------%
 
 
@@ -251,33 +258,36 @@ for ii=1:length(imgs_binary) % loop through provided images
         %-- Compactness / circularity --%
         %   The degree of being far from a circle (1: circle, 0: straight line).
         Aggs0(jj).circularity = 4 * pi * Aggs0(jj).area / (Aggs0(jj).perimeter ^ 2);  % circularity
-        Aggs0(jj).compact_b = Aggs0(jj).area / (pi * (Aggs0(jj).lmax / 2) ^ 2);
 
-        n = nnz(img_binary);
-        p = sum(sum(abs(img_binary(2:end, :) - img_binary(1:end-1, :)))) + ...  % vertical edges
-            sum(sum(abs(img_binary(:, 2:end) - img_binary(:, 1:end-1))));  % hori
-        Ld = (4 * nnz(img_binary) - p) / 2;
-        Ldmin = n - 1;
-        Ldmax = 2 * (n - sqrt(n));
-        Aggs0(jj).compact = (Ld - Ldmin) / (Ldmax - Ldmin);
-
-        %-- Texture --%
-        img_e = entropyfilt(img, true(25));
-        Aggs0(jj).entropy = mean(img(img_binary == 1));
-        
-        %-- Gradient and sharpness --%
-        bw = 5;  % bandwith on border to gather pixels
-        [gx, gy] = gradient(double(imgaussfilt(img, 3)));
-        grad = sqrt(gx.^2 + gy.^2);  % norm of gradient
-
-        [grad, ds] = binner(img_binary, grad);
-        Aggs0(jj).sharp = log10(mean(grad(ds <= bw))) - ...
-            log10(mean((grad(ds > bw) + eps)));  % "+eps" avoids div. by zero
-        
-        %-- Optical depth --%
-        agg_grayscale = double(img(Aggs0(jj).binary));  % the selected agg's grayscale pixel values
-        gray_extent = double(max(max(max(img)), 1) - min(min(img)));
-        Aggs0(jj).depth = -(mean(agg_grayscale) - bg_level) / 255;  % agg's optical depth metric (1: black, 0: white)
+        if f_adv
+            Aggs0(jj).compact_b = Aggs0(jj).area / (pi * (Aggs0(jj).lmax / 2) ^ 2);
+    
+            n = nnz(img_binary);
+            p = sum(sum(abs(img_binary(2:end, :) - img_binary(1:end-1, :)))) + ...  % vertical edges
+                sum(sum(abs(img_binary(:, 2:end) - img_binary(:, 1:end-1))));  % hori
+            Ld = (4 * nnz(img_binary) - p) / 2;
+            Ldmin = n - 1;
+            Ldmax = 2 * (n - sqrt(n));
+            Aggs0(jj).compact = (Ld - Ldmin) / (Ldmax - Ldmin);
+    
+            %-- Texture --%
+            img_e = entropyfilt(img, true(25));
+            Aggs0(jj).entropy = mean(img(img_binary == 1));
+            
+            %-- Gradient and sharpness --%
+            bw = 5;  % bandwith on border to gather pixels
+            [gx, gy] = gradient(double(imgaussfilt(img, 3)));
+            grad = sqrt(gx.^2 + gy.^2);  % norm of gradient
+    
+            [grad, ds] = binner(img_binary, grad);
+            Aggs0(jj).sharp = log10(mean(grad(ds <= bw))) - ...
+                log10(mean((grad(ds > bw) + eps)));  % "+eps" avoids div. by zero
+            
+            %-- Optical depth --%
+            agg_grayscale = double(img(Aggs0(jj).binary));  % the selected agg's grayscale pixel values
+            gray_extent = double(max(max(max(img)), 1) - min(min(img)));
+            Aggs0(jj).depth = -(mean(agg_grayscale) - bg_level) / 255;  % agg's optical depth metric (1: black, 0: white)
+        end
         
         %-- Center-of-mass --%
         [x, y] = find(img_binary ~= 0);
@@ -315,22 +325,17 @@ end
 %   Rg      Radius of gyration [nm]
 function [Rg] = gyration(img_binary, pixsize)
 
-
-total_area = nnz(img_binary)*pixsize^2;
+total_area = nnz(img_binary);
 
 [xpos,ypos] = find(img_binary);
 n_pix = size(xpos,1);
-Centroid.x = sum(xpos)/n_pix;
-Centroid.y = sum(ypos)/n_pix;
+centroid_x = sum(xpos)/n_pix;
+centroid_y = sum(ypos)/n_pix;
 
-Ar2 = zeros(n_pix,1);
+Ar2 = (xpos - centroid_x) .^ 2 + ...
+    (ypos - centroid_y) .^ 2;
 
-for kk = 1:n_pix
-    Ar2(kk,1) = (((xpos(kk,1)-Centroid.x)*pixsize)^2+...
-        ((ypos(kk,1)-Centroid.y)*pixsize)^2)*pixsize^2;
-end
-
-Rg = (sum(Ar2)/total_area)^0.5;
+Rg = (sum(Ar2)/total_area)^0.5 .*pixsize;
 
 end
 
