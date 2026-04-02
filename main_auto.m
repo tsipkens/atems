@@ -10,6 +10,11 @@ clc;
 
 [Imgs, imgs, pixsizes] = tools.load_imgs('images', 1); % load first image in 'images' folder
 
+% Check if images were loaded successfully
+if isempty(Imgs) || isempty(Imgs.fname)
+    error('No valid images found in the "images" folder. Please ensure the folder exists and contains valid image files.');
+end
+
 fname = {Imgs.fname};
 
 
