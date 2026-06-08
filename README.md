@@ -62,7 +62,7 @@ git submodule init
 
 The submodule is not necessary for any of the scripts or methods included with this code. 
 
-Additional dependencies are required for use of the **[carboseg](https://github.com/tsipkens/atems/tree/master/carboseg)** or convolutional neural network component of this program, including a copy of Python. See the appropriate [section below](#+-carboseg-and-cnn-segmentation) for more information. 
+Additional dependencies are required for use of the **[carboseg](https://github.com/tsipkens/atems/tree/master/carboseg)** or convolutional neural network component of this program, including a copy of Python. See the appropriate [section below](#+-carboseg-and-cnn-segmentation) for more information. The corresponding ONNX file is available **[here](https://github.com/maxfrei750/CarbonBlackSegmentation/releases/download/v1.0/FPN-resnet50-imagenet.onnx)**. 
 
 This code has been tested on Windows 10+. Linux users may have some issues with loading images when supplying a string to `tools.load_imgs(...)` (for example, because of differences in file separator). macOS users may encounter similar issues, including in writing aggregate structures to JSON files and in certain plotting functions. 
 
@@ -229,7 +229,7 @@ Though, the technique still occasionally fails, particularly if the function doe
 
 This `seg_carboseg(...)` function employs Python to implement a convolutional neural network (CNN) for segmentation as described by [Sipkens et al.][ptech.cnn] Details and code for the training of the network are available in a parallel repository at https://github.com/maxfrei750/CarbonBlackSegmentation, with primary contributions by Max Frei ([@maxfrei750](https://github.com/maxfrei750)). The implementation here makes use of the ONNX file output (to be downloaded [here](https://github.com/tsipkens/FPN-resnet50-imagenet)) from that procedure and employs the Python ONNX runtime for execution. Use of this function requires the necessary Python environment as a pre-requisite. 
 
-> We also note that, as of this writing, MATLAB does not support the necessary layers to import the ONNX as a native MATLAB object. 
+> We also note that, as of this writing, MATLAB does not support the necessary layers to import the ONNX as a native MATLAB object. The corresponding ONNX file is available **[here](https://github.com/maxfrei750/CarbonBlackSegmentation/releases/download/v1.0/FPN-resnet50-imagenet.onnx)**. 
 
 Details on the setup and use of this component are given in the [README](carboseg/README.md) in the **carboseg** subfolder. Two options exist for interacting with the Python code: (1) initializing an instance of Python directly in MATLAB or (2) a multi-step procedure of exporting and reimporting images. 
 
